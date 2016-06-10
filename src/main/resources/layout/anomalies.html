@@ -1,0 +1,177 @@
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>Anomalies</h1></br>
+		<div class="callout callout-warning">        
+			<p>Things that might not be 'quite right' about your database and schema</p>
+		</div>		
+      </section>
+      <!-- Main content -->
+      <section class="content">
+	  <div class="row">
+		<div class="col-md-6"> <!-- Implied Relationship -->
+			<div class="box box-success">
+				<div class="box-header with-border">
+				  <h3 class="box-title">Columns whose name and type imply a relationship to another table's primary key</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="implied_constraints" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Child Column</th>					  
+					  <th>Implied Parent Column</th>						  
+					</tr>
+					</thead>
+					<tbody>
+					{{#impliedConstraints}}				
+					<tr>
+					 <td><a href='tables/{{childTable.name}}.html'>{{childTable.name}}</a>.{{childColumns}}</td>
+					 <td><a href='tables/{{parentTable.name}}.html'>{{parentTable.name}}</a>.{{parentColumns}}</td>
+					</tr>				
+					{{/impliedConstraints}}				
+					{{^impliedConstraints}}
+					<tr><td colspan="3">Anomaly not detected</td></tr>
+					{{/impliedConstraints}}				
+					</tbody>
+					</table>				
+				</div>
+			</div>	
+		</div>	
+		<div class="col-md-6"> <!-- Tables without indexes -->
+			<div class="box box-danger">
+				<div class="box-header with-border">
+				  <h3 class="box-title">Tables without indexes</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="un_indexed_tables" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Table</th>
+					  {{#displayNumRows}}
+					  <th>Rows</th>		
+					  {{/displayNumRows}}				  
+					</tr>
+					</thead>
+					<tbody>
+					{{#unIndexedTables}}				
+					<tr>
+					 <td><a href='tables/{{name}}.html'>{{name}}</a></td>
+					 {{#displayNumRows}}
+					 <td>{{numRows}}</td>
+					 {{/displayNumRows}}
+					</tr>				
+					{{/unIndexedTables}}				
+					{{^unIndexedTables}}
+					<tr><td colspan="3">Anomaly not detected</td></tr>
+					{{/unIndexedTables}}				
+					</tbody>
+					</table>				
+				</div>
+			</div>			
+		</div>
+		<div class="col-md-6"> <!-- Tables that contain a single column -->
+			<div class="box box-info">
+				<div class="box-header with-border">
+				  <h3 class="box-title">Tables that contain a single column</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="un_indexed_tables" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Table</th>					  
+					  <th>Column</th>					  
+					</tr>
+					</thead>
+					<tbody>
+					{{#oneColumnTables}}				
+					<tr>
+					 <td><a href='tables/{{name}}.html'>{{name}}</a></td>
+					 <td>{{columns.get}}</td>					 
+					</tr>				
+					{{/oneColumnTables}}				
+					{{^oneColumnTables}}
+					<tr><td colspan="3">Anomaly not detected</td></tr>
+					{{/oneColumnTables}}				
+					</tbody>
+					</table>				
+				</div>
+			</div>			
+		</div>
+		<div class="col-md-6"> <!-- Tables with incrementing column names, potentially indicating denormalization -->
+			<div class="box box-danger">
+				<div class="box-header with-border">
+				  <h3 class="box-title">Tables with incrementing column names, potentially indicating denormalization</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="un_indexed_tables" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Table</th>				  
+					</tr>
+					</thead>
+					<tbody>
+					{{#incrementingColumnNames}}				
+					<tr>
+					 <td><a href='tables/{{name}}.html'>{{name}}</a></td>
+					</tr>				
+					{{/incrementingColumnNames}}				
+					{{^incrementingColumnNames}}
+					<tr><td colspan="3">Anomaly not detected</td></tr>
+					{{/incrementingColumnNames}}				
+					</tbody>
+					</table>				
+				</div>
+			</div>			
+		</div>	
+		<div class="col-md-6"> <!-- Columns whose default value is the word 'NULL' or 'null', but the SQL NULL value may have been intended -->
+			<div class="box box-primary">
+				<div class="box-header with-border">
+				  <h3 class="box-title" title="Columns whose default value is the word 'NULL' or 'null', but the SQL NULL value may have been intende">Columns whose default value is the word 'NULL' or 'null'</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="un_indexed_tables" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Table</th>				  
+					</tr>
+					</thead>
+					<tbody>
+					{{#uniqueNullables}}				
+					<tr>
+					 <td><a href='tables/{{table.name}}.html'>{{table.name}}</a>.{{name}}</td>
+					</tr>				
+					{{/uniqueNullables}}				
+					{{^uniqueNullables}}
+					<tr><td colspan="3">Anomaly not detected</td></tr>
+					{{/uniqueNullables}}				
+					</tbody>
+					</table>				
+				</div>
+			</div>			
+		</div>			
+	 </div>
+	 </section>

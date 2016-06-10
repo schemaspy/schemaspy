@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{{databaseName}} Database</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.5 -->
+  <link rel="stylesheet" href="{{rootPath}}bootstrap/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{{rootPath}}plugins/datatables/dataTables.bootstrap.css">  
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.1.2/css/buttons.bootstrap.min.css">  
+  <!-- Code Mirror -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/codemirror.min.css">  
+  
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{rootPath}}dist/css/AdminLTE.min.css">
+  <!-- Salvattore -->
+  <link rel="stylesheet" href="{{rootPath}}plugins/salvattore/salvattore.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="{{rootPath}}dist/css/skins/_all-skins.min.css">
+  <!-- SchemaSpy -->
+  <link rel="stylesheet" href="{{rootPath}}schemaSpy.css">
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="{{rootPath}}index.html" class="navbar-brand"><b>{{databaseName}}</b> Database</a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="{{rootPath}}index.html">Tables <span class="sr-only">(current)</span></a></li>            
+			<li><a href="{{rootPath}}columns.html" title="All of the columns in the schema">Columns</a></li>
+			<li><a href="{{rootPath}}constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">Constraints</a></li>
+			<li><a href="{{rootPath}}relationships.html" title="Diagram of table relationships">Relationships</a></li>
+			<li><a href="{{rootPath}}orphans.html" title="View of tables with neither parents nor children">Orphan&nbsp;Tables</a></li>				
+			<li><a href="{{rootPath}}anomalies.html" title="Things that might not be quite right">Anomalies</a></li>
+			<li><a href="http://sourceforge.net/donate/index.php?group_id=137197" title="Please help keep SchemaSpy alive" target="_blank">Donate</a></li>			
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Main content -->
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    {{{content}}}    
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div>
+      <div class="pull-right hidden-xs">
+		  <a href="http://sourceforge.net" target="_blank"><img src="http://sourceforge.net/sflogo.php?group_id=137197&amp;type=1" alt="SourceForge.net" border="0" height="31" width="88"></a>
+      </div>
+      <strong>Generate by <a href="http://schemaspy.sourceforge.net/">SchemeSpy</a></strong>
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 2.1.4 -->
+<script src="{{rootPath}}plugins/jQuery/jQuery-2.1.4.min.js"></script>
+<script src="{{rootPath}}plugins/jQueryUI/jquery-ui.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="{{rootPath}}bootstrap/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
+<script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.colVis.min.js"></script>
+
+<!-- SlimScroll -->
+<script src="{{rootPath}}plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="{{rootPath}}plugins/fastclick/fastclick.js"></script>
+<!-- Salvattore -->
+<script src="{{rootPath}}plugins/salvattore/salvattore.min.js"></script>
+<!-- CodeMirror -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/mode/sql/sql.min.js"></script>
+<!-- AdminLTE App -->
+<script src="{{rootPath}}dist/js/app.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{{rootPath}}dist/js/demo.js"></script>
+<script src="{{pageScript}}"></script>
+<script src="{{rootPath}}schemaSpy.js"></script>
+</body>
+</html>

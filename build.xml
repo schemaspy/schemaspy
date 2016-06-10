@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="rebuild" name="SchemaSpy">
+  <property name="dest" value="output"/>
+  <property name="dist" value="target"/>
+  <property name="src" value="src/main/java"/>
+  <property name="resources" value="src/main/resources"/>
+  <path id="project.class.path">
+    <pathelement location="${dest}"/>
+  </path>
+  <!--Patternset to exclude files from the output directory:-->
+  <patternset id="dest.exclude">
+    <exclude name="package cache/"/>
+    <exclude name="dependency cache/"/>
+  </patternset>
+  <target name="archive" depends="resource">
+    <jar compress="true" destfile="${dist}/schemaSpy.jar">
+      <fileset dir="${dest}">
+        <patternset refid="dest.exclude"/>
+        <include name="**/*.*"/>
+      </fileset>
+      <manifest>
+        <attribute name="Main-Class" value="net.sourceforge.schemaspy.Main"/>
+      	<attribute name="Implementation-Build" value="Unknown"/>
+      </manifest>
+    </jar>
+    <jar compress="true" destfile="${dist}/schemaSpy_source.jar">
+      <fileset dir="${src}"/>
+    </jar>
+  </target>
+  <target name="clean">
+    <delete file="${dist}/schemaSpy.jar"/>
+    <delete file="${dist}/schemaSpy_source.jar"/>
+    <delete failonerror="false" includeemptydirs="true">
+      <fileset dir="${dest}"/>
+    </delete>
+  </target>
+  <target name="resource">
+    <copy todir="${dest}">
+      <fileset dir="${resources}">
+        <include name="**/*.properties"/>
+        <include name="**/*.css"/>
+        <include name="**/*.gif"/>
+        <include name="**/*.js"/>
+        <include name="**/*.xsd"/>
+        <include name="**/*.rev"/>
+        <include name="**/*.MF"/>
+      </fileset>
+    </copy>
+  </target>
+  <target name="javadoc"/>
+  <target name="compile" depends="init">
+    <javac srcdir="${src}"
+      includes="**/*.java"
+      excludes="test/**"
+      destdir="${dest}"
+      debug="on"
+      debuglevel="source,lines"
+      source="1.5"
+      target="1.5"
+      includeAntRuntime="false"
+    />
+  </target>
+
+  <target name="make" depends="compile,archive"/>
+  <target name="rebuild" depends="clean,make"/>
+  <target name="init">
+    <mkdir dir="${dest}"/>
+    <mkdir dir="${dist}"/>
+  </target>
+</project>

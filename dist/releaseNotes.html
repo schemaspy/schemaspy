@@ -1,0 +1,848 @@
+<html>
+<head>
+<title>SchemaSpy Release Notes</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<style type="text/css">
+    body     { color: #000000; background-color: #F7F7F7; font-family: verdana, times, sans-serif; }
+    .release { font-weight: bold; padding-top: 12px}
+    li       { font-weight: normal; }
+  </style>
+</head>
+<body>
+<h3><a href='http://schemaspy.sourceforge.net'>SchemaSpy</a> Release Notes</h3>
+<ul>
+
+<li class='release'>x.x.x - xx/xx/xxxx - Subversion revision xxx
+<ul>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3429895&group_id=137197&atid=737987">
+        bug 3429895</a> - java.lang.OutOfMemoryError: unable to create new native thread.<br>
+        Put in a more reasonable default maximum number of database threads. 
+        rev 653<br>
+        Thanks to Daniel Ceregatti for reporting the issue.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=3428311&group_id=137197">
+        bug 3428311</a> - Invalid filenames used for generated XML.<br>
+        Removed @ and : delineated portions of the database name when generating the XML filenames used. 
+        rev 652<br>
+        Thanks to Cedric for reporting the issue.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/?func=detail&atid=737987&aid=3427040&group_id=137197">
+        bug 3427040</a> - SQL Server 2005 Table comments includes field comments.<br>
+        rev 650<br>
+        Thanks to unnamed submitter for providing the updated SQL.
+    </li>
+    <li>Implemented a <a href="https://sourceforge.net/projects/schemaspy/forums/forum/462850/topic/4613005">
+        request for more compact detail pages</a>.<br>
+        Detail pages will no longer show all the columns of tables within one degree of separation of the
+        focal table.
+        This can help reduce the complexity of those diagrams significantly while only slightly reducing
+        their functionality.
+        rev 648
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2965546&group_id=137197&atid=737987">
+        bug 2965546</a> - Oracle DEFAULT NULL anomaly.<br>
+        Changed the 'null' check to be compliant with newer versions of the JDBC drivers.
+        This should reduce the possibility of false positives while giving correct
+        results moving forward.
+        rev 645<br>
+        Thanks to Vladimir Vilinski for reporting the issue.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3296973&group_id=137197&atid=737987">
+        bug 3296973</a> - Tables not included with -i appears in relationship tab<br>
+        rev 643<br>
+        Thanks to Lennart Jonsson for reporting the issue.
+    </li>
+    <li>Refactored to no longer require database properties and column exclusions being
+        passed throughout the code.
+    </li>
+    <li>When dealing with multiple schemas all regular expressions are now passed 
+        to child processes in the environment.  
+        This is to resolve the problem where some operating system shells expanded
+        the regular expressions as if they were file specifications.<br>
+        rev 641
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=3286264&group_id=137197">
+        bug 3286264</a> - Incomplete cross-schema relationship details in XML<br>
+        rev 637<br>
+        Thanks to Damien (Damo) for identifying the deficiency and providing a fix.
+    </li>
+    <li>Added a Maven POM and restructured the directory layout to conform to Maven standards.</li>
+    <li>Resolved a NullPointerException that occurred when evaluating cross-
+        catalog tables in databases that don't report schema details.<br>
+        rev 631<br>
+        Thanks to Kris Zarns for identifying the issue and for providing a
+        test case that easily reproduced the failure.
+    </li>
+    <li>Added a new <code>-columndetails</code> option that makes it possible
+        to specify which details appear (and their order) on the columns tab.
+        This is a list of names that can include 
+        <code>id table column type size nulls auto default children parents comments</code>
+        with a default list of 
+        <code>id table column type size nulls auto default</code>.
+        Note that <code>id</code> will only appear when run against databases
+        that require column identifiers (e.g. DB2).
+        <br>
+        rev 631
+    </li>
+    <li>Can now use <code>-all</code> on databases like MySQL.  
+        With MySQL you'll probably want to specify <code>-db mysql</code>
+        whenever you use <code>-all</code> since a logical database is 
+        required for the initial connection.<br>
+        rev 630
+    </li>
+    <li>Links to remote tables now also have direct links to the schema too.<br>
+        rev 629
+    </li>
+    <li>Added a summary of remote tables to the tables tab to quickly
+        identify remote relationships.<br>
+        rev 628
+    </li>
+    <li>It's now possible to supplement your real database metadata with logical
+        tables and relationships.
+        One possible use is with systems that store some of their data
+        in non-relational data storage.
+        E.g. what I did to generate <a href=http://schemaspy.sourceforge.net/unifieddb/">
+        an ERD for the Unified Database (UDB)</a>.
+        rev 627
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&aid=3177548&group_id=137197&atid=737987">
+        bug 3177548</a> - -pfp doesn't work when analyzing multiple schemas<br>
+        When analyzing multiple schemas SchemaSpy now prompts for a 
+        password one time.
+        That password is passed to child processes through their environment
+        to prevent it from being readily visible to other users on the machine.
+        Note this is not a secure solution, but it's more secure than exposing 
+        it on the command-line.<br>
+        rev 626<br>
+        Thanks to Kris Zarns for reporting the issue.
+    </li>
+    <li>Foundation for supporting image formats other than PNG (e.g. SVG).
+        Unfortunately SVG isn't quite ready for prime time yet.<br>
+        rev 625
+    </li>
+    <li>Added an optional <code>short_column_type</code> to 
+        <code>selectColumnTypesSql</code> to simplify the generated ER diagrams.
+        Otherwise they could become extremely large. 
+        rev 624
+    </li>
+    <li>Changed default from <code>-lq</code> (low quality) to <code>-hq</code>
+        (high quality) after seeing how the low quality diagrams look on 
+        various systems.<br>  
+        rev 623
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1598563&group_id=137197&atid=737990">
+        feature request 1598563</a> - Show full definition for ENUM and SET types<br>
+        rev 622<br>
+        Thanks to Erik Meitner for the suggestion.
+    </li>
+    <li>Low quality rendering was always being used when multiple schemas 
+        were being analyzed.  
+        Now honors <code>-hq</code> or <code>-lq</code> from command-line for 
+        multiples.<br>
+        rev 620
+    </li>
+    <li>Now makes sure XML-defined FKs point to PKs.  
+        If not then assumes it should have been a PK (with a warning).<br>
+        rev 619
+    </li>
+    <li>While trying to resolve <a href="https://sourceforge.net/projects/schemaspy/forums/forum/462850/topic/3232728">
+        a problem with MySQL's cross-schema foreign keys</a> I discovered that MySQL uses
+        catalogs as a namespace mechanism from the perspective of the JDBC metadata
+        services, but uses schemas to represent the same thing in INFORMATION_SCHEMA.
+        Before this SchemaSpy had completely ignored catalogs, but to resolve the issue
+        I had to make it fully catalog aware.
+        This is a fairly significant change (and "the right thing to do") 
+        that could result in other types of databases not being evaluated correctly.
+        In the process I added lots of additional logging to help resolve future issues.<br>
+        rev 610<br>
+        Thanks to Danny Wang for identifying the issue and for providing an extremely
+        concise test case.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737990&aid=3155648&group_id=137197">
+        bug 3155648</a> - Firebird requires single-threaded metadata retrieval<br>
+        rev 610<br>
+        Thanks to Fernando Boaglio for reporting the issue and providing a solution.
+    </li>
+    <li>Refactored how database drivers get resolved to make it easier for
+        Maven to override.<br>
+        rev 609<br>
+        Thanks to James Atwill for making the suggestion.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&aid=3148639&group_id=137197&atid=737987">
+        bug 3148639</a> - FK's on views not detected<br>
+        rev 608<br>
+        Thanks to Michael M. for reporting the issue.
+    </li>
+    <li>Implemented <a href="http://sourceforge.net/tracker/?func=detail&atid=737990&aid=3141248&group_id=137197">
+        feature request 3141248</a> - H2 Database Support<br>
+        rev 607<br>
+        Thanks to Alexey Kuznetsov for providing the configuration details for this.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/?func=detail&atid=737989&aid=3140441&group_id=137197">
+        patch 3140441</a> - Table names containing #'s don't link well<br>
+        The trailing portions of tables names that contained #'s were being treated 
+        as anchors instead of part of the file name.
+        rev 606<br>
+        Thanks to Mark Berger for identifying the problem and providing the fix.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/?func=detail&atid=737990&aid=3136739&group_id=137197">
+        feature request 3136739</a> - Shared Driver Classloader<br>
+        SchemaSpy now will use the default classloader if no driverPath is specified.
+        This resolves issues that some people ran into when running under tools like Maven.
+        rev 605<br>
+        Thanks to Bruno Leonardo Gonçalves for reporting the issue and providing the fix.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=3101845&group_id=137197">
+        bug 3101845</a> - OutOfMemoryError with back-referencing cross-schema tables.<br>
+        Prevented the inadvertent recursion that was occurring. rev 602.<br>
+        Thanks to Victor for reporting the issue.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=3096742&group_id=137197">
+        bug 3096742</a> - Many pages have missing /tbody tags.<br>
+        Added missing tags to generated output. rev 601.<br>
+        Thanks to Jeff Greif for reporting the issue.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=3065002&group_id=137197">
+        bug 3065002</a> - Doesn't show number of rows for tables that contain more than 2,147,483,647 rows.<br>
+        Changed ints to longs. rev 599.<br>
+        Thanks to Mark Berger for identifying the problem and providing the fix.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/?func=detail&atid=737990&aid=3048496&group_id=137197">
+        feature request 3048496</a> - Add an option to the command line parameters for MS SQL instance name<br>
+        Added two new properties files (mssql-jtds-instance.properties and
+        mssql05-jtds-instance.properties) for using instances with the MS SQL jTDS driver.
+        These files require a -instance option to be specified on the command line, which
+        is much simpler than figuring out the key=value settings that the driver requires.
+        rev 598<br>
+        Thanks to Tim Abell for the suggestion.
+    </li>
+    <li>Removed the ads from the generated pages due to generating
+        close to zero revenue.  The pages should be less cluttered
+        and potentially load faster.
+    </li>
+    <li>Added support for Teradata and SQLite databases.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&aid=2693317&group_id=137197&atid=737989">
+        bug 2693317</a> - SQL Server 2005 query bug<br>
+        Corrected the query to resolve variant field errors. rev 593.<br>
+        Thanks to Erik Putrycz for providing the fix.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&aid=2815629&group_id=137197&atid=737988">
+        bug 2815629</a> - Case sensitive MS SQL INFORMATION_SCHEMA.TABLES<br>
+        Corrected the query of MS SQL table details so that it works with databases
+        that have case sensitivity enabled. rev 592.<br>
+        Thanks to sadas for reporting the issue.
+    </li>
+</ul>
+</li>
+<li class='release'>5.0.0 - 08/16/2010 - Subversion revision 591
+<ul>
+    <li>Added SQL to query view details for MySQL databases. 
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1600035&group_id=137197&atid=737990">
+        feature request 1600035</a> - Exclusion regex<br>
+        I don't like the inconsistency of the command line that this introduces, but
+        there's a new <code>-I</code> option that takes a regular expression of tables to
+        excludes from the analysis.  This is the inverse of <code>-i</code> which specifies which
+        tables to include.  The two can be used together<br>
+        Thanks to Erik Meitner for the suggestion.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1537126&group_id=137197&atid=737987">
+        bug 1537126</a> - XML output fails with binary columns<br>
+        It took a while but I think I finally came up with a regular expression
+        that'll determine if the default value is representable in XML in Unicode:<br>
+        <code>^[ -\uD7FF\uE000-\uFFFD\p{L}\p{M}\p{Z}\p{S}\p{N}\p{P}]*$</code>
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2218941&group_id=137197&atid=737987">
+        bug 2218941</a> - No diagrams when schema only has implied relationships<br>
+        Thanks to Steven Buschman for identifying and reproducing the problem 
+        and José E. Giménez for directing me to the solution.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2433403&group_id=137197&atid=737987">
+        bug 2433403</a> - Fail equal token (\=) in -desc option<br>
+        Thanks to José E. Giménez for the patch that resolved this.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker2/index.php?func=detail&aid=2660020&group_id=137197&atid=737987">
+        bug 2660020</a> - Table comments are not retrieved in SQL Server 2000<br>
+        Thanks to Frank Biedermann for the SQL that implemented this.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/forum/message.php?msg_id=7095169">an issue</a>
+        where an InvalidConfigurationException was thrown when using Sybase.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=2820802&group_id=137197">
+        bug 2820802</a> - ConcurrentModificationException<br>
+        This would sometimes occur while determining referential integrity-based
+        insertion/deletion ordering with schemas that have recursive foreign
+        key relationships.<br>
+        Thanks to Joao Carlos Batalha for reporting the problem.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=2827876&group_id=137197">
+        bug 2827876</a> - Table name not showing in XML Representation<br>
+        Check constraints would replace table entries the generated XML.<br>
+        Thanks to TomM for reporting the problem.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/?func=detail&aid=2828474&group_id=137197&atid=737990">
+        feature request 2828474</a> - Support Informix without Schemas.<br/>
+        Added a new <code>-noschema</code> option for database drivers that claim that 
+        they support schemas but really don't (e.g. older versions of Informix).<br>
+        Thanks to Joao Batalha for reporting the problem.
+    </li>
+    <li>There were scenarios where SchemaSpy had difficultly resolving
+        the dot executable though the PATH environment variable.
+        Added a -gv option to optionally remove the dependency on having your PATH
+        include Graphviz's bin directory.  
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=2393049&group_id=137197">
+        bug 2393049</a> - SchemaSpy fails to access metadata on z/OS-based DB2 systems<br>
+        SchemaSpy now more fully supports DB2 on z/OS-based systems by specifying
+        <code>-type db2zos</code>.<br>
+        Thanks to Christian Riedel for providing the z/OS-specific configuration file.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&aid=2942336&group_id=137197&atid=737987">
+        bug 2942336</a> - Related table names missing from table details
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/?func=detail&aid=2943959&group_id=137197&atid=737990">
+        feature request 2943959</a> - Add deletion rule details.<br/>
+        Now shows details about foreign key constraint deletion rules:
+        cascade on delete, null on delete and restrict delete.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/?func=detail&atid=737990&aid=2949120&group_id=137197">
+        feature request 2949120</a> - Expose object model.<br/>
+        SchemaAnalyzer.analyze() now returns the gathered database metadata.
+        This would typically be used with HTML-generation disabled.
+        Eventually all error reporting would occur in the calling class, but
+        that hasn't been implemented yet nor has the ability to generate no
+        files at all.<br>
+        Thanks to Dominique De Vito for the suggestion.
+    </li>
+    <li>Added the ability to specify the SQL used to query basic details of 
+        tables and views.
+        This same query can optionally return row counts or view definitions,
+        possibly negating the need for additional trips to the database.<br>
+        Thanks to Jason Friedman for the suggestion.
+    </li>
+    <li>Partially implemented <a href="https://sourceforge.net/tracker/?func=detail&atid=737990&aid=2712121&group_id=137197">
+        feature request 2712121</a> - Formatting SQL output.<br/>
+        SchemaSpy still does no real formatting the View SQL, but it now
+        detects that the SQL is already formatted and presents it in that form.
+        I don't know if the databases typically retain this formatting
+        information or not (MySQL does not).<br>
+        Thanks to Reiner Kräutle for the suggestion.
+    </li>
+    <li>Added the ability to specify a custom SQL formatter via the -sqlFormatter
+        option.  
+        This formatter must implement the
+        <a href='http://schemaspy.svn.sourceforge.net/viewvc/schemaspy/trunk/src/net/sourceforge/schemaspy/view/SqlFormatter.java?view=log'>
+        SqlFormatter</a> interface and return the SQL formatted appropriately in HTML.
+        Implementing a "good" formatter is basically a project in itself and beyond
+        the scope of SchemaSpy, so plug in your own if desired.
+        Use -dp to make the specified class visible to SchemaSpy's class loader. 
+    </li>
+    <li>Now treats DB2 Materialized Query Tables (MQTs) as views per
+        <a href='https://sourceforge.net/projects/schemaspy/forums/forum/462849/topic/3586068'>
+        Jonas Söderström's suggestion</a>.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=2996883&group_id=137197">
+        bug 2996883</a> - Misleading warning messages when invalid regular expressions 
+        are specified.<br>
+        Thanks to David Corlette for reporting the problem.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/?func=detail&aid=2999566&group_id=137197&atid=737990">
+        feature request 2999566</a> - Provide verbose details of program flow.<br/>
+        Added a new <code>-logLevel</code> option that lets you specify how
+        verbose the logging output should be.<br/>
+        The levels in descending order are:
+        <ul>
+         <li><code>severe</code> (highest - least detail)</li>
+         <li><code>warning</code> (default)</li>
+         <li><code>info</code></li>
+         <li><code>config</code></li>
+         <li><code>fine</code></li>
+         <li><code>finer</code></li>
+         <li><code>finest</code> (lowest - most detail)</li>
+        </ul>
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=3026251&group_id=137197">
+        bug 3026251</a> - Arrowtail decoration not appearing in diagrams.<br>
+        There were minor changes made to the Graphviz dot language dealing with
+        edge rendering that now require explicit settings.<br>
+        Thanks to Keith Clarke for reporting the problem and researching the solution.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/?func=detail&aid=3021923&group_id=137197&atid=737990">
+        feature request 3021923</a> - Enter passwords from within SchemaSpy.<br/>
+        Added a new -pfp (prompt for password) option that causes SchemaSpy 
+        to prompt the user for a password.
+        If running in a Java6 or later environment it uses the JVM-provided classes
+        (via reflection),
+        while with older JVMs it attempts to emulate the same behavior.<br>
+        Thanks to st0w for the suggestion.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/?func=detail&atid=737990&aid=3041957&group_id=137197">
+        feature request 3041957</a> - Optionally exclude database views.<br/>
+        Added a new -noviews option that causes SchemaSpy exclude all views from
+        its analysis.<br> 
+        Thanks to Mattias Melin for the suggestion.
+    </li>
+    <li>On the tables tab you can now view tables and views separately as
+        well as hide comments.<br/>
+        Thanks to jpummill for the idea.
+    </li>
+    <li>The columns page with extremely large databases (e.g. 20,000 columns) was
+        so massive that 
+        <a href="https://sourceforge.net/projects/schemaspy/forums/forum/462850/topic/2976775?message=6358882">
+        browsers were unable to render it</a>.
+        The new columns page has been trimmed down to help it load.
+        There was also a performance issue where the visibility state of column 
+        comments were out of sync with the css.  That resulted in the page attempting
+        to hide 20,000+ columns on load.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=3041947&group_id=137197">
+        bug 3041947</a> - NullPointerException when unable to resolve column type.<br>
+        SQL Anywhere returns null for view column types, resulting in SchemaSpy
+        to throw exceptions.  Now those view columns will show a type of "unknown". 
+        Thanks to Mattias Melin for reporting the problem and researching the solution.
+    </li>
+    <li>Added two new optional SQL queries for view comments: selectViewCommentsSql 
+        and selectViewColumnCommentsSql.<br>
+        These are optional and expected to return view and view column comments
+        when selectViewsSql, selectTableCommentsSql and selectColumnCommentsSql don't.<br>
+        Thanks to David Corlette for the idea.
+    </li>
+</ul>
+</li>
+
+<li class='release'>4.1.1 - 10/20/2008
+<ul>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2182700&group_id=137197&atid=737987">
+        bug 2182700</a> - Exception when extends directive has trailing space
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2182705&group_id=137197&atid=737987">
+        bug 2182705</a> - Null ID on DB2 views
+    </li>
+</ul>
+</li>
+
+<li class='release'>4.1.0 - 10/17/2008
+<ul>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1548661&group_id=137197&atid=737990">
+        feature request 1548661</a> - Add support for Ruby on Rails databases.<br>
+        Ruby on Rails databases use an "interesting" naming convention when mapping for
+        tables (plural), foreign keys (singular form of referenced table name 
+        suffixed by <code>_id</code>) and primary keys (always <code>id</code>).
+        This release introduces the -ror (<em>R</em>uby <em>o</em>n <em>R</em>ails)
+        parameter that tells SchemaSpy to look for and render these types of relationships.<br>
+        Thanks to John Danilson for the suggestion.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2175509&group_id=137197&atid=737987">
+        bug 2175509</a> - Incorrect ER notation.<br>
+        SchemaSpy was using incorrect entity relationship diagram notations
+        in the cardinality of the foreign key side of relationships.
+        In many cases it showed 'one' or 'one or more' when it should have shown 'zero or more'.
+        Thanks to Dan Zingaro for noticing the incorrectness and for helping
+        to resolve the issue.
+    </li>
+    <li>Added a new <code>import</code> directive to database configuration files
+        to be able to reuse complex SQL (or other settings) from configurations
+        not in the normal inheritance tree. 
+    </li>
+    <li>Added support for MS SQL Server 2005 with jTDS driver, including column comment
+        retrieval for all of the MS SQL databases.<br>
+        Thanks to Ernest Zapata for the configuration files.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2175489&group_id=137197&atid=737990">
+        feature request 2175489</a> - Allow connection properties without file.<br>
+        Can now specify connection properties directly on the command line without
+        having to put them in a file.<br>
+        Thanks to Ernest Zapata for the suggestion and implementation.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2175499&group_id=137197&atid=737990">
+        feature request 2175499</a> - Single Sign-On Support.<br>
+        With the introduction of the <code>-sso</code> option running 
+        SchemaSpy against a database that supports single sign-on now
+        no longer requires the user name to be specified on the command line.
+        Thanks to Ernest Zapata for the suggestion and implementation.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2126345&group_id=137197&atid=737987">
+        bug 2126345</a> - Unable to extract number of rows.<br>
+        Now doesn't report intermediate problems while attempting to
+        extract number of rows when a fallback to a more basic approach is required.
+    </li>
+</ul>
+</li>
+
+<li class='release'>4.0.0 - 09/19/2008
+<ul>
+    <li>One major enhancement of this release is the implementation of 
+        <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1996467&group_id=137197&atid=737990">
+        feature request 1996467</a> - Define Non-Foreign Key relationships.<br>
+        There have been several requests related to this topic.<br>
+        SchemaSpy now supports defining supplemental schema metadata in XML.  
+        This includes defining foreign keys, remote tables, schema/table/column comments and column exclusions.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1643953&group_id=137197&atid=737990">
+        feature request 1643953</a> - Provide way to suppress columns in images.<br>  
+        This feature request resulted into a re-thinking of the compact form of the overview relationships diagram.
+        The compact form now displays only primary and foreign key columns while the non-compact
+        form displays all columns.  
+        This is also used to indicate degrees of separation for the detailed diagrams<br>
+        Thanks to Paul B Callahan for the suggestion.
+    </li>
+    <li><a href="http://www.jquery.com">jQuery</a> was presented by Scott Ryan at a recent 
+        <a href="http://opensource.meetup.com/88/">Colorado Springs Open Source Software</a> meeting.
+        One of the big advantages of jQuery is that it lets you separate behavior from
+        the structure of your web pages.  There are tons of other benefits to jQuery, so
+        SchemaSpy now uses it under the 
+        <a href="http://jquery.com/dev/svn/trunk/jquery/MIT-LICENSE.txt">MIT license</a>.
+    </li>
+    <li>Added support for Derby (JavaDB) databases, both embedded and network.
+    </li>
+    <li>Added support for SQL Server with jTDS driver.
+    </li>
+    <li>Added support for SQL Server 2005.
+    </li>
+    <li>Added support for MaxDB.
+    </li>
+    <li>Renamed -cp option to -dp (driver path) to reduce confusion/conflict with the
+        java executable's -cp option.  -cp is deprecated but still valid.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1593736&group_id=137197&atid=737990">
+        feature request 1593736</a> - Graph generation performance opportunity.<br>
+        This cut the number of calls to the dot executable in half, significantly
+        reducing the time required to generate diagrams.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1609408&group_id=137197&atid=737990">
+        feature request 1609408</a> - Better Unicode support to resolve some table name to URL mapping issues
+        that show up with Japanese table names. 
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1887490&group_id=137197&atid=737990">
+        feature request 1887490</a> - Get rowcount from metadata.<br>  
+        Added MySQL-specific <code>selectRowCountSql</code> implementation.<br>
+        Added Oracle-specific <code>selectRowCountSql</code> implementation provided by Mikheil Kapanadze.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1598195&group_id=137197&atid=737990">
+        feature request 1598195</a> - Sybase replacement for <code>"select count(*) from"</code>.<br>
+        Added ability to provide a database-specific <code>selectRowCountSql</code> to query
+        the number of rows in a column.  
+        For large Sybase databases this should significantly reduce processing time.<br>
+        Thanks to Klaus-Martin Hansche for the suggestion.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1598113&group_id=137197&atid=737990">
+        feature request 1598113</a> - Request for font specification parameter.<br>  
+        Added <code>-font</code> and <code>-fontsize</code> options for generated diagrams.<br>
+        Thanks to Tim Walters for the suggestion.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1444337&group_id=137197&atid=737990">
+        feature request 1444337</a> - Document cross-schema FK with -all option.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1562942&group_id=137197&atid=737990">
+        feature request 1562942</a> - Refactor to allow for dependency injection.<br>  
+        Separating configuration from processing simplifies integration with Maven, Maven2, Ant, etc.<br>
+        Thanks to Tim P for the suggestion.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1601046&group_id=137197&atid=737990">
+        feature request 1601046</a> - Remove System.exit calls to allow for easier integration with 
+        build tools.
+    </li>
+    <li>Implemented <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1526669&group_id=137197&atid=737990">
+        feature request 1526669</a> - Don't display row counts.<br>
+        Thanks to Gonzalo Mena-Mendoza for the suggestion.
+    </li>
+    <li>Implemented <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2018566&group_id=137197&atid=737987">
+        patch 2018566</a> - SQL Server column comment SQL.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2080062&group_id=137197&atid=737987">
+        bug 2080062</a> - NullPointerException with Oracle 11g and some Advanced Queuing Tables
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1571711&group_id=137197&atid=737987">
+        bug 1571711</a> - Fails to correctly identify dot version on MacOS-X.<br>
+        Thanks to Jean-François Veillette for providing the fix.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1620052&group_id=137197&atid=737987">
+        bug 1620052</a> - Documenting foreign keys referencing anther schema. 
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1687569&group_id=137197&atid=737987">
+        bug 1687569</a> - Minor HTML validation errors.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1689794&group_id=137197&atid=737987">
+        bug 1689794</a> - Case-sensitive table names handled incorrectly.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1841219&group_id=137197&atid=737987">
+        bug 1841219</a> - Exception when running against DB2 UDB for AS/400.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=1947528&group_id=137197&atid=737987">
+        bug 1947528</a> - Table Column regular expression not excluded.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2040582&group_id=137197&atid=737987">
+        bug 2040582</a> - Oracle - can't add Foreign Keys from tables in other schema.
+    </li>
+    <li>Resolved <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2116863&group_id=137197&atid=737987">
+        bug 2116863</a> - SQLException thrown if no schema matches.
+    </li>
+</ul>
+</li>
+
+<li class='release'>3.1.1 - 12/18/2006
+<ul>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1602135&group_id=137197&atid=737987">
+        bug 1602135</a> - Exception using dot version 2.9.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1571711&group_id=137197&atid=737987">
+        bug 1571711</a> - Fail to use precompiled version of dot on MacOS-X.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1597609&group_id=137197&atid=737987">
+        bug 1597609</a> - Quoting and Sybase ASE.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1589939&group_id=137197&atid=737987">
+        bug 1589939</a> - Incorrect Sybase SQL syntax by extract the number of rows.
+    </li>
+</ul>
+</li>
+
+<li class='release'>3.1.0 - 10/05/2006
+<ul>
+    <li>Implemented <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1537790&group_id=137197&atid=737990">
+        feature request 1537790</a> - Column name sort.<br>
+        The Columns page is now sortable by column, table, type, size, nullability, 
+        auto increment, default value, children or parents.<br>
+        Thanks to John Danilson for the suggestion.
+    </li>
+    <li>Implemented <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1479956&group_id=137197&atid=737990">
+        feature request 1479956</a> - Add description.<br>
+        Added a new option (-desc) to provide a description of the schema that is displayed
+        on the non-detail pages.<br>
+        Thanks to Amihay Gonen for the suggestion.
+    </li>
+    <li>Implemented <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1570467&group_id=137197&atid=737990">
+        feature request 1570467</a> - No table comments option.<br>
+        Added -notablecomments option for databases like MySQL that stuff unrelated data where comments belong.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1484462&group_id=137197&atid=737987">
+        bug 1484462</a> - SchemaSpy_3.0.0 and Oracle 10g problems.
+        <br>Now ignores tables associated with Oracle's recycle bin.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1558067&group_id=137197&atid=737987">
+        bug 1558067</a> - OutOfMemoryError on Linux while trying to determine insertion order with
+        recursive constraints.  Thanks to Remke Rutgers for his solution.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1530945&group_id=137197&atid=737987">
+        bug 1530945</a> - Incorrect variables size in DB2.  
+        <br>Now uses the value from BUFFER_LENGTH if it's available.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1487385&group_id=137197&atid=737987">
+        bug 1487385</a> - XML file is not a valid UTF8.
+        <br>Bernard D'Havé provided the code to resolve this one.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1507335&group_id=137197&atid=737987">
+        bug 1507335</a> - Views are not filtered with the regular expressions.</li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1502357&group_id=137197&atid=737987">
+        bug 1502357</a> - Blank Relationships tab.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1530965&group_id=137197&atid=737987">
+        bug 1530965</a> - columns.html table output issues with DB2.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1487385&group_id=137197&atid=737987">
+        bug 1487385</a> - XML file is not valid UTF8.
+    </li>
+    <li>Resolved <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1571077&group_id=137197&atid=737987">
+        bug 1571077</a> - Long comments don't wrap.
+    </li>
+</ul>
+</li>
+
+<li class='release'>3.0.0 - 05/07/2006
+<ul>
+    <li>SchemaSpy now generates an XML representation of the database's schema.</li>
+    <li>New -all option analyzes all schemas in the database with one command.</li>
+    <li>Now displays database table and row comments.</li>
+    <li>Comments are normally hidden by default, but a new option reverses that behavior.</li>
+    <li>Added a new option to allow HTML in comments.</li>
+    <li>You can now specify a subset of tables/views to include in the analysis
+        with the new -i &lt;regularExpression&gt; option.</li>
+    <li>Now supports Firebird.</li>
+    <li>Now supports Microsoft SQL Server 2005 thanks to Craig Boland
+        providing a configured mssql05.properties file.</li>
+    <li>Now supports Informix thanks to Tom Conlin
+        providing a configured informix.properties file.</li>
+    <li>A new option (-maxdet) was added to help keep extremely large
+        schemas from getting out of control.</li>
+    <li>Some users needed to specify the character set used to connect to their
+        database, so a new option (-connprops) was added.</li>
+    <li>The relationships page will now always be available, even if there are no relationships or just
+        implied relationships.</li>
+    <li>Tables that contain only implied relationships will now show them by default.</li>
+    <li>Resolved <a
+        href="https://sourceforge.net/tracker/index.php?func=detail&aid=1440650&group_id=137197&atid=737987">bug
+        1440650</a> - Oracle 10g flashback tables with bizarre illegal names
+        cause SchemaSpy to crash.</li>
+    <li>Added support for table names with embedded spaces (<a
+        href="http://sourceforge.net/tracker/index.php?func=detail&aid=1445745&group_id=137197&atid=737990">feature
+        request 1445745</a>) and reserved words (<a
+        href="http://sourceforge.net/tracker/index.php?func=detail&aid=1449203&group_id=137197&atid=737987">bug
+        1449203</a>).</li>
+    <li>Resolved <a
+        href="https://sourceforge.net/tracker/?func=detail&atid=737987&aid=1481396&group_id=137197">bug
+        1481396</a> - NumberFormatException in view.DotFormatter.writeHeader.  Now includes
+        diagnostics to help identify Graphviz configuration issues.</li>
+    <li>Cleaned-up the formatting of table details.</li>
+</ul>
+</li>
+
+<li class='release'>2.1.2 - 02/28/2006
+<ul>
+<li>Now generates a relatively useful relationships page even if dot fails 
+    to build the larger (and more likely to break Graphviz's dot) images.</li>
+<li>Lots of minor code cleanup after cranking up Eclipse's warning levels.</li>
+</ul>
+</li>
+
+<li class='release'>2.1.1 - 02/05/2006
+<ul>
+<li>Added a more descriptive error message when the correct version of 
+    Graphviz dot isn't installed.</li>
+<li>Some people were having problems by passing -cp to java and not to SchemaSpy.  
+    The classpath-related error messages now clearly specify where -cp belongs.</li>
+<li>Revamped the classpath-related error messages to include the classpath 
+    entries that weren't valid.  This should make it easier to track down JDBC 
+    driver issues.</li>
+<li>Updated MySQL's configuration file to point to the latest JDBC drivers.  
+    Also gave the URL for the Connector/J drivers.</li>
+</ul>
+</li>
+
+<li class='release'>2.1.0 - 11/23/2005
+<ul>
+<li>SchemaSpy can now analyze all of the schemas of a database with one command.
+    This feature should allow a DBA to do a bulk analysis, documenting every user 
+    schema with one command.</li>
+<li>Resolution of <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1350392&group_id=137197&atid=737987">bug 1350392</a>
+    - NullPointer if FK table not in analyzed schema.</li>
+<li>Was missing the border along the top edge of the page.</li>
+<li>Luke Hutteman found a threading issue while reviewing portions of the code.  
+    Thanks Luke!</li>
+<li>Resolution of <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1351460&group_id=137197&atid=737987">bug 1351460</a>
+    - Tab background color mis-named.</li>
+<li>Resolution of <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1351488&group_id=137197&atid=737987">bug 1351488</a>
+    - Relationships tab displayed when no relationships exist.</li>
+<li>The layout of the tab area is now significantly cleaner.</li>
+<li>Added -rankdirbug option to deal with the dot bugs that invariably result from 
+    using a non-standard rankdir in .dot files.  
+    This option should not be used unless absolutely necessary.</li>
+<li>Refactored many of the 'formatters' to become 'pages'.</li>
+</ul>
+</li>
+
+<li class='release'>2.0.0 - 11/06/2005
+<ul>
+<li>SchemaSpy now uses a tabbed layout that results in a significantly cleaner page.</li>
+<li>You now have the ability to explicitly exclude columns from the relationship 
+    analysis using a regular expression notation.  
+    This keeps those pesky tables that are related to everything from severely 
+    cluttering your view of your schema.</li>
+<li>Added information in the graphs about how many 'parent' and 'child' tables are 
+    related to a given table.  
+    This gives a visual clue that there are more tables beyond the outskirts of 
+    what's currently visible.</li>
+<li>SchemaSpy now supports HSQLDB thanks to bension providing a hsqldb.properties 
+    configuration file.</li>
+<li>Added support for DB2 UDB Type 4 driver.</li>
+<li>The graphs are now clearer due to the use of a sans serif font.</li>
+<li>Resolution of <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1340880&group_id=137197&atid=737987">bug 1340880</a>
+    - accent characters cause dot to fail.  
+    SchemaSpy now generates the .dot files using the UTF-8 character set, which 
+    is what the dot program expects.</li>
+</ul>
+</li>
+
+<li class='release'>1.7.1 - 10/20/2005
+<ul>
+<li>Added support for DB2's Net (Type 4) driver.</li>
+<li>Resolution of <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1325650&group_id=137197&atid=737987">bug 1325650</a>.
+    Was having more problems with extracting information on Oracle indexes.  
+    Due to an Oracle driver bug (Oracle bug #2686037) I inverted how the 
+    selectIndexesSql gets evaluated and significantly optimized the SQL.  
+    Thanks to Andrea for helping to figure all of this out.</li>
+<li>Added details of the -cp option to the diagnostic messages when unable to 
+    load database drivers.</li>
+<li>Fixed some minor cosmetic problems.</li>
+</ul>
+</li>
+
+<li class='release'>1.7.0 - 10/11/2005
+<ul>
+<li>SchemaSpy now supports PostgreSQL thanks to Tomi Ollila providing a 
+    pgsql.properties.</li>
+<li>Added a new page that lists all of the columns (with details) in the schema.  
+    The intent of this page is to make it easier to find inconsistencies in the 
+    schema as well as make it easier to do things like search for all instances 
+    of a certain type of column (e.g. 'timestamp').</li>
+<li>Resolution of <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1283622&group_id=137197&atid=737987">bug 1283622</a>.
+    A user from the Slovak Republic ran into problems where dot was unable to 
+    deal with some of the characters that are in this character set.  
+    Now it should handle them appropriately.</li>
+<li>Refactored how the links on each page get generated.  
+    It was pretty much cut and paste before.  
+    Now it's consolidated in HtmlFormatter.writeTableOfContents() so it's much 
+    more consistent and easier to change.</li>
+<li>Implemented <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1312220&group_id=137197&atid=737990">feature request 1312220</a>:
+    Modified build.xml to include an appropriate level of debug information 
+    (source files and line numbers).</li>
+</ul>
+</li>
+
+<li class='release'>1.6.1 - 09/16/2005
+<ul>
+<li>Fixed Utilities page to not have the 'Generated by SchemaSpy' label on each 
+    table.</li>
+<li>Yan-Fa Li figured out what was causing dot problems on Unix: quotes around 
+    filenames.</li>
+<li>Updated the legend to somewhat match the new IE diagram representation.</li>
+</ul>
+</li>
+
+<li class='release'>1.6.0 - 09/11/2005 
+<ul>
+<li>Now displays graphical relationships using Information Engineering (IE) notation.
+    This should make it easier to understand the different types of relationships 
+    in the schema.</li>
+<li>Beefed-up the code that detects if dot is being executed correctly.
+    Some users were getting output that implied that dot was working, but no images 
+    were created.</li>
+<li>Added version information to .dot files to help debugging.</li>
+<li>Anomalies page had some anomalies.</li>
+</ul>
+</li>
+
+<li class='release'>1.5.2 - 09/03/2005
+<ul>
+<li>Implemented <a href="http://sourceforge.net/tracker/index.php?func=detail&aid=1280949&group_id=137197&atid=737990">feature request 1280949</a>:
+    Many of DB2's error messages don't give table, column or constraint names but 
+    instead give their IDs.  
+    As a developer it's a pain to have to try to translate these IDs into something useful.
+    SchemaSpy previously gave these details before I converted to the JDBC metadata 
+    approach, which doesn't return these IDs.  
+    It now displays these IDs for database types that support it and that have the 
+    appropriate SQL defined in their properties files.</li>
+</ul>
+</li>
+
+<li class='release'>1.5.0 - 08/30/2005
+<ul>
+<li>Now displays two versions of the main relationships graph: a smaller 'compact' 
+    version and a large full-size version.  
+    The compact version should make it easier to get a 'big picture' view of the 
+    relationships.</li>
+<li>Now takes advantage of the GraphVis dot 2.6 ability to point to the East/West 
+    center of a node if running dot 2.6 or higher.</li>
+<li>Figured out a way to have the graph point to the appropriate portion of the 
+    main table in the table detail pages.</li>
+<li>Introduced a new anomaly: Columns whose default value is the word 'NULL' or 'null',
+    but the SQL NULL value may have been intended.</li>
+<li>Realized that index sort order relates to the column, not the index.  
+    Not sure what I was thinking.</li>
+<li>Added some instructions on the format of connectionSpec in the .properties files.</li>
+</ul>
+</li>
+
+</ul>
+</body>
+</html>
