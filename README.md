@@ -10,7 +10,8 @@ In next days I have plan to release new SchemaSpy version and concentrate to ref
 
 Previous repository for SchemaSpy you can find here: http://schemaspy.sourceforge.net
 
-In new SchemaSpy 6.0 version you will find:
+In new **SchemaSpy 6.0 ** version you will find:
+
 1. Absolutely new amazing look and feel generated content
 
 2. You can very easily change SchemaSpy theme because all of the logic was moved outside the Java code
