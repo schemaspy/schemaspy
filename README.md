@@ -24,5 +24,3 @@ In new SchemaSpy 6.0 version you will find:
 6. You can also easily create in database comments links to the tables and columns
 
 More detail will came in next days plus I have in plan to start working on all not resolved issues.
-
-@rafalkasa
