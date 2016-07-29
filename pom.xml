@@ -104,7 +104,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>net.sourceforge.schemaspy.Main</mainClass>
+							<mainClass>org.schemaspy.Main</mainClass>
 						</manifest>
 						<manifestEntries>
 							<Implementation-Build>${buildNumber}</Implementation-Build>

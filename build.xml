@@ -19,7 +19,7 @@
         <include name="**/*.*"/>
       </fileset>
       <manifest>
-        <attribute name="Main-Class" value="net.sourceforge.schemaspy.Main"/>
+        <attribute name="Main-Class" value="org.schemaspy.Main"/>
       	<attribute name="Implementation-Build" value="Unknown"/>
       </manifest>
     </jar>
