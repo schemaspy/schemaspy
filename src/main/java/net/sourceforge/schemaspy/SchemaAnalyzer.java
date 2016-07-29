@@ -63,20 +63,7 @@ import net.sourceforge.schemaspy.util.Dot;
 import net.sourceforge.schemaspy.util.LineWriter;
 import net.sourceforge.schemaspy.util.LogFormatter;
 import net.sourceforge.schemaspy.util.ResourceWriter;
-import net.sourceforge.schemaspy.view.DotFormatter;
-import net.sourceforge.schemaspy.view.HtmlAnomaliesPage;
-import net.sourceforge.schemaspy.view.HtmlColumnsPage;
-import net.sourceforge.schemaspy.view.HtmlConstraintsPage;
-import net.sourceforge.schemaspy.view.HtmlMainIndexPage;
-import net.sourceforge.schemaspy.view.HtmlOrphansPage;
-import net.sourceforge.schemaspy.view.HtmlRelationshipsPage;
-import net.sourceforge.schemaspy.view.HtmlRoutinesPage;
-import net.sourceforge.schemaspy.view.HtmlTablePage;
-import net.sourceforge.schemaspy.view.ImageWriter;
-import net.sourceforge.schemaspy.view.StyleSheet;
-import net.sourceforge.schemaspy.view.TextFormatter;
-import net.sourceforge.schemaspy.view.WriteStats;
-import net.sourceforge.schemaspy.view.XmlTableFormatter;
+import net.sourceforge.schemaspy.view.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -445,6 +432,7 @@ public class SchemaAnalyzer {
         logger.info("Writing/diagramming details");
 
         generateTables(progressListener, outputDir, db, tables, stats);
+        HtmlComponentPage.getInstance().write(db, tables, outputDir);
     }
 
     /**

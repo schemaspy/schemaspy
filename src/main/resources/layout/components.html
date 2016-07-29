@@ -1,0 +1,41 @@
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+        <h1>Tables</h1></br>
+      </section>
+      <!-- Main content -->
+      <section class="content">
+		<div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">Tables</h3>			  
+			  <span class="label label-primary pull-right"><i class="fa fa-database fa-2x"></i></span>
+            </div><!-- /.box-header -->
+            <div class="box-body">
+            <table id="database_objects" class="table table-bordered table-striped dataTable" role="grid">
+				<thead>
+					<tr>
+					  <th valign="bottom">Table / View</th>
+					  <th align="right" valign="bottom">Children</th>
+					  <th align="right" valign="bottom">Parents</th>
+					  <th align="right" valign="bottom">Columns</th>
+					  <th align="right" valign="bottom">Rows</th>
+					  <th align="right" valign="bottom">Type</th>
+					  <th class="toggle">Comments</th>
+					</tr>
+				</thead>
+				<tbody>
+				{{#tables}}
+				 <tr class="tbl even" valign="top">  <td class="detail"><a href="tables/{{table.name}}.html">{{table.name}}</a></td>
+				  <td class="detail" align="right">{{table.maxChildren}}</td>
+				  <td class="detail" align="right">{{table.maxParents}}</td>
+				  <td class="detail" align="right">{{table.columns.size}}</td>
+				  <td class="detail" align="right">{{table.numRows}}</td>
+				  <td class="detail" align="right">{{table.type}}</td>
+				  <td class="comment detail" style="display: table-cell;">{{{comments}}}</td>
+				  </tr>
+				{{/tables}}				  
+			</table>
+            </div>
+            <!-- /.box-body -->
+          </div>			
+      </section>
+      <!-- /.content -->

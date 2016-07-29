@@ -150,3 +150,7 @@ td.diagram  {
 .CodeMirror {
   height: auto;    
 }
+
+.logo-text {
+  font-family: "Indie Flower", "Helvetica Neue", Helvetica, Arial, cursive;
+}
