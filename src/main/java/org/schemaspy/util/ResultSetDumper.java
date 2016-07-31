@@ -1,5 +1,5 @@
 /*
- * This file is a part of the SchemaSpy project (http://schemaspy.sourceforge.net).
+ * This file is a part of the SchemaSpy project (http://schemaspy.org).
  * Copyright (C) 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
