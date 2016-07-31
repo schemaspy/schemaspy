@@ -16,12 +16,12 @@
 	-->
 	<!-- mvn clean deploy -Dgpg.passphrase=passphrase -->
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.sourceforge.schemaspy</groupId>
+	<groupId>org.schemaspy</groupId>
 	<artifactId>schemaspy</artifactId>
 	<packaging>jar</packaging>
 	<name>SchemaSpy</name>
-	<version>5.0.0</version>
-	<url>http://schemaspy.sourceforge.net</url>
+	<version>6.0.0</version>
+	<url>http://schemaspy.org</url>
 	<description>SchemaSpy generates HTML and PNG-based entity relationship diagrams from JDBC-enabled databases.</description>
 	<inceptionYear>2004</inceptionYear>
 	<parent>
@@ -46,6 +46,11 @@
 		<developerConnection>scm:svn:${svn.url}</developerConnection>
 	</scm>
 	<developers>
+		<developer>
+			<id>rafalkasa</id>
+			<name>Rafal Kasa</name>
+			<email>rafalkasa@gmail.com</email>
+		</developer>
 		<developer>
 			<id>john.currier</id>
 			<name>John Currier</name>
@@ -118,23 +123,6 @@
 				<configuration>
 					<doctitle>API for ${project.name} ${project.version}</doctitle>
 					<windowtitle>API for ${project.name} ${project.version}</windowtitle>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.0-beta-3</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>create</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<doCheck>false</doCheck>
-					<doUpdate>false</doUpdate>
 				</configuration>
 			</plugin>
 		</plugins>
