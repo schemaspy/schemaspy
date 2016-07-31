@@ -1,5 +1,5 @@
 /*
- * This file is a part of the SchemaSpy project (http://schemaspy.sourceforge.net).
+ * This file is a part of the SchemaSpy project (http://schemaspy.org).
  * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
@@ -1356,6 +1356,7 @@ public class Config
         } catch (FileNotFoundException notFoundOnFilesystemWithoutExtension) {
             try {
                 File propertiesFile = new File(type + ".properties");
+                System.out.println(type + ".properties");
                 bundle = new PropertyResourceBundle(new FileInputStream(propertiesFile));
                 dbPropertiesLoadedFrom = propertiesFile.getAbsolutePath();
             } catch (FileNotFoundException notFoundOnFilesystemWithExtensionTackedOn) {
@@ -1608,9 +1609,11 @@ public class Config
 
             while ((entry = jar.getNextJarEntry()) != null) {
                 String entryName = entry.getName();
-                int dotPropsIndex = entryName.indexOf(".properties");
-                if (dotPropsIndex != -1)
-                    databaseTypes.add(entryName.substring(0, dotPropsIndex));
+                if (entryName.indexOf("dbTypes") != -1) {
+                    int dotPropsIndex = entryName.indexOf(".properties");
+                    if (dotPropsIndex != -1)
+                        databaseTypes.add(entryName.substring(0, dotPropsIndex));
+                }
             }
         } catch (IOException exc) {
         } finally {
@@ -1646,7 +1649,7 @@ public class Config
             System.out.println("   -o outputDirectory    directory to place the generated output in");
             System.out.println("   -dp pathToDrivers     optional - looks for JDBC drivers here before looking");
             System.out.println("                           in driverPath in [databaseType].properties.");
-            System.out.println("Go to http://schemaspy.sourceforge.net for a complete list/description");
+            System.out.println("Go to http://schemaspy.org for a complete list/description");
             System.out.println(" of additional parameters.");
             System.out.println();
         }
