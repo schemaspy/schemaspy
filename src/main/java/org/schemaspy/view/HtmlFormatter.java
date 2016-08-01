@@ -108,24 +108,6 @@ public class HtmlFormatter {
      */
     protected void writeHeader(Database db, Table table, String text, LineWriter out) throws IOException {
         writeHeader(db, table, text, null, out);
-        //test(table);
-    }
-
-    private void test(Table table) {
-        MustacheFactory mf = new DefaultMustacheFactory();
-        URL url = getClass().getResource("/layout/index.html");
-        Mustache mustache = mf.compile(url.getPath());
-        String pathToStore = "d:\\svn\\codelabs\\schemaspy\\doc\\index2.html";
-        File testPage = new File(pathToStore);
-        StringWriter result = new StringWriter();
-        FileUtils fileUtils = new FileUtils();
-
-        try {
-                mustache.execute(result, table).flush();
-                fileUtils.writeStringToFile(testPage, result.toString(), "UTF-8");
-            } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     protected void writeGeneratedOn(String connectTime, LineWriter html) throws IOException {
