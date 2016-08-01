@@ -1356,7 +1356,6 @@ public class Config
         } catch (FileNotFoundException notFoundOnFilesystemWithoutExtension) {
             try {
                 File propertiesFile = new File(type + ".properties");
-                System.out.println(type + ".properties");
                 bundle = new PropertyResourceBundle(new FileInputStream(propertiesFile));
                 dbPropertiesLoadedFrom = propertiesFile.getAbsolutePath();
             } catch (FileNotFoundException notFoundOnFilesystemWithExtensionTackedOn) {
