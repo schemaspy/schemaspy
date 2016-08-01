@@ -1,3 +1,21 @@
+/*
+ * This file is a part of the SchemaSpy project (http://schemaspy.org).
+ * Copyright (C) 2016 Rafal Kasa
+ *
+ * SchemaSpy is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * SchemaSpy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 package org.schemaspy;
 
 import org.schemaspy.model.ConnectionFailure;
@@ -17,7 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by rkasa on 2016-08-01.
+ * @author Rafal Kasa on 2016-08-01.
  */
 public class DbDriverLoader {
 
@@ -88,7 +106,13 @@ public class DbDriverLoader {
      */
     protected Driver getDriver(String driverClass, String driverPath) throws MalformedURLException {
         List<URL> classpath = getExistingUrls(driverPath);
-//        List<URL> classpath = getExistingUrls(getClass().getResource("/org/schemaspy/dbDrivers/sqljdbc42.jar").getPath());
+        if (classpath.size() <= 0) {
+            URL url = getClass().getResource(driverPath);
+            if (url != null) {
+                classpath = getExistingUrls(url.getPath());
+            }
+        }
+
         ClassLoader loader = getDriverClassLoader(classpath);
         Driver driver = null;
 

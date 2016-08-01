@@ -1364,7 +1364,7 @@ public class Config
                     dbPropertiesLoadedFrom = "[" + getLoadedFromJar() + "]" + File.separator + type + ".properties";
                 } catch (Exception notInJarWithoutPath) {
                     try {
-                        String path = TableOrderer.class.getPackage().getName() + ".dbTypes." + type;
+                        String path = TableOrderer.class.getPackage().getName() + ".types." + type;
                         path = path.replace('.', '/');
                         bundle = ResourceBundle.getBundle(path);
                         dbPropertiesLoadedFrom = "[" + getLoadedFromJar() + "]/" + path + ".properties";
@@ -1608,7 +1608,7 @@ public class Config
 
             while ((entry = jar.getNextJarEntry()) != null) {
                 String entryName = entry.getName();
-                if (entryName.indexOf("dbTypes") != -1) {
+                if (entryName.indexOf("types") != -1) {
                     int dotPropsIndex = entryName.indexOf(".properties");
                     if (dotPropsIndex != -1)
                         databaseTypes.add(entryName.substring(0, dotPropsIndex));
