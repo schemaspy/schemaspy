@@ -18,6 +18,7 @@
  */
 package org.schemaspy.view;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,22 +62,22 @@ public class DotFormatter {
      * Write real relationships (excluding implied) associated with the given table.<p>
      * Returns a set of the implied constraints that could have been included but weren't.
      */
-    public Set<ForeignKeyConstraint> writeRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, LineWriter dot) throws IOException {
-        return writeRelationships(table, twoDegreesOfSeparation, stats, false, dot);
+    public Set<ForeignKeyConstraint> writeRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, LineWriter dot, File outputDir) throws IOException {
+        return writeRelationships(table, twoDegreesOfSeparation, stats, false, dot, outputDir);
     }
 
     /**
      * Write implied relationships associated with the given table
      */
-    public void writeAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, LineWriter dot) throws IOException {
-        writeRelationships(table, twoDegreesOfSeparation, stats, true, dot);
+    public void writeAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, LineWriter dot, File outputDir) throws IOException {
+        writeRelationships(table, twoDegreesOfSeparation, stats, true, dot, outputDir);
     }
 
     /**
      * Write relationships associated with the given table.<p>
      * Returns a set of the implied constraints that could have been included but weren't.
      */
-    private Set<ForeignKeyConstraint> writeRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, boolean includeImplied, LineWriter dot) throws IOException {
+    private Set<ForeignKeyConstraint> writeRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, boolean includeImplied, LineWriter dot, File outputDir) throws IOException {
         Set<Table> tablesWritten = new HashSet<Table>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<ForeignKeyConstraint>();
 
@@ -97,7 +98,7 @@ public class DotFormatter {
             if (!tablesWritten.add(relatedTable))
                 continue; // already written
 
-            nodes.put(relatedTable, new DotNode(relatedTable, "", new DotNodeConfig(false, false)));
+            nodes.put(relatedTable, new DotNode(relatedTable, "", outputDir, new DotNodeConfig(false, false)));
             connectors.addAll(finder.getRelatedConnectors(relatedTable, table, true, includeImplied));
         }
 
@@ -121,7 +122,7 @@ public class DotFormatter {
                         continue; // already written
 
                     allCousinConnectors.addAll(finder.getRelatedConnectors(cousin, relatedTable, false, includeImplied));
-                    nodes.put(cousin, new DotNode(cousin, false, ""));
+                    nodes.put(cousin, new DotNode(cousin, false, "", outputDir));
                 }
 
                 allCousins.addAll(cousins);
@@ -159,7 +160,7 @@ public class DotFormatter {
         }
 
         // include the table itself
-        nodes.put(table, new DotNode(table, ""));
+        nodes.put(table, new DotNode(table, "", outputDir));
 
         connectors.addAll(allCousinConnectors);
         for (DotConnector connector : connectors) {
@@ -259,18 +260,18 @@ public class DotFormatter {
         dot.writeln("  ];");
 }
 
-    public void writeRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, LineWriter dot) throws IOException {
-        writeRelationships(db, tables, compact, showColumns, false, stats, dot);
+    public void writeRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, LineWriter dot, File outputDir) throws IOException {
+        writeRelationships(db, tables, compact, showColumns, false, stats, dot, outputDir);
     }
 
     /**
      * Returns <code>true</code> if it wrote any implied relationships
      */
-    public boolean writeAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, LineWriter dot) throws IOException {
-        return writeRelationships(db, tables, compact, showColumns, true, stats, dot);
+    public boolean writeAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, LineWriter dot, File outputDir) throws IOException {
+        return writeRelationships(db, tables, compact, showColumns, true, stats, dot, outputDir);
     }
 
-    private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, LineWriter dot) throws IOException {
+    private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, LineWriter dot, File outputDir) throws IOException {
         DotConnectorFinder finder = DotConnectorFinder.getInstance();
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
         boolean wroteImplied = false;
@@ -293,12 +294,12 @@ public class DotFormatter {
 
         for (Table table : tables) {
             if (!table.isOrphan(includeImplied)) {
-                nodes.put(table, new DotNode(table, "tables/", nodeConfig));
+                nodes.put(table, new DotNode(table, "tables/", outputDir, nodeConfig));
             }
         }
 
         for (Table table : db.getRemoteTables()) {
-            nodes.put(table, new DotNode(table, "tables/", nodeConfig));
+            nodes.put(table, new DotNode(table, "tables/", outputDir, nodeConfig));
         }
 
         Set<DotConnector> connectors = new TreeSet<DotConnector>();
@@ -335,9 +336,9 @@ public class DotFormatter {
         }
     }
 
-    public void writeOrphan(Table table, LineWriter dot) throws IOException {
+    public void writeOrphan(Table table, LineWriter dot, File outputDir) throws IOException {
         writeHeader(table.getName(), false, dot);
-        dot.writeln(new DotNode(table, true, "tables/").toString());
+        dot.writeln(new DotNode(table, true, "tables/", outputDir).toString());
         dot.writeln("}");
     }
 }

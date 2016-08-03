@@ -38,6 +38,7 @@ public class DotNode {
     private final Table table;
     private final DotNodeConfig config;
     private final String path;
+    private final String outputDir;
     private final Set<TableColumn> excludedColumns = new HashSet<TableColumn>();
     private final String lineSeparator = System.getProperty("line.separator");
     private final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
@@ -50,13 +51,14 @@ public class DotNode {
      * @param table Table
      * @param path String
      */
-    public DotNode(Table table, String path) {
-        this(table, path, new DotNodeConfig(true, true));
+    public DotNode(Table table, String path, File outputDir) {
+        this(table, path, outputDir, new DotNodeConfig(true, true));
     }
 
-    public DotNode(Table table, String path, DotNodeConfig config) {
+    public DotNode(Table table, String path, File outputDir, DotNodeConfig config) {
         this.table = table;
         this.path = path + (table.isRemote() ? ("../../" + table.getContainer() + "/tables/") : "");
+        this.outputDir = outputDir.toString();
         this.config = config;
     }
 
@@ -68,8 +70,8 @@ public class DotNode {
      * @param showColumns boolean
      * @param path String
      */
-    public DotNode(Table table, boolean showColumns, String path) {
-        this(table, path, showColumns ? new DotNodeConfig(true, false) : new DotNodeConfig());
+    public DotNode(Table table, boolean showColumns, String path, File outputDir) {
+        this(table, path, outputDir, showColumns ? new DotNodeConfig(true, false) : new DotNodeConfig());
     }
 
     public void setShowImplied(boolean showImplied) {
@@ -136,9 +138,9 @@ public class DotNode {
                     buf.append("<TR ALIGN=\"LEFT\">");
                     buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"15\" HEIGHT=\"16\">");
                     if (column.isPrimary()) {
-                        buf.append("<IMG SRC=\"" + getFileSystemPath("/layout/images/primaryKeys.png")+"\"/>");
+                        buf.append("<IMG SRC=\"" + outputDir +"/images/primaryKeys.png\"/>");
                     } else if (column.isForeignKey()) {
-                        buf.append("<IMG SRC=\""+getFileSystemPath("/layout/images/foreignKeys.png")+"\"/>");
+                        buf.append("<IMG SRC=\""+ outputDir +"/images/foreignKeys.png\"/>");
                     }
                     buf.append("</TD>");
                     buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\""+maxwidth+"\" HEIGHT=\"16\">");

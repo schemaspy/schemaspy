@@ -111,7 +111,7 @@ public class HtmlTablePage extends HtmlFormatter {
         scopes.put("definitionExists", definitionExists(table));
 
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName());
-        mw.write("/layout/tables/table.html", Markdown.pagePath(table.getName()), "table.js");
+        mw.write("layout/tables/table.html", Markdown.pagePath(table.getName()), "table.js");
     }
 
 
@@ -160,7 +160,7 @@ public class HtmlTablePage extends HtmlFormatter {
      * @return boolean <code>true</code> if the table has implied relatives within two
      *                 degrees of separation.
      */
-    private boolean generateDots(Table table, File diagramDir, WriteStats stats) throws IOException {
+    private boolean generateDots(Table table, File diagramDir, WriteStats stats, File outputDir) throws IOException {
         Dot dot = Dot.getInstance();
         String extension = dot == null ? "png" : dot.getFormat();
 
@@ -191,12 +191,12 @@ public class HtmlTablePage extends HtmlFormatter {
             DotFormatter formatter = DotFormatter.getInstance();
             LineWriter dotOut = new LineWriter(oneDegreeDotFile, Config.DOT_CHARSET);
             WriteStats oneStats = new WriteStats(stats);
-            formatter.writeRealRelationships(table, false, oneStats, dotOut);
+            formatter.writeRealRelationships(table, false, oneStats, dotOut, outputDir);
             dotOut.close();
 
             dotOut = new LineWriter(twoDegreesDotFile, Config.DOT_CHARSET);
             WriteStats twoStats = new WriteStats(stats);
-            impliedConstraints = formatter.writeRealRelationships(table, true, twoStats, dotOut);
+            impliedConstraints = formatter.writeRealRelationships(table, true, twoStats, dotOut, outputDir);
             dotOut.close();
 
             if (oneStats.getNumTablesWritten() + oneStats.getNumViewsWritten() == twoStats.getNumTablesWritten() + twoStats.getNumViewsWritten()) {
@@ -205,11 +205,11 @@ public class HtmlTablePage extends HtmlFormatter {
 
             if (!impliedConstraints.isEmpty()) {
                 dotOut = new LineWriter(oneImpliedDotFile, Config.DOT_CHARSET);
-                formatter.writeAllRelationships(table, false, stats, dotOut);
+                formatter.writeAllRelationships(table, false, stats, dotOut, outputDir);
                 dotOut.close();
 
                 dotOut = new LineWriter(twoImpliedDotFile, Config.DOT_CHARSET);
-                formatter.writeAllRelationships(table, true, stats, dotOut);
+                formatter.writeAllRelationships(table, true, stats, dotOut, outputDir);
                 dotOut.close();
                 return true;
             }
@@ -221,7 +221,7 @@ public class HtmlTablePage extends HtmlFormatter {
     private Object generateDiagrams(Table table, WriteStats stats, File outputDir, List<MustacheTableDiagram> diagrams) throws IOException {
         Object graphviz = new Object();;
         File diagramsDir = new File(outputDir, "diagrams");
-        boolean hasImplied = generateDots(table, diagramsDir, stats);
+        boolean hasImplied = generateDots(table, diagramsDir, stats, outputDir);
 
         if (table.getMaxChildren() + table.getMaxParents() > 0)
         {

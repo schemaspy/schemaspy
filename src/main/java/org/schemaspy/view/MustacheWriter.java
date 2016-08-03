@@ -4,10 +4,10 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.schemaspy.model.InvalidConfigurationException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -26,6 +26,7 @@ public class MustacheWriter {
         this.rootPath = rootPath;
         this.databaseName = databaseName;
     }
+
     public void write(String templatePath, String destination, String scriptFileName) {
         MustacheFactory mf = new DefaultMustacheFactory();
         MustacheFactory contentMf = new DefaultMustacheFactory();
@@ -34,11 +35,11 @@ public class MustacheWriter {
         FileUtils fileUtils = new FileUtils();
 
         HashMap<String, Object> mainScope = new HashMap<String, Object>();
-        URL containerTemplate = getClass().getResource("/layout/container.html");
-        URL template = getClass().getResource(templatePath);
+        //URL containerTemplate = getClass().getResource("/layout/container.html");
+       // URL template = getClass().getResource(templatePath);
 
         try {
-            Mustache mustache = mf.compile(template.getPath());
+            Mustache mustache = mf.compile(getReader(templatePath),"template");
             mustache.execute(result, scopes).flush();
 
             mainScope.put("databaseName", databaseName);
@@ -46,12 +47,48 @@ public class MustacheWriter {
             mainScope.put("pageScript",scriptFileName);
             mainScope.put("rootPath", rootPath);
 
-            Mustache mustacheContent = contentMf.compile(containerTemplate.getPath());
+            Mustache mustacheContent = contentMf.compile(getReader("layout/container.html"), "container");
             mustacheContent.execute(content, mainScope).flush();
 
             fileUtils.writeStringToFile(new File(outputDir, destination), content.toString(), "UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static StringReader getReader(String fileName) throws IOException {
+        File cssFile = new File(fileName);
+        if (cssFile.exists())
+            return new StringReader(fileName);
+        cssFile = new File(System.getProperty("user.dir"), fileName);
+        if (cssFile.exists())
+            return new StringReader(fileName);
+
+        InputStream cssStream = StyleSheet.class.getClassLoader().getResourceAsStream(fileName);
+        if (cssStream == null)
+            throw new ParseException("Unable to find requested file: " + fileName);
+        String inputStream = IOUtils.toString(cssStream, "UTF-8").toString();
+        return new StringReader(inputStream);
+    }
+
+    /**
+     * Indicates an exception in parsing the css
+     */
+    public static class ParseException extends InvalidConfigurationException {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * @param cause root exception that caused the failure
+         */
+        public ParseException(Exception cause) {
+            super(cause);
+        }
+
+        /**
+         * @param msg textual description of the failure
+         */
+        public ParseException(String msg) {
+            super(msg);
         }
     }
 

@@ -94,7 +94,7 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
                 File imgFile = new File(diagramDir, dotBaseFilespec + ".1degree." + dot.getFormat());
 
                 LineWriter dotOut = new LineWriter(dotFile, Config.DOT_CHARSET);
-                DotFormatter.getInstance().writeOrphan(table, dotOut);
+                DotFormatter.getInstance().writeOrphan(table, dotOut, outputDir);
                 dotOut.close();
                 try {
                     maps.append(dot.generateDiagram(dotFile, imgFile));
@@ -112,7 +112,7 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
             scopes.put("maps", maps);
 
             MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName());
-            mw.write("/layout/orphans.html", "orphans.html", "");
+            mw.write("layout/orphans.html", "orphans.html", "");
 
             return true;
         } finally {

@@ -56,12 +56,7 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.xml.SchemaMeta;
-import org.schemaspy.util.ConnectionURLBuilder;
-import org.schemaspy.util.DOMUtil;
-import org.schemaspy.util.DbSpecificOption;
-import org.schemaspy.util.Dot;
-import org.schemaspy.util.LineWriter;
-import org.schemaspy.util.LogFormatter;
+import org.schemaspy.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -344,7 +339,7 @@ public class SchemaAnalyzer {
         String dotBaseFilespec = "relationships";
         out = new LineWriter(new File(summaryDir, dotBaseFilespec + ".real.compact.dot"), Config.DOT_CHARSET);
         WriteStats stats = new WriteStats(tables);
-        DotFormatter.getInstance().writeRealRelationships(db, tables, true, showDetailedTables, stats, out);
+        DotFormatter.getInstance().writeRealRelationships(db, tables, true, showDetailedTables, stats, out, outputDir);
         boolean hasRealRelationships = stats.getNumTablesWritten() > 0 || stats.getNumViewsWritten() > 0;
         out.close();
 
@@ -352,7 +347,7 @@ public class SchemaAnalyzer {
             // real relationships exist so generate the 'big' form of the relationships .dot file
             progressListener.graphingSummaryProgressed();
             out = new LineWriter(new File(summaryDir, dotBaseFilespec + ".real.large.dot"), Config.DOT_CHARSET);
-            DotFormatter.getInstance().writeRealRelationships(db, tables, false, showDetailedTables, stats, out);
+            DotFormatter.getInstance().writeRealRelationships(db, tables, false, showDetailedTables, stats, out, outputDir);
             out.close();
         }
 
@@ -372,14 +367,14 @@ public class SchemaAnalyzer {
 
         File impliedDotFile = new File(summaryDir, dotBaseFilespec + ".implied.compact.dot");
         out = new LineWriter(impliedDotFile, Config.DOT_CHARSET);
-        boolean hasImplied = DotFormatter.getInstance().writeAllRelationships(db, tables, true, showDetailedTables, stats, out);
+        boolean hasImplied = DotFormatter.getInstance().writeAllRelationships(db, tables, true, showDetailedTables, stats, out, outputDir);
 
         Set<TableColumn> excludedColumns = stats.getExcludedColumns();
         out.close();
         if (hasImplied) {
             impliedDotFile = new File(summaryDir, dotBaseFilespec + ".implied.large.dot");
             out = new LineWriter(impliedDotFile, Config.DOT_CHARSET);
-            DotFormatter.getInstance().writeAllRelationships(db, tables, false, showDetailedTables, stats, out);
+            DotFormatter.getInstance().writeAllRelationships(db, tables, false, showDetailedTables, stats, out, outputDir);
             out.close();
         } else {
             impliedDotFile.delete();
@@ -446,7 +441,7 @@ public class SchemaAnalyzer {
         FileFilter filter = FileFilterUtils.and(notHtmlFilter);
         //cleanDirectory(outputDir,"/diagrams");
         //cleanDirectory(outputDir,"/tables");
-        FileUtils.copyDirectory(directory, outputDir, filter);
+        ResourceWriter.copyResources(url, outputDir, filter);
     }
 
     private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {

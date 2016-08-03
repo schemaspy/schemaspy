@@ -17,22 +17,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package org.schemaspy.util;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.logging.Logger;
 
 public class ResourceWriter {
+    private static final Logger logger = Logger.getLogger(ResourceWriter.class.getName());
     private static ResourceWriter instance = new ResourceWriter();
-
-    protected ResourceWriter() {
-    }
-
-    public static ResourceWriter getInstance() {
-        return instance;
-    }
 
     /**
      * Write the specified resource to the specified filename
@@ -56,5 +55,79 @@ public class ResourceWriter {
         }
         in.close();
         out.close();
+    }
+
+    /**
+     * Copies resources to target folder.
+     *
+     * @param resourceUrl
+     * @param targetPath
+     * @return
+     */
+    public static void copyResources(URL resourceUrl, File targetPath, FileFilter filter) throws IOException {
+        if (resourceUrl == null) {
+            return;
+        }
+
+        URLConnection urlConnection = resourceUrl.openConnection();
+
+        /**
+         * Copy resources either from inside jar or from project folder.
+         */
+        if (urlConnection instanceof JarURLConnection) {
+            copyJarResourceToPath((JarURLConnection) urlConnection, targetPath, filter);
+        } else {
+            File file = new File(resourceUrl.getPath());
+            if (file.isDirectory()) {
+                FileUtils.copyDirectory(file, targetPath, filter);
+            } else {
+                FileUtils.copyFile(file, targetPath);
+            }
+        }
+    }
+
+    /**
+     * Copies resources from the jar file of the current thread and extract it
+     * to the destination path.
+     *
+     * @param jarConnection
+     * @param destPath destination file or directory
+     */
+    static void copyJarResourceToPath(JarURLConnection jarConnection, File destPath, FileFilter filter) {
+        try {
+            JarFile jarFile = jarConnection.getJarFile();
+            String jarConnectionEntryName = jarConnection.getEntryName();
+
+            /**
+             * Iterate all entries in the jar file.
+             */
+            for (Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements();) {
+                JarEntry jarEntry = e.nextElement();
+                String jarEntryName = jarEntry.getName();
+
+                /**
+                 * Extract files only if they match the path.
+                 */
+                if (jarEntryName.startsWith(jarConnectionEntryName + "/")) {
+                    String filename = jarEntryName.substring(jarConnectionEntryName.length());
+                    File currentFile = new File(destPath, filename);
+
+
+                    if (jarEntry.isDirectory()) {
+                        currentFile.mkdirs();
+                    } else {
+                        if ((filter == null) || filter.accept(currentFile)) {
+                            InputStream is = jarFile.getInputStream(jarEntry);
+                            OutputStream out = FileUtils.openOutputStream(currentFile);
+                            IOUtils.copy(is, out);
+                            is.close();
+                            out.close();
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            logger.warning(e.getMessage());
+        }
     }
 }
