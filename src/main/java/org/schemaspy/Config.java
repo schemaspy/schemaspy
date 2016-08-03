@@ -581,7 +581,7 @@ public class Config
         if (css == null) {
             css = pullParam("-css");
             if (css == null)
-                css = getClass().getResource("/layout/schemaSpy.css").getPath();
+                css = "layout/schemaSpy.css";
         }
         return css;
     }
