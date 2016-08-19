@@ -59,7 +59,10 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
 
         try {
             Dot dot = getDot();
-            Object graphvizExists = dot; //if null mean that it was problem with dot Graphviz initialization
+            Object graphvizExists = dot;
+
+            if (dot == null) //if null mean that it was problem with dot Graphviz initialization
+                return false;
 
             File compactRelationshipsDotFile = new File(diagramDir, dotBaseFilespec + ".real.compact.dot");
             File compactRelationshipsDiagramFile = new File(diagramDir, dotBaseFilespec + ".real.compact." + dot.getFormat());

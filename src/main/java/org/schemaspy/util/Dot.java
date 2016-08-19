@@ -35,8 +35,8 @@ import org.schemaspy.Config;
 public class Dot {
     private static Dot instance = new Dot();
     private final Version version;
-    private final Version supportedVersion = new Version("2.2.1");
-    private final Version badVersion = new Version("2.4");
+    private final Version supportedVersion = new Version("2.26");
+    private final Version badVersion = new Version("2.31");
     private final String lineSeparator = System.getProperty("line.separator");
     private String dotExe;
     private String format = "png";
