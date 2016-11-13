@@ -5,6 +5,7 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
 
 import java.io.*;
@@ -19,6 +20,7 @@ public class MustacheWriter {
     private HashMap<String, Object> scopes;
     private  String rootPath;
     private String databaseName;
+    private String templateDirectory = Config.getInstance().getTemplateDirectory();
 
     public MustacheWriter(File outputDir, HashMap<String, Object> scopes, String rootPath, String databaseName) {
         this.outputDir = outputDir;
@@ -35,11 +37,11 @@ public class MustacheWriter {
         FileUtils fileUtils = new FileUtils();
 
         HashMap<String, Object> mainScope = new HashMap<String, Object>();
-        //URL containerTemplate = getClass().getResource("/layout/container.html");
+        //URL containerTemplate = getClass().getResource(Paths.get(templateDirectory,"container.html").toString());
        // URL template = getClass().getResource(templatePath);
 
         try {
-            Mustache mustache = mf.compile(getReader(templatePath),"template");
+            Mustache mustache = mf.compile(getReader(new File(templateDirectory,templatePath).toString()),"template");
             mustache.execute(result, scopes).flush();
 
             mainScope.put("databaseName", databaseName);
@@ -47,7 +49,7 @@ public class MustacheWriter {
             mainScope.put("pageScript",scriptFileName);
             mainScope.put("rootPath", rootPath);
 
-            Mustache mustacheContent = contentMf.compile(getReader("layout/container.html"), "container");
+            Mustache mustacheContent = contentMf.compile(getReader(new File(templateDirectory,"container.html").toString()), "container");
             mustacheContent.execute(content, mainScope).flush();
 
             fileUtils.writeStringToFile(new File(outputDir, destination), content.toString(), "UTF-8");
@@ -57,14 +59,14 @@ public class MustacheWriter {
     }
 
     private static StringReader getReader(String fileName) throws IOException {
-        File cssFile = new File(fileName);
-        if (cssFile.exists())
-            return new StringReader(fileName);
-        cssFile = new File(System.getProperty("user.dir"), fileName);
-        if (cssFile.exists())
-            return new StringReader(fileName);
+    	InputStream cssStream = null;
+        if (new File(fileName).exists()){
+        	cssStream = new FileInputStream(fileName);
+        }else {
+	        if (new File(System.getProperty("user.dir"), fileName).exists())
+	        	cssStream = new FileInputStream(fileName);
+        }
 
-        InputStream cssStream = StyleSheet.class.getClassLoader().getResourceAsStream(fileName);
         if (cssStream == null)
             throw new ParseException("Unable to find requested file: " + fileName);
         String inputStream = IOUtils.toString(cssStream, "UTF-8").toString();

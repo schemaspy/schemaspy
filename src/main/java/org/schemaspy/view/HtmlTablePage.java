@@ -111,7 +111,7 @@ public class HtmlTablePage extends HtmlFormatter {
         scopes.put("definitionExists", definitionExists(table));
 
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName());
-        mw.write("layout/tables/table.html", Markdown.pagePath(table.getName()), "table.js");
+        mw.write("tables/table.html", Markdown.pagePath(table.getName()), "table.js");
     }
 
 

@@ -147,7 +147,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
         scopes.put("columns", tableColumns);
 
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), database.getName());
-        mw.write("layout/column.html", "columns.html", "column.js");
+        mw.write("column.html", "columns.html", "column.js");
     }
 
     public void writeMainTableHeader(boolean hasTableIds, ColumnInfo selectedColumn, LineWriter out) throws IOException {

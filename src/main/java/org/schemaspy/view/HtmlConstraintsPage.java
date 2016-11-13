@@ -60,7 +60,7 @@ public class HtmlConstraintsPage extends HtmlFormatter {
         scopes.put("tables", tables);
 
         MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName());
-        mw.write("layout/constraint.html", "constraints.html", "constraint.js");
+        mw.write("constraint.html", "constraints.html", "constraint.js");
     }
 
     private void writeHeader(Database database, LineWriter html) throws IOException {
