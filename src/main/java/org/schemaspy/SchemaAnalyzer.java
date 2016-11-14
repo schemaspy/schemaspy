@@ -30,8 +30,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -39,6 +41,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -75,10 +78,69 @@ public class SchemaAnalyzer {
     public Database analyze(Config config) throws SQLException, IOException {
     	// don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
     	// and not already logging fine details (to keep from obfuscating those)
-        boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
-        ProgressListener progressListener = new ConsoleProgressListener(render);
 
-        return analyze(config, progressListener);
+    	// if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas  
+        List<String> schemas = config.getSchemas();
+        if (schemas != null || config.isEvaluateAllEnabled()) {
+        	return this.analyzeMultipleSchemas(config,schemas);
+        }else{
+            boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
+            ProgressListener progressListener = new ConsoleProgressListener(render);
+            return analyze(config, progressListener);
+        }
+    }
+
+	public Database analyzeMultipleSchemas(Config config,List<String> schemas)throws SQLException, IOException {
+        try {
+        	String schemaSpec = config.getSchemaSpec();
+	        
+            Connection connection = this.getConnection(config);
+            DatabaseMetaData meta = connection.getMetaData();
+            //-all(evaluteAll) given then get list of the chemas
+            if (schemas == null || config.isEvaluateAllEnabled()) {
+            	if(schemaSpec==null)
+            		schemaSpec=".*";
+                System.out.println("Analyzing schemas that match regular expression '" + schemaSpec + "':");
+                System.out.println("(use -schemaSpec on command line or in .properties to exclude other schemas)");
+                schemas = getPopulatedSchemas(meta, schemaSpec, false);
+                if (schemas.isEmpty())
+                	schemas = getPopulatedSchemas(meta, schemaSpec, true);
+                if (schemas.isEmpty())
+                	schemas = Arrays.asList(new String[] {config.getUser()});
+            }
+        	
+        	System.out.println("Analyzing schemas: "+schemas.toString());
+        	
+	        boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
+	        String dbName = config.getDb();
+	        File outputDir = config.getOutputDir();
+	        // set flag which later on used for generation rootPathtoHome link.
+	        config.setOneOfMultipleSchemas(true);
+	        for (String schema : schemas) {
+	        	// reset -all(evaluteAll) and -schemas parametter to avoid infinite loop! now we are analyzing single schema
+	        	config.setSchemas(null);
+	            config.setEvaluateAllEnabled(false);
+	            if (dbName == null)
+	            	config.setDb(schema);
+	            else
+	        		config.setSchema(schema);
+	            config.setOutputDir(new File(outputDir, schema).toString());
+	            
+	            ProgressListener progressListener = new ConsoleProgressListener(render);
+	            System.out.println("Analyzing " + schema);
+	            System.out.flush();
+				this.analyze(config,progressListener);
+	        }
+	        
+            LineWriter index = new LineWriter(new File(outputDir, "index.html"), config.getCharset());
+            HtmlMultipleSchemasIndexPage.getInstance().write(dbName, schemas, meta, index);
+            index.close();
+	        
+	        return null;// change this 
+        } catch (Config.MissingRequiredParameterException missingParam) {
+            config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
+            return null;
+        }
     }
 
     public Database analyze(Config config, ProgressListener progressListener) throws SQLException, IOException {
@@ -114,26 +176,6 @@ public class SchemaAnalyzer {
                 }
             }
 
-            List<String> schemas = config.getSchemas();
-            if (schemas != null) {
-                List<String> args = config.asList();
-
-                // following params will be replaced by something appropriate
-                args.remove("-schemas");
-                args.remove("-schemata");
-
-                String dbName = config.getDb();
-
-                MultipleSchemaAnalyzer.getInstance().analyze(dbName, schemas, args, config);
-                return null;
-            }
-
-            Properties properties = config.determineDbProperties(config.getDbType());
-
-            ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
-            if (config.getDb() == null)
-                config.setDb(urlBuilder.getConnectionURL());
-
             if (config.getRemainingParameters().size() != 0) {
                 StringBuilder msg = new StringBuilder("Unrecognized option(s):");
                 for (String remnant : config.getRemainingParameters())
@@ -141,16 +183,9 @@ public class SchemaAnalyzer {
                 logger.warning(msg.toString());
             }
 
-            String driverClass = properties.getProperty("driver");
-            String driverPath = properties.getProperty("driverPath");
-            if (driverPath == null)
-                driverPath = "";
-            if (config.getDriverPath() != null)
-                driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
-
-            DbDriverLoader driverLoader = new DbDriverLoader();
-            Connection connection = driverLoader.getConnection(config, urlBuilder.getConnectionURL(), driverClass, driverPath);
-
+            Connection connection = getConnection(config);
+            Properties properties = config.determineDbProperties(config.getDbType());
+            ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
             DatabaseMetaData meta = connection.getMetaData();
             String dbName = config.getDb();
             String schema = config.getSchema();
@@ -443,6 +478,55 @@ public class SchemaAnalyzer {
         //cleanDirectory(outputDir,"/tables");
         ResourceWriter.copyResources(url, outputDir, filter);
     }
+
+    private List<String> getPopulatedSchemas(DatabaseMetaData meta, String schemaSpec, boolean isCatalog) throws SQLException {
+        List<String> populatedSchemas;
+
+        if ((!isCatalog && meta.supportsSchemasInTableDefinitions()) ||
+             (isCatalog && meta.supportsCatalogsInTableDefinitions())) {
+            Pattern schemaRegex = Pattern.compile(schemaSpec);
+
+            populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, isCatalog);
+            Iterator<String> iter = populatedSchemas.iterator();
+            while (iter.hasNext()) {
+                String schema = iter.next();
+                if (!schemaRegex.matcher(schema).matches()) {
+                    if (fineEnabled) {
+                        logger.fine("Excluding schema " + schema +
+                                    ": doesn't match + \"" + schemaRegex + '"');
+                    }
+                    iter.remove(); // remove those that we're not supposed to analyze
+                } else {
+                    if (fineEnabled) {
+                        logger.fine("Including schema " + schema +
+                                    ": matches + \"" + schemaRegex + '"');
+                    }
+                }
+            }
+        } else {
+            populatedSchemas = new ArrayList<String>();
+        }
+
+        return populatedSchemas;
+    }
+    private Connection getConnection(Config config) throws InvalidConfigurationException, IOException {
+
+        Properties properties = config.determineDbProperties(config.getDbType());
+
+        ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
+        if (config.getDb() == null)
+            config.setDb(urlBuilder.getConnectionURL());
+
+        String driverClass = properties.getProperty("driver");
+        String driverPath = properties.getProperty("driverPath");
+        if (driverPath == null)
+            driverPath = "";
+        if (config.getDriverPath() != null)
+            driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
+
+        DbDriverLoader driverLoader = new DbDriverLoader();
+        return driverLoader.getConnection(config, urlBuilder.getConnectionURL(), driverClass, driverPath);
+	}
 
     private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
         HtmlTablePage tableFormatter = HtmlTablePage.getInstance();

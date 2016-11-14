@@ -5,6 +5,7 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
 
 import java.io.*;
@@ -18,12 +19,19 @@ public class MustacheWriter {
     private File outputDir;
     private HashMap<String, Object> scopes;
     private  String rootPath;
+    private  String rootPathtoHome;
     private String databaseName;
 
     public MustacheWriter(File outputDir, HashMap<String, Object> scopes, String rootPath, String databaseName) {
         this.outputDir = outputDir;
         this.scopes = scopes;
         this.rootPath = rootPath;
+        boolean isOneOfMultipleSchemas = Config.getInstance().isOneOfMultipleSchemas();
+        if(isOneOfMultipleSchemas){
+            this.rootPathtoHome = "../"+rootPath;
+        }else{
+            this.rootPathtoHome = rootPath;
+        }
         this.databaseName = databaseName;
     }
 
@@ -46,6 +54,7 @@ public class MustacheWriter {
             mainScope.put("content", result);
             mainScope.put("pageScript",scriptFileName);
             mainScope.put("rootPath", rootPath);
+            mainScope.put("rootPathtoHome", rootPathtoHome);
 
             Mustache mustacheContent = contentMf.compile(getReader("layout/container.html"), "container");
             mustacheContent.execute(content, mainScope).flush();
