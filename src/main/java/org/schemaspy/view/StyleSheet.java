@@ -148,8 +148,7 @@ public class StyleSheet {
     	InputStream cssStream = null;
         if (new File(cssName).exists()){
         	cssStream = new FileInputStream(cssName);
-        }else {
-	        if (new File(System.getProperty("user.dir"), cssName).exists())
+        }else if (new File(System.getProperty("user.dir"), cssName).exists()){
 	        	cssStream = new FileInputStream(cssName);
         }
 

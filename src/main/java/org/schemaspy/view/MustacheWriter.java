@@ -62,8 +62,7 @@ public class MustacheWriter {
     	InputStream cssStream = null;
         if (new File(fileName).exists()){
         	cssStream = new FileInputStream(fileName);
-        }else {
-	        if (new File(System.getProperty("user.dir"), fileName).exists())
+        }else if (new File(System.getProperty("user.dir"), fileName).exists()){
 	        	cssStream = new FileInputStream(fileName);
         }
 
