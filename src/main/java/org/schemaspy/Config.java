@@ -285,8 +285,8 @@ public class Config
         	templateDirectory = pullParam("-template");
 	        if (templateDirectory == null)
 	        	// fefault template dir = resources/layout/
-	        	templateDirectory = getClass().getClassLoader().getResource(" getClass()").getPath();  	
-
+	        	templateDirectory = getClass().getResource("/layout").getPath();  
+	        
         return templateDirectory;
     }
 
