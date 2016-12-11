@@ -353,23 +353,4 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
 
         return buf.toString();
     }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.childTable != ((ForeignKeyConstraint)obj).childTable) {
-            return false;
-        }
-
-        if (this.parentTable != ((ForeignKeyConstraint)obj).parentTable) {
-            return false;
-        }
-
-        return true;
-    }
 }
