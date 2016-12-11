@@ -62,7 +62,6 @@ public class DbAnalyzer {
                 	Table existingTable = keyedTablesByPrimary.get(primary);
                     duplicatePrimaries = addKeyedTablesByPrimary(keyedTablesByPrimary, duplicatePrimaries, table, primary, existingTable);
 
-                    primary = new DatabaseObject(tableColumn);
                     primary.setName(table.getName()+primary.getName());
                     existingTable = keyedTablesByPrimary.get(primary);
                     duplicatePrimaries = addKeyedTablesByPrimary(keyedTablesByPrimary, duplicatePrimaries, table, primary, existingTable);
@@ -87,8 +86,8 @@ public class DbAnalyzer {
 
         List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<ImpliedForeignKeyConstraint>();
         for (TableColumn childColumn : columnsWithoutParents) {
+            Table primaryTable = keyedTablesByPrimary.get(new DatabaseObject(childColumn));
             DatabaseObject column = new DatabaseObject(childColumn);
-            Table primaryTable = keyedTablesByPrimary.get(column);
             if (primaryTable == null) {
                 column.setName(childColumn.getTable().getName()+childColumn.getName());
                 primaryTable = keyedTablesByPrimary.get(column);
