@@ -25,19 +25,26 @@ import org.schemaspy.model.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.model.ProcessExecutionException;
+import org.schemaspy.service.TableService;
 import org.schemaspy.ui.MainFrame;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * @author John Currier
  */
 public class Main {
     public static void main(String[] argv) throws Exception {
+
+        final AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext("org.schemaspy.service");
+        applicationContext.register(SchemaAnalyzer.class);
+
         if (argv.length == 1 && argv[0].equals("-gui")) { // warning: serious temp hack
             new MainFrame().setVisible(true);
             return;
         }
 
-        SchemaAnalyzer analyzer = new SchemaAnalyzer();
+        SchemaAnalyzer analyzer = applicationContext.getBean(SchemaAnalyzer.class);
 
         int rc = 1;
 

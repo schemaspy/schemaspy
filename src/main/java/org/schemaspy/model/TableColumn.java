@@ -64,7 +64,7 @@ public class TableColumn {
      * @param rs ResultSet returned from {@link DatabaseMetaData#getColumns(String, String, String, String)}
      * @throws SQLException
      */
-    TableColumn(Table table, ResultSet rs) throws SQLException {
+    public TableColumn(Table table, ResultSet rs) throws SQLException {
         this.table = table;
 
         // names and types are typically reused *many* times in a database,
@@ -134,6 +134,8 @@ public class TableColumn {
         defaultValue = colMeta.getDefaultValue();
         comments = colMeta.getComments();
     }
+
+
 
     /**
      * Returns the {@link Table} that this column belongs to.

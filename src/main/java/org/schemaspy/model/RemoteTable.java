@@ -32,6 +32,7 @@ import org.schemaspy.Config;
  * @author John Currier
  */
 public class RemoteTable extends Table {
+
     private final String baseContainer;
     private final static Logger logger = Logger.getLogger(RemoteTable.class.getName());
     private final static boolean finerEnabled = logger.isLoggable(Level.FINER);
@@ -49,53 +50,12 @@ public class RemoteTable extends Table {
         this.baseContainer = baseContainer;
     }
 
-    /**
-     * Connect to the PK's referenced by this table that live in the original schema
-     * @param tables
-     * @param excludeIndirectColumns
-     * @param excludeColumns
-     * @throws SQLException
-     */
-    @Override
-    public void connectForeignKeys(Map<String, Table> tables) throws SQLException {
-        if (finerEnabled)
-            logger.finer("Connecting foreign keys to " + getFullName());
-        ResultSet rs = null;
-
-        try {
-            // get remote table's FKs that reference PKs in our schema
-            rs = db.getMetaData().getImportedKeys(getCatalog(), getSchema(), getName());
-
-            while (rs.next()) {
-                String otherSchema = rs.getString("PKTABLE_SCHEM");
-                String otherCatalog = rs.getString("PKTABLE_CAT");
-
-                // if it points back to our schema then use it
-                if (baseContainer.equals(otherSchema) || baseContainer.equals(otherCatalog)) {
-                    addForeignKey(rs.getString("FK_NAME"), rs.getString("FKCOLUMN_NAME"),
-                            otherCatalog, otherSchema,
-                            rs.getString("PKTABLE_NAME"), rs.getString("PKCOLUMN_NAME"),
-                            rs.getInt("UPDATE_RULE"), rs.getInt("DELETE_RULE"),
-                            tables);
-                }
-            }
-        } catch (SQLException sqlExc) {
-            if (!isLogical()) {
-                // if explicitly asking for these details then propagate the exception
-                if (Config.getInstance().isOneOfMultipleSchemas())
-                    throw sqlExc;
-
-                // otherwise just report the fact that we tried & couldn't
-                System.err.println("Couldn't resolve foreign keys for remote table " + getFullName() + ": " + sqlExc);
-            }
-        } finally {
-            if (rs != null)
-                rs.close();
-        }
-    }
-
     @Override
     public boolean isRemote() {
         return true;
+    }
+
+    public String getBaseContainer() {
+        return baseContainer;
     }
 }
