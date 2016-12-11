@@ -56,7 +56,7 @@ public class Table implements Comparable<Table> {
     private final String name;
     private final String fullName;
     private final String container;
-    protected final CaseInsensitiveMap<TableColumn> columns = new CaseInsensitiveMap<TableColumn>();
+    protected CaseInsensitiveMap<TableColumn> columns = new CaseInsensitiveMap<TableColumn>();
     private final List<TableColumn> primaryKeys = new ArrayList<TableColumn>();
     private final CaseInsensitiveMap<ForeignKeyConstraint> foreignKeys = new CaseInsensitiveMap<ForeignKeyConstraint>();
     private final CaseInsensitiveMap<TableIndex> indexes = new CaseInsensitiveMap<TableIndex>();
@@ -314,6 +314,10 @@ public class Table implements Comparable<Table> {
         Set<TableColumn> sorted = new TreeSet<TableColumn>(new ByColumnIdComparator());
         sorted.addAll(columns.values());
         return new ArrayList<TableColumn>(sorted);
+    }
+
+    public void setColumns(CaseInsensitiveMap<TableColumn> columns) {
+        this.columns = columns;
     }
 
     /**

@@ -35,19 +35,19 @@ import org.schemaspy.model.xml.TableColumnMeta;
 
 public class TableColumn {
     private final Table table;
-    private final String name;
-    private final Object id;
-    private       String typeName;
-    private       String shortTypeName;
-    private       Integer type;
-    private final int length;
-    private final int decimalDigits;
-    private final String detailedSize;
-    private final boolean isNullable;
-    private       boolean isAutoUpdated;
-    private       Boolean isUnique;
-    private final Object defaultValue;
-    private       String comments;
+    private String name;
+    private Object id;
+    private String typeName;
+    private String shortTypeName;
+    private Integer type;
+    private int length;
+    private int decimalDigits;
+    private String detailedSize;
+    private boolean isNullable;
+    private boolean isAutoUpdated;
+    private Boolean isUnique;
+    private Object defaultValue;
+    private String comments;
     private final Map<TableColumn, ForeignKeyConstraint> parents = new HashMap<TableColumn, ForeignKeyConstraint>();
     private final Map<TableColumn, ForeignKeyConstraint> children = new TreeMap<TableColumn, ForeignKeyConstraint>(new ColumnComparator());
     private boolean allowImpliedParents = true;
@@ -64,48 +64,8 @@ public class TableColumn {
      * @param rs ResultSet returned from {@link DatabaseMetaData#getColumns(String, String, String, String)}
      * @throws SQLException
      */
-    public TableColumn(Table table, ResultSet rs) throws SQLException {
+    public TableColumn(Table table) throws SQLException {
         this.table = table;
-
-        // names and types are typically reused *many* times in a database,
-        // so keep a single instance of each distinct one
-        // (thanks to Mike Barnes for the suggestion)
-        String tmp = rs.getString("COLUMN_NAME");
-        name = tmp == null ? null : tmp.intern();
-        tmp = rs.getString("TYPE_NAME");
-        typeName = tmp == null ? "unknown" : tmp.intern();
-        type = rs.getInt("DATA_TYPE");
-
-        decimalDigits = rs.getInt("DECIMAL_DIGITS");
-        Number bufLength = (Number)rs.getObject("BUFFER_LENGTH");
-        if (bufLength != null && bufLength.shortValue() > 0)
-            length = bufLength.shortValue();
-        else
-            length = rs.getInt("COLUMN_SIZE");
-
-        StringBuilder buf = new StringBuilder();
-        buf.append(length);
-        if (decimalDigits > 0) {
-            buf.append(',');
-            buf.append(decimalDigits);
-        }
-        detailedSize = buf.toString();
-
-        isNullable = rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable;
-        defaultValue = rs.getString("COLUMN_DEF");
-        setComments(rs.getString("REMARKS"));
-        id = new Integer(rs.getInt("ORDINAL_POSITION") - 1);
-
-        Pattern excludeIndirectColumns = Config.getInstance().getIndirectColumnExclusions();
-        Pattern excludeColumns = Config.getInstance().getColumnExclusions();
-
-        isAllExcluded = matches(excludeColumns);
-        isExcluded = isAllExcluded || matches(excludeIndirectColumns);
-        if (isExcluded && finerEnabled) {
-            logger.finer("Excluding column " + getTable() + '.' + getName() +
-                        ": matches " + excludeColumns + ":" + isAllExcluded + " " +
-                        excludeIndirectColumns + ":" + matches(excludeIndirectColumns));
-        }
     }
 
     /**
@@ -155,6 +115,10 @@ public class TableColumn {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /**
      * Returns the ID of the column or <code>null</code> if the database doesn't support the concept.
      *
@@ -162,6 +126,10 @@ public class TableColumn {
      */
     public Object getId() {
         return id;
+    }
+
+    public void setId(Object id) {
+        this.id = id;
     }
 
     /**
@@ -223,6 +191,10 @@ public class TableColumn {
         return length;
     }
 
+    public void setLength(int length) {
+        this.length = length;
+    }
+
     /**
      * Decimal digits of the column.
      * See {@link DatabaseMetaData#getColumns(String, String, String, String)}'s <code>DECIMAL_DIGITS</code>.
@@ -231,6 +203,10 @@ public class TableColumn {
      */
     public int getDecimalDigits() {
         return decimalDigits;
+    }
+
+    public void setDecimalDigits(int decimalDigits) {
+        this.decimalDigits = decimalDigits;
     }
 
     /**
@@ -242,6 +218,10 @@ public class TableColumn {
         return detailedSize;
     }
 
+    public void setDetailedSize(String detailedSize) {
+        this.detailedSize = detailedSize;
+    }
+
     /**
      * Returns <code>true</code> if null values are allowed
      *
@@ -249,6 +229,10 @@ public class TableColumn {
      */
     public boolean isNullable() {
         return isNullable;
+    }
+
+    public void setNullable(boolean nullable) {
+        isNullable = nullable;
     }
 
     /**
@@ -326,6 +310,10 @@ public class TableColumn {
         return defaultValue;
     }
 
+    public void setDefaultValue(Object defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
     /**
      * @return Comments associated with this column, or <code>null</code> if none.
      */
@@ -355,6 +343,10 @@ public class TableColumn {
         return isExcluded;
     }
 
+    public void setExcluded(boolean excluded) {
+        isExcluded = excluded;
+    }
+
     /**
      * Returns <code>true</code> if this column is to be excluded from all relationships in
      * relationship diagrams.  This includes the detailed diagrams of the containing table.
@@ -366,6 +358,10 @@ public class TableColumn {
      */
     public boolean isAllExcluded() {
         return isAllExcluded;
+    }
+
+    public void setAllExcluded(boolean allExcluded) {
+        isAllExcluded = allExcluded;
     }
 
     /**

@@ -140,10 +140,54 @@ public class TableService {
             return;
 
         if (table.getColumn(columnName) == null) {
-            TableColumn column = new TableColumn(table, rs);
-
+            TableColumn column = initColumn(table, rs);
             table.getColumnsMap().put(column.getName(), column);
         }
+    }
+
+    private TableColumn initColumn(Table table, ResultSet rs) throws SQLException {
+        TableColumn column = new TableColumn(table);
+        // names and types are typically reused *many* times in a database,
+        // so keep a single instance of each distinct one
+        // (thanks to Mike Barnes for the suggestion)
+        String tmp = rs.getString("COLUMN_NAME");
+        column.setName(tmp == null ? null : tmp.intern());
+        tmp = rs.getString("TYPE_NAME");
+        column.setTypeName(tmp == null ? "unknown" : tmp.intern());
+        column.setType(rs.getInt("DATA_TYPE"));
+
+        column.setDecimalDigits(rs.getInt("DECIMAL_DIGITS"));
+        Number bufLength = (Number)rs.getObject("BUFFER_LENGTH");
+        if (bufLength != null && bufLength.shortValue() > 0)
+            column.setLength(bufLength.shortValue());
+        else
+            column.setLength(rs.getInt("COLUMN_SIZE"));
+
+        StringBuilder buf = new StringBuilder();
+        buf.append(column.getLength());
+        if (column.getDecimalDigits() > 0) {
+            buf.append(',');
+            buf.append(column.getDecimalDigits());
+        }
+        column.setDetailedSize(buf.toString());
+
+        column.setNullable(rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable);
+        column.setDefaultValue(rs.getString("COLUMN_DEF"));
+        column.setComments(rs.getString("REMARKS"));
+        column.setId(new Integer(rs.getInt("ORDINAL_POSITION") - 1));
+
+        Pattern excludeIndirectColumns = Config.getInstance().getIndirectColumnExclusions();
+        Pattern excludeColumns = Config.getInstance().getColumnExclusions();
+
+        column.setAllExcluded(column.matches(excludeColumns));
+        column.setExcluded(column.isAllExcluded() || column.matches(excludeIndirectColumns));
+        if (column.isExcluded() && finerEnabled) {
+            logger.finer("Excluding column " + column.getTable() + '.' + column.getName() +
+                    ": matches " + excludeColumns + ":" + column.isAllExcluded() + " " +
+                    excludeIndirectColumns + ":" + column.matches(excludeIndirectColumns));
+        }
+
+        return column;
     }
 
     /**
