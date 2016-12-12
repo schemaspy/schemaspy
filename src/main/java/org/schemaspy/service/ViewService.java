@@ -4,6 +4,7 @@ import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.View;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +15,7 @@ import java.util.logging.Logger;
 /**
  * Created by rkasa on 2016-12-10.
  */
+@Service
 public class ViewService {
 
     @Autowired
@@ -27,7 +29,7 @@ public class ViewService {
      * @return
      * @throws SQLException
      */
-    private String fetchViewSql(Database db, View view) throws SQLException {
+    public String fetchViewSql(Database db, View view) throws SQLException {
         String selectViewSql = Config.getInstance().getDbProperties().getProperty("selectViewSql");
         if (selectViewSql == null)
             return null;

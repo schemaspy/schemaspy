@@ -29,6 +29,9 @@ public class DatabaseService {
     private TableService tableService;
 
     @Autowired
+    private ViewService viewService;
+
+    @Autowired
     private SqlService sqlService;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
@@ -75,7 +78,7 @@ public class DatabaseService {
 
         String[] types = getTypes(config, "tableTypes", "TABLE");
         NameValidator validator = new NameValidator("table", include, exclude, types);
-        List<BasicTableMeta> entries = getBasicTableMeta(db, listener, metadata, true, types);
+        List<BasicTableMeta> entries = getBasicTableMeta(config, db, listener, metadata, true, types);
 
         TableCreator creator;
         if (maxThreads == 1) {
@@ -123,10 +126,17 @@ public class DatabaseService {
         String[] types = getTypes(config, "viewTypes", "VIEW");
         NameValidator validator = new NameValidator("view", includeTables, excludeTables, types);
 
-        for (BasicTableMeta entry : getBasicTableMeta(db, listener, metadata, false, types)) {
+        for (BasicTableMeta entry : getBasicTableMeta(config, db, listener, metadata, false, types)) {
             if (validator.isValid(entry.getName(), entry.getType())) {
                 View view = new View(db, entry.getCatalog(), entry.getSchema(), entry.getName(),
                         entry.getRemarks(), entry.getViewSql());
+
+                tableService.gatheringTableDetails(db, view);
+
+                if (entry.getViewSql() == null) {
+                    view.setViewSql(viewService.fetchViewSql(db, view));
+                }
+
                 db.getViewsMap().put(view.getName(), view);
                 listener.gatheringDetailsProgressed(view);
 
@@ -340,13 +350,14 @@ public class DatabaseService {
      * @return
      * @throws SQLException
      */
-    private List<BasicTableMeta> getBasicTableMeta(Database db,
+    private List<BasicTableMeta> getBasicTableMeta(Config config,
+                                                   Database db,
                                                    ProgressListener listener,
                                                    DatabaseMetaData metadata,
                                                    boolean forTables,
                                                    String... types) throws SQLException {
         String queryName = forTables ? "selectTablesSql" : "selectViewsSql";
-        String sql = Config.getInstance().getDbProperties().getProperty(queryName);
+        String sql = config.getDbProperties().getProperty(queryName);
         List<BasicTableMeta> basics = new ArrayList<BasicTableMeta>();
         ResultSet rs = null;
 
