@@ -22,3 +22,7 @@ In new **SchemaSpy 6.0** version you will find:
 6. You can also easily create in database comments links to the tables and columns
 
 More detail will came in next days plus I have in plan to start working on all not resolved issues.
+
+### Download
+
+[SchemaSpy v6.0.0-beta.1](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0-beta.1/schemaspy-6.0.0-beta.1.jar)
