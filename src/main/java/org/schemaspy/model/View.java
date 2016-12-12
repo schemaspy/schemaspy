@@ -43,9 +43,6 @@ public class View extends Table {
                 String name, String remarks, String viewSql) throws SQLException {
         super(db, catalog, schema, name, remarks);
 
-        //if (viewSql == null)
-        //    viewSql = fetchViewSql();
-
         if (viewSql != null && viewSql.trim().length() > 0)
             this.viewSql = viewSql;
     }
