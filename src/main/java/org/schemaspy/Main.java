@@ -49,7 +49,7 @@ public class Main {
         int rc = 1;
 
         try {
-            rc = analyzer.analyze(new Config(argv)) == null ? 1 : 0;
+            rc = analyzer.analyze(new Config(argv)) ? 0 : 1;
         } catch (ConnectionFailure couldntConnect) {
             // failure already logged
             rc = 3;
