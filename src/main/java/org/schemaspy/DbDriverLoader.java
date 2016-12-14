@@ -41,7 +41,7 @@ public class DbDriverLoader {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    protected Connection getConnection(Config config, String connectionURL,
+    public Connection getConnection(Config config, String connectionURL,
                                        String driverClass, String driverPath) throws FileNotFoundException, IOException {
         if (logger.isLoggable(Level.INFO)) {
             logger.info("Using database properties:");

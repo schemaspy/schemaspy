@@ -43,8 +43,8 @@ public class View extends Table {
                 String name, String remarks, String viewSql) throws SQLException {
         super(db, catalog, schema, name, remarks);
 
-        if (viewSql == null)
-            viewSql = fetchViewSql();
+        //if (viewSql == null)
+        //    viewSql = fetchViewSql();
 
         if (viewSql != null && viewSql.trim().length() > 0)
             this.viewSql = viewSql;
@@ -63,39 +63,7 @@ public class View extends Table {
         return viewSql;
     }
 
-    /**
-     * Extract the SQL that describes this view from the database
-     *
-     * @return
-     * @throws SQLException
-     */
-    private String fetchViewSql() throws SQLException {
-        String selectViewSql = Config.getInstance().getDbProperties().getProperty("selectViewSql");
-        if (selectViewSql == null)
-            return null;
-
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        StringBuilder viewDefinition = new StringBuilder();
-        try {
-            stmt = db.prepareStatement(selectViewSql, getName());
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                try {
-                    viewDefinition.append(rs.getString("view_definition"));
-                } catch (SQLException tryOldName) {
-                    viewDefinition.append(rs.getString("text"));
-                }
-            }
-            return viewDefinition.toString();
-        } catch (SQLException sqlException) {
-            System.err.println(selectViewSql);
-            throw sqlException;
-        } finally {
-            if (rs != null)
-                rs.close();
-            if (stmt != null)
-                stmt.close();
-        }
+    public void setViewSql(String viewSql) {
+        this.viewSql = viewSql;
     }
 }

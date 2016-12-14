@@ -52,7 +52,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      * @param name
      * @param deleteRule
      */
-    ForeignKeyConstraint(Table child, String name, int updateRule, int deleteRule) {
+    public ForeignKeyConstraint(Table child, String name, int updateRule, int deleteRule) {
         this.name = name; // implied constraints will have a null name and override getName()
         if (finerEnabled)
             logger.finer("Adding foreign key constraint '" + getName() + "' to " + child.getFullName());
@@ -97,7 +97,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      *
      * @param column
      */
-    void addParentColumn(TableColumn column) {
+    public void addParentColumn(TableColumn column) {
         if (column != null) {
             parentColumns.add(column);
             parentTable = column.getTable();
@@ -109,7 +109,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      *
      * @param column
      */
-    void addChildColumn(TableColumn column) {
+    public void addChildColumn(TableColumn column) {
         if (column != null) {
             childColumns.add(column);
         }
@@ -352,5 +352,24 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
         }
 
         return buf.toString();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.childTable != ((ForeignKeyConstraint)obj).childTable) {
+            return false;
+        }
+
+        if (this.parentTable != ((ForeignKeyConstraint)obj).parentTable) {
+            return false;
+        }
+
+        return true;
     }
 }

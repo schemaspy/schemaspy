@@ -20,14 +20,9 @@ package org.schemaspy;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +30,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -48,7 +42,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.schemaspy.model.ConnectionFailure;
 import org.schemaspy.model.ConsoleProgressListener;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
@@ -59,12 +52,15 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.xml.SchemaMeta;
+import org.schemaspy.service.DatabaseService;
+import org.schemaspy.service.SqlService;
 import org.schemaspy.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.schemaspy.view.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -74,6 +70,12 @@ import org.w3c.dom.Element;
 public class SchemaAnalyzer {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private boolean fineEnabled;
+
+    @Autowired
+    private SqlService sqlService;
+
+    @Autowired
+    private DatabaseService databaseService;
 
     public Database analyze(Config config) throws SQLException, IOException {
     	// don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
@@ -175,38 +177,27 @@ public class SchemaAnalyzer {
                     throw new IOException("Failed to create directory '" + outputDir + "'");
                 }
             }
+          
+            List<String> schemas = config.getSchemas();
+            if (schemas != null) {
+                List<String> args = config.asList();
 
-            if (config.getRemainingParameters().size() != 0) {
-                StringBuilder msg = new StringBuilder("Unrecognized option(s):");
-                for (String remnant : config.getRemainingParameters())
-                    msg.append(" " + remnant);
-                logger.warning(msg.toString());
+                // following params will be replaced by something appropriate
+                args.remove("-schemas");
+                args.remove("-schemata");
+
+                String dbName = config.getDb();
+
+                MultipleSchemaAnalyzer.getInstance().analyze(dbName, schemas, args, config);
+                return null;
             }
-
-            Connection connection = getConnection(config);
-            Properties properties = config.determineDbProperties(config.getDbType());
-            ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
-            DatabaseMetaData meta = connection.getMetaData();
+          
             String dbName = config.getDb();
             String schema = config.getSchema();
 
-            if (config.isEvaluateAllEnabled()) {
-                List<String> args = config.asList();
-                for (DbSpecificOption option : urlBuilder.getOptions()) {
-                    if (!args.contains("-" + option.getName())) {
-                        args.add("-" + option.getName());
-                        args.add(option.getValue().toString());
-                    }
-                }
-
-                String schemaSpec = config.getSchemaSpec();
-                if (schemaSpec == null)
-                    schemaSpec = properties.getProperty("schemaSpec", ".*");
-                MultipleSchemaAnalyzer.getInstance().analyze(dbName, meta, schemaSpec, null, args, config);
-                return null;    // no database to return
-            }
-
             String catalog = config.getCatalog();
+
+            DatabaseMetaData meta = sqlService.connect(config);
 
             logger.fine("supportsSchemasInTableDefinitions: " + meta.supportsSchemasInTableDefinitions());
             logger.fine("supportsCatalogsInTableDefinitions: " + meta.supportsCatalogsInTableDefinitions());
@@ -242,7 +233,8 @@ public class SchemaAnalyzer {
             //
             // create our representation of the database
             //
-            Database db = new Database(config, connection, meta, dbName, catalog, schema, schemaMeta, progressListener);
+            Database db = new Database(config, meta, dbName, catalog, schema, schemaMeta, progressListener);
+            databaseService.gatheringSchemaDetails(config, db, progressListener);
 
             long duration = progressListener.startedGraphingSummaries();
 
@@ -304,13 +296,10 @@ public class SchemaAnalyzer {
             // 'try' to make some memory available for the sorting process
             // (some people have run out of memory while RI sorting tables)
             builder = null;
-            connection = null;
             document = null;
             factory = null;
             meta = null;
-            properties = null;
             rootNode = null;
-            urlBuilder = null;
 
             List<ForeignKeyConstraint> recursiveConstraints = new ArrayList<ForeignKeyConstraint>();
 

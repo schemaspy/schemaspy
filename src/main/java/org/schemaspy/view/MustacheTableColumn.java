@@ -116,51 +116,7 @@ public class MustacheTableColumn {
 
             ForeignKeyConstraint constraint = dumpParents ? column.getChildConstraint(this.column) : column.getParentConstraint(this.column);
             MustacheTableColumnRelatives relative = new MustacheTableColumnRelatives(column, constraint);
-//            if (constraint.isImplied())
-//                out.writeln("   <tr class='impliedRelationship relative " + evenOdd + "' valign='top'>");
-//            else
-//                out.writeln("   <tr class='relative " + evenOdd + "' valign='top'>");
-//            out.write("    <td class='relatedTable detail' title=\"");
-//            out.write(constraint.toString());
-//            out.write("\">");
-//            if (columnTable.isRemote() && !Config.getInstance().isOneOfMultipleSchemas()) {
-//                out.write(columnTable.getContainer());
-//                out.write('.');
-//                out.write(columnTableName);
-//            } else {
-//                if (columnTable.isRemote()) {
-//                    out.write("<a href='");
-//                    out.write(path);
-//                    out.write("../../" + urlEncode(columnTable.getContainer()) + "/index.html'>");
-//                    out.write(columnTable.getContainer());
-//                    out.write("</a>.");
-//                }
-//                out.write("<a href='");
-//                out.write(path);
-//                if (columnTable.isRemote()) {
-//                    out.write("../../" + urlEncode(columnTable.getContainer()) + "/tables/");
-//                }
-//                out.write(urlEncode(columnTableName));
-//                out.write(".html'>");
-//                out.write(columnTableName);
-//                out.write("</a>");
-//            }
-//            out.write("<span class='relatedKey'>.");
-//            out.write(column.getName());
-//            out.writeln("</span>");
-//            out.writeln("    </td>");
-//
-//            out.write("    <td class='constraint detail'>");
-//            out.write(constraint.getName());
-//            String ruleText = constraint.getDeleteRuleDescription();
-//            if (ruleText.length() > 0)
-//            {
-//                String ruleAlias = constraint.getDeleteRuleAlias();
-//                out.write("<span title='" + ruleText + "'>&nbsp;" + ruleAlias + "</span>");
-//            }
-//            out.writeln("</td>");
-//
-//            out.writeln("   </tr>");
+
             relatives.add(relative);
         }
     }
