@@ -74,6 +74,7 @@ public class Config
     private String catalog;
     private String schema;
     private List<String> schemas;
+    private boolean oneOfMultipleSchemas = false;
     private String user;
     private Boolean singleSignOn;
     private Boolean noSchema;
@@ -971,6 +972,10 @@ public class Config
         return tableExclusions;
     }
 
+    public void setSchemas(List<String> schemas) {
+    	this.schemas=schemas;
+    }
+    
     /**
      * @return
      */
@@ -1116,8 +1121,11 @@ public class Config
      * @return boolean
      */
     public boolean isOneOfMultipleSchemas() {
-        // set by MultipleSchemaAnalyzer
-        return Boolean.getBoolean("oneofmultipleschemas");
+        return oneOfMultipleSchemas;
+    }
+    public void setOneOfMultipleSchemas(boolean oneOfMultipleSchemas){
+        // set by SchemaAnalyzer.analyzeMultipleSchemas function.
+    	this.oneOfMultipleSchemas = oneOfMultipleSchemas;
     }
 
     /**
