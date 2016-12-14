@@ -74,7 +74,7 @@ public class SchemaAnalyzer {
     @Autowired
     private DatabaseService databaseService;
 
-    public Database analyze(Config config) throws SQLException, IOException {
+    public boolean analyze(Config config) throws SQLException, IOException {
     	// don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
     	// and not already logging fine details (to keep from obfuscating those)
         boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
@@ -83,16 +83,16 @@ public class SchemaAnalyzer {
         return analyze(config, progressListener);
     }
 
-    public Database analyze(Config config, ProgressListener progressListener) throws SQLException, IOException {
+    public boolean analyze(Config config, ProgressListener progressListener) throws SQLException, IOException {
         try {
             if (config.isHelpRequired()) {
                 config.dumpUsage(null, false);
-                return null;
+                return false;
             }
 
             if (config.isDbHelpRequired()) {
                 config.dumpUsage(null, true);
-                return null;
+                return false;
             }
 
             // set the log level for the root logger
@@ -127,7 +127,7 @@ public class SchemaAnalyzer {
                 String dbName = config.getDb();
 
                 MultipleSchemaAnalyzer.getInstance().analyze(dbName, schemas, args, config);
-                return null;
+                return true;
             }
 
             String dbName = config.getDb();
@@ -269,10 +269,10 @@ public class SchemaAnalyzer {
                 }
             }
 
-            return db;
+            return true;
         } catch (Config.MissingRequiredParameterException missingParam) {
             config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
-            return null;
+            return false;
         }
     }
 
