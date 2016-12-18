@@ -3,3 +3,5 @@ target/
 schemaspy.iml
 .project
 .classpath
+.settings
+/bin/

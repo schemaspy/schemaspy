@@ -2,8 +2,6 @@ package org.schemaspy.service;
 
 import org.schemaspy.Config;
 import org.schemaspy.DbDriverLoader;
-import org.schemaspy.MultipleSchemaAnalyzer;
-import org.schemaspy.model.Database;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ConnectionURLBuilder;
 import org.schemaspy.util.DbSpecificOption;
@@ -83,7 +81,7 @@ public class SqlService {
             String schemaSpec = config.getSchemaSpec();
             if (schemaSpec == null)
                 schemaSpec = properties.getProperty("schemaSpec", ".*");
-            MultipleSchemaAnalyzer.getInstance().analyze(databaseName, meta, schemaSpec, null, args, config);
+
             return null;    // no database to return
         }
 

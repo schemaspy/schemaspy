@@ -18,14 +18,20 @@
  */
 package org.schemaspy.view;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import org.schemaspy.Config;
+import org.schemaspy.util.DiagramUtil;
+import org.schemaspy.util.Dot;
 import org.schemaspy.util.LineWriter;
+import org.schemaspy.util.Markdown;
 
 /**
  * The page that contains links to the various schemas that were analyzed
@@ -50,89 +56,104 @@ public class HtmlMultipleSchemasIndexPage extends HtmlFormatter {
         return instance;
     }
 
-    public void write(String dbName, List<String> populatedSchemas, DatabaseMetaData meta, LineWriter index) throws IOException {
-        writeHeader(dbName, meta, populatedSchemas.size(), false, populatedSchemas.get(0).toString(), index);
 
+    public void write(File outputDir, String dbName, List<String> populatedSchemas, DatabaseMetaData meta) throws IOException {
+        List<MustacheSchema> schemas = new ArrayList<>();
         for (String schema : populatedSchemas) {
-            writeLineItem(schema, index);
+            schemas.add(new MustacheSchema(schema));
         }
 
-        writeFooter(index);
-    }
-
-    private void writeHeader(String databaseName, DatabaseMetaData meta, int numberOfSchemas, boolean showIds, String aSchema, LineWriter html) throws IOException {
         String connectTime = new SimpleDateFormat("EEE MMM dd HH:mm z yyyy").format(new Date());
 
-        html.writeln("<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>");
-        html.writeln("<html>");
-        html.writeln("<head>");
-        html.write("  <title>SchemaSpy Analysis");
-        if (databaseName != null) {
-            html.write(" of Database ");
-            html.write(databaseName);
-        }
-        html.writeln("</title>");
-        html.write("  <link rel=stylesheet href='");
-        html.write(aSchema);
-        html.writeln("/schemaSpy.css' type='text/css'>");
-        html.writeln("  <meta HTTP-EQUIV='Content-Type' CONTENT='text/html; charset=" + Config.getInstance().getCharset() + "'>");
-        html.writeln("</head>");
-        html.writeln("<body>");
-        writeTableOfContents(html);
-        html.writeln("<div class='content' style='clear:both;'>");
-        html.writeln("<table width='100%' border='0' cellpadding='0'>");
-        html.writeln(" <tr>");
-        html.write("  <td class='heading' valign='top'><h1>");
-        html.write("SchemaSpy Analysis");
-        if (databaseName != null) {
-            html.write(" of Database ");
-            html.write(databaseName);
-        }
-        html.writeln("</h1></td>");
-        html.writeln(" </tr>");
-        html.writeln("</table>");
-        html.writeln("<table width='100%'>");
-        html.writeln(" <tr><td class='container'>");
-        writeGeneratedOn(connectTime, html);
-        html.writeln(" </td></tr>");
-        html.writeln(" <tr>");
-        html.write("  <td class='container'>");
-        if (meta != null) {
-            html.write("Database Type: ");
-            html.write(getDatabaseProduct(meta));
-        }
-        html.writeln("  </td>");
-        html.writeln("  <td class='container' align='right' valign='top' rowspan='3'>");
-        html.write("    <br>");
-        html.writeln("  </td>");
-        html.writeln(" </tr>");
-        html.writeln("</table>");
+        HashMap<String, Object> scopes = new HashMap<String, Object>();
+        scopes.put("databaseName", dbName);
+        scopes.put("connectTime", connectTime);
 
-        html.writeln("<div class='indent'>");
-        html.write("<b>");
-        html.write(String.valueOf(numberOfSchemas));
-        if (databaseName != null)
-            html.write(" Schema");
-        else
-            html.write(" Database");
-        html.write(numberOfSchemas == 1 ? "" : "s");
-        html.writeln(":</b>");
-        html.writeln("<TABLE class='dataTable' border='1' rules='groups'>");
-        html.writeln("<colgroup>");
-        html.writeln("<thead align='left'>");
-        html.writeln("<tr>");
-        html.write("  <th valign='bottom'>");
-        if (databaseName != null)
-            html.write("Schema");
-        else
-            html.write("Database");
-        html.writeln("</th>");
-        if (showIds)
-            html.writeln("  <th align='center' valign='bottom'>ID</th>");
-        html.writeln("</tr>");
-        html.writeln("</thead>");
-        html.writeln("<tbody>");
+        scopes.put("databaseProduct", getDatabaseProduct(meta));
+        scopes.put("schemas", schemas);
+        scopes.put("schemasNumber", Integer.toString(schemas.size()));
+
+        scopes.put("multipleSchemas", true);
+
+
+
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", dbName, true);
+        mw.write("layout/multi.html", "index.html", "");
     }
+
+//    private void writeHeader(String databaseName, DatabaseMetaData meta4, int numberOfSchemas, boolean showIds9, String aSchema, LineWriter html) throws IOException {
+//        String connectTime = new SimpleDateFormat("EEE MMM dd HH:mm z yyyy").format(new Date());
+//
+//        html.writeln("<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>");
+//        html.writeln("<html>");
+//        html.writeln("<head>");
+//        html.write("  <title>SchemaSpy Analysis");
+//        if (databaseName != null) {
+//            html.write(" of Database ");
+//            html.write(databaseName);
+//        }
+//        html.writeln("</title>");
+//        html.write("  <link rel=stylesheet href='");
+//        html.write(aSchema);
+//        html.writeln("/schemaSpy.css' type='text/css'>");
+//        html.writeln("  <meta HTTP-EQUIV='Content-Type' CONTENT='text/html; charset=" + Config.getInstance().getCharset() + "'>");
+//        html.writeln("</head>");
+//        html.writeln("<body>");
+//        writeTableOfContents(html);
+//        html.writeln("<div class='content' style='clear:both;'>");
+//        html.writeln("<table width='100%' border='0' cellpadding='0'>");
+//        html.writeln(" <tr>");
+//        html.write("  <td class='heading' valign='top'><h1>");
+//        html.write("SchemaSpy Analysis");
+//        if (databaseName != null) {
+//            html.write(" of Database ");
+//            html.write(databaseName);
+//        }
+//        html.writeln("</h1></td>");
+//        html.writeln(" </tr>");
+//        html.writeln("</table>");
+//        html.writeln("<table width='100%'>");
+//        html.writeln(" <tr><td class='container'>");
+//        writeGeneratedOn(connectTime, html);
+//        html.writeln(" </td></tr>");
+//        html.writeln(" <tr>");
+//        html.write("  <td class='container'>");
+//        if (meta != null) {
+//            html.write("Database Type: ");
+//            html.write(getDatabaseProduct(meta));
+//        }
+//        html.writeln("  </td>");
+//        html.writeln("  <td class='container' align='right' valign='top' rowspan='3'>");
+//        html.write("    <br>");
+//        html.writeln("  </td>");
+//        html.writeln(" </tr>");
+//        html.writeln("</table>");
+//
+//        html.writeln("<div class='indent'>");
+//        html.write("<b>");
+//        html.write(String.valueOf(numberOfSchemas));
+//        if (databaseName != null)
+//            html.write(" Schema");
+//        else
+//            html.write(" Database");
+//        html.write(numberOfSchemas == 1 ? "" : "s");
+//        html.writeln(":</b>");
+//        html.writeln("<TABLE class='dataTable' border='1' rules='groups'>");
+//        html.writeln("<colgroup>");
+//        html.writeln("<thead align='left'>");
+//        html.writeln("<tr>");
+//        html.write("  <th valign='bottom'>");
+//        if (databaseName != null)
+//            html.write("Schema");
+//        else
+//            html.write("Database");
+//        html.writeln("</th>");
+//        if (showIds)
+//            html.writeln("  <th align='center' valign='bottom'>ID</th>");
+//        html.writeln("</tr>");
+//        html.writeln("</thead>");
+//        html.writeln("<tbody>");
+//    }
 
     private void writeLineItem(String schema, LineWriter index) throws IOException {
         index.writeln(" <tr>");
@@ -142,26 +163,6 @@ public class HtmlMultipleSchemasIndexPage extends HtmlFormatter {
         index.write(schema);
         index.writeln("</a></td>");
         index.writeln(" </tr>");
-    }
-
-    @Override
-    protected void writeTableOfContents(LineWriter html) throws IOException {
-        // have to use a table to deal with a horizontal scrollbar showing up inappropriately
-        html.writeln("<table id='headerHolder' cellspacing='0' cellpadding='0'><tr><td>");
-        html.writeln("<div id='header'>");
-        html.writeln(" <ul>");
-        html.writeln("  <li id='current'><a href='index.html' title='All user schemas in the database'>Schemas</a></li>");
-        html.writeln("  <li><a href='http://sourceforge.net/donate/index.php?group_id=137197' title='Please help keep SchemaSpy alive' target='_blank'>Donate</a></li>");
-        html.writeln(" </ul>");
-        html.writeln("</div>");
-        html.writeln("</td></tr></table>");
-    }
-
-    @Override
-    protected void writeFooter(LineWriter html) throws IOException {
-        html.writeln("</tbody>");
-        html.writeln("</table>");
-        super.writeFooter(html);
     }
 
     /**

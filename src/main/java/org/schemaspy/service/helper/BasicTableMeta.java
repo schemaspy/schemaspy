@@ -14,7 +14,7 @@ public class BasicTableMeta
     final String type;
     final String remarks;
     final String viewSql;
-    final int numRows;  // -1 if not determined
+    final long numRows;  // -1 if not determined
 
     /**
      * @param schema
@@ -24,7 +24,7 @@ public class BasicTableMeta
      * @param text optional textual SQL used to create the view
      * @param numRows number of rows, or -1 if not determined
      */
-    public BasicTableMeta(String catalog, String schema, String name, String type, String remarks, String text, int numRows)
+    public BasicTableMeta(String catalog, String schema, String name, String type, String remarks, String text, long numRows)
     {
         this.catalog = catalog;
         this.schema = schema;
@@ -47,7 +47,7 @@ public class BasicTableMeta
         return name;
     }
 
-    public int getNumRows() {
+    public long getNumRows() {
         return numRows;
     }
 

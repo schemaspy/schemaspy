@@ -34,9 +34,9 @@ import org.schemaspy.Config;
 
 public class Dot {
     private static Dot instance = new Dot();
-    private final Version version;
-    private final Version supportedVersion = new Version("2.26");
-    private final Version badVersion = new Version("2.31");
+    private final GraphvizVersion graphvizVersion;
+    private final GraphvizVersion supportedGraphvizVersion = new GraphvizVersion("2.26");
+    private final GraphvizVersion badGraphvizVersion = new GraphvizVersion("2.31");
     private final String lineSeparator = System.getProperty("line.separator");
     private String dotExe;
     private String format = "png";
@@ -48,16 +48,16 @@ public class Dot {
     private Dot() {
         String versionText = null;
         // dot -V should return something similar to:
-        //  dot version 2.8 (Fri Feb  3 22:38:53 UTC 2006)
+        //  dot graphvizVersion 2.8 (Fri Feb  3 22:38:53 UTC 2006)
         // or sometimes something like:
-        //  dot - Graphviz version 2.9.20061004.0440 (Wed Oct 4 21:01:52 GMT 2006)
+        //  dot - Graphviz graphvizVersion 2.9.20061004.0440 (Wed Oct 4 21:01:52 GMT 2006)
         String[] dotCommand = new String[] { getExe(), "-V" };
 
         try {
             Process process = Runtime.getRuntime().exec(dotCommand);
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String versionLine = reader.readLine();
-            logger.config("Version: \"" + versionLine + "\"");
+            logger.config("GraphvizVersion: \"" + versionLine + "\"");
 
             // look for a number followed numbers or dots
             Matcher matcher = Pattern.compile("[0-9][0-9.]+").matcher(versionLine);
@@ -74,14 +74,14 @@ public class Dot {
         } catch (Exception validDotDoesntExist) {
             if (Config.getInstance().isHtmlGenerationEnabled()) {
                 System.err.println();
-                logger.warning("Failed to query Graphviz version information");
+                logger.warning("Failed to query Graphviz graphvizVersion information");
                 logger.warning("  with: " + getDisplayableCommand(dotCommand));
                 logger.warning("  " + validDotDoesntExist);
                 logger.log(Level.INFO, "Graphviz query failure details:", validDotDoesntExist);
             }
         }
 
-        version = new Version(versionText);
+        graphvizVersion = new GraphvizVersion(versionText);
         validatedRenderers.add("");
     }
 
@@ -90,23 +90,23 @@ public class Dot {
     }
 
     public boolean exists() {
-        return version.toString() != null;
+        return graphvizVersion.toString() != null;
     }
 
-    public Version getVersion() {
-        return version;
+    public GraphvizVersion getGraphvizVersion() {
+        return graphvizVersion;
     }
 
     public boolean isValid() {
-        return exists() && (getVersion().equals(supportedVersion) || getVersion().compareTo(badVersion) > 0);
+        return exists() && (getGraphvizVersion().equals(supportedGraphvizVersion) || getGraphvizVersion().compareTo(badGraphvizVersion) > 0);
     }
 
     public String getSupportedVersions() {
-        return "dot version " + supportedVersion + " or versions greater than " + badVersion;
+        return "dot graphvizVersion " + supportedGraphvizVersion + " or versions greater than " + badGraphvizVersion;
     }
 
     public boolean supportsCenteredEastWestEdges() {
-        return getVersion().compareTo(new Version("2.6")) >= 0;
+        return getGraphvizVersion().compareTo(new GraphvizVersion("2.6")) >= 0;
     }
 
     /**
@@ -140,7 +140,7 @@ public class Dot {
      * @return
      */
     public boolean requiresGdRenderer() {
-        return getVersion().compareTo(new Version("2.12")) >= 0 && supportsRenderer(":gd");
+        return getGraphvizVersion().compareTo(new GraphvizVersion("2.12")) >= 0 && supportsRenderer(":gd");
     }
 
     /**
@@ -154,7 +154,7 @@ public class Dot {
      */
     public void setRenderer(String renderer) {
         if (isValid() && !supportsRenderer(renderer)) {
-            logger.info("renderer '" + renderer + "' is not supported by your version of dot");
+            logger.info("renderer '" + renderer + "' is not supported by your graphvizVersion of dot");
         }
 
         this.renderer = renderer;

@@ -121,7 +121,7 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
             scopes.put("anyRelationships", anyRelationships(hasRealRelationships, hasImpliedRelationships));
             scopes.put("diagrams", diagrams);
 
-            MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName());
+            MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
             mw.write("layout/relationships.html", "relationships.html", "relationships.js");
             return true;
         } catch (Dot.DotFailure dotFailure) {

@@ -110,7 +110,7 @@ public class HtmlTablePage extends HtmlFormatter {
         scopes.put("indexExists", indexExists(table, indexedColumns));
         scopes.put("definitionExists", definitionExists(table));
         System.out.println("Table -> "+table.getName());
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName());
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
         mw.write("layout/tables/table.html", Markdown.pagePath(table.getName()), "table.js");
     }
 
