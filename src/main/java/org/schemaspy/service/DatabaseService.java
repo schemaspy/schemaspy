@@ -378,7 +378,7 @@ public class DatabaseService {
                     String remarks = getOptionalString(rs, clazz + "_comment");
                     String text = forTables ? null : getOptionalString(rs, "view_definition");
                     String rows = forTables ? getOptionalString(rs, "table_rows") : null;
-                    int numRows = rows == null ? -1 : Integer.parseInt(rows);
+                    long numRows = rows == null ? -1 : Long.parseLong(rows);
 
                     basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, text, numRows));
                 }
