@@ -78,7 +78,7 @@ public class HtmlMultipleSchemasIndexPage extends HtmlFormatter {
 
 
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", dbName, true);
-        mw.write("layout/multi.html", "index.html", "");
+        mw.write("multi.html", "index.html", "");
     }
 
 //    private void writeHeader(String databaseName, DatabaseMetaData meta4, int numberOfSchemas, boolean showIds9, String aSchema, LineWriter html) throws IOException {

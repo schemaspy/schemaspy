@@ -285,7 +285,7 @@ public class Config
         if (templateDirectory == null)
         	templateDirectory = pullParam("-template");
 	        if (templateDirectory == null)
-	        	// fefault template dir = resources/layout/
+	        	// default template dir = resources/layout/
 	        	templateDirectory = getClass().getResource("/layout").getPath();  
 	        
         return templateDirectory;
