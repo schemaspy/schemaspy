@@ -59,7 +59,7 @@ public class HtmlConstraintsPage extends HtmlFormatter {
         scopes.put("constraints", constraints);
         scopes.put("tables", tables);
 
-        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName());
+        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName(), false);
         mw.write("constraint.html", "constraints.html", "constraint.js");
     }
 

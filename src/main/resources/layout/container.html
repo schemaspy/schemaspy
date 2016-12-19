@@ -41,12 +41,14 @@
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
 <body class="hold-transition skin-blue layout-top-nav">
 <div class="wrapper">
-
+  {{#isMultipleSchemas}}
+  {{/isMultipleSchemas}}
+  {{^isMultipleSchemas}}
   <header class="main-header">
     <nav class="navbar navbar-static-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="{{rootPath}}index.html" class="navbar-brand"><b>{{databaseName}}</b> Database</a>
+          <a href="{{rootPathtoHome}}index.html" class="navbar-brand"><b>{{databaseName}}</b> Database</a>
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
             <i class="fa fa-bars"></i>
           </button>
@@ -71,6 +73,7 @@
       <!-- /.container-fluid -->
     </nav>
   </header>
+  {{/isMultipleSchemas}}
   <!-- Main content -->
   <!-- Full Width Column -->
   <div class="content-wrapper">
@@ -83,7 +86,7 @@
         <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
         <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
       </div>
-      <strong>Generate by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemeSpy 6.0</a></strong>
+      <strong>Generate by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemeSpy {{version}}</a></strong>
     </div>
     <!-- /.container -->
   </footer>

@@ -71,7 +71,7 @@ public class HtmlAnomaliesPage extends HtmlFormatter {
         scopes.put("incrementingColumnNames", incrementingColumnNames);
         scopes.put("uniqueNullables", uniqueNullables);
 
-        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName());
+        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName(), false);
         mw.write("anomalies.html", "anomalies.html", "anomalies.js");
     }
 

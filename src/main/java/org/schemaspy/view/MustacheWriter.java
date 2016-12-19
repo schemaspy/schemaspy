@@ -7,9 +7,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
+import org.schemaspy.util.Version;
 
 import java.io.*;
-import java.net.URL;
 import java.util.HashMap;
 
 /**
@@ -19,13 +19,23 @@ public class MustacheWriter {
     private File outputDir;
     private HashMap<String, Object> scopes;
     private  String rootPath;
+    private  String rootPathtoHome;
     private String databaseName;
+    private boolean isMultipleSchemas;
     private String templateDirectory = Config.getInstance().getTemplateDirectory();
 
-    public MustacheWriter(File outputDir, HashMap<String, Object> scopes, String rootPath, String databaseName) {
+    public MustacheWriter(File outputDir, HashMap<String, Object> scopes, String rootPath, String databaseName, boolean isMultipleSchemas) {
         this.outputDir = outputDir;
         this.scopes = scopes;
         this.rootPath = rootPath;
+        this.isMultipleSchemas = isMultipleSchemas;
+        boolean isOneOfMultipleSchemas = Config.getInstance().isOneOfMultipleSchemas();
+
+        if(isOneOfMultipleSchemas){
+            this.rootPathtoHome = "../"+rootPath;
+        }else{
+            this.rootPathtoHome = rootPath;
+        }
         this.databaseName = databaseName;
     }
 
@@ -48,11 +58,17 @@ public class MustacheWriter {
             mainScope.put("content", result);
             mainScope.put("pageScript",scriptFileName);
             mainScope.put("rootPath", rootPath);
+            mainScope.put("rootPathtoHome", rootPathtoHome);
+            mainScope.put("isMultipleSchemas", isMultipleSchemas);
+            Version version = new Version();
+            mainScope.put("version", version.getVersion());
 
             Mustache mustacheContent = contentMf.compile(getReader(new File(templateDirectory,"container.html").toString()), "container");
             mustacheContent.execute(content, mainScope).flush();
 
-            fileUtils.writeStringToFile(new File(outputDir, destination), content.toString(), "UTF-8");
+            File destinationFile = new File(outputDir, destination);
+
+            fileUtils.writeStringToFile(destinationFile, content.toString(), "UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -25,10 +25,10 @@ import junit.framework.TestCase;
 /**
  * @author John Currier
  */
-public class VersionTest extends TestCase {
-    private final Version twoNineOne = new Version("2.9.1");
-    private final Version twoTen = new Version("2.10");
-    private final Version twoTenOne = new Version("2.10.1");
+public class GraphvizVersionTest extends TestCase {
+    private final GraphvizVersion twoNineOne = new GraphvizVersion("2.9.1");
+    private final GraphvizVersion twoTen = new GraphvizVersion("2.10");
+    private final GraphvizVersion twoTenOne = new GraphvizVersion("2.10.1");
 
     public void testCompareTo() {
         assertTrue(twoNineOne.compareTo(twoTen) < 0);
@@ -62,9 +62,9 @@ public class VersionTest extends TestCase {
 
     private void compareEquals(String digits, String versionLine)
     {
-        Version expected = new Version(digits);
+        GraphvizVersion expected = new GraphvizVersion(digits);
         String actual = getVersionDigits(versionLine);
-        assertEquals(expected, new Version(actual));
+        assertEquals(expected, new GraphvizVersion(actual));
     }
 
     private String getVersionDigits(String versionLine) {

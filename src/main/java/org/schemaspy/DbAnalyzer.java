@@ -68,6 +68,7 @@ public class DbAnalyzer {
                 }
             }
 
+            //TODO fixed column name "LanguageId" should be moved to schemaspy properties
             for (TableColumn column : table.getColumns()) {
                 if (!column.isForeignKey() && column.allowsImpliedParents() && !column.getName().equals("LanguageId"))
                     columnsWithoutParents.add(column);

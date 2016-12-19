@@ -228,7 +228,7 @@ public class DotFormatter {
     }
 
     private void writeHeader(String diagramName, boolean showLabel, LineWriter dot) throws IOException {
-        dot.writeln("// dot " + Dot.getInstance().getVersion() + " on " + System.getProperty("os.name") + " " + System.getProperty("os.version"));
+        dot.writeln("// dot " + Dot.getInstance().getGraphvizVersion() + " on " + System.getProperty("os.name") + " " + System.getProperty("os.version"));
         dot.writeln("// SchemaSpy rev " + new Revision());
         dot.writeln("digraph \"" + diagramName + "\" {");
         dot.writeln("  graph [");

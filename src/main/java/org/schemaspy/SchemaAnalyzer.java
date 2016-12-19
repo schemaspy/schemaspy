@@ -20,32 +20,23 @@ package org.schemaspy;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.Driver;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.schemaspy.model.ConnectionFailure;
 import org.schemaspy.model.ConsoleProgressListener;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
@@ -56,12 +47,15 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.xml.SchemaMeta;
+import org.schemaspy.service.DatabaseService;
+import org.schemaspy.service.SqlService;
 import org.schemaspy.util.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.schemaspy.view.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -72,13 +66,77 @@ public class SchemaAnalyzer {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private boolean fineEnabled;
 
+    @Autowired
+    private SqlService sqlService;
+
+    @Autowired
+    private DatabaseService databaseService;
+
     public Database analyze(Config config) throws SQLException, IOException {
     	// don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
     	// and not already logging fine details (to keep from obfuscating those)
-        boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
-        ProgressListener progressListener = new ConsoleProgressListener(render);
 
-        return analyze(config, progressListener);
+    	// if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas  
+        List<String> schemas = config.getSchemas();
+        if (schemas != null || config.isEvaluateAllEnabled()) {
+        	return this.analyzeMultipleSchemas(config,schemas);
+        }else{
+            boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
+            ProgressListener progressListener = new ConsoleProgressListener(render);
+            return analyze(config, progressListener);
+        }
+    }
+
+	public Database analyzeMultipleSchemas(Config config, List<String> schemas)throws SQLException, IOException {
+        try {
+        	String schemaSpec = config.getSchemaSpec();
+            Connection connection = this.getConnection(config);
+            DatabaseMetaData meta = connection.getMetaData();
+            //-all(evaluteAll) given then get list of the chemas
+            if (schemas == null || config.isEvaluateAllEnabled()) {
+            	if(schemaSpec==null)
+            		schemaSpec=".*";
+                System.out.println("Analyzing schemas that match regular expression '" + schemaSpec + "':");
+                System.out.println("(use -schemaSpec on command line or in .properties to exclude other schemas)");
+                schemas = getPopulatedSchemas(meta, schemaSpec, false);
+                if (schemas.isEmpty())
+                	schemas = getPopulatedSchemas(meta, schemaSpec, true);
+                if (schemas.isEmpty())
+                	schemas = Arrays.asList(new String[] {config.getUser()});
+            }
+
+            Version version = new Version();
+        	System.out.println("Analyzing schemas: "+schemas.toString());
+        	
+	        boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
+	        String dbName = config.getDb();
+	        File outputDir = config.getOutputDir();
+	        // set flag which later on used for generation rootPathtoHome link.
+	        config.setOneOfMultipleSchemas(true);
+	        for (String schema : schemas) {
+	        	// reset -all(evaluteAll) and -schemas parametter to avoid infinite loop! now we are analyzing single schema
+	        	config.setSchemas(null);
+	            config.setEvaluateAllEnabled(false);
+	            if (dbName == null)
+	            	config.setDb(schema);
+	            else
+	        		config.setSchema(schema);
+	            config.setOutputDir(new File(outputDir, schema).toString());
+	            
+	            ProgressListener progressListener = new ConsoleProgressListener(render);
+	            System.out.println("Analyzing " + schema);
+	            System.out.flush();
+				this.analyze(config,progressListener);
+	        }
+
+            prepareLayoutFiles(outputDir);
+            HtmlMultipleSchemasIndexPage.getInstance().write(outputDir, dbName, schemas, meta);
+	        
+	        return null;// change this 
+        } catch (Config.MissingRequiredParameterException missingParam) {
+            config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
+            return null;
+        }
     }
 
     public Database analyze(Config config, ProgressListener progressListener) throws SQLException, IOException {
@@ -113,7 +171,7 @@ public class SchemaAnalyzer {
                     throw new IOException("Failed to create directory '" + outputDir + "'");
                 }
             }
-
+          
             List<String> schemas = config.getSchemas();
             if (schemas != null) {
                 List<String> args = config.asList();
@@ -124,54 +182,16 @@ public class SchemaAnalyzer {
 
                 String dbName = config.getDb();
 
-                MultipleSchemaAnalyzer.getInstance().analyze(dbName, schemas, args, config);
+                analyzeMultipleSchemas(config, schemas);
                 return null;
             }
-
-            Properties properties = config.determineDbProperties(config.getDbType());
-
-            ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
-            if (config.getDb() == null)
-                config.setDb(urlBuilder.getConnectionURL());
-
-            if (config.getRemainingParameters().size() != 0) {
-                StringBuilder msg = new StringBuilder("Unrecognized option(s):");
-                for (String remnant : config.getRemainingParameters())
-                    msg.append(" " + remnant);
-                logger.warning(msg.toString());
-            }
-
-            String driverClass = properties.getProperty("driver");
-            String driverPath = properties.getProperty("driverPath");
-            if (driverPath == null)
-                driverPath = "";
-            if (config.getDriverPath() != null)
-                driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
-
-            DbDriverLoader driverLoader = new DbDriverLoader();
-            Connection connection = driverLoader.getConnection(config, urlBuilder.getConnectionURL(), driverClass, driverPath);
-
-            DatabaseMetaData meta = connection.getMetaData();
+          
             String dbName = config.getDb();
             String schema = config.getSchema();
 
-            if (config.isEvaluateAllEnabled()) {
-                List<String> args = config.asList();
-                for (DbSpecificOption option : urlBuilder.getOptions()) {
-                    if (!args.contains("-" + option.getName())) {
-                        args.add("-" + option.getName());
-                        args.add(option.getValue().toString());
-                    }
-                }
-
-                String schemaSpec = config.getSchemaSpec();
-                if (schemaSpec == null)
-                    schemaSpec = properties.getProperty("schemaSpec", ".*");
-                MultipleSchemaAnalyzer.getInstance().analyze(dbName, meta, schemaSpec, null, args, config);
-                return null;    // no database to return
-            }
-
             String catalog = config.getCatalog();
+
+            DatabaseMetaData meta = sqlService.connect(config);
 
             logger.fine("supportsSchemasInTableDefinitions: " + meta.supportsSchemasInTableDefinitions());
             logger.fine("supportsCatalogsInTableDefinitions: " + meta.supportsCatalogsInTableDefinitions());
@@ -207,7 +227,8 @@ public class SchemaAnalyzer {
             //
             // create our representation of the database
             //
-            Database db = new Database(config, connection, meta, dbName, catalog, schema, schemaMeta, progressListener);
+            Database db = new Database(config, meta, dbName, catalog, schema, schemaMeta, progressListener);
+            databaseService.gatheringSchemaDetails(config, db, progressListener);
 
             long duration = progressListener.startedGraphingSummaries();
 
@@ -269,13 +290,10 @@ public class SchemaAnalyzer {
             // 'try' to make some memory available for the sorting process
             // (some people have run out of memory while RI sorting tables)
             builder = null;
-            connection = null;
             document = null;
             factory = null;
             meta = null;
-            properties = null;
             rootNode = null;
-            urlBuilder = null;
 
             List<ForeignKeyConstraint> recursiveConstraints = new ArrayList<ForeignKeyConstraint>();
 
@@ -444,6 +462,56 @@ public class SchemaAnalyzer {
         ResourceWriter.copyResources(url, outputDir, filter);
     }
 
+    private List<String> getPopulatedSchemas(DatabaseMetaData meta, String schemaSpec, boolean isCatalog) throws SQLException {
+        List<String> populatedSchemas;
+
+        if ((!isCatalog && meta.supportsSchemasInTableDefinitions()) ||
+             (isCatalog && meta.supportsCatalogsInTableDefinitions())) {
+            Pattern schemaRegex = Pattern.compile(schemaSpec);
+
+            populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, isCatalog);
+            Iterator<String> iter = populatedSchemas.iterator();
+            while (iter.hasNext()) {
+                String schema = iter.next();
+                if (!schemaRegex.matcher(schema).matches()) {
+                    if (fineEnabled) {
+                        logger.fine("Excluding schema " + schema +
+                                    ": doesn't match + \"" + schemaRegex + '"');
+                    }
+                    iter.remove(); // remove those that we're not supposed to analyze
+                } else {
+                    if (fineEnabled) {
+                        logger.fine("Including schema " + schema +
+                                    ": matches + \"" + schemaRegex + '"');
+                    }
+                }
+            }
+        } else {
+            populatedSchemas = new ArrayList<String>();
+        }
+
+        return populatedSchemas;
+    }
+
+    private Connection getConnection(Config config) throws InvalidConfigurationException, IOException {
+
+        Properties properties = config.determineDbProperties(config.getDbType());
+
+        ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
+        if (config.getDb() == null)
+            config.setDb(urlBuilder.getConnectionURL());
+
+        String driverClass = properties.getProperty("driver");
+        String driverPath = properties.getProperty("driverPath");
+        if (driverPath == null)
+            driverPath = "";
+        if (config.getDriverPath() != null)
+            driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
+
+        DbDriverLoader driverLoader = new DbDriverLoader();
+        return driverLoader.getConnection(config, urlBuilder.getConnectionURL(), driverClass, driverPath);
+	}
+
     private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
         HtmlTablePage tableFormatter = HtmlTablePage.getInstance();
         for (Table table : tables) {
@@ -523,79 +591,6 @@ public class SchemaAnalyzer {
             for (String populated : populatedSchemas) {
                 System.out.print(" " + populated);
             }
-        }
-    }
-
-    /**
-     * Currently very DB2-specific
-     * @param recursiveConstraints List
-     * @param schema String
-     * @param out LineWriter
-     * @throws IOException
-     */
-    /* we'll eventually want to put this functionality back in with a
-     * database independent implementation
-    private static void writeRemoveRecursiveConstraintsSql(List recursiveConstraints, String schema, LineWriter out) throws IOException {
-        for (Iterator iter = recursiveConstraints.iterator(); iter.hasNext(); ) {
-            ForeignKeyConstraint constraint = (ForeignKeyConstraint)iter.next();
-            out.writeln("ALTER TABLE " + schema + "." + constraint.getChildTable() + " DROP CONSTRAINT " + constraint.getName() + ";");
-        }
-    }
-    */
-
-    /**
-     * Currently very DB2-specific
-     * @param recursiveConstraints List
-     * @param schema String
-     * @param out LineWriter
-     * @throws IOException
-     */
-    /* we'll eventually want to put this functionality back in with a
-     * database independent implementation
-    private static void writeRestoreRecursiveConstraintsSql(List recursiveConstraints, String schema, LineWriter out) throws IOException {
-        Map ruleTextMapping = new HashMap();
-        ruleTextMapping.put(new Character('C'), "CASCADE");
-        ruleTextMapping.put(new Character('A'), "NO ACTION");
-        ruleTextMapping.put(new Character('N'), "NO ACTION"); // Oracle
-        ruleTextMapping.put(new Character('R'), "RESTRICT");
-        ruleTextMapping.put(new Character('S'), "SET NULL");  // Oracle
-
-        for (Iterator iter = recursiveConstraints.iterator(); iter.hasNext(); ) {
-            ForeignKeyConstraint constraint = (ForeignKeyConstraint)iter.next();
-            out.write("ALTER TABLE \"" + schema + "\".\"" + constraint.getChildTable() + "\" ADD CONSTRAINT \"" + constraint.getName() + "\"");
-            StringBuffer buf = new StringBuffer();
-            for (Iterator columnIter = constraint.getChildColumns().iterator(); columnIter.hasNext(); ) {
-                buf.append("\"");
-                buf.append(columnIter.next());
-                buf.append("\"");
-                if (columnIter.hasNext())
-                    buf.append(",");
-            }
-            out.write(" FOREIGN KEY (" + buf.toString() + ")");
-            out.write(" REFERENCES \"" + schema + "\".\"" + constraint.getParentTable() + "\"");
-            buf = new StringBuffer();
-            for (Iterator columnIter = constraint.getParentColumns().iterator(); columnIter.hasNext(); ) {
-                buf.append("\"");
-                buf.append(columnIter.next());
-                buf.append("\"");
-                if (columnIter.hasNext())
-                    buf.append(",");
-            }
-            out.write(" (" + buf.toString() + ")");
-            out.write(" ON DELETE ");
-            out.write(ruleTextMapping.get(new Character(constraint.getDeleteRule())).toString());
-            out.write(" ON UPDATE ");
-            out.write(ruleTextMapping.get(new Character(constraint.getUpdateRule())).toString());
-            out.writeln(";");
-        }
-    }
-    */
-
-    static void yankParam(List<String> args, String paramId) {
-        int paramIndex = args.indexOf(paramId);
-        if (paramIndex >= 0) {
-            args.remove(paramIndex);
-            args.remove(paramIndex);
         }
     }
 }

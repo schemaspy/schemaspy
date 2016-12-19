@@ -54,7 +54,7 @@ public class TableIndex implements Comparable<TableIndex> {
         return name;
     }
 
-    void addColumn(TableColumn column, String sortOrder) {
+    public void addColumn(TableColumn column, String sortOrder) {
         if (column != null) {
             columns.add(column);
             columnsAscending.add(Boolean.valueOf(sortOrder == null || sortOrder.equals("A")));
