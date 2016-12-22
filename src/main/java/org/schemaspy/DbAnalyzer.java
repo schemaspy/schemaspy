@@ -61,21 +61,20 @@ public class DbAnalyzer {
         
         for (TableColumn childColumn : columnsWithoutParents) {
             DatabaseObject columnWithoutParent = new DatabaseObject(childColumn);
-            //Table primaryTable = keyedTablesByPrimary.get(column);
             
-            // search for PK table
+            // search for Parent(PK) table
         	Table primaryTable = null;
             for (Map.Entry<DatabaseObject, Table> entry : keyedTablesByPrimary.entrySet()) {
             	DatabaseObject key = entry.getKey();
-            	if(columnWithoutParent.getName().equals("product_industry_wid") && key.getName().equals("industry_wid")){
-            		int a =1;
-            	}
             	// if adress_id=adress_id OR shipping_adress_id like %adress_id
                 if (columnWithoutParent.getName().compareToIgnoreCase(key.getName())==0 || columnWithoutParent.getName().matches(".*"+key.getName())) {
-                    if ((columnWithoutParent.getType() != null && key.getType() != null && columnWithoutParent.getType().compareTo(key.getType()) == 0)
+                    // check f columnTypes Or ColumnTypeNames  are same.
+                	if ((columnWithoutParent.getType() != null && key.getType() != null && columnWithoutParent.getType().compareTo(key.getType()) == 0)
                     	|| 	columnWithoutParent.getTypeName().compareToIgnoreCase(key.getTypeName())==0 ){
-                    	if(columnWithoutParent.getLength() - key.getLength()==0){
-                    		primaryTable = entry.getValue();
+                    	// check if column lengths are same. 
+                		if(columnWithoutParent.getLength() - key.getLength()==0){
+                    		// found parent table. exit the loop. 
+                			primaryTable = entry.getValue();
                     		break;
                     	}
                     }
@@ -86,14 +85,16 @@ public class DbAnalyzer {
                 //Optional<DatabaseObject> databaseObject = primaryColumns.stream().filter(d-> d.getName().equals(primaryTable.getName())).findFirst();
                 //if (databaseObject.isPresent()) {
                 //    TableColumn parentColumn = primaryTable.getColumn(databaseObject.get().getOrginalName());
-                    TableColumn parentColumn = primaryTable.getPrimaryColumns().get(0);
-                    // make sure the potential child->parent relationships isn't already a
-                    // parent->child relationship
-                    if (parentColumn.getParentConstraint(childColumn) == null) {
-                        // ok, we've found a potential relationship with a column matches a primary
-                        // key column in another table and isn't already related to that column
-                        impliedConstraints.add(new ImpliedForeignKeyConstraint(parentColumn, childColumn));
-                    }
+            	
+            	// // can't match up multiples...yet...==> so checks only first  PK column.
+            	TableColumn parentColumn = primaryTable.getPrimaryColumns().get(0);
+                // make sure the potential child->parent relationships isn't already a
+                // parent->child relationship
+                if (parentColumn.getParentConstraint(childColumn) == null) {
+                    // ok, we've found a potential relationship with a column matches a primary
+                    // key column in another table and isn't already related to that column
+                    impliedConstraints.add(new ImpliedForeignKeyConstraint(parentColumn, childColumn));
+                }
                 //}
             }
         }
