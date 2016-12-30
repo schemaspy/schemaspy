@@ -64,22 +64,28 @@ public class DbAnalyzer {
             
             // search for Parent(PK) table
         	Table primaryTable = null;
-            for (Map.Entry<DatabaseObject, Table> entry : keyedTablesByPrimary.entrySet()) {
-            	DatabaseObject key = entry.getKey();
-            	// if adress_id=adress_id OR shipping_adress_id like %adress_id
-                if (columnWithoutParent.getName().compareToIgnoreCase(key.getName())==0 || columnWithoutParent.getName().matches(".*"+key.getName())) {
-                    // check f columnTypes Or ColumnTypeNames  are same.
-                	if ((columnWithoutParent.getType() != null && key.getType() != null && columnWithoutParent.getType().compareTo(key.getType()) == 0)
-                    	|| 	columnWithoutParent.getTypeName().compareToIgnoreCase(key.getTypeName())==0 ){
-                    	// check if column lengths are same. 
-                		if(columnWithoutParent.getLength() - key.getLength()==0){
-                    		// found parent table. exit the loop. 
-                			primaryTable = entry.getValue();
-                    		break;
-                    	}
-                    }
-                }
-            }
+			for (Map.Entry<DatabaseObject, Table> entry : keyedTablesByPrimary.entrySet()) {
+				DatabaseObject key = entry.getKey();
+				if (columnWithoutParent.getName().compareToIgnoreCase(key.getName()) == 0
+						// if adress_id=adress_id OR shipping_adress_id like &description%_adress_id
+						|| columnWithoutParent.getName().matches(".*_" + key.getName())
+						// if order.adressid=>adress.id. find FKs that made from %parentTablename%PKcol%
+						// if order.adress_id=>adress.id. find FKs that made from %tablename%_%PKcol%
+						|| columnWithoutParent.getName().matches(entry.getValue().getName() + ".*" + key.getName()) 
+						) {
+					// check f columnTypes Or ColumnTypeNames are same.
+					if ((columnWithoutParent.getType() != null && key.getType() != null
+							&& columnWithoutParent.getType().compareTo(key.getType()) == 0)
+							|| columnWithoutParent.getTypeName().compareToIgnoreCase(key.getTypeName()) == 0) {
+						// check if column lengths are same.
+						if (columnWithoutParent.getLength() - key.getLength() == 0) {
+							// found parent table. exit the loop.
+							primaryTable = entry.getValue();
+							break;
+						}
+					}
+				}
+			}
             
             if (primaryTable != null && primaryTable != childColumn.getTable()) {
                 //Optional<DatabaseObject> databaseObject = primaryColumns.stream().filter(d-> d.getName().equals(primaryTable.getName())).findFirst();
