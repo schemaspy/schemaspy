@@ -68,10 +68,10 @@ public class DbAnalyzer {
 				DatabaseObject key = entry.getKey();
 				if (columnWithoutParent.getName().compareToIgnoreCase(key.getName()) == 0
 						// if adress_id=adress_id OR shipping_adress_id like &description%_adress_id
-						|| columnWithoutParent.getName().matches(".*_" + key.getName())
+						|| columnWithoutParent.getName().matches("(?i).*_" + key.getName())
 						// if order.adressid=>adress.id. find FKs that made from %parentTablename%PKcol%
 						// if order.adress_id=>adress.id. find FKs that made from %tablename%_%PKcol%
-						|| columnWithoutParent.getName().matches(entry.getValue().getName() + ".*" + key.getName()) 
+						|| columnWithoutParent.getName().matches("(?i)" +entry.getValue().getName() + ".*" + key.getName()) 
 						) {
 					// check f columnTypes Or ColumnTypeNames are same.
 					if ((columnWithoutParent.getType() != null && key.getType() != null
