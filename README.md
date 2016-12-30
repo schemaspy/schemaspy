@@ -27,3 +27,12 @@ More detail will came in next days plus I have in plan to start working on all n
 [Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0-beta.2)
 
 [Download](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0-beta.2/schemaspy-6.0.0-beta.2.jar)
+
+## Bugs and Issues
+
+Have a bug or an issue with SchemaSpy? [Open a new issue](https://github.com/schemaspy/schemaspy/issues) here on GitHub.
+
+## Creator
+
+SchemaSpy is maintained by **[Rafal Kasa](malito:rafalkasa@gmail.com)** please contact with me if you have some question or proposition.
+* https://github.com/rafalkasa
