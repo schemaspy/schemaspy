@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class DatabaseObject implements Comparable<DatabaseObject>{
     private String name;
-    private final String orginalName;
+    private final String fullName;
     private final String typeName;
     private final Integer type;
     private final int length;
@@ -16,7 +16,7 @@ public class DatabaseObject implements Comparable<DatabaseObject>{
 
     public DatabaseObject(TableColumn object) {
         this.name = object.getName();
-        this.orginalName = new String(object.getName());
+        this.fullName = new String(object.getTable().getFullName()+"."+ object.getName());
         this.typeName = object.getTypeName();
         this.type = object.getType();
         this.length = object.getLength();
@@ -53,8 +53,8 @@ public class DatabaseObject implements Comparable<DatabaseObject>{
         return children;
     }
 
-    public String getOrginalName() {
-        return orginalName;
+    public String getFullName() {
+        return fullName;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class DatabaseObject implements Comparable<DatabaseObject>{
     
 	@Override
 	public int compareTo(DatabaseObject column2) {
-        int rc = this.getName().compareToIgnoreCase(column2.getName());
+        int rc = this.getFullName().compareToIgnoreCase(column2.getFullName());
         if (rc == 0) {
             if (this.getType() != null && column2.getType() != null)
             	// type is exact while typeName can be adorned with additional stuff (e.g. MSSQL appends " identity" for auto-inc keys)
