@@ -22,6 +22,7 @@ public class MustacheWriter {
     private  String rootPathtoHome;
     private String databaseName;
     private boolean isMultipleSchemas;
+    private String templateDirectory = Config.getInstance().getTemplateDirectory();
 
     public MustacheWriter(File outputDir, HashMap<String, Object> scopes, String rootPath, String databaseName, boolean isMultipleSchemas) {
         this.outputDir = outputDir;
@@ -46,11 +47,11 @@ public class MustacheWriter {
         FileUtils fileUtils = new FileUtils();
 
         HashMap<String, Object> mainScope = new HashMap<String, Object>();
-        //URL containerTemplate = getClass().getResource("/layout/container.html");
+        //URL containerTemplate = getClass().getResource(Paths.get(templateDirectory,"container.html").toString());
        // URL template = getClass().getResource(templatePath);
 
         try {
-            Mustache mustache = mf.compile(getReader(templatePath),"template");
+            Mustache mustache = mf.compile(getReader(new File(templateDirectory,templatePath).toString()),"template");
             mustache.execute(result, scopes).flush();
 
             mainScope.put("databaseName", databaseName);
@@ -62,7 +63,7 @@ public class MustacheWriter {
             Version version = new Version();
             mainScope.put("version", version.getVersion());
 
-            Mustache mustacheContent = contentMf.compile(getReader("layout/container.html"), "container");
+            Mustache mustacheContent = contentMf.compile(getReader(new File(templateDirectory,"container.html").toString()), "container");
             mustacheContent.execute(content, mainScope).flush();
 
             File destinationFile = new File(outputDir, destination);
@@ -74,14 +75,13 @@ public class MustacheWriter {
     }
 
     private static StringReader getReader(String fileName) throws IOException {
-        File cssFile = new File(fileName);
-        if (cssFile.exists())
-            return new StringReader(fileName);
-        cssFile = new File(System.getProperty("user.dir"), fileName);
-        if (cssFile.exists())
-            return new StringReader(fileName);
+    	InputStream cssStream = null;
+        if (new File(fileName).exists()){
+        	cssStream = new FileInputStream(fileName);
+        }else if (new File(System.getProperty("user.dir"), fileName).exists()){
+	        	cssStream = new FileInputStream(fileName);
+        }
 
-        InputStream cssStream = StyleSheet.class.getClassLoader().getResourceAsStream(fileName);
         if (cssStream == null)
             throw new ParseException("Unable to find requested file: " + fileName);
         String inputStream = IOUtils.toString(cssStream, "UTF-8").toString();

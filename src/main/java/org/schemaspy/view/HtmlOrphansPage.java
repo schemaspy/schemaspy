@@ -112,7 +112,7 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
             scopes.put("maps", maps);
 
             MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
-            mw.write("layout/orphans.html", "orphans.html", "");
+            mw.write("orphans.html", "orphans.html", "");
 
             return true;
         } finally {

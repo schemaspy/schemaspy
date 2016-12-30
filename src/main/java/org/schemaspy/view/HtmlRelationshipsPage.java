@@ -122,7 +122,7 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
             scopes.put("diagrams", diagrams);
 
             MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
-            mw.write("layout/relationships.html", "relationships.html", "relationships.js");
+            mw.write("relationships.html", "relationships.html", "relationships.js");
             return true;
         } catch (Dot.DotFailure dotFailure) {
             System.err.println(dotFailure);

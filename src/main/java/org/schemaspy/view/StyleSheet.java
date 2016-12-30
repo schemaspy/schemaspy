@@ -20,17 +20,21 @@ package org.schemaspy.view;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+
+import org.apache.commons.io.IOUtils;
 import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.LineWriter;
@@ -117,7 +121,7 @@ public class StyleSheet {
     public static StyleSheet getInstance() throws ParseException {
         if (instance == null) {
             try {
-                instance = new StyleSheet(new BufferedReader(getReader(Config.getInstance().getCss())));
+                instance = new StyleSheet(new BufferedReader(getReader(new File(Config.getInstance().getTemplateDirectory(),Config.getInstance().getCss()).toString())));
             } catch (IOException exc) {
                 throw new ParseException(exc);
             }
@@ -141,18 +145,17 @@ public class StyleSheet {
      * @throws IOException
      */
     private static Reader getReader(String cssName) throws IOException {
-        File cssFile = new File(cssName);
-        if (cssFile.exists())
-            return new FileReader(cssFile);
-        cssFile = new File(System.getProperty("user.dir"), cssName);
-        if (cssFile.exists())
-            return new FileReader(cssFile);
+    	InputStream cssStream = null;
+        if (new File(cssName).exists()){
+        	cssStream = new FileInputStream(cssName);
+        }else if (new File(System.getProperty("user.dir"), cssName).exists()){
+	        	cssStream = new FileInputStream(cssName);
+        }
 
-        InputStream cssStream = StyleSheet.class.getClassLoader().getResourceAsStream(cssName);
         if (cssStream == null)
-            throw new ParseException("Unable to find requested style sheet: " + cssName);
-
-        return new InputStreamReader(cssStream);
+            throw new ParseException("Unable to find requested file: " + cssName);
+        String inputStream = IOUtils.toString(cssStream, "UTF-8").toString();
+        return new StringReader(inputStream);
     }
 
     private Map<String, String> parseAttributes(String data) {
@@ -258,7 +261,7 @@ public class StyleSheet {
          * @param propName name of the missing property in that section
          */
         public MissingCssPropertyException(String cssSection, String propName) {
-            super("Required property '" + propName + "' was not found for the definition of '" + cssSection + "' in " + Config.getInstance().getCss());
+            super("Required property '" + propName + "' was not found for the definition of '" + cssSection + "' in " + new File(Config.getInstance().getTemplateDirectory(),Config.getInstance().getCss()).toString());
         }
     }
 

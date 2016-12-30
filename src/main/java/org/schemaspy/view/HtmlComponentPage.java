@@ -65,7 +65,7 @@ public class HtmlComponentPage extends HtmlFormatter {
         scopes.put("database", database);
 
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", database.getName(), false);
-        mw.write("layout/components.html", "components.html", "components.js");
+        mw.write("components.html", "components.html", "components.js");
     }
 
 

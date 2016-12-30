@@ -79,7 +79,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         scopes.put("databaseName", databaseName);
 
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", database.getName(), false);
-        mw.write("layout/main.html", "index.html", "main.js");
+        mw.write("main.html", "index.html", "main.js");
     }
 
     private String getDatabaseDescription(Database db) {
