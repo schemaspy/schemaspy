@@ -25,4 +25,4 @@ More detail will came in next days plus I have in plan to start working on all n
 
 ### Download
 
-[SchemaSpy v6.0.0-beta.1](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0-beta.1/schemaspy-6.0.0-beta.1.jar)
+[SchemaSpy v6.0.0-beta.2](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0-beta.2/schemaspy-6.0.0-beta.2.jar)
