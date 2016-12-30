@@ -32,7 +32,7 @@ More detail will came in next days plus I have in plan to start working on all n
 
 Have a bug or an issue with SchemaSpy? [Open a new issue](https://github.com/schemaspy/schemaspy/issues) here on GitHub.
 
-## Creator
+## Maintained
 
 SchemaSpy is maintained by **[Rafal Kasa](malito:rafalkasa@gmail.com)** please contact with me if you have some question or proposition.
 * https://github.com/rafalkasa
