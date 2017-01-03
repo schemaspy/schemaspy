@@ -127,6 +127,7 @@ public class Config
     private static final String DEFAULT_TABLE_INCLUSION = ".*"; // match everything
     private static final String DEFAULT_TABLE_EXCLUSION = "";   // match nothing
     private static final String DEFAULT_COLUMN_EXCLUSION = "[^.]";  // match nothing
+    private File jarFile;
 
     /**
      * Default constructor. Intended for when you want to inject properties
@@ -282,13 +283,21 @@ public class Config
     }
 
     public String getTemplateDirectory() {
-        if (templateDirectory == null)
-        	templateDirectory = pullParam("-template");
-	        if (templateDirectory == null)
-	        	// default template dir = resources/layout/
-	        	templateDirectory = getClass().getResource("/layout").getPath();  
-	        
+        if (templateDirectory == null) {
+            templateDirectory = pullParam("-template");
+            if (templateDirectory == null) {
+                // default template dir = resources/layout/
+                templateDirectory = getClass().getResource("/layout").getPath();
+            }
+        }
         return templateDirectory;
+    }
+
+    public boolean isJarFile() {
+        if (jarFile == null) {
+            jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+        }
+        return jarFile.isFile();
     }
 
     public void setDbType(String dbType) {

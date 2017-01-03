@@ -121,7 +121,11 @@ public class StyleSheet {
     public static StyleSheet getInstance() throws ParseException {
         if (instance == null) {
             try {
-                instance = new StyleSheet(new BufferedReader(getReader(new File(Config.getInstance().getTemplateDirectory(),Config.getInstance().getCss()).toString())));
+                String path = "layout/"+Config.getInstance().getCss();
+                if (!Config.getInstance().isJarFile()) {
+                    path = new File(Config.getInstance().getTemplateDirectory(), Config.getInstance().getCss()).getPath();
+                }
+                instance = new StyleSheet(new BufferedReader(getReader(path)));
             } catch (IOException exc) {
                 throw new ParseException(exc);
             }
@@ -150,6 +154,10 @@ public class StyleSheet {
         	cssStream = new FileInputStream(cssName);
         }else if (new File(System.getProperty("user.dir"), cssName).exists()){
 	        	cssStream = new FileInputStream(cssName);
+        } else {
+            if (Config.getInstance().isJarFile()) {
+                cssStream = StyleSheet.class.getClassLoader().getResourceAsStream(cssName);
+            }
         }
 
         if (cssStream == null)

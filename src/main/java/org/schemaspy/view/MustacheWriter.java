@@ -51,7 +51,8 @@ public class MustacheWriter {
        // URL template = getClass().getResource(templatePath);
 
         try {
-            Mustache mustache = mf.compile(getReader(new File(templateDirectory,templatePath).toString()),"template");
+            String path = getTemplatePath(templatePath);
+            Mustache mustache = mf.compile(getReader(path),"template");
             mustache.execute(result, scopes).flush();
 
             mainScope.put("databaseName", databaseName);
@@ -63,7 +64,8 @@ public class MustacheWriter {
             Version version = new Version();
             mainScope.put("version", version.getVersion());
 
-            Mustache mustacheContent = contentMf.compile(getReader(new File(templateDirectory,"container.html").toString()), "container");
+            path = getTemplatePath("container.html");
+            Mustache mustacheContent = contentMf.compile(getReader(path), "container");
             mustacheContent.execute(content, mainScope).flush();
 
             File destinationFile = new File(outputDir, destination);
@@ -74,12 +76,24 @@ public class MustacheWriter {
         }
     }
 
+    private String getTemplatePath(String templatePath) {
+        String path = "layout/"+templatePath;
+        if (!Config.getInstance().isJarFile()) {
+            path = new File(templateDirectory,templatePath).getPath();
+        }
+        return path;
+    }
+
     private static StringReader getReader(String fileName) throws IOException {
     	InputStream cssStream = null;
         if (new File(fileName).exists()){
         	cssStream = new FileInputStream(fileName);
         }else if (new File(System.getProperty("user.dir"), fileName).exists()){
 	        	cssStream = new FileInputStream(fileName);
+        } else {
+            if (Config.getInstance().isJarFile()) {
+                cssStream = StyleSheet.class.getClassLoader().getResourceAsStream(fileName);
+            }
         }
 
         if (cssStream == null)
