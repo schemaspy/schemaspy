@@ -145,7 +145,7 @@
 				</executions>
 				<configuration>
 					<doCheck>true</doCheck>
-					<format>${version}.{0,number} {1,date,yyyy-MM-dd HH:mm:ss}</format>
+					<format>${project.version}.{0,number} {1,date,yyyy-MM-dd HH:mm:ss}</format>
 					<items>
 						<item>buildNumber</item>
 						<item>timestamp</item>
