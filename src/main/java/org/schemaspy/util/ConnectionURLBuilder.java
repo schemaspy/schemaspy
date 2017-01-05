@@ -18,11 +18,12 @@
  */
 package org.schemaspy.util;
 
+import org.schemaspy.Config;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
-import org.schemaspy.Config;
 
 /**
  * @author John Currier
@@ -71,7 +72,7 @@ public class ConnectionURLBuilder {
             logger.fine(option.toString());
 
             // replace e.g. <host> with myDbHost
-            connectionSpec = connectionSpec.replaceAll("\\<" + option.getName() + "\\>", option.getValue().toString());
+            connectionSpec = connectionSpec.replaceAll("\\<" + option.getName() + "\\>", option.getValue());
         }
 
         return connectionSpec;
@@ -98,12 +99,12 @@ public class ConnectionURLBuilder {
         if (paramIndex < 0) {
             if (config != null)
                 param = config.getParam(option.getName());  // not in args...might be one of
-                                                            // the common db params
+            // the common db params
             if (param == null)
                 throw new Config.MissingRequiredParameterException(option.getName(), option.getDescription(), true);
         } else {
             args.remove(paramIndex);
-            param = args.get(paramIndex).toString();
+            param = args.get(paramIndex);
             args.remove(paramIndex);
         }
 

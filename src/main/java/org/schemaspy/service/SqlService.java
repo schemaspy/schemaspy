@@ -13,7 +13,12 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,7 +79,7 @@ public class SqlService {
             for (DbSpecificOption option : urlBuilder.getOptions()) {
                 if (!args.contains("-" + option.getName())) {
                     args.add("-" + option.getName());
-                    args.add(option.getValue().toString());
+                    args.add(option.getValue());
                 }
             }
 
@@ -87,6 +92,7 @@ public class SqlService {
 
         return meta;
     }
+
     /**
      * Create a <code>PreparedStatement</code> from the specified SQL.
      * The SQL can contain these named parameters (but <b>not</b> question marks).
@@ -95,10 +101,11 @@ public class SqlService {
      * <li>:owner - alias for :schema
      * <li>:table - replaced with the name of the table
      * </ol>
-     * @param sql String - SQL without question marks
+     *
+     * @param sql       String - SQL without question marks
      * @param tableName String - <code>null</code> if the statement doesn't deal with <code>Table</code>-level details.
-     * @throws SQLException
      * @return PreparedStatement
+     * @throws SQLException
      */
     public PreparedStatement prepareStatement(String sql, String tableName) throws SQLException {
         StringBuilder sqlBuf = new StringBuilder(sql);
@@ -123,10 +130,9 @@ public class SqlService {
      * Replaces named parameters in <code>sql</code> with question marks and
      * returns appropriate matching values in the returned <code>List</code> of <code>String</code>s.
      *
-     * @param sql StringBuffer input SQL with named parameters, output named params are replaced with ?'s.
+     * @param sql       StringBuffer input SQL with named parameters, output named params are replaced with ?'s.
      * @param tableName String
      * @return List of Strings
-     *
      * @see #prepareStatement(String, String)
      */
     private List<String> getSqlParams(String schema, String name, StringBuilder sql, String tableName) {
