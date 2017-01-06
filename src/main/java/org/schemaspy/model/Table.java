@@ -203,10 +203,9 @@ public class Table implements Comparable<Table> {
      * @return
      */
     public static String getFullName(String db, String catalog, String schema, String table) {
-        String fullName = (catalog == null && schema == null ? db + '.' : "") +
+        return (catalog == null && schema == null ? db + '.' : "") +
                 (catalog == null ? "" : catalog + '.') +
                 (schema == null ? "" : schema + '.') + table;
-        return fullName;
     }
 
     /**
