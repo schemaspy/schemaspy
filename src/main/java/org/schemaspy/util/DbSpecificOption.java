@@ -18,33 +18,32 @@
  */
 package org.schemaspy.util;
 
-public class DbSpecificOption {
+import java.util.Objects;
+
+public final class DbSpecificOption {
     private final String name;
-    private       Object value;
+    private String value;
     private final String description;
 
-    public DbSpecificOption(String name, String value, String description) {
-        this.name = name;
-        this.value = value;
-        this.description = description;
-    }
-
     public DbSpecificOption(String name, String description) {
-        this(name, null, description);
+        this.name = Objects.requireNonNull(name);
+        this.description = description;
     }
 
     public String getName() {
         return name;
     }
 
-    public Object getValue() {
+    //TODO This method may return null. Consider changing the return type to Optional<String> and return Optional.empty instead of null
+    public String getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
+    //TODO This method may return null. Consider changing the return type to Optional<String> and return Optional.empty instead of null
     public String getDescription() {
         return description;
     }
