@@ -18,10 +18,10 @@
  */
 package org.schemaspy.model;
 
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
+import org.schemaspy.model.xml.TableColumnMeta;
+import org.schemaspy.model.xml.TableMeta;
+import org.schemaspy.util.CaseInsensitiveMap;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,19 +30,11 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import org.schemaspy.Config;
-import org.schemaspy.model.xml.ForeignKeyMeta;
-import org.schemaspy.model.xml.TableColumnMeta;
-import org.schemaspy.model.xml.TableMeta;
-import org.schemaspy.util.CaseInsensitiveMap;
-import org.schemaspy.util.Markdown;
 
 /**
  * A <code>Table</code> is one of the basic building blocks of SchemaSpy
@@ -60,11 +52,11 @@ public class Table implements Comparable<Table> {
     private final List<TableColumn> primaryKeys = new ArrayList<TableColumn>();
     private final CaseInsensitiveMap<ForeignKeyConstraint> foreignKeys = new CaseInsensitiveMap<ForeignKeyConstraint>();
     private final CaseInsensitiveMap<TableIndex> indexes = new CaseInsensitiveMap<TableIndex>();
-    private       Object id;
+    private Object id;
     private final Map<String, String> checkConstraints = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
     private long numRows;
     protected final Database db;
-    private       String comments;
+    private String comments;
     private int maxChildren;
     private int maxParents;
     private final static Logger logger = Logger.getLogger(Table.class.getName());
@@ -133,6 +125,7 @@ public class Table implements Comparable<Table> {
     /**
      * Add a column that's defined in xml metadata.
      * Assumes that a column named colMeta.getName() doesn't already exist in <code>columns</code>.
+     *
      * @param colMeta
      * @return
      */
@@ -211,8 +204,8 @@ public class Table implements Comparable<Table> {
      */
     public static String getFullName(String db, String catalog, String schema, String table) {
         String fullName = (catalog == null && schema == null ? db + '.' : "") +
-                            (catalog == null ? "" : catalog + '.') +
-                            (schema == null ? "" : schema + '.') + table;
+                (catalog == null ? "" : catalog + '.') +
+                (schema == null ? "" : schema + '.') + table;
         return fullName;
     }
 
@@ -227,9 +220,8 @@ public class Table implements Comparable<Table> {
     }
 
     /**
-     * @see #setId(Object)
-     *
      * @return
+     * @see #setId(Object)
      */
     public Object getId() {
         return id;
@@ -332,6 +324,7 @@ public class Table implements Comparable<Table> {
     /**
      * Returns <code>true</code> if this table references no other tables..<p/>
      * Used in dependency analysis.
+     *
      * @return
      */
     public boolean isRoot() {
@@ -347,6 +340,7 @@ public class Table implements Comparable<Table> {
     /**
      * Returns <code>true</code> if this table is referenced by no other tables.<p/>
      * Used in dependency analysis.
+     *
      * @return
      */
     public boolean isLeaf() {
@@ -424,7 +418,7 @@ public class Table implements Comparable<Table> {
 
     /**
      * Remove the specified {@link ForeignKeyConstraint} from this table.<p>
-     *
+     * <p>
      * This is a more drastic removal solution that was proposed by Remke Rutgers
      *
      * @param constraint
@@ -500,6 +494,7 @@ public class Table implements Comparable<Table> {
 
     /**
      * Returns the number of non-implied children
+     *
      * @return
      */
     public int getNumNonImpliedChildren() {
@@ -550,13 +545,12 @@ public class Table implements Comparable<Table> {
 
     /**
      * Remove one foreign key constraint.
-     *
+     * <p>
      * <p/>Used during dependency analysis phase.
      *
      * @return
      */
     public ForeignKeyConstraint removeAForeignKeyConstraint() {
-        @SuppressWarnings("hiding")
         final List<TableColumn> columns = getColumns();
         int numParents = 0;
         int numChildren = 0;
@@ -583,6 +577,7 @@ public class Table implements Comparable<Table> {
 
     /**
      * Returns <code>true</code> if this table is logical (not physical), <code>false</code> otherwise
+     *
      * @return
      */
     public boolean isLogical() {
@@ -610,6 +605,7 @@ public class Table implements Comparable<Table> {
 
     /**
      * Returns <code>true</code> if this table is remote (in another schema), <code>false</code> otherwise
+     *
      * @return
      */
     public boolean isRemote() {
@@ -619,6 +615,7 @@ public class Table implements Comparable<Table> {
     /**
      * If this is a view it returns the SQL used to create the view (if it's available).
      * <code>null</code> if it's not a view or the SQL isn't available.
+     *
      * @return
      * @see #isView()
      */
@@ -698,7 +695,7 @@ public class Table implements Comparable<Table> {
     /**
      * Compare this table to another table.
      * Results are based on 1: identity, 2: table name, 3: schema name<p/>
-     *
+     * <p>
      * This implementation was put in place to deal with analyzing multiple
      * schemas that contain identically named tables.
      *
@@ -724,7 +721,7 @@ public class Table implements Comparable<Table> {
             if (id1 == null || id2 == null)
                 return column1.getName().compareToIgnoreCase(column2.getName());
             if (id1 instanceof Number && id2 instanceof Number)
-                return ((Number)id1).intValue() - ((Number)id2).intValue();
+                return ((Number) id1).intValue() - ((Number) id2).intValue();
             return id1.toString().compareToIgnoreCase(id2.toString());
         }
     }
