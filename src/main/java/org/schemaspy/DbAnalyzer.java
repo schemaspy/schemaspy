@@ -64,6 +64,7 @@ public class DbAnalyzer {
             
             // search for Parent(PK) table
         	Table primaryTable = null;
+        	Integer numPrimaryTableFound=0;
 			for (Map.Entry<DatabaseObject, Table> entry : keyedTablesByPrimary.entrySet()) {
 				DatabaseObject key = entry.getKey();
 				if (columnWithoutParent.getName().compareToIgnoreCase(key.getName()) == 0
@@ -79,9 +80,15 @@ public class DbAnalyzer {
 							|| columnWithoutParent.getTypeName().compareToIgnoreCase(key.getTypeName()) == 0) {
 						// check if column lengths are same.
 						if (columnWithoutParent.getLength() - key.getLength() == 0) {
-							// found parent table. exit the loop.
+							// found parent table.
 							primaryTable = entry.getValue();
-							break;
+							numPrimaryTableFound++;
+							// if child column refrencing multiple PK(Parent) tables then dont create implied relationship and exit the loop.
+							// one column can reference only one parent table.! 
+							if (numPrimaryTableFound>1) {
+								primaryTable=null;
+								break;
+							}
 						}
 					}
 				}
