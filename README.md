@@ -23,6 +23,11 @@ In new **SchemaSpy 6.0** version you will find:
 
 More detail will came in next days plus I have in plan to start working on all not resolved issues.
 
+## Documentation
+
+If you need more info about how to use or install SchemaSpy please read the last documentation at Read the Docs.
+[Documentation] (http://schemaspy.readthedocs.io/en/latest/)
+
 ## SchemaSpy v6.0.0-beta.3
 [Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0-beta.3)
 
