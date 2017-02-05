@@ -17,7 +17,7 @@ Graphvize
     .. warning::
         Remember to add folder contains Graphvize dot.exe application to your system PATH variablev eg.
 
-        .. code-block:: cmd
+        .. code-block:: bash
 
             C:\Program Files (x86)\Graphviz2.38\bin        
 

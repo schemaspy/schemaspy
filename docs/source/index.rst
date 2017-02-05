@@ -5,7 +5,7 @@
    
    home
    installation
-   :caption: Contents:
+   started
 
 
 Indices and tables

@@ -36,8 +36,6 @@ SchemaSpy is a command line tool. If you're more comfortable with the point-and-
 
 SchemaSpy was mentioned in one of th  O'Reilly's book |java_power_tools|
 
-.. _installation
-
 .. links external on new tab
 .. |github_link| raw:: html
 
