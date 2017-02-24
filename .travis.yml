@@ -10,7 +10,8 @@ jdk:
 addons:
   apt:
     packages:
-      - oracle-java8-installer  
+      - oracle-java8-installer
+before_install: echo "MAVEN_OPTS='-Xmx512m -XX:MaxPermSize=512m'" > ~/.mavenrc
 script:
   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
 cache:
