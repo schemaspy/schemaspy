@@ -1,10 +1,13 @@
 # [Schema Spy](http://schemaspy.org/) -  [schemaspy.org](http://schemaspy.org/)
 
+[![Build Status](https://travis-ci.org/schemaspy/schemaspy.svg?branch=master)](https://travis-ci.org/schemaspy/schemaspy)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=com.qualinsight.plugins.sonarqube:qualinsight-plugins-sonarqube-badges)](https://sonarqube.com/dashboard?id=org.schemaspy%3Aschemaspy)
+
 This is a new code repository for SchemaSpy tool initially created and maintained by John Currier.
 I'm personally believe that work on SchemaSpy should be continued and a lot of still existing issue should be resolved.
 Last released version of the SchemaSpy was two years ago, and I have plan to change this.
 
-I would like to say GOOD Thank you to John Currier for invent this database entity-relationship (ER) diagram generator.
+I would like to say thank you to John Currier for invent this database entity-relationship (ER) diagram generator.
 
 In next days I have plan to release new SchemaSpy version and concentrate to refactor and improve the solution.
 In new **SchemaSpy 6.0** version you will find:
