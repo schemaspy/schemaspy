@@ -17,7 +17,7 @@ before_script:
  - "echo $SONAR_SCANNER_OPTS="
  - "export SONAR_SCANNER_OPTS=-Xmx1024m"
 script:
-  - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+  - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN
 cache:
   directories:
     - '$HOME/.m2/repository'
