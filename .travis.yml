@@ -4,7 +4,7 @@ install: true
 addons:
   sonarqube:
     token:
-      secure: "d442f6daecd72c86069c35403ecee240beed34ae"
+      secure: SONAR_TOKEN
 jdk:
   - oraclejdk8
 addons:
