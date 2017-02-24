@@ -1,6 +1,6 @@
 # [Schema Spy](http://schemaspy.org/) -  [schemaspy.org](http://schemaspy.org/)
 
-https://travis-ci.org/schemaspy/schemaspy.svg?branch=master
+[![Build Status](https://travis-ci.org/schemaspy/schemaspy.svg?branch=master)](https://travis-ci.org/schemaspy/schemaspy)
 
 This is a new code repository for SchemaSpy tool initially created and maintained by John Currier.
 I'm personally believe that work on SchemaSpy should be continued and a lot of still existing issue should be resolved.
