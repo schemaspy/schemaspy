@@ -11,9 +11,13 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
-before_install: echo "MAVEN_OPTS='-Xmx512m -XX:MaxPermSize=512m'" > ~/.mavenrc
+before_script:
+ - "echo $JAVA_OPTS"
+ - "export JAVA_OPTS=-Xmx512m"
+ - "echo $SONAR_SCANNER_OPTS="
+ - "export SONAR_SCANNER_OPTS=-Xmx512m"
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+  - mvn clean -X org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
 cache:
   directories:
     - '$HOME/.m2/repository'
