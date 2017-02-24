@@ -7,6 +7,10 @@ addons:
       secure: "d442f6daecd72c86069c35403ecee240beed34ae"
 jdk:
   - oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer  
 script:
   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
 cache:
