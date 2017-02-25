@@ -2,22 +2,19 @@ language: java
 sudo: false
 install: true
 addons:
-  sonarqube:
-    token:
-      secure: SONAR_TOKEN
+  sonarqube
 jdk:
   - oraclejdk8
 addons:
   apt:
     packages:
       - oracle-java8-installer
-before_script:
- - "echo $JAVA_OPTS"
- - "export JAVA_OPTS=-Xmx1024m"
- - "echo $SONAR_SCANNER_OPTS="
- - "export SONAR_SCANNER_OPTS=-Xmx1024m"
 script:
-  - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN
+  - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com  \
+                                                                                  -Dsonar.login=$SONAR_TOKEN \
+                                                                                  -Dsonar.github.oauth=$GITHUB_ACCESS_TOKEN \
+                                                                                  -Dsonar.github.pullRequest=$PULL_REQUEST_ID \
+                                                                                  -Dsonar.analysis.mode=preview
 cache:
   directories:
     - '$HOME/.m2/repository'
