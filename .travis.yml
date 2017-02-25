@@ -12,7 +12,8 @@ addons:
     packages:
       - oracle-java8-installer
 script:
-  - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN
+  - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com  -Dsonar.login=$SONAR_TOKEN
+cache:
   directories:
     - '$HOME/.m2/repository'
     - '$HOME/.sonar/cache'
