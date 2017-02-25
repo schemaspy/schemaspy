@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/schemaspy/schemaspy.svg?branch=master)](https://travis-ci.org/schemaspy/schemaspy)
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=com.qualinsight.plugins.sonarqube:qualinsight-plugins-sonarqube-badges)](https://sonarqube.com/dashboard?id=org.schemaspy%3Aschemaspy)
-[![Quality Gate](https://sonarqube.com/api/badges/measure?key=com.qualinsight.plugins.sonarqube:qualinsight-plugins-sonarqube-badges&metric=coverage)](https://sonarqube.com/dashboard/index/com.qualinsight.plugins.sonarqube:qualinsight-plugins-sonarqube-badges?id=org.schemaspy%3Aschemaspy)
+[![Quality Gate](https://sonarqube.com/api/badges/measure?key=com.qualinsight.plugins.sonarqube:qualinsight-plugins-sonarqube-badges&metric=coverage)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 
 This is a new code repository for SchemaSpy tool initially created and maintained by John Currier.
 I'm personally believe that work on SchemaSpy should be continued and a lot of still existing issue should be resolved.
