@@ -11,13 +11,12 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
-before_script:
- - "echo $JAVA_OPTS"
- - "export JAVA_OPTS=-Xmx1024m"
- - "echo $SONAR_SCANNER_OPTS="
- - "export SONAR_SCANNER_OPTS=-Xmx1024m"
 script:
-  - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN
+  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then
+      mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com  -Dsonar.login=$SONAR_TOKEN;
+    else
+      mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com  -Dsonar.login=$SONAR_TOKEN -Dsonar.github.oauth=$GITHUB_ACCESS_TOKEN -Dsonar.github.pullRequest=$TRAVIS_PULL_REQUEST -Dsonar.github.repository=$TRAVIS_REPO_SLUG -Dsonar.analysis.mode=preview;
+    fi
 cache:
   directories:
     - '$HOME/.m2/repository'
