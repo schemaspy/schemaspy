@@ -13,9 +13,9 @@ addons:
       - oracle-java8-installer
 script:
   - if [ $TRAVIS_PULL_REQUEST == "false" ]; then
-      - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com  -Dsonar.login=$SONAR_TOKEN;
+      mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com  -Dsonar.login=$SONAR_TOKEN;
     else
-      - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com  -Dsonar.login=$SONAR_TOKEN -Dsonar.github.oauth=$GITHUB_ACCESS_TOKEN -Dsonar.github.pullRequest=$TRAVIS_PULL_REQUEST -Dsonar.github.repository=$TRAVIS_REPO_SLUG -Dsonar.analysis.mode=preview;
+      mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com  -Dsonar.login=$SONAR_TOKEN -Dsonar.github.oauth=$GITHUB_ACCESS_TOKEN -Dsonar.github.pullRequest=$TRAVIS_PULL_REQUEST -Dsonar.github.repository=$TRAVIS_REPO_SLUG -Dsonar.analysis.mode=preview;
     fi
 cache:
   directories:
