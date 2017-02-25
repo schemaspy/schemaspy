@@ -1,12 +1,7 @@
 language: java
 sudo: false
 install: true
-addons:
-  sonarqube:
-    token:
-      secure: $SONAR_TOKEN
-    pull_request:
-      github_token: $GITHUB_TOKEN
+
 jdk:
   - oraclejdk8
 addons:
@@ -14,11 +9,7 @@ addons:
     packages:
       - oracle-java8-installer
 script:
-  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then
-      mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN;
-    else
-      mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN -Dsonar.github.oauth=$GITHUB_TOKEN -Dsonar.github.pullRequest=$TRAVIS_PULL_REQUEST -Dsonar.github.repository=$TRAVIS_REPO_SLUG -Dsonar.analysis.mode=preview;
-    fi
+  - ./travis.sh
 cache:
   directories:
     - '$HOME/.m2/repository'
