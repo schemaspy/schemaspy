@@ -12,12 +12,7 @@ addons:
     packages:
       - oracle-java8-installer
 script:
-  - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com  \
-                                                                                  -Dsonar.login=$SONAR_TOKEN \
-                                                                                  -Dsonar.github.oauth=$GITHUB_ACCESS_TOKEN \
-                                                                                  -Dsonar.github.pullRequest=$PULL_REQUEST_ID \
-                                                                                  -Dsonar.analysis.mode=preview
-cache:
+  - mvn clean -e org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN
   directories:
     - '$HOME/.m2/repository'
     - '$HOME/.sonar/cache'
