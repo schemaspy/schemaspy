@@ -1,6 +1,7 @@
 # [Schema Spy](http://schemaspy.org/) -  [schemaspy.org](http://schemaspy.org/)
 
 [![Build Status](https://travis-ci.org/schemaspy/schemaspy.svg?branch=master)](https://travis-ci.org/schemaspy/schemaspy)
+[![Documentation Status](https://readthedocs.org/projects/schemaspy/badge/?version=latest)](http://schemaspy.readthedocs.io/en/latest/?badge=latest)
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.schemaspy%3Aschemaspy)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 [![Quality Gate](https://sonarqube.com/api/badges/measure?key=org.schemaspy%3Aschemaspy&metric=coverage)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 
@@ -45,3 +46,4 @@ Have a bug or an issue with SchemaSpy? [Open a new issue](https://github.com/sch
 
 SchemaSpy is maintained by [Rafal Kasa](malito:rafalkasa@gmail.com) please contact with me if you have some question or proposition.
 * https://github.com/rafalkasa
+
