@@ -94,8 +94,14 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
                 File imgFile = new File(diagramDir, dotBaseFilespec + ".1degree." + dot.getFormat());
 
                 LineWriter dotOut = new LineWriter(dotFile, Config.DOT_CHARSET);
-                DotFormatter.getInstance().writeOrphan(table, dotOut, outputDir);
-                dotOut.close();
+                try {
+                    DotFormatter.getInstance().writeOrphan(table, dotOut, outputDir);
+                } catch (IOException e) {
+                    throw  new IOException(e);
+                } finally {
+                    dotOut.close();
+                }
+
                 try {
                     maps.append(dot.generateDiagram(dotFile, imgFile));
                 } catch (Dot.DotFailure dotFailure) {
