@@ -114,9 +114,8 @@ public class SqlService {
                 stmt.setString(i + 1, sqlParams.get(i).toString());
             }
         } catch (SQLException exc) {
-            throw exc;
-        } finally {
             stmt.close();
+            throw exc;
         }
 
         return stmt;

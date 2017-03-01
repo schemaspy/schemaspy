@@ -114,7 +114,7 @@ public class Config
     private Boolean viewsEnabled;
     private Boolean meterEnabled;
     private Boolean railsEnabled;
-    private Boolean evaluteAll;
+    private Boolean evaluateAll;
     private Boolean highQuality;
     private Boolean lowQuality;
     private String schemaSpec;  // used in conjunction with evaluateAll
@@ -137,14 +137,14 @@ public class Config
     {
         if (instance == null)
             setInstance(this);
-        options = new ArrayList<String>();
+        options = new ArrayList<>();
     }
 
     /**
      * Construct a configuration from an array of options (e.g. from a command
      * line interface).
      *
-     * @param options
+     * @param argv
      */
     public Config(String[] argv)
     {
@@ -1125,13 +1125,13 @@ public class Config
     }
 
     public void setEvaluateAllEnabled(boolean enabled) {
-        evaluteAll = enabled;
+        evaluateAll = enabled;
     }
 
     public boolean isEvaluateAllEnabled() {
-        if (evaluteAll == null)
-            evaluteAll = options.remove("-all");
-        return evaluteAll;
+        if (evaluateAll == null)
+            evaluateAll = options.remove("-all");
+        return evaluateAll;
     }
 
     /**
