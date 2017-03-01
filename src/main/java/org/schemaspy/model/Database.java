@@ -87,6 +87,11 @@ public class Database {
         return schema;
     }
 
+    public Config getConfig()
+    {
+        return config;
+    }
+
     /**
      * Details of the database type that's running under the covers.
      *
