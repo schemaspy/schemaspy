@@ -13,12 +13,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -112,8 +107,8 @@ public class SqlService {
         List<String> sqlParams = getSqlParams(defaultSchema, databaseName, sqlBuf, tableName); // modifies sqlBuf
         if (fineEnabled)
             logger.fine(sqlBuf + " " + sqlParams);
-        PreparedStatement stmt = connection.prepareStatement(sqlBuf.toString());
 
+        PreparedStatement stmt = connection.prepareStatement(sqlBuf.toString());
         try {
             for (int i = 0; i < sqlParams.size(); ++i) {
                 stmt.setString(i + 1, sqlParams.get(i).toString());

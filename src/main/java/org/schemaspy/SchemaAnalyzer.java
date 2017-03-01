@@ -279,13 +279,14 @@ public class SchemaAnalyzer {
                 xmlName += '.' + schema;
 
             out = new LineWriter(new File(outputDir, xmlName + ".xml"), Config.DOT_CHARSET);
-            document.getDocumentElement().normalize();
             try {
-				DOMUtil.printDOM(document, out);
+                document.getDocumentElement().normalize();
+                DOMUtil.printDOM(document, out);
 			} catch (TransformerException exc) {
 				throw new IOException(exc);
-			}
-            out.close();
+			} finally {
+                out.close();
+            }
 
             // 'try' to make some memory available for the sorting process
             // (some people have run out of memory while RI sorting tables)
@@ -304,14 +305,7 @@ public class SchemaAnalyzer {
             // also populates the recursiveConstraints collection
             List<Table> orderedTables = orderer.getTablesOrderedByRI(db.getTables(), recursiveConstraints);
 
-            out = new LineWriter(new File(outputDir, "insertionOrder.txt"), 16 * 1024, Config.DOT_CHARSET);
-            TextFormatter.getInstance().write(orderedTables, false, out);
-            out.close();
-
-            out = new LineWriter(new File(outputDir, "deletionOrder.txt"), 16 * 1024, Config.DOT_CHARSET);
-            Collections.reverse(orderedTables);
-            TextFormatter.getInstance().write(orderedTables, false, out);
-            out.close();
+            writeOrders(outputDir, orderedTables);
 
             duration = progressListener.finishedGatheringDetails();
             long overallDuration = progressListener.finished(tables, config);
@@ -329,6 +323,28 @@ public class SchemaAnalyzer {
         } catch (Config.MissingRequiredParameterException missingParam) {
             config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
             return null;
+        }
+    }
+
+    private void writeOrders(File outputDir, List<Table> orderedTables) throws IOException {
+        LineWriter out;
+        out = new LineWriter(new File(outputDir, "insertionOrder.txt"), 16 * 1024, Config.DOT_CHARSET);
+        try {
+            TextFormatter.getInstance().write(orderedTables, false, out);
+        } catch (IOException e) {
+            throw new IOException(e);
+        } finally {
+            out.close();
+        }
+
+        out = new LineWriter(new File(outputDir, "deletionOrder.txt"), 16 * 1024, Config.DOT_CHARSET);
+        try {
+            Collections.reverse(orderedTables);
+            TextFormatter.getInstance().write(orderedTables, false, out);
+        } catch (IOException e) {
+            throw new IOException(e);
+        } finally {
+            out.close();
         }
     }
 
