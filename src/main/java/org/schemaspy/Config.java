@@ -114,9 +114,11 @@ public class Config {
     private static final String DEFAULT_TABLE_INCLUSION = ".*"; // match everything
     private static final String DEFAULT_TABLE_EXCLUSION = "";   // match nothing
     private static final String DEFAULT_COLUMN_EXCLUSION = "[^.]";  // match nothing
+    private static final String DEFAULT_PROPERTIES_FILE = "schemaspy.properties";
     private File jarFile;
     private Properties schemaspyProperties = new Properties();
     private Logger logger = Logger.getLogger(Config.class.getName());
+
     /**
      * Default constructor. Intended for when you want to inject properties
      * independently (i.e. not from a command line interface).
@@ -136,10 +138,7 @@ public class Config {
     public Config(String[] argv) {
 
         setInstance(this);
-
-        loadProperties();
-        options = fixupArgs(Arrays.asList(argv), schemaspyProperties);
-
+        options = fixupArgs(Arrays.asList(argv));
         helpRequired = options.remove("-?") ||
                 options.remove("/?") ||
                 options.remove("?") ||
@@ -147,17 +146,6 @@ public class Config {
                 options.remove("-help") ||
                 options.remove("--help");
         dbHelpRequired = options.remove("-dbHelp") || options.remove("-dbhelp");
-    }
-
-    private void loadProperties() {
-        File configFile = new File(System.getProperty("user.dir") + "/schemaspy.properties");
-        String contents;
-        try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
-            contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, "UTF-8"));
-            this.schemaspyProperties.load(new StringReader(contents.replace("\\", "\\\\")));
-        } catch (IOException e) {
-            logger.log(Level.WARNING, e.getMessage(), e);
-        }
     }
 
     public static Config getInstance() {
@@ -1023,7 +1011,7 @@ public class Config {
             if (tmp == null)
                 tmp = pullParam("-schemata");
             if (tmp != null) {
-                schemas = new ArrayList<String>();
+                schemas = new ArrayList<>();
 
                 for (String name : tmp.split("[\\s,'\"]")) {
                     if (name.length() > 0)
@@ -1113,7 +1101,7 @@ public class Config {
      * @param columnDetails
      */
     public void setColumnDetails(String columnDetails) {
-        this.columnDetails = new ArrayList<String>();
+        this.columnDetails = new ArrayList<>();
         if (columnDetails == null || columnDetails.length() == 0) {
             // not specified, so use defaults
             columnDetails = "id table column type size nulls auto default";
@@ -1279,7 +1267,7 @@ public class Config {
             return;
         }
 
-        Map<String, Level> levels = new LinkedHashMap<String, Level>();
+        Map<String, Level> levels = new LinkedHashMap<>();
         levels.put("severe", Level.SEVERE);
         levels.put("warning", Level.WARNING);
         levels.put("info", Level.INFO);
@@ -1498,12 +1486,12 @@ public class Config {
      */
     public void setDbSpecificOptions(Map<String, String> dbSpecificOptions) {
         this.dbSpecificOptions = dbSpecificOptions;
-        originalDbSpecificOptions = new HashMap<String, String>(dbSpecificOptions);
+        originalDbSpecificOptions = new HashMap<>(dbSpecificOptions);
     }
 
     public Map<String, String> getDbSpecificOptions() {
         if (dbSpecificOptions == null)
-            dbSpecificOptions = new HashMap<String, String>();
+            dbSpecificOptions = new HashMap<>();
         return dbSpecificOptions;
     }
 
@@ -1591,7 +1579,7 @@ public class Config {
      * @param args List
      * @return List
      */
-    protected List<String> fixupArgs(List<String> args, Properties schemaspyProperties) {
+    protected List<String> fixupArgs(List<String> args) {
         List<String> expandedArgs = new ArrayList<>();
 
         for (String arg : args) {
@@ -1603,7 +1591,11 @@ public class Config {
                 expandedArgs.add(arg);
             }
         }
-
+        if (expandedArgs.indexOf("-configFile") < 0) {
+            loadProperties(DEFAULT_PROPERTIES_FILE);
+        } else {
+            loadProperties(expandedArgs.get(expandedArgs.indexOf("-configFile") + 1));
+        }
         for (Entry<Object, Object> prop : schemaspyProperties.entrySet()) {
             if (!expandedArgs.contains(prop.getKey().toString().replace("schemaspy.", "-"))) {
                 expandedArgs.add(prop.getKey().toString().replace("schemaspy.", "-"));
@@ -1613,7 +1605,7 @@ public class Config {
         // some OSes/JVMs do filename expansion with runtime.exec() and some don't,
         // so MultipleSchemaAnalyzer has to surround params with double quotes...
         // strip them here for the OSes/JVMs that don't do anything with the params
-        List<String> unquotedArgs = new ArrayList<String>();
+        List<String> unquotedArgs = new ArrayList<>();
 
         for (String arg : expandedArgs) {
             if (arg.startsWith("\"") && arg.endsWith("\""))  // ".*" becomes .*
@@ -1622,6 +1614,17 @@ public class Config {
         }
 
         return unquotedArgs;
+    }
+
+    private void loadProperties(String path) {
+        File configFile = new File(path);
+        String contents;
+        try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
+            contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, "UTF-8"));
+            this.schemaspyProperties.load(new StringReader(contents.replace("\\", "\\\\")));
+        } catch (IOException e) {
+            logger.log(Level.WARNING, e.getMessage(), e);
+        }
     }
 
     /**
@@ -1649,7 +1652,7 @@ public class Config {
     }
 
     public static Set<String> getBuiltInDatabaseTypes(String loadedFromJar) {
-        Set<String> databaseTypes = new TreeSet<String>();
+        Set<String> databaseTypes = new TreeSet<>();
         JarInputStream jar = null;
 
         try {
