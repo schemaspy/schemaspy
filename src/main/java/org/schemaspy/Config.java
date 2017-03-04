@@ -1596,7 +1596,7 @@ public class Config {
 
         for (String arg : args) {
             int indexOfEquals = arg.indexOf('=');
-            if (indexOfEquals != -1 && indexOfEquals -1 != arg.indexOf(ESCAPED_EQUALS)) {
+            if (indexOfEquals != -1 && indexOfEquals - 1 != arg.indexOf(ESCAPED_EQUALS)) {
                 expandedArgs.add(arg.substring(0, indexOfEquals));
                 expandedArgs.add(arg.substring(indexOfEquals + 1));
             } else {
