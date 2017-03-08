@@ -89,6 +89,7 @@ public class SchemaAnalyzer {
 
 	public Database analyzeMultipleSchemas(Config config, List<String> schemas)throws SQLException, IOException {
         try {
+            Database db = null;
         	String schemaSpec = config.getSchemaSpec();
             Connection connection = this.getConnection(config);
             DatabaseMetaData meta = connection.getMetaData();
@@ -126,13 +127,15 @@ public class SchemaAnalyzer {
 	            ProgressListener progressListener = new ConsoleProgressListener(render);
 	            System.out.println("Analyzing " + schema);
 	            System.out.flush();
-				this.analyze(config,progressListener);
+				db = this.analyze(config,progressListener);
+                if (db == null) //if any of analysed schema returns null
+                    return db;
 	        }
 
             prepareLayoutFiles(outputDir);
             HtmlMultipleSchemasIndexPage.getInstance().write(outputDir, dbName, schemas, meta);
 	        
-	        return null;// change this 
+	        return db;
         } catch (Config.MissingRequiredParameterException missingParam) {
             config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
             return null;
