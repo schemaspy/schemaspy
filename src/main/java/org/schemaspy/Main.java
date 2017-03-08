@@ -34,11 +34,12 @@ import java.util.logging.Logger;
  */
 public class Main {
     public static void main(String[] argv) throws Exception {
+        Logger logger = Logger.getLogger(Main.class.getName());
 
         final AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext("org.schemaspy.service");
         applicationContext.register(SchemaAnalyzer.class);
 
-        if (argv.length == 1 && argv[0].equals("-gui")) { // warning: serious temp hack
+        if (argv.length == 1 && "-gui".equals(argv[0])) { // warning: serious temp hack
             new MainFrame().setVisible(true);
             return;
         }
@@ -50,25 +51,25 @@ public class Main {
         try {
             rc = analyzer.analyze(new Config(argv)) == null ? 1 : 0;
         } catch (ConnectionFailure couldntConnect) {
-            // failure already logged
+            logger.log(Level.WARNING, "Connection Failure", couldntConnect);
             rc = 3;
         } catch (EmptySchemaException noData) {
-            // failure already logged
+            logger.log(Level.WARNING, "Empty schema", noData);
             rc = 2;
         } catch (InvalidConfigurationException badConfig) {
-            System.err.println();
+            logger.info("");
             if (badConfig.getParamName() != null)
-                System.err.println("Bad parameter specified for " + badConfig.getParamName());
-            System.err.println(badConfig.getMessage());
+                logger.log(Level.WARNING, "Bad parameter specified for " + badConfig.getParamName());
+            logger.log(Level.WARNING, "Bad config " + badConfig.getMessage());
             if (badConfig.getCause() != null && !badConfig.getMessage().endsWith(badConfig.getMessage()))
-                System.err.println(" caused by " + badConfig.getCause().getMessage());
-            Logger logger = Logger.getLogger(Main.class.getName());
+                logger.log(Level.WARNING, " caused by " + badConfig.getCause().getMessage());
+
             logger.log(Level.FINE, "Command line parameters: " + Arrays.asList(argv));
             logger.log(Level.FINE, "Invalid configuration detected", badConfig);
         } catch (ProcessExecutionException badLaunch) {
-            System.err.println(badLaunch.getMessage());
+            logger.log(Level.WARNING, badLaunch.getMessage(), badLaunch);
         } catch (Exception exc) {
-            exc.printStackTrace();
+            logger.log(Level.SEVERE, exc.getMessage(), exc);
         }
 
         System.exit(rc);

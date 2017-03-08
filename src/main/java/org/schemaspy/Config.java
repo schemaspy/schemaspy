@@ -18,50 +18,37 @@
  */
 package org.schemaspy;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.sql.DatabaseMetaData;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
-import java.util.logging.Level;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.PasswordReader;
 import org.schemaspy.view.DefaultSqlFormatter;
 import org.schemaspy.view.SqlFormatter;
+import org.springframework.util.FileCopyUtils;
+
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.DatabaseMetaData;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Configuration of a SchemaSpy run
  *
  * @author John Currier
  */
-public class Config
-{
+public class Config {
     private static Config instance;
     private final List<String> options;
     private Map<String, String> dbSpecificOptions;
@@ -127,14 +114,16 @@ public class Config
     private static final String DEFAULT_TABLE_INCLUSION = ".*"; // match everything
     private static final String DEFAULT_TABLE_EXCLUSION = "";   // match nothing
     private static final String DEFAULT_COLUMN_EXCLUSION = "[^.]";  // match nothing
+    private static final String DEFAULT_PROPERTIES_FILE = "schemaspy.properties";
     private File jarFile;
+    private Properties schemaspyProperties = new Properties();
+    private Logger logger = Logger.getLogger(Config.class.getName());
 
     /**
      * Default constructor. Intended for when you want to inject properties
      * independently (i.e. not from a command line interface).
      */
-    public Config()
-    {
+    public Config() {
         if (instance == null)
             setInstance(this);
         options = new ArrayList<>();
@@ -146,18 +135,17 @@ public class Config
      *
      * @param argv
      */
-    public Config(String[] argv)
-    {
+    public Config(String[] argv) {
+
         setInstance(this);
         options = fixupArgs(Arrays.asList(argv));
-
-        helpRequired =  options.remove("-?") ||
-                        options.remove("/?") ||
-                        options.remove("?") ||
-                        options.remove("-h") ||
-                        options.remove("-help") ||
-                        options.remove("--help");
-        dbHelpRequired =  options.remove("-dbHelp") || options.remove("-dbhelp");
+        helpRequired = options.remove("-?") ||
+                options.remove("/?") ||
+                options.remove("?") ||
+                options.remove("-h") ||
+                options.remove("-help") ||
+                options.remove("--help");
+        dbHelpRequired = options.remove("-dbHelp") || options.remove("-dbhelp");
     }
 
     public static Config getInstance() {
@@ -169,7 +157,7 @@ public class Config
 
     /**
      * Sets the global instance.
-     *
+     * <p>
      * Useful for things like selecting a specific configuration in a UI.
      *
      * @param config
@@ -243,7 +231,7 @@ public class Config
     /**
      * Return the path to Graphviz (used to find the dot executable to run to
      * generate ER diagrams).<p/>
-     *
+     * <p>
      * Returns {@link #getDefaultGraphvizPath()} if a specific Graphviz path
      * was not specified.
      *
@@ -270,6 +258,7 @@ public class Config
      * If a directory is specified then it is expected to contain files
      * matching the pattern <code>[schema].meta.xml</code>.
      * For databases that don't have schema substitute database for schema.
+     *
      * @param meta
      */
     public void setMeta(String meta) {
@@ -376,7 +365,9 @@ public class Config
         if (port == null)
             try {
                 port = Integer.valueOf(pullParam("-port"));
-            } catch (Exception notSpecified) {}
+            } catch (Exception notSpecified) {
+                logger.log(Level.WARNING, notSpecified.getMessage(), notSpecified);
+            }
         return port;
     }
 
@@ -400,6 +391,7 @@ public class Config
      * User used to connect to the database.
      * Required unless single sign-on is enabled
      * (see {@link #setSingleSignOn(boolean)}).
+     *
      * @return
      */
     public String getUser() {
@@ -435,6 +427,7 @@ public class Config
 
     /**
      * Set the password used to connect to the database.
+     *
      * @param password
      */
     public void setPassword(String password) {
@@ -442,8 +435,8 @@ public class Config
     }
 
     /**
-     * @see #setPassword(String)
      * @return
+     * @see #setPassword(String)
      */
     public String getPassword() {
         if (password == null)
@@ -464,6 +457,7 @@ public class Config
 
     /**
      * Set to <code>true</code> to prompt for the password
+     *
      * @param promptForPassword
      */
     public void setPromptForPasswordEnabled(boolean promptForPassword) {
@@ -471,8 +465,8 @@ public class Config
     }
 
     /**
-     * @see #setPromptForPasswordEnabled(boolean)
      * @return
+     * @see #setPromptForPasswordEnabled(boolean)
      */
     public boolean isPromptForPasswordEnabled() {
         if (promptForPassword == null) {
@@ -489,10 +483,14 @@ public class Config
     public int getMaxDetailedTables() {
         if (maxDetailedTables == null) {
             int max = 300; // default
-            try {
-                max = Integer.parseInt(pullParam("-maxdet"));
-            } catch (Exception notSpecified) {}
-
+            String param = pullParam("-maxdet");
+            if (param != null) {
+                try {
+                    max = Integer.parseInt(param);
+                } catch (NumberFormatException e) {
+                    logger.log(Level.WARNING, e.getMessage(), e);
+                }
+            }
             maxDetailedTables = new Integer(max);
         }
 
@@ -508,6 +506,7 @@ public class Config
      * database connection.<br>
      * user (from -u) and password (from -p) will be passed in the
      * connection properties if specified.
+     *
      * @param propertiesFilename
      * @throws FileNotFoundException
      * @throws IOException
@@ -523,6 +522,7 @@ public class Config
      * Returns a {@link Properties} populated either from the properties file specified
      * by {@link #setConnectionPropertiesFile(String)}, the properties specified by
      * {@link #setConnectionProperties(String)} or not populated.
+     *
      * @return
      * @throws FileNotFoundException
      * @throws IOException
@@ -589,7 +589,7 @@ public class Config
      * Note that this file is parsed and used to determine characteristics
      * of the generated diagrams, so it must contain specific settings that
      * are documented within schemaSpy.css.<p>
-     *
+     * <p>
      * Defaults to <code>"schemaSpy.css"</code>.
      *
      * @param css
@@ -631,9 +631,9 @@ public class Config
     /**
      * The font size to use within diagrams.  This is the size of the font used for
      * 'large' (e.g. not 'compact') diagrams.<p>
-     *
+     * <p>
      * Modify the .css to specify HTML font sizes.<p>
-     *
+     * <p>
      * Defaults to 11.
      *
      * @param fontSize
@@ -643,17 +643,21 @@ public class Config
     }
 
     /**
-     * @see #setFontSize(int)
      * @return
+     * @see #setFontSize(int)
      */
     public int getFontSize() {
         if (fontSize == null) {
             int size = 11; // default
-            try {
-                size = Integer.parseInt(pullParam("-fontsize"));
-            } catch (Exception notSpecified) {}
-
-            fontSize = new Integer(size);
+            String param = pullParam("-fontsize");
+            if (param != null) {
+                try {
+                    size = Integer.parseInt(param);
+                } catch (NumberFormatException e) {
+                    logger.log(Level.WARNING, e.getMessage(), e);
+                }
+            }
+            fontSize = Integer.valueOf(size);
         }
 
         return fontSize.intValue();
@@ -708,8 +712,8 @@ public class Config
     }
 
     /**
-     * @see #setMaxDbThreads(int)
      * @throws InvalidConfigurationException if unable to load properties
+     * @see #setMaxDbThreads(int)
      */
     public int getMaxDbThreads() throws InvalidConfigurationException {
         if (maxDbThreads == null) {
@@ -718,7 +722,7 @@ public class Config
                 properties = determineDbProperties(getDbType());
             } catch (IOException exc) {
                 throw new InvalidConfigurationException("Failed to load properties for " + getDbType() + ": " + exc)
-                                .setParamName("-type");
+                        .setParamName("-type");
             }
 
             final int defaultMax = 15;  // not scientifically derived
@@ -773,7 +777,7 @@ public class Config
     /**
      * Look for Ruby on Rails-based naming conventions in
      * relationships between logical foreign keys and primary keys.<p>
-     *
+     * <p>
      * Basically all tables have a primary key named <code>ID</code>.
      * All tables are named plural names.
      * The columns that logically reference that <code>ID</code> are the singular
@@ -786,9 +790,8 @@ public class Config
     }
 
     /**
-     * @see #setRailsEnabled(boolean)
-     *
      * @return
+     * @see #setRailsEnabled(boolean)
      */
     public boolean isRailsEnabled() {
         if (railsEnabled == null)
@@ -817,7 +820,7 @@ public class Config
     /**
      * If enabled we'll attempt to query/render the number of rows that
      * each table contains.<p/>
-     *
+     * <p>
      * Defaults to <code>true</code> (enabled).
      *
      * @param enabled
@@ -827,8 +830,8 @@ public class Config
     }
 
     /**
-     * @see #setNumRowsEnabled(boolean)
      * @return
+     * @see #setNumRowsEnabled(boolean)
      */
     public boolean isNumRowsEnabled() {
         if (numRowsEnabled == null)
@@ -839,7 +842,7 @@ public class Config
 
     /**
      * If enabled we'll include views in the analysis.<p/>
-     *
+     * <p>
      * Defaults to <code>true</code> (enabled).
      *
      * @param enabled
@@ -849,8 +852,8 @@ public class Config
     }
 
     /**
-     * @see #setViewsEnabled(boolean)
      * @return
+     * @see #setViewsEnabled(boolean)
      */
     public boolean isViewsEnabled() {
         if (viewsEnabled == null)
@@ -863,6 +866,7 @@ public class Config
      * Returns <code>true</code> if metering should be embedded in
      * the generated pages.<p/>
      * Defaults to <code>false</code> (disabled).
+     *
      * @return
      */
     public boolean isMeterEnabled() {
@@ -876,7 +880,7 @@ public class Config
      * Set the columns to exclude from all relationship diagrams.
      *
      * @param columnExclusions regular expression of the columns to
-     *        exclude
+     *                         exclude
      */
     public void setColumnExclusions(String columnExclusions) {
         this.columnExclusions = Pattern.compile(columnExclusions);
@@ -884,6 +888,7 @@ public class Config
 
     /**
      * See {@link #setColumnExclusions(String)}
+     *
      * @return
      */
     public Pattern getColumnExclusions() {
@@ -905,16 +910,15 @@ public class Config
      * columns aren't directly referenced by the focal table.
      *
      * @param columnExclusions regular expression of the columns to
-     *        exclude
+     *                         exclude
      */
     public void setIndirectColumnExclusions(String fullColumnExclusions) {
         indirectColumnExclusions = Pattern.compile(fullColumnExclusions);
     }
 
     /**
-     * @see #setIndirectColumnExclusions(String)
-     *
      * @return
+     * @see #setIndirectColumnExclusions(String)
      */
     public Pattern getIndirectColumnExclusions() {
         if (indirectColumnExclusions == null) {
@@ -932,6 +936,7 @@ public class Config
 
     /**
      * Set the tables to include as a regular expression
+     *
      * @param tableInclusions
      */
     public void setTableInclusions(String tableInclusions) {
@@ -963,6 +968,7 @@ public class Config
 
     /**
      * Set the tables to exclude as a regular expression
+     *
      * @param tableInclusions
      */
     public void setTableExclusions(String tableExclusions) {
@@ -993,9 +999,9 @@ public class Config
     }
 
     public void setSchemas(List<String> schemas) {
-    	this.schemas=schemas;
+        this.schemas = schemas;
     }
-    
+
     /**
      * @return
      */
@@ -1005,7 +1011,7 @@ public class Config
             if (tmp == null)
                 tmp = pullParam("-schemata");
             if (tmp != null) {
-                schemas = new ArrayList<String>();
+                schemas = new ArrayList<>();
 
                 for (String name : tmp.split("[\\s,'\"]")) {
                     if (name.length() > 0)
@@ -1060,11 +1066,11 @@ public class Config
             }
 
             try {
-                Class<SqlFormatter> clazz = (Class<SqlFormatter>)Class.forName(sqlFormatterClass);
+                Class<SqlFormatter> clazz = (Class<SqlFormatter>) Class.forName(sqlFormatterClass);
                 sqlFormatter = clazz.newInstance();
             } catch (Exception exc) {
                 throw new InvalidConfigurationException("Failed to initialize instance of SQL formatter: ", exc)
-                            .setParamName("-sqlFormatter");
+                        .setParamName("-sqlFormatter");
             }
         }
 
@@ -1074,7 +1080,7 @@ public class Config
     /**
      * Set the details to show on the columns page, where "details" are
      * comma and/or space separated.
-     *
+     * <p>
      * Valid values:
      * <ul>
      * <li>id</li>
@@ -1088,14 +1094,14 @@ public class Config
      * <li>children</li>
      * <li>parents</li>
      * </ul>
-     *
+     * <p>
      * The default details are <code>"table column type size nulls auto default"</code>.
      * Note that "column" is the initially displayed detail and must be included.
      *
      * @param columnDetails
      */
     public void setColumnDetails(String columnDetails) {
-        this.columnDetails = new ArrayList<String>();
+        this.columnDetails = new ArrayList<>();
         if (columnDetails == null || columnDetails.length() == 0) {
             // not specified, so use defaults
             columnDetails = "id table column type size nulls auto default";
@@ -1143,9 +1149,10 @@ public class Config
     public boolean isOneOfMultipleSchemas() {
         return oneOfMultipleSchemas;
     }
-    public void setOneOfMultipleSchemas(boolean oneOfMultipleSchemas){
+
+    public void setOneOfMultipleSchemas(boolean oneOfMultipleSchemas) {
         // set by SchemaAnalyzer.analyzeMultipleSchemas function.
-    	this.oneOfMultipleSchemas = oneOfMultipleSchemas;
+        this.oneOfMultipleSchemas = oneOfMultipleSchemas;
     }
 
     /**
@@ -1179,8 +1186,8 @@ public class Config
     }
 
     /**
-     * @see #setRenderer(String)
      * @return
+     * @see #setRenderer(String)
      */
     public String getRenderer() {
         String renderer = pullParam("-renderer");
@@ -1243,13 +1250,13 @@ public class Config
      * Set the level of logging to perform.<p/>
      * The levels in descending order are:
      * <ul>
-     *  <li><code>severe</code> (highest - least detail)
-     *  <li><code>warning</code> (default)
-     *  <li><code>info</code>
-     *  <li><code>config</code>
-     *  <li><code>fine</code>
-     *  <li><code>finer</code>
-     *  <li><code>finest</code>  (lowest - most detail)
+     * <li><code>severe</code> (highest - least detail)
+     * <li><code>warning</code> (default)
+     * <li><code>info</code>
+     * <li><code>config</code>
+     * <li><code>fine</code>
+     * <li><code>finer</code>
+     * <li><code>finest</code>  (lowest - most detail)
      * </ul>
      *
      * @param logLevel
@@ -1260,7 +1267,7 @@ public class Config
             return;
         }
 
-        Map<String, Level> levels = new LinkedHashMap<String, Level>();
+        Map<String, Level> levels = new LinkedHashMap<>();
         levels.put("severe", Level.SEVERE);
         levels.put("warning", Level.WARNING);
         levels.put("info", Level.INFO);
@@ -1322,9 +1329,8 @@ public class Config
     }
 
     /**
-     * @see #setHasOrphans()
-     *
      * @return
+     * @see #setHasOrphans()
      */
     public boolean hasOrphans() {
         return hasOrphans;
@@ -1338,9 +1344,8 @@ public class Config
     }
 
     /**
-     * @see #setHasRoutines()
-     *
      * @return
+     * @see #setHasRoutines()
      */
     public boolean hasRoutines() {
         return hasRoutines;
@@ -1349,6 +1354,7 @@ public class Config
     /**
      * Returns the database properties to use.
      * These should be determined by calling {@link #determineDbProperties(String)}.
+     *
      * @return
      * @throws InvalidConfigurationException
      */
@@ -1412,7 +1418,7 @@ public class Config
         // bring in key/values pointed to by the include directive
         // example: include.1=mysql::selectRowCountSql
         for (int i = 1; true; ++i) {
-            String include = (String)props.remove("include." + i);
+            String include = (String) props.remove("include." + i);
             if (include == null)
                 break;
 
@@ -1429,7 +1435,7 @@ public class Config
         }
 
         // bring in base properties files pointed to by the extends directive
-        String baseDbType = (String)props.remove("extends");
+        String baseDbType = (String) props.remove("extends");
         if (baseDbType != null) {
             baseDbType = baseDbType.trim();
             Properties baseProps = determineDbProperties(baseDbType);
@@ -1454,8 +1460,7 @@ public class Config
         return dbPropertiesLoadedFrom;
     }
 
-    public List<String> getRemainingParameters()
-    {
+    public List<String> getRemainingParameters() {
         try {
             populate();
         } catch (IllegalArgumentException exc) {
@@ -1464,7 +1469,7 @@ public class Config
             throw new InvalidConfigurationException(exc);
         } catch (InvocationTargetException exc) {
             if (exc.getCause() instanceof InvalidConfigurationException)
-                throw (InvalidConfigurationException)exc.getCause();
+                throw (InvalidConfigurationException) exc.getCause();
             throw new InvalidConfigurationException(exc.getCause());
         } catch (IntrospectionException exc) {
             throw new InvalidConfigurationException(exc);
@@ -1481,12 +1486,12 @@ public class Config
      */
     public void setDbSpecificOptions(Map<String, String> dbSpecificOptions) {
         this.dbSpecificOptions = dbSpecificOptions;
-        originalDbSpecificOptions = new HashMap<String, String>(dbSpecificOptions);
+        originalDbSpecificOptions = new HashMap<>(dbSpecificOptions);
     }
 
     public Map<String, String> getDbSpecificOptions() {
-        if (dbSpecificOptions ==  null)
-            dbSpecificOptions = new HashMap<String, String>();
+        if (dbSpecificOptions == null)
+            dbSpecificOptions = new HashMap<>();
         return dbSpecificOptions;
     }
 
@@ -1530,7 +1535,7 @@ public class Config
      * @throws MissingRequiredParameterException
      */
     private String pullParam(String paramId, boolean required, boolean dbTypeSpecific)
-                                throws MissingRequiredParameterException {
+            throws MissingRequiredParameterException {
         int paramIndex = options.indexOf(paramId);
         if (paramIndex < 0) {
             if (required)
@@ -1571,27 +1576,36 @@ public class Config
      * Allow an equal sign in args...like "-o=foo.bar". Useful for things like
      * Ant and Maven.
      *
-     * @param args
-     *            List
+     * @param args List
      * @return List
      */
     protected List<String> fixupArgs(List<String> args) {
-        List<String> expandedArgs = new ArrayList<String>();
+        List<String> expandedArgs = new ArrayList<>();
 
         for (String arg : args) {
             int indexOfEquals = arg.indexOf('=');
-            if (indexOfEquals != -1 && indexOfEquals -1 != arg.indexOf(ESCAPED_EQUALS)) {
+            if (indexOfEquals != -1 && indexOfEquals - 1 != arg.indexOf(ESCAPED_EQUALS)) {
                 expandedArgs.add(arg.substring(0, indexOfEquals));
                 expandedArgs.add(arg.substring(indexOfEquals + 1));
             } else {
                 expandedArgs.add(arg);
             }
         }
-
+        if (expandedArgs.indexOf("-configFile") < 0) {
+            loadProperties(DEFAULT_PROPERTIES_FILE);
+        } else {
+            loadProperties(expandedArgs.get(expandedArgs.indexOf("-configFile") + 1));
+        }
+        for (Entry<Object, Object> prop : schemaspyProperties.entrySet()) {
+            if (!expandedArgs.contains(prop.getKey().toString().replace("schemaspy.", "-"))) {
+                expandedArgs.add(prop.getKey().toString().replace("schemaspy.", "-"));
+                expandedArgs.add(prop.getValue().toString());
+            }
+        }
         // some OSes/JVMs do filename expansion with runtime.exec() and some don't,
         // so MultipleSchemaAnalyzer has to surround params with double quotes...
         // strip them here for the OSes/JVMs that don't do anything with the params
-        List<String> unquotedArgs = new ArrayList<String>();
+        List<String> unquotedArgs = new ArrayList<>();
 
         for (String arg : expandedArgs) {
             if (arg.startsWith("\"") && arg.endsWith("\""))  // ".*" becomes .*
@@ -1600,6 +1614,17 @@ public class Config
         }
 
         return unquotedArgs;
+    }
+
+    private void loadProperties(String path) {
+        File configFile = new File(path);
+        String contents;
+        try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
+            contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, "UTF-8"));
+            this.schemaspyProperties.load(new StringReader(contents.replace("\\", "\\\\")));
+        } catch (IOException e) {
+            logger.log(Level.WARNING, e.getMessage(), e);
+        }
     }
 
     /**
@@ -1619,7 +1644,7 @@ public class Config
             for (int i = 0; i < props.length; ++i) {
                 Method readMethod = props[i].getReadMethod();
                 if (readMethod != null)
-                    readMethod.invoke(this, (Object[])null);
+                    readMethod.invoke(this, (Object[]) null);
             }
 
             populating = false;
@@ -1627,7 +1652,7 @@ public class Config
     }
 
     public static Set<String> getBuiltInDatabaseTypes(String loadedFromJar) {
-        Set<String> databaseTypes = new TreeSet<String>();
+        Set<String> databaseTypes = new TreeSet<>();
         JarInputStream jar = null;
 
         try {
@@ -1647,7 +1672,8 @@ public class Config
             if (jar != null) {
                 try {
                     jar.close();
-                } catch (IOException ignore) {}
+                } catch (IOException ignore) {
+                }
             }
         }
 
@@ -1715,7 +1741,7 @@ public class Config
             for (int i = 0; i < props.length; ++i) {
                 PropertyDescriptor prop = props[i];
                 if (prop.getName().equalsIgnoreCase(paramName)) {
-                    Object result = prop.getReadMethod().invoke(this, (Object[])null);
+                    Object result = prop.getReadMethod().invoke(this, (Object[]) null);
                     return result == null ? null : result.toString();
                 }
             }
@@ -1734,7 +1760,7 @@ public class Config
      * @throws IOException
      */
     public List<String> asList() throws IOException {
-        List<String> params = new ArrayList<String>();
+        List<String> params = new ArrayList<>();
 
         if (originalDbSpecificOptions != null) {
             for (String key : originalDbSpecificOptions.keySet()) {
@@ -1823,7 +1849,7 @@ public class Config
             params.add(value);
         } else {
             Properties props = getConnectionProperties();
-            if (!props.isEmpty() ) {
+            if (!props.isEmpty()) {
                 params.add("-connprops");
                 StringBuilder buf = new StringBuilder();
                 for (Entry<Object, Object> entry : props.entrySet()) {
@@ -1859,7 +1885,7 @@ public class Config
             params.add("-meta");
             params.add(value);
         }
-        
+
         value = getTemplateDirectory();
         if (value != null) {
             params.add("-template");
