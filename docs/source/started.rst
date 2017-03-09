@@ -1,16 +1,46 @@
 Get Started
 =====================================
 
-Welcome in SchemaSpy we will do the best to simplify documentation process of your database
+Welcome to SchemaSpy. We will do the best to simplify documentation process of your database.
+
+Configuration
+-----------------
+
+Parameters can be specified in the comand line (described below) or you can predefine configuration in the file.
+SchemaSpy will search configuration file in 
+``<current-dir>/schemaspy.properties``
+To use an alternative configuration file run SchemaSpy with parameter: ``java -jar schemaspy.jar -configFile path/to/config.file``
+
+Config file example: ::
+
+	# type of database. Run with -dbhelp for details
+	schemaspy.t=mssql
+	# optional path to alternative jdbc drivers. 
+	schemaspy.dp=path/to/drivers
+	# database properties: host, port number, name user, password
+	schemaspy.host=server
+	schemaspy.port=1433
+	schemaspy.db=db_name
+	schemaspy.u=database_user
+	schemaspy.p=database_password
+	# output dir to save generated files
+	schemaspy.o=path/to/output
+	# db scheme for which generate diagrams
+	schemaspy.s=dbo
 
 Running SchemaSpy
 -----------------
 
-You can easy run SchemaSpy from the command line:
+You can easily run SchemaSpy from the command line:
 
 .. code-block:: bash
 
     java -jar schemaspy.jar -t dbType -dp C:/sqljdbc4-3.0.jar -db dbName -host server -port 1433 [-s schema] -u user [-p password] -o outputDir
+
+Parameters priority:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is important to notice, that command-line parameters **override** those configured in schemaspy.properties file. 
 
 Commonly used parameters:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,3 +66,4 @@ Commonly used parameters:
     either higher or lower quality images. That is, some might not have the "lower quality" libraries and others might not have the "higher quality" libraries.
     Higher quality output takes longer to generate and results in significantly larger image files (which take longer to download / display),
     but the resultant Entity Relationship diagrams generally look better.
+

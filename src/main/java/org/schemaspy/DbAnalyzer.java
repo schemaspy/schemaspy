@@ -31,27 +31,11 @@ import org.schemaspy.model.*;
 import org.schemaspy.util.Inflection;
 
 public class DbAnalyzer {
+	
     public static List<ImpliedForeignKeyConstraint> getImpliedConstraints(Collection<Table> tables) {
         List<TableColumn> columnsWithoutParents = new ArrayList<TableColumn>();
-        Map<DatabaseObject, Table> keyedTablesByPrimary = new TreeMap<DatabaseObject, Table>(new Comparator<DatabaseObject>() {
-            @Override
-			public int compare(DatabaseObject column1, DatabaseObject column2) {
-                int rc = column1.getName().compareToIgnoreCase(column2.getName());
-                if (rc == 0) {
-	                if (column1.getType() != null && column2.getType() != null)
-	                	// type is exact while typeName can be adorned with additional stuff (e.g. MSSQL appends " identity" for auto-inc keys)
-	                	rc = column1.getType().compareTo(column2.getType());
-	                else
-	                    rc = column1.getTypeName().compareToIgnoreCase(column2.getTypeName());
-                }
-                if (rc == 0)
-                    rc = column1.getLength() - column2.getLength();
-                return rc;
-            }
-        });
-
-        int duplicatePrimaries = 0;
-
+        Map<DatabaseObject, Table> keyedTablesByPrimary = new TreeMap<DatabaseObject, Table>();
+        
         // gather all the primary key columns and columns without parents
         for (Table table : tables) {
             List<TableColumn> tablePrimaries = table.getPrimaryColumns();
@@ -59,73 +43,77 @@ public class DbAnalyzer {
             	TableColumn tableColumn = tablePrimaries.get(0);
                 DatabaseObject primary = new DatabaseObject(tableColumn);
                 if (tableColumn.allowsImpliedChildren()) {
-                	Table existingTable = keyedTablesByPrimary.get(primary);
-                    duplicatePrimaries = addKeyedTablesByPrimary(keyedTablesByPrimary, duplicatePrimaries, table, primary, existingTable);
-
-                    primary.setName(table.getName()+primary.getName());
-                    existingTable = keyedTablesByPrimary.get(primary);
-                    duplicatePrimaries = addKeyedTablesByPrimary(keyedTablesByPrimary, duplicatePrimaries, table, primary, existingTable);
+                    // new primary key name/type 
+                    keyedTablesByPrimary.put(primary, table);
                 }
             }
 
             //TODO fixed column name "LanguageId" should be moved to schemaspy properties
             for (TableColumn column : table.getColumns()) {
-                if (!column.isForeignKey() && column.allowsImpliedParents() && !column.getName().equals("LanguageId"))
+                if (!column.isForeignKey() && !column.isPrimary() && column.allowsImpliedParents() && !column.getName().equals("LanguageId"))
                     columnsWithoutParents.add(column);
             }
         }
 
-        // if more than half of the tables have the same primary key then
-        // it's most likely a database where primary key names aren't unique
-        // (e.g. they all have a primary key named 'ID')
-        if (duplicatePrimaries > keyedTablesByPrimary.size()) // bizarre logic, but it does approximately what we need
-            return new ArrayList<ImpliedForeignKeyConstraint>();
-
         sortColumnsByTable(columnsWithoutParents);
         Set<DatabaseObject> primaryColumns = keyedTablesByPrimary.keySet();
-
         List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<ImpliedForeignKeyConstraint>();
+        
         for (TableColumn childColumn : columnsWithoutParents) {
-            Table primaryTable = keyedTablesByPrimary.get(new DatabaseObject(childColumn));
-            DatabaseObject column = new DatabaseObject(childColumn);
-            if (primaryTable == null) {
-                column.setName(childColumn.getTable().getName()+childColumn.getName());
-                primaryTable = keyedTablesByPrimary.get(column);
-            }
+            DatabaseObject columnWithoutParent = new DatabaseObject(childColumn);
+            
+            // search for Parent(PK) table
+        	Table primaryTable = null;
+        	Integer numPrimaryTableFound=0;
+			for (Map.Entry<DatabaseObject, Table> entry : keyedTablesByPrimary.entrySet()) {
+				DatabaseObject key = entry.getKey();
+				if (columnWithoutParent.getName().compareToIgnoreCase(key.getName()) == 0
+						// if adress_id=adress_id OR shipping_adress_id like &description%_adress_id
+						|| columnWithoutParent.getName().matches("(?i).*_" + key.getName())
+						// if order.adressid=>adress.id. find FKs that made from %parentTablename%PKcol%
+						// if order.adress_id=>adress.id. find FKs that made from %tablename%_%PKcol%
+						|| columnWithoutParent.getName().matches("(?i)" +entry.getValue().getName() + ".*" + key.getName()) 
+						) {
+					// check f columnTypes Or ColumnTypeNames are same.
+					if ((columnWithoutParent.getType() != null && key.getType() != null
+							&& columnWithoutParent.getType().compareTo(key.getType()) == 0)
+							|| columnWithoutParent.getTypeName().compareToIgnoreCase(key.getTypeName()) == 0) {
+						// check if column lengths are same.
+						if (columnWithoutParent.getLength() - key.getLength() == 0) {
+							// found parent table.
+							primaryTable = entry.getValue();
+							numPrimaryTableFound++;
+							// if child column refrencing multiple PK(Parent) tables then dont create implied relationship and exit the loop.
+							// one column can reference only one parent table.! 
+							if (numPrimaryTableFound>1) {
+								primaryTable=null;
+								break;
+							}
+						}
+					}
+				}
+			}
+            
             if (primaryTable != null && primaryTable != childColumn.getTable()) {
-                Optional<DatabaseObject> databaseObject = primaryColumns.stream().filter(d-> d.getName().equals(column.getName())).findFirst();
-                if (databaseObject.isPresent()) {
-                    TableColumn parentColumn = primaryTable.getColumn(databaseObject.get().getOrginalName());
-                    // make sure the potential child->parent relationships isn't already a
-                    // parent->child relationship
-                    if (parentColumn.getParentConstraint(childColumn) == null) {
-                        // ok, we've found a potential relationship with a column matches a primary
-                        // key column in another table and isn't already related to that column
-                        impliedConstraints.add(new ImpliedForeignKeyConstraint(parentColumn, childColumn));
-                    }
+                //Optional<DatabaseObject> databaseObject = primaryColumns.stream().filter(d-> d.getName().equals(primaryTable.getName())).findFirst();
+                //if (databaseObject.isPresent()) {
+                //    TableColumn parentColumn = primaryTable.getColumn(databaseObject.get().getOrginalName());
+            	
+            	// // can't match up multiples...yet...==> so checks only first  PK column.
+            	TableColumn parentColumn = primaryTable.getPrimaryColumns().get(0);
+                // make sure the potential child->parent relationships isn't already a
+                // parent->child relationship
+                if (parentColumn.getParentConstraint(childColumn) == null) {
+                    // ok, we've found a potential relationship with a column matches a primary
+                    // key column in another table and isn't already related to that column
+                    impliedConstraints.add(new ImpliedForeignKeyConstraint(parentColumn, childColumn));
                 }
+                //}
             }
         }
+        
 
         return impliedConstraints;
-    }
-
-    private static int addKeyedTablesByPrimary(Map<DatabaseObject, Table> keyedTablesByPrimary, int duplicatePrimaries, Table table, DatabaseObject primary, Table existingTable) {
-        if (existingTable == null) {
-            // new primary key name/type discovered
-            keyedTablesByPrimary.put(primary, table);
-        } else {
-            ++duplicatePrimaries;
-
-            // already found one with this signature. keep the one with
-            // the most children since it's most likely to be the one of
-            // most importance
-            TableColumn existingPrimary = existingTable.getPrimaryColumns().get(0);
-            if (primary.getChildren().size() > existingPrimary.getChildren().size()) {
-                keyedTablesByPrimary.put(primary, table);
-            }
-        }
-        return duplicatePrimaries;
     }
 
     /**
