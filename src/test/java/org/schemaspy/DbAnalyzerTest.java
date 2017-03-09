@@ -63,9 +63,9 @@ public class DbAnalyzerTest extends TestCase {
     }
 
     private Table createAlbumTable() throws SQLException {
-        Table table = new Table(database, catalog, schema, "Album", "This is comment for database on PostgresSQL [Invoice] link is also working");
+        Table table = new Table(database, catalog, schema, "ALbum", "This is comment for database on PostgresSQL [Invoice] link is also working");
         TableColumn column1 = new TableColumn(table);
-        column1.setName("Id");
+        column1.setName("ID");
         column1.setTypeName("int");
         column1.setLength(0);
         column1.setDetailedSize("10");
@@ -77,7 +77,7 @@ public class DbAnalyzerTest extends TestCase {
         column2.setLength(160);
 
         TableColumn column3 = new TableColumn(table);
-        column3.setName("ArtistId");
+        column3.setName("arTistID");
         column3.setTypeName("int");
         column3.setType(1);
         column3.setLength(0);
