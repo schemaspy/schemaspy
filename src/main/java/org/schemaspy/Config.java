@@ -1623,7 +1623,7 @@ public class Config {
             contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, "UTF-8"));
             this.schemaspyProperties.load(new StringReader(contents.replace("\\", "\\\\")));
         } catch (IOException e) {
-            logger.log(Level.WARNING, e.getMessage(), e);
+            logger.log(Level.INFO, "Configuration file not found");
         }
     }
 
