@@ -11,6 +11,7 @@ public class MustacheTableColumnRelatives {
     private TableColumn column;
     private Table table;
     private ForeignKeyConstraint constraint;
+    private String path;
 
     public MustacheTableColumnRelatives(ForeignKeyConstraint constraint) {
         this.constraint = constraint;
@@ -20,10 +21,15 @@ public class MustacheTableColumnRelatives {
         this(constraint);
         this.column = column;
         this.table = column.getTable();
+        this.path = table.isRemote() ? ("../../" + table.getContainer() + "/tables/") : "";
     }
 
     public Table getTable() {
         return table;
+    }
+
+    public String getPath() {
+        return path;
     }
 
     public ForeignKeyConstraint getConstraint() {
