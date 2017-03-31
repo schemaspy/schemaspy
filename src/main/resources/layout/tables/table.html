@@ -61,7 +61,7 @@
 				  {{#children}}
 				   <tr>
 					<td title="{{constraint}}">
-						<a href='{{table.name}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span>
+						<a href='{{path}}{{table.name}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span>
 					</td>
 					<td class="constraint detail">
 						{{constraint.name}} <span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span>
@@ -75,7 +75,7 @@
 				  {{#parents}}
 				   <tr>
 					<td title="{{constraint}}">
-						<a href='{{table.name}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span>
+						<a href='{{path}}{{table.name}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span>
 					</td>
 					<td class="constraint detail">
 						{{constraint.name}} <span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span>

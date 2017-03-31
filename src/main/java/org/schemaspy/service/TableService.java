@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -205,12 +205,26 @@ public class TableService {
         try {
             // get our foreign keys that reference other tables' primary keys
             rs = db.getMetaData().getImportedKeys(table.getCatalog(), table.getSchema(), table.getName());
+            ArrayList<ForeignKey> importedKeys = new ArrayList<>();
 
             while (rs.next()) {
-                addForeignKey(db, table, rs.getString("FK_NAME"), rs.getString("FKCOLUMN_NAME"),
-                        rs.getString("PKTABLE_CAT"), rs.getString("PKTABLE_SCHEM"),
-                        rs.getString("PKTABLE_NAME"), rs.getString("PKCOLUMN_NAME"),
-                        rs.getInt("UPDATE_RULE"), rs.getInt("DELETE_RULE"),
+                ForeignKey key = new ForeignKey();
+                key.setFK_NAME(rs.getString("FK_NAME"));
+                key.setFKCOLUMN_NAME(rs.getString("FKCOLUMN_NAME"));
+                key.setPKTABLE_CAT(rs.getString("PKTABLE_CAT"));
+                key.setPKTABLE_SCHEM(rs.getString("PKTABLE_SCHEM"));
+                key.setPKTABLE_NAME(rs.getString("PKTABLE_NAME"));
+                key.setPKCOLUMN_NAME(rs.getString("PKCOLUMN_NAME"));
+                key.setUPDATE_RULE(rs.getInt("UPDATE_RULE"));
+                key.setDELETE_RULE(rs.getInt("DELETE_RULE"));
+                importedKeys.add(key);
+            }
+
+            for(ForeignKey importedKey : importedKeys) {
+                addForeignKey(db, table, importedKey.getFK_NAME(), importedKey.getFKCOLUMN_NAME(),
+                        importedKey.getPKTABLE_CAT(), importedKey.getPKTABLE_SCHEM(),
+                        importedKey.getPKTABLE_NAME(), importedKey.getPKCOLUMN_NAME(),
+                        importedKey.getUPDATE_RULE(), importedKey.getDELETE_RULE(),
                         tables);
             }
         } finally {
@@ -226,13 +240,22 @@ public class TableService {
                 // get the foreign keys that reference our primary keys
                 // note that this can take an insane amount of time on Oracle (i.e. 30 secs per call)
                 rs = db.getMetaData().getExportedKeys(table.getCatalog(), table.getSchema(), table.getName());
+                ArrayList<ForeignKey> exportedKeys = new ArrayList<>();
 
                 while (rs.next()) {
-                    String otherCatalog = rs.getString("FKTABLE_CAT");
-                    String otherSchema = rs.getString("FKTABLE_SCHEM");
+                    ForeignKey key = new ForeignKey();
+                    key.setFKTABLE_CAT(rs.getString("FKTABLE_CAT"));
+                    key.setFKTABLE_SCHEM(rs.getString("FKTABLE_SCHEM"));
+                    key.setFKTABLE_NAME(rs.getString("FKTABLE_NAME"));
+                    exportedKeys.add(key);
+                }
+
+                for(ForeignKey exportedKey : exportedKeys) {
+                    String otherCatalog = exportedKey.getFKTABLE_CAT();
+                    String otherSchema = exportedKey.getFKTABLE_SCHEM();
                     if (!String.valueOf(table.getSchema()).equals(String.valueOf(otherSchema)) ||
                             !String.valueOf(table.getCatalog()).equals(String.valueOf(otherCatalog))) {
-                        addRemoteTable(db, otherCatalog, otherSchema, rs.getString("FKTABLE_NAME"), table.getSchema(), false);
+                        addRemoteTable(db, otherCatalog, otherSchema, exportedKey.getFKTABLE_NAME(), table.getSchema(), false);
                     }
                 }
             } finally {
@@ -344,15 +367,15 @@ public class TableService {
                     childColumn.addParent(parentColumn, foreignKey);
                     parentColumn.addChild(childColumn, foreignKey);
                 } else {
-                    logger.warning("Couldn't add FK '" + foreignKey.getName() + "' to table '" + this +
+                    logger.warning("Couldn't add FK '" + foreignKey.getName() + "' to table '" + table.getName() +
                             "' - Column '" + pkColName + "' doesn't exist in table '" + parentTable + "'");
                 }
             } else {
-                logger.warning("Couldn't add FK '" + foreignKey.getName() + "' to table '" + this +
+                logger.warning("Couldn't add FK '" + foreignKey.getName() + "' to table '" + table.getName() +
                         "' - Unknown Referenced Table '" + pkTableName + "'");
             }
         } else {
-            logger.warning("Couldn't add FK '" + foreignKey.getName() + "' to table '" + this +
+            logger.warning("Couldn't add FK '" + foreignKey.getName() + "' to table '" + table.getName() +
                     "' - Column '" + fkColName + "' doesn't exist");
         }
     }
@@ -474,8 +497,10 @@ public class TableService {
 
             if (logical)
                 remoteTable = new LogicalRemoteTable(db, remoteCatalog, remoteSchema, remoteTableName, baseContainer);
-            else
+            else {
                 remoteTable = new RemoteTable(db, remoteCatalog, remoteSchema, remoteTableName, baseContainer);
+                this.initColumns(db, remoteTable);
+            }
 
             if (fineEnabled)
                 logger.fine("Adding remote table " + fullName);
