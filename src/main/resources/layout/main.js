@@ -13,16 +13,8 @@ $.fn.dataTable.ext.search.push(
 );
 }
 
-function enableAnchors() {
-    anchors.options.visible = 'always';
-    anchors.add('h3');
-}
-
 $(document).ready(function() {
 	var activeObject;
-
-    enableAnchors();
-
     var table = $('#database_objects').DataTable( {
         lengthChange: false,
 		pageLength: 50,
