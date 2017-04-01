@@ -178,7 +178,7 @@ public class DbAnalyzer {
         List<Table> orphans = new ArrayList<Table>();
 
         for (Table table : tables) {
-            if (table.isOrphan(false)) {
+            if (table.isOrphan(false) && !table.isView()) {
                 orphans.add(table);
             }
         }
