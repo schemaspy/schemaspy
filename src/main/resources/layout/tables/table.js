@@ -1,4 +1,11 @@
+function enableAnchors() {
+    anchors.options.visible = 'always';
+    anchors.add('h3');
+}
+
 $(document).ready(function() {
+    enableAnchors();
+
     var table = $('#standard_table').DataTable( {
         lengthChange: false,		
 		bSort: false,
