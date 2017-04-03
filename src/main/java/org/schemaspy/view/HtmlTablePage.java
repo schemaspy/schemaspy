@@ -162,7 +162,7 @@ public class HtmlTablePage extends HtmlFormatter {
      */
     private boolean generateDots(Table table, File diagramDir, WriteStats stats, File outputDir) throws IOException {
         Dot dot = Dot.getInstance();
-        String extension = dot == null ? "png" : dot.getFormat();
+        String extension = dot == null ? "svg" : dot.getFormat();
 
         File oneDegreeDotFile = new File(diagramDir, table.getName() + ".1degree.dot");
         File oneDegreeDiagramFile = new File(diagramDir, table.getName() + ".1degree." + extension);
