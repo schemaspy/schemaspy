@@ -39,7 +39,7 @@ public class DotNode {
     private final DotNodeConfig config;
     private final String path;
     private final String outputDir;
-    private final Set<TableColumn> excludedColumns = new HashSet<TableColumn>();
+    private final Set<TableColumn> excludedColumns = new HashSet<>();
     private final String lineSeparator = System.getProperty("line.separator");
     private final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
 
@@ -116,7 +116,7 @@ public class DotNode {
 
         if (config.showColumns) {
             List<TableColumn> primaryColumns = table.getPrimaryColumns();
-            Set<TableColumn> indexColumns = new HashSet<TableColumn>();
+            Set<TableColumn> indexColumns = new HashSet<>();
 
             for (TableIndex index : table.getIndexes()) {
                 indexColumns.addAll(index.getColumns());
@@ -212,14 +212,14 @@ public class DotNode {
     }
 
     private int getColumnMaxWidth() {
-        int maxwidth = getTextWidth(table.getName());
+        int maxWidth = getTextWidth(table.getName());
         for (TableColumn column : table.getColumns()) {
             int size = getTextWidth(column.getName());
-            if (maxwidth < size) {
-                maxwidth = size;
+            if (maxWidth < size) {
+                maxWidth = size;
             }
         }
-        return maxwidth;
+        return maxWidth;
     }
 
     private int getTextWidth(String text) {
