@@ -138,9 +138,9 @@ public class DotNode {
                     buf.append("<TR ALIGN=\"LEFT\">");
                     buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"15\" HEIGHT=\"16\">");
                     if (column.isPrimary()) {
-                        buf.append("<IMG SRC=\"" + outputDir +"/images/primaryKeys.png\"/>");
+                        buf.append("<IMG SRC=\"" + outputDir +"/images/primaryKey.png\"/>");
                     } else if (column.isForeignKey()) {
-                        buf.append("<IMG SRC=\""+ outputDir +"/images/foreignKeys.png\"/>");
+                        buf.append("<IMG SRC=\""+ outputDir +"/images/foreignKey.png\"/>");
                     }
                     buf.append("</TD>");
                     buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\""+maxwidth+"\" HEIGHT=\"16\">");
