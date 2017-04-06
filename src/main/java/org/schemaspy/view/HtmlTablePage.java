@@ -18,20 +18,16 @@
  */
 package org.schemaspy.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
 import org.schemaspy.Config;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ForeignKeyConstraint;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.model.TableIndex;
+import org.schemaspy.model.*;
 import org.schemaspy.util.DiagramUtil;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.LineWriter;
 import org.schemaspy.util.Markdown;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * The page that contains the details of a specific table or view
@@ -40,9 +36,9 @@ import org.schemaspy.util.Markdown;
  */
 public class HtmlTablePage extends HtmlFormatter {
     private static final HtmlTablePage instance = new HtmlTablePage();
-    private int columnCounter = 0;
 
-    private final Map<String, String> defaultValueAliases = new HashMap<String, String>();
+    private final Map<String, String> defaultValueAliases = new HashMap<>();
+
     {
         defaultValueAliases.put("CURRENT TIMESTAMP", "now"); // DB2
         defaultValueAliases.put("CURRENT TIME", "now");      // DB2
@@ -74,11 +70,11 @@ public class HtmlTablePage extends HtmlFormatter {
     }
 
     public void writeMainTable(Database db, Table table, File outputDir, WriteStats stats) throws IOException {
-        Set<TableColumn> primaries = new HashSet<TableColumn>(table.getPrimaryColumns());
-        Set<TableColumn> indexes = new HashSet<TableColumn>();
+        Set<TableColumn> primaries = new HashSet<>(table.getPrimaryColumns());
+        Set<TableColumn> indexes = new HashSet<>();
         Set<MustacheTableColumn> tableColumns = new LinkedHashSet<>();
         Set<MustacheTableIndex> indexedColumns = new LinkedHashSet<>();
-        Set<TableIndex> sortIndexes = new TreeSet<TableIndex>(table.getIndexes()); // sort primary keys first
+        Set<TableIndex> sortIndexes = new TreeSet<>(table.getIndexes()); // sort primary keys first
 
         for (TableIndex index : sortIndexes) {
             indexes.addAll(index.getColumns());
@@ -86,12 +82,12 @@ public class HtmlTablePage extends HtmlFormatter {
         }
 
         for (TableColumn column : table.getColumns()) {
-            tableColumns.add(new MustacheTableColumn(column, indexes,getPathToRoot()));
+            tableColumns.add(new MustacheTableColumn(column, indexes, getPathToRoot()));
         }
 
-        HashMap<String, Object> scopes = new HashMap<String, Object>();
+        HashMap<String, Object> scopes = new HashMap<>();
         scopes.put("table", table);
-        scopes.put("comments", Markdown.toHtml(table.getComments(),getPathToRoot()));
+        scopes.put("comments", Markdown.toHtml(table.getComments(), getPathToRoot()));
         scopes.put("primaries", primaries);
         scopes.put("columns", tableColumns);
         scopes.put("indexes", indexedColumns);
@@ -115,11 +111,10 @@ public class HtmlTablePage extends HtmlFormatter {
     }
 
 
-
     private Set<Table> sqlReferences(Table table, Database db) {
         Set<Table> references = null;
 
-        if  (table.isView() && table.getViewSql() != null) {
+        if (table.isView() && table.getViewSql() != null) {
             DefaultSqlFormatter formatter = new DefaultSqlFormatter();
             references = formatter.getReferencedTables(table.getViewSql(), db);
         }
@@ -130,9 +125,9 @@ public class HtmlTablePage extends HtmlFormatter {
         return table.getViewSql() != null ? table.getViewSql().trim() : "";
     }
 
-    private Object indexExists(Table table,  Set<MustacheTableIndex> indexedColumns) {
+    private Object indexExists(Table table, Set<MustacheTableIndex> indexedColumns) {
         Object exists = null;
-        if  (!table.isView() && indexedColumns.size() > 0) {
+        if (!table.isView() && !indexedColumns.isEmpty()) {
             exists = new Object();
         }
         return exists;
@@ -140,7 +135,7 @@ public class HtmlTablePage extends HtmlFormatter {
 
     private Object definitionExists(Table table) {
         Object exists = null;
-        if  (table.isView() && table.getViewSql() != null) {
+        if (table.isView() && table.getViewSql() != null) {
             exists = new Object();
         }
         return exists;
@@ -148,21 +143,21 @@ public class HtmlTablePage extends HtmlFormatter {
 
     /**
      * Generate the .dot file(s) to represent the specified table's relationships.
-     *
+     * <p>
      * Generates a <TABLENAME>.dot if the table has real relatives.
-     *
+     * <p>
      * Also generates a <TABLENAME>.implied2degrees.dot if the table has implied relatives within
      * two degrees of separation.
      *
-     * @param table Table
+     * @param table       Table
      * @param diagramsDir File
-     * @throws IOException
      * @return boolean <code>true</code> if the table has implied relatives within two
-     *                 degrees of separation.
+     * degrees of separation.
+     * @throws IOException
      */
     private boolean generateDots(Table table, File diagramDir, WriteStats stats, File outputDir) throws IOException {
         Dot dot = Dot.getInstance();
-        String extension = dot == null ? "png" : dot.getFormat();
+        String extension = dot == null ? "svg" : dot.getFormat();
 
         File oneDegreeDotFile = new File(diagramDir, table.getName() + ".1degree.dot");
         File oneDegreeDiagramFile = new File(diagramDir, table.getName() + ".1degree." + extension);
@@ -219,12 +214,12 @@ public class HtmlTablePage extends HtmlFormatter {
     }
 
     private Object generateDiagrams(Table table, WriteStats stats, File outputDir, List<MustacheTableDiagram> diagrams) throws IOException {
-        Object graphviz = new Object();;
-        File diagramsDir = new File(outputDir, "diagrams");
-        boolean hasImplied = generateDots(table, diagramsDir, stats, outputDir);
+        Object graphviz = new Object();
 
-        if (table.getMaxChildren() + table.getMaxParents() > 0)
-        {
+        File diagramsDir = new File(outputDir, "diagrams");
+        generateDots(table, diagramsDir, stats, outputDir);
+
+        if (table.getMaxChildren() + table.getMaxParents() > 0) {
             if (HtmlTableDiagrammer.getInstance().write(table, diagramsDir, diagrams)) {
                 //writeExcludedColumns(stats.getExcludedColumns(), table, html);
             } else {

@@ -18,11 +18,9 @@
  */
 package org.schemaspy.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.schemaspy.Config;
+
+import java.io.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.schemaspy.Config;
 
 public class Dot {
     private static Dot instance = new Dot();
@@ -39,11 +36,15 @@ public class Dot {
     private final GraphvizVersion badGraphvizVersion = new GraphvizVersion("2.31");
     private final String lineSeparator = System.getProperty("line.separator");
     private String dotExe;
-    private String format = "png";
+    private String format = "svg";
     private String renderer;
     private final Set<String> validatedRenderers = Collections.synchronizedSet(new HashSet<String>());
     private final Set<String> invalidatedRenderers = Collections.synchronizedSet(new HashSet<String>());
     private final Logger logger = Logger.getLogger(Dot.class.getName());
+
+    private static final String CAIRO_RENDERER = ":cairo";
+    private static final String GD_RENDERER = ":gd";
+    private static final String EMPTY_RENDERER = "";
 
     private Dot() {
         String versionText = null;
@@ -51,7 +52,7 @@ public class Dot {
         //  dot graphvizVersion 2.8 (Fri Feb  3 22:38:53 UTC 2006)
         // or sometimes something like:
         //  dot - Graphviz graphvizVersion 2.9.20061004.0440 (Wed Oct 4 21:01:52 GMT 2006)
-        String[] dotCommand = new String[] { getExe(), "-V" };
+        String[] dotCommand = new String[]{getExe(), "-V"};
 
         try {
             Process process = Runtime.getRuntime().exec(dotCommand);
@@ -67,7 +68,7 @@ public class Dot {
                 if (Config.getInstance().isHtmlGenerationEnabled()) {
                     System.err.println();
                     logger.warning("Invalid dot configuration detected.  '" +
-                                        getDisplayableCommand(dotCommand) + "' returned:");
+                            getDisplayableCommand(dotCommand) + "' returned:");
                     logger.warning("   " + versionLine);
                 }
             }
@@ -121,8 +122,8 @@ public class Dot {
     }
 
     /**
-     * @see #setFormat(String)
      * @return
+     * @see #setFormat(String)
      */
     public String getFormat() {
         return format;
@@ -132,7 +133,7 @@ public class Dot {
      * Returns true if the installed dot requires specifying :gd as a renderer.
      * This was added when Win 2.15 came out because it defaulted to Cairo, which produces
      * better quality output, but at a significant speed and size penalty.<p>
-     *
+     * <p>
      * The intent of this property is to determine if it's ok to tack ":gd" to
      * the format specifier.  Earlier versions didn't require it and didn't know
      * about the option.
@@ -140,7 +141,7 @@ public class Dot {
      * @return
      */
     public boolean requiresGdRenderer() {
-        return getGraphvizVersion().compareTo(new GraphvizVersion("2.12")) >= 0 && supportsRenderer(":gd");
+        return getGraphvizVersion().compareTo(new GraphvizVersion("2.12")) >= 0 && supportsRenderer(GD_RENDERER);
     }
 
     /**
@@ -161,15 +162,15 @@ public class Dot {
     }
 
     /**
-     * @see #setRenderer(String)
      * @return the renderer to use
+     * @see #setRenderer(String)
      */
     public String getRenderer() {
         if (renderer == null) {
             setHighQuality(true);
         }
 
-        return supportsRenderer(renderer) ? renderer : (requiresGdRenderer() ? ":gd" : "");
+        return supportsRenderer(renderer) ? renderer : (requiresGdRenderer() ? GD_RENDERER : "");
     }
 
     /**
@@ -180,12 +181,12 @@ public class Dot {
      * not have the "higher quality" libraries.
      */
     public void setHighQuality(boolean highQuality) {
-        if (highQuality && supportsRenderer(":cairo")) {
-            setRenderer(":cairo");
-        } else if (supportsRenderer(":gd")) {
-            setRenderer(":gd");
+        if (highQuality && supportsRenderer(CAIRO_RENDERER)) {
+            setRenderer(CAIRO_RENDERER);
+        } else if (supportsRenderer(GD_RENDERER)) {
+            setRenderer(GD_RENDERER);
         } else {
-            setRenderer("");
+            setRenderer(EMPTY_RENDERER);
         }
     }
 
@@ -193,7 +194,7 @@ public class Dot {
      * @see #setHighQuality(boolean)
      */
     public boolean isHighQuality() {
-        return getRenderer().indexOf(":cairo") != -1;
+        return getRenderer().indexOf(CAIRO_RENDERER) != -1;
     }
 
     /**
@@ -214,9 +215,9 @@ public class Dot {
             return false;
 
         try {
-            String[] dotCommand = new String[] {
-                getExe(),
-                "-T" + getFormat() + ':'
+            String[] dotCommand = new String[]{
+                    getExe(),
+                    "-T" + getFormat() + ':'
             };
             Process process = Runtime.getRuntime().exec(dotCommand);
             BufferedReader errors = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -246,8 +247,7 @@ public class Dot {
      * @return
      */
     private String getExe() {
-        if (dotExe == null)
-        {
+        if (dotExe == null) {
             File gv = Config.getInstance().getGraphvizDir();
 
             if (gv == null) {
@@ -270,13 +270,13 @@ public class Dot {
 
         BufferedReader mapReader = null;
         // this one is for executing.  it can (hopefully) deal with funky things in filenames.
-        String[] dotCommand = new String[] {
-            getExe(),
-            "-T" + getFormat() + getRenderer(),
-            dotFile.toString(),
-            "-o" + diagramFile,
-            //"-v", //Enable verbose mode
-            "-Tcmapx"
+        String[] dotCommand = new String[]{
+                getExe(),
+                "-T" + getFormat() + getRenderer(),
+                dotFile.toString(),
+                "-o" + diagramFile,
+                //"-v", //Enable verbose mode
+                "-Tcmapx"
         };
         // this one is for display purposes ONLY.
         String commandLine = getDisplayableCommand(dotCommand);
@@ -311,7 +311,8 @@ public class Dot {
             if (mapReader != null) {
                 try {
                     mapReader.close();
-                } catch (IOException ignore) {}
+                } catch (IOException ignore) {
+                }
             }
         }
     }
