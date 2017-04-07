@@ -11,6 +11,62 @@
       </section>
       <!-- Main content -->
       <section class="content">
+		<div class="row">
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-aqua"><i class="fa fa-table"></i></span>
+				  <div class="info-box-content">
+					  <span class="info-box-text">TABLES</span>
+					  <span class="info-box-number">{{tablesAmount}}</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-red"><i class="fa fa-table"></i></span>
+				  <div class="info-box-content">
+					  <span class="info-box-text">VIEWS</span>
+					  <span class="info-box-number">{{viewsAmount}}</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+
+		  <!-- fix for small devices only -->
+		  <div class="clearfix visible-sm-block"></div>
+
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-green"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></span>
+
+				  <div class="info-box-content">
+					  <span class="info-box-text">COLUMNS</span>
+					  <span class="info-box-number">{{columnsAmount}}</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		  <div class="col-md-3 col-sm-6 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-yellow"><i class="ion ion-key"></i></span>
+
+				  <div class="info-box-content">
+					  <span class="info-box-text">Constraints</span>
+					  <span class="info-box-number">{{constraintsAmount}}</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+		  </div>
+		  <!-- /.col -->
+		</div>
 		<div class="box box-primary">		
 			<div class="box-header with-border">
 			  <h3 class="box-title">Database Properties</h3>
@@ -55,3 +111,8 @@
           </div>			
       </section>
       <!-- /.content -->
+	  <script>
+          var config = {
+              paggination: {{paginationEnabled}}
+          }
+	  </script>
