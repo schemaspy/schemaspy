@@ -104,6 +104,7 @@ public class Config {
     private Boolean evaluateAll;
     private Boolean highQuality;
     private Boolean lowQuality;
+    private Boolean paginationEnabled;
     private String schemaSpec;  // used in conjunction with evaluateAll
     private boolean hasOrphans = false;
     private boolean hasRoutines = false;
@@ -1352,6 +1353,28 @@ public class Config {
     }
 
     /**
+     * If enabled we'll turn on pagination in generated html<p/>
+     * <p>
+     * Defaults to <code>true</code> (enabled).
+     *
+     * @param enabled
+     */
+    public void setPaginationEnabled(boolean enabled) {
+        paginationEnabled = enabled;
+    }
+
+    /**
+     * @return
+     * @see #setPaginationEnabled(boolean)
+     */
+    public boolean isPaginationEnabled() {
+        if (paginationEnabled == null)
+            paginationEnabled = !options.remove("-nopages");
+
+        return paginationEnabled;
+    }
+
+    /**
      * Returns the database properties to use.
      * These should be determined by calling {@link #determineDbProperties(String)}.
      *
@@ -1788,6 +1811,8 @@ public class Config {
             params.add("-norows");
         if (!isViewsEnabled())
             params.add("-noviews");
+        if (!isPaginationEnabled())
+            params.add("-nopages");
         if (isRankDirBugEnabled())
             params.add("-rankdirbug");
         if (isRailsEnabled())
