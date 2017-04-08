@@ -18,28 +18,28 @@
  */
 package org.schemaspy.view;
 
-import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.io.File;
-import java.text.NumberFormat;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.apache.commons.io.FilenameUtils;
 import org.schemaspy.Config;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
-import org.apache.commons.io.FilenameUtils;
 
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.io.File;
 import java.net.URL;
+import java.text.NumberFormat;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DotNode {
     private final Table table;
     private final DotNodeConfig config;
     private final String path;
     private final String outputDir;
-    private final Set<TableColumn> excludedColumns = new HashSet<TableColumn>();
+    private final Set<TableColumn> excludedColumns = new HashSet<>();
     private final String lineSeparator = System.getProperty("line.separator");
     private final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
 
@@ -49,7 +49,7 @@ public class DotNode {
      * of those columns.
      *
      * @param table Table
-     * @param path String
+     * @param path  String
      */
     public DotNode(Table table, String path, File outputDir) {
         this(table, path, outputDir, new DotNodeConfig(true, true));
@@ -66,9 +66,9 @@ public class DotNode {
      * Create a DotNode and specify whether it displays its columns.
      * The details of the optional columns (e.g. type, size) are not displayed.
      *
-     * @param table Table
+     * @param table       Table
      * @param showColumns boolean
-     * @param path String
+     * @param path        String
      */
     public DotNode(Table table, boolean showColumns, String path, File outputDir) {
         this(table, path, outputDir, showColumns ? new DotNodeConfig(true, false) : new DotNodeConfig());
@@ -101,13 +101,13 @@ public class DotNode {
         buf.append("   label=<" + lineSeparator);
         buf.append("    <TABLE BORDER=\"" + (config.showColumnDetails ? "2" : "0") + "\" CELLBORDER=\"1\" CELLSPACING=\"0\" BGCOLOR=\"" + css.getTableBackground() + "\">" + lineSeparator);
         buf.append("      <TR>");
-        buf.append("<TD "+colspanHeader+" BGCOLOR=\"" + css.getTableHeadBackground() + "\">");
-            buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\">");
-            buf.append("<TR>");
-            buf.append("<TD ALIGN=\"LEFT\"><B>" + fqTableName + "</B></TD>");
-            buf.append("<TD ALIGN=\"RIGHT\">[" + tableOrView + "]</TD>");
-            buf.append("</TR>");
-            buf.append("</TABLE>");
+        buf.append("<TD " + colspanHeader + " BGCOLOR=\"" + css.getTableHeadBackground() + "\">");
+        buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\">");
+        buf.append("<TR>");
+        buf.append("<TD ALIGN=\"LEFT\"><B>" + fqTableName + "</B></TD>");
+        buf.append("<TD ALIGN=\"RIGHT\">[" + tableOrView + "]</TD>");
+        buf.append("</TR>");
+        buf.append("</TABLE>");
         buf.append("</TD>");
         buf.append("</TR>" + lineSeparator);
 
@@ -116,7 +116,7 @@ public class DotNode {
 
         if (config.showColumns) {
             List<TableColumn> primaryColumns = table.getPrimaryColumns();
-            Set<TableColumn> indexColumns = new HashSet<TableColumn>();
+            Set<TableColumn> indexColumns = new HashSet<>();
 
             for (TableIndex index : table.getIndexes()) {
                 indexColumns.addAll(index.getColumns());
@@ -138,12 +138,12 @@ public class DotNode {
                     buf.append("<TR ALIGN=\"LEFT\">");
                     buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"15\" HEIGHT=\"16\">");
                     if (column.isPrimary()) {
-                        buf.append("<IMG SRC=\"" + outputDir +"/images/primaryKeys.png\"/>");
+                        buf.append("<IMG SRC=\"" + outputDir + "/images/primaryKeys.png\"/>");
                     } else if (column.isForeignKey()) {
-                        buf.append("<IMG SRC=\""+ outputDir +"/images/foreignKeys.png\"/>");
+                        buf.append("<IMG SRC=\"" + outputDir + "/images/foreignKeys.png\"/>");
                     }
                     buf.append("</TD>");
-                    buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\""+maxwidth+"\" HEIGHT=\"16\">");
+                    buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxwidth + "\" HEIGHT=\"16\">");
                     buf.append(column.getName());
                     buf.append("</TD>");
                     buf.append("</TR>");
@@ -170,8 +170,7 @@ public class DotNode {
             buf.append("      <TR><TD PORT=\"elipses\" COLSPAN=\"3\" ALIGN=\"LEFT\">...</TD></TR>" + lineSeparator);
         }
 
-        if (!table.isView())
-        {
+        if (!table.isView()) {
             buf.append("      <TR>");
             buf.append("<TD ALIGN=\"LEFT\" BGCOLOR=\"" + css.getBodyBackground() + "\">");
             int numParents = config.showImpliedRelationships ? table.getNumParents() : table.getNumNonImpliedParents();
@@ -212,22 +211,22 @@ public class DotNode {
     }
 
     private int getColumnMaxWidth() {
-        int maxwidth = getTextWidth(table.getName());
+        int maxWidth = getTextWidth(table.getName());
         for (TableColumn column : table.getColumns()) {
             int size = getTextWidth(column.getName());
-            if (maxwidth < size) {
-                maxwidth = size;
+            if (maxWidth < size) {
+                maxWidth = size;
             }
         }
-        return maxwidth;
+        return maxWidth;
     }
 
     private int getTextWidth(String text) {
         AffineTransform affinetransform = new AffineTransform();
-        FontRenderContext frc = new FontRenderContext(affinetransform,true,true);
-        int fontSize = Config.getInstance().getFontSize()+1;
+        FontRenderContext frc = new FontRenderContext(affinetransform, true, true);
+        int fontSize = Config.getInstance().getFontSize() + 1;
         Font font = new Font(Config.getInstance().getFont(), Font.BOLD, fontSize);
-        int fontWidth = (int)(font.getStringBounds(text, frc).getWidth());
+        int fontWidth = (int) (font.getStringBounds(text, frc).getWidth());
         return fontWidth;
     }
 

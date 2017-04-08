@@ -5,6 +5,12 @@
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.schemaspy%3Aschemaspy)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 [![Quality Gate](https://sonarqube.com/api/badges/measure?key=org.schemaspy%3Aschemaspy&metric=coverage)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 
+> Please support a project by simply putting a Github star. 
+Share this library with friends on Twitter and everywhere else you can.
+
+> If you notice bug or have something not working please report an issue, we'll try to fix it as soon as possible.
+More documentation and features expected to be soon. Feel free to contribute.
+
 This is a new code repository for SchemaSpy tool initially created and maintained by John Currier.
 I'm personally believe that work on SchemaSpy should be continued and a lot of still existing issue should be resolved.
 Last released version of the SchemaSpy was two years ago, and I have plan to change this.
@@ -44,6 +50,6 @@ Have a bug or an issue with SchemaSpy? [Open a new issue](https://github.com/sch
 
 ## Maintained
 
-SchemaSpy is maintained by [Rafal Kasa](malito:rafalkasa@gmail.com) please contact with me if you have some question or proposition.
+SchemaSpy is maintained by [Rafal Kasa](malito:rafalkasa@gmail.com) with SchemaSpy community support please contact with me if you have some question or proposition.
 * https://github.com/rafalkasa
 
