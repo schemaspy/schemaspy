@@ -649,7 +649,7 @@ public class Config {
      */
     public int getFontSize() {
         if (fontSize == null) {
-            int size = 11; // default
+            int size = 12; // default
             String param = pullParam("-fontsize");
             if (param != null) {
                 try {
