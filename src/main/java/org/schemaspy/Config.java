@@ -105,6 +105,7 @@ public class Config {
     private Boolean highQuality;
     private Boolean lowQuality;
     private Boolean paginationEnabled;
+    private String imageFormat;
     private String schemaSpec;  // used in conjunction with evaluateAll
     private boolean hasOrphans = false;
     private boolean hasRoutines = false;
@@ -649,7 +650,7 @@ public class Config {
      */
     public int getFontSize() {
         if (fontSize == null) {
-            int size = 12; // default
+            int size = 11; // default
             String param = pullParam("-fontsize");
             if (param != null) {
                 try {
@@ -1373,6 +1374,18 @@ public class Config {
 
         return paginationEnabled;
     }
+    public void setImageFormat(String imageFormat) {
+        this.imageFormat = imageFormat;
+    }
+
+    public String getImageFormat() {
+        if (imageFormat == null) {
+            imageFormat = pullParam("-imageformat");
+            if (imageFormat == null)
+                imageFormat = "png";
+        }
+        return imageFormat;
+    }
 
     /**
      * Returns the database properties to use.
@@ -1837,6 +1850,8 @@ public class Config {
         params.add(String.valueOf(getFontSize()));
         params.add("-t");
         params.add(getDbType());
+        params.add("-imageformat");
+        params.add(getImageFormat());
         isHighQuality();    // query to set renderer correctly
         isLowQuality();     // query to set renderer correctly
         params.add("-renderer");  // instead of -hq and/or -lq

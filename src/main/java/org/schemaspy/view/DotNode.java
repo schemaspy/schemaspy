@@ -143,7 +143,7 @@ public class DotNode {
                         buf.append("<IMG SRC=\"" + outputDir + "/images/foreignKeys.png\"/>");
                     }
                     buf.append("</TD>");
-                    buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxwidth + "\" HEIGHT=\"17\">");
+                    buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxwidth + "\" HEIGHT=\"16\">");
                     buf.append(column.getName());
                     buf.append("</TD>");
                     buf.append("</TR>");
