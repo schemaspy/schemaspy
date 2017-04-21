@@ -1,8 +1,5 @@
 package org.schemaspy;
 
-import junit.framework.TestCase;
-import junitx.framework.ListAssert;
-import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,10 +14,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Created by rkasa on 2016-12-04.
  */
-public class DbAnalyzerTest extends TestCase {
+public class DbAnalyzerTest {
     private String catalog;
     private String schema;
     private Database database;
@@ -34,14 +33,12 @@ public class DbAnalyzerTest extends TestCase {
 
     @Test
     public void testGetImpliedConstraints() throws Exception {
-
-
         Table album = createAlbumTable();
         Table track = createTrackTable();
         Table artist = createArtistTable();
         Table invoiceLine = createInvoiceLineTable();
 
-        List<Table> tables = new ArrayList<Table>();
+        List<Table> tables = new ArrayList<>();
         tables.add(artist);
         tables.add(album);
         tables.add(track);
@@ -49,17 +46,11 @@ public class DbAnalyzerTest extends TestCase {
 
         List<ImpliedForeignKeyConstraint> impliedForeignKeyConstraintList = DbAnalyzer.getImpliedConstraints(tables);
 
-        List<ImpliedForeignKeyConstraint> expactedImpliedForeignKeyConstraints = new ArrayList<>();
         ImpliedForeignKeyConstraint invoiceLineTrackId = new ImpliedForeignKeyConstraint(track.getColumn("Id"), invoiceLine.getColumn("TrackId"));
         ImpliedForeignKeyConstraint trackAlbumId = new ImpliedForeignKeyConstraint(album.getColumn("Id"), track.getColumn("AlbumId"));
         ImpliedForeignKeyConstraint albumArtistId = new ImpliedForeignKeyConstraint(artist.getColumn("Id"), album.getColumn("ArtistId"));
-        expactedImpliedForeignKeyConstraints.add(invoiceLineTrackId);
-        expactedImpliedForeignKeyConstraints.add(trackAlbumId);
-        expactedImpliedForeignKeyConstraints.add(albumArtistId);
 
-        Assert.assertThat(impliedForeignKeyConstraintList.isEmpty(), Is.is(false));
-        ListAssert.assertEquals(expactedImpliedForeignKeyConstraints, impliedForeignKeyConstraintList);
-
+        assertThat(impliedForeignKeyConstraintList).containsExactlyInAnyOrder(invoiceLineTrackId, trackAlbumId, albumArtistId);
     }
 
     private Table createAlbumTable() throws SQLException {
@@ -251,7 +242,7 @@ public class DbAnalyzerTest extends TestCase {
 
     @Test
     public void testGetRailsConstraints() throws Exception {
-        assertTrue(true);
+        Assert.assertTrue(true);
     }
 
 }
