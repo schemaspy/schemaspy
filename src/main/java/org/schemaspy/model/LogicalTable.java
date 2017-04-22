@@ -18,8 +18,6 @@
  */
 package org.schemaspy.model;
 
-import java.sql.SQLException;
-
 /**
  * This is a logical (versus physical) table that represents something
  * that doesn't really exist in the current database.
@@ -27,7 +25,7 @@ import java.sql.SQLException;
  * @author John Currier
  */
 public class LogicalTable extends Table {
-    public LogicalTable(Database db, String catalog, String schema, String name, String comments) throws SQLException {
+    public LogicalTable(Database db, String catalog, String schema, String name, String comments) {
         super(db, catalog, schema, name, comments);
     }
 

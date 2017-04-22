@@ -18,9 +18,9 @@
  */
 package org.schemaspy.model;
 
+import org.schemaspy.model.xml.TableColumnMeta;
+
 import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +30,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.schemaspy.Config;
-import org.schemaspy.model.xml.TableColumnMeta;
 
 public class TableColumn {
     private final Table table;
@@ -61,10 +59,8 @@ public class TableColumn {
      * Create a column associated with a table.
      *
      * @param table Table the table that this column belongs to
-     * @param rs ResultSet returned from {@link DatabaseMetaData#getColumns(String, String, String, String)}
-     * @throws SQLException
      */
-    public TableColumn(Table table) throws SQLException {
+    public TableColumn(Table table) {
         this.table = table;
     }
 
