@@ -18,11 +18,6 @@
  */
 package org.schemaspy.model;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import org.schemaspy.Config;
-
 /**
  * Treat views as tables that have no rows and are represented by the SQL that
  * defined them.
@@ -37,10 +32,9 @@ public class View extends Table {
      * @param name
      * @param remarks
      * @param viewSql
-     * @throws SQLException
      */
     public View(Database db, String catalog, String schema,
-                String name, String remarks, String viewSql) throws SQLException {
+                String name, String remarks, String viewSql) {
         super(db, catalog, schema, name, remarks);
 
         if (viewSql != null && viewSql.trim().length() > 0)

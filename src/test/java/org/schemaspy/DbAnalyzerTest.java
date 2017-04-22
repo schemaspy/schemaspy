@@ -53,7 +53,7 @@ public class DbAnalyzerTest {
         assertThat(impliedForeignKeyConstraintList).containsExactlyInAnyOrder(invoiceLineTrackId, trackAlbumId, albumArtistId);
     }
 
-    private Table createAlbumTable() throws SQLException {
+    private Table createAlbumTable() {
         Table table = new Table(database, catalog, schema, "ALbum", "This is comment for database on PostgresSQL [Invoice] link is also working");
         TableColumn column1 = new TableColumn(table);
         column1.setName("ID");
@@ -84,7 +84,7 @@ public class DbAnalyzerTest {
         return table;
     }
 
-    private Table createTrackTable() throws SQLException {
+    private Table createTrackTable() {
         Table table = new Table(database, catalog, schema, "Track", "");
         TableColumn column1 = new TableColumn(table);
         column1.setName("Id");
@@ -167,7 +167,7 @@ public class DbAnalyzerTest {
         return table;
     }
 
-    private Table createArtistTable() throws SQLException {
+    private Table createArtistTable() {
         Table table = new Table(database, catalog, schema, "Artist", "");
         TableColumn column1 = new TableColumn(table);
         column1.setName("Id");
@@ -191,7 +191,7 @@ public class DbAnalyzerTest {
         return table;
     }
 
-    private Table createInvoiceLineTable() throws SQLException {
+    private Table createInvoiceLineTable() {
         Table table = new Table(database, catalog, schema, "InvoiceLine", "");
         TableColumn column1 = new TableColumn(table);
         column1.setName("Id");
