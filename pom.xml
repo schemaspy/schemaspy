@@ -33,7 +33,7 @@
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.3.7.RELEASE</spring.version>
+        <spring.version>4.3.8.RELEASE</spring.version>
     </properties>
     <issueManagement>
         <url>https://github.com/schemaspy/schemaspy/issues</url>
