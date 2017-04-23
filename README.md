@@ -37,7 +37,9 @@ More detail will came in next days plus I have in plan to start working on all n
 ## Documentation
 
 If you need more info about how to use or install SchemaSpy please read the last documentation at Read the Docs.
-[Documentation] (http://schemaspy.readthedocs.io/en/latest/)
+[Documentation](http://schemaspy.readthedocs.io/en/latest/)
+
+[Sample Output](http://schemaspy.org/sample/index.html)
 
 ## SchemaSpy v6.0.0 RC1
 [Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0-rc1)
@@ -47,6 +49,9 @@ If you need more info about how to use or install SchemaSpy please read the last
 ## Bugs and Issues
 
 Have a bug or an issue with SchemaSpy? [Open a new issue](https://github.com/schemaspy/schemaspy/issues) here on GitHub.
+
+## Contribution
+Are very welcome! And remember, contribution is not only PRs and code, but any help with docs or helping other developers to solve issues are very appreciated! Thanks in advance!
 
 ## Maintained
 
