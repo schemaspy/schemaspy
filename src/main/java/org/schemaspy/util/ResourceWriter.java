@@ -17,10 +17,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package org.schemaspy.util;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -31,31 +36,6 @@ import java.util.logging.Logger;
 
 public class ResourceWriter {
     private static final Logger logger = Logger.getLogger(ResourceWriter.class.getName());
-    private static ResourceWriter instance = new ResourceWriter();
-
-    /**
-     * Write the specified resource to the specified filename
-     *
-     * @param resourceName
-     * @param writeTo
-     * @throws IOException
-     */
-    public void writeResource(String resourceName, File writeTo) throws IOException {
-        writeTo.getParentFile().mkdirs();
-        InputStream in = getClass().getResourceAsStream(resourceName);
-        if (in == null)
-            throw new IOException("Resource \"" + resourceName + "\" not found");
-
-        byte[] buf = new byte[4096];
-
-        OutputStream out = new FileOutputStream(writeTo);
-        int numBytes = 0;
-        while ((numBytes = in.read(buf)) != -1) {
-            out.write(buf, 0, numBytes);
-        }
-        in.close();
-        out.close();
-    }
 
     /**
      * Copies resources to target folder.
@@ -93,7 +73,7 @@ public class ResourceWriter {
      * @param jarConnection
      * @param destPath destination file or directory
      */
-    static void copyJarResourceToPath(JarURLConnection jarConnection, File destPath, FileFilter filter) {
+    private static void copyJarResourceToPath(JarURLConnection jarConnection, File destPath, FileFilter filter) {
         try {
             JarFile jarFile = jarConnection.getJarFile();
             String jarConnectionEntryName = jarConnection.getEntryName();
@@ -116,7 +96,7 @@ public class ResourceWriter {
                     if (jarEntry.isDirectory()) {
                         currentFile.mkdirs();
                     } else {
-                        if ((filter == null) || filter.accept(currentFile)) {
+                        if (filter == null || filter.accept(currentFile)) {
                             InputStream is = jarFile.getInputStream(jarEntry);
                             OutputStream out = FileUtils.openOutputStream(currentFile);
                             IOUtils.copy(is, out);
