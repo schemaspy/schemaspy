@@ -76,6 +76,30 @@
 			  <p>Database Type: {{database.databaseProduct}}</p>			  
 			</div><!-- /.box-body -->
 		</div>
+		{{#catalog}}
+		{{#catalog.comment}}
+		<div class="box box-primary">		
+			<div class="box-header with-border">
+			  <h3 class="box-title">Catalog {{catalog.name}}</h3>
+			  <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>			  
+			</div><!-- /.box-header -->
+			<div class="box-body">
+			  <p> {{{catalog.comment}}} </p>			  
+			</div><!-- /.box-body -->
+		</div>
+		{{/catalog.comment}}
+		{{/catalog}}
+		{{#schema}}
+		<div class="box box-primary">		
+			<div class="box-header with-border">
+			  <h3 class="box-title">Schema {{schema.name}}</h3>
+			  <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>			  
+			</div><!-- /.box-header -->
+			<div class="box-body">
+			  <p> {{{schema.comment}}} </p>			  
+			</div><!-- /.box-body -->
+		</div>
+		{{/schema}}
 		<div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Tables</h3>			  

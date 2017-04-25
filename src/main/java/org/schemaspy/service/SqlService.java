@@ -2,6 +2,7 @@ package org.schemaspy.service;
 
 import org.schemaspy.Config;
 import org.schemaspy.DbDriverLoader;
+import org.schemaspy.model.Database;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ConnectionURLBuilder;
 import org.schemaspy.util.DbSpecificOption;
@@ -28,9 +29,6 @@ public class SqlService {
 
     private Connection connection;
     private DatabaseMetaData meta;
-
-    private String defaultSchema;
-    private String databaseName;
 
     public Connection getConnection() {
         return connection;
@@ -66,9 +64,6 @@ public class SqlService {
 
         meta = connection.getMetaData();
 
-        databaseName = config.getDb();
-        defaultSchema = config.getSchema();
-
         if (config.isEvaluateAllEnabled()) {
             List<String> args = config.asList();
             for (DbSpecificOption option : urlBuilder.getOptions()) {
@@ -102,9 +97,9 @@ public class SqlService {
      * @return PreparedStatement
      * @throws SQLException
      */
-    public PreparedStatement prepareStatement(String sql, String tableName) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, Database db, String tableName) throws SQLException {
         StringBuilder sqlBuf = new StringBuilder(sql);
-        List<String> sqlParams = getSqlParams(defaultSchema, databaseName, sqlBuf, tableName); // modifies sqlBuf
+        List<String> sqlParams = getSqlParams(sqlBuf, db.getName(), db.getCatalog().getName(), db.getSchema().getName(), tableName); // modifies sqlBuf
         if (fineEnabled)
             logger.fine(sqlBuf + " " + sqlParams);
 
@@ -130,17 +125,21 @@ public class SqlService {
      * @return List of Strings
      * @see #prepareStatement(String, String)
      */
-    private List<String> getSqlParams(String schema, String name, StringBuilder sql, String tableName) {
+    private List<String> getSqlParams(StringBuilder sql, String dbName, String catalog, String schema, String tableName) {
         Map<String, String> namedParams = new HashMap<String, String>();
         if (schema == null) {
-            schema = name; // some 'schema-less' db's treat the db name like a schema (unusual case)
+            schema = dbName; // some 'schema-less' db's treat the db name like a schema (unusual case)
         }
-
+        
+        namedParams.put(":dbname", dbName);
         namedParams.put(":schema", schema);
         namedParams.put(":owner", schema); // alias for :schema
         if (tableName != null) {
             namedParams.put(":table", tableName);
             namedParams.put(":view", tableName); // alias for :table
+        }
+        if (catalog != null) {
+            namedParams.put(":catalog", catalog);
         }
 
         List<String> sqlParams = new ArrayList<String>();

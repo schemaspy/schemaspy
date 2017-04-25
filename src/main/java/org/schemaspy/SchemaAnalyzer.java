@@ -36,7 +36,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+//import javax.xml.validation.Schema;
 
+import org.schemaspy.model.Catalog;
 import org.schemaspy.model.ConsoleProgressListener;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
@@ -45,6 +47,7 @@ import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
+import org.schemaspy.model.Schema;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.service.DatabaseService;
@@ -76,32 +79,39 @@ public class SchemaAnalyzer {
     	// don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
     	// and not already logging fine details (to keep from obfuscating those)
 
+        boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
+        ProgressListener progressListener = new ConsoleProgressListener(render);
+        
     	// if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas  
         List<String> schemas = config.getSchemas();
         if (schemas != null || config.isEvaluateAllEnabled()) {
-        	return this.analyzeMultipleSchemas(config,schemas);
+        	return this.analyzeMultipleSchemas(config, progressListener);
         }else{
-            boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
-            ProgressListener progressListener = new ConsoleProgressListener(render);
             return analyze(config, progressListener);
         }
     }
 
-	public Database analyzeMultipleSchemas(Config config, List<String> schemas)throws SQLException, IOException {
+	public Database analyzeMultipleSchemas(Config config, ProgressListener progressListener)throws SQLException, IOException {
         try {
+            // following params will be replaced by something appropriate
+            List<String> args = config.asList();
+            args.remove("-schemas");
+            args.remove("-schemata");
+           
+            List<String> schemas = config.getSchemas();
             Database db = null;
         	String schemaSpec = config.getSchemaSpec();
             Connection connection = this.getConnection(config);
             DatabaseMetaData meta = connection.getMetaData();
-            //-all(evaluteAll) given then get list of the chemas
+            //-all(evaluteAll) given then get list of the database schemas
             if (schemas == null || config.isEvaluateAllEnabled()) {
             	if(schemaSpec==null)
             		schemaSpec=".*";
                 System.out.println("Analyzing schemas that match regular expression '" + schemaSpec + "':");
                 System.out.println("(use -schemaSpec on command line or in .properties to exclude other schemas)");
-                schemas = getPopulatedSchemas(meta, schemaSpec, false);
+                schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false);
                 if (schemas.isEmpty())
-                	schemas = getPopulatedSchemas(meta, schemaSpec, true);
+                	schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
                 if (schemas.isEmpty())
                 	schemas = Arrays.asList(new String[] {config.getUser()});
             }
@@ -109,11 +119,13 @@ public class SchemaAnalyzer {
             Version version = new Version();
         	System.out.println("Analyzing schemas: "+schemas.toString());
         	
-	        boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
 	        String dbName = config.getDb();
 	        File outputDir = config.getOutputDir();
 	        // set flag which later on used for generation rootPathtoHome link.
 	        config.setOneOfMultipleSchemas(true);
+
+	        List<MustacheSchema> mustacheSchemas =new ArrayList<MustacheSchema>();
+	        MustacheCatalog  mustacheCatalog = null; 
 	        for (String schema : schemas) {
 	        	// reset -all(evaluteAll) and -schemas parametter to avoid infinite loop! now we are analyzing single schema
 	        	config.setSchemas(null);
@@ -124,16 +136,17 @@ public class SchemaAnalyzer {
 	        		config.setSchema(schema);
 	            config.setOutputDir(new File(outputDir, schema).toString());
 	            
-	            ProgressListener progressListener = new ConsoleProgressListener(render);
 	            System.out.println("Analyzing " + schema);
 	            System.out.flush();
 				db = this.analyze(config,progressListener);
                 if (db == null) //if any of analysed schema returns null
                     return db;
+                mustacheSchemas.add(new MustacheSchema(db.getSchema(),""));
+                mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
 	        }
 
             prepareLayoutFiles(outputDir);
-            HtmlMultipleSchemasIndexPage.getInstance().write(outputDir, dbName, schemas, meta);
+            HtmlMultipleSchemasIndexPage.getInstance().write(outputDir, dbName, mustacheCatalog ,mustacheSchemas, meta);
 	        
 	        return db;
         } catch (Config.MissingRequiredParameterException missingParam) {
@@ -175,20 +188,6 @@ public class SchemaAnalyzer {
                 }
             }
           
-            List<String> schemas = config.getSchemas();
-            if (schemas != null) {
-                List<String> args = config.asList();
-
-                // following params will be replaced by something appropriate
-                args.remove("-schemas");
-                args.remove("-schemata");
-
-                String dbName = config.getDb();
-
-                analyzeMultipleSchemas(config, schemas);
-                return null;
-            }
-          
             String dbName = config.getDb();
             String schema = config.getSchema();
 
@@ -199,21 +198,11 @@ public class SchemaAnalyzer {
             logger.fine("supportsSchemasInTableDefinitions: " + meta.supportsSchemasInTableDefinitions());
             logger.fine("supportsCatalogsInTableDefinitions: " + meta.supportsCatalogsInTableDefinitions());
 
-            if (schema == null && meta.supportsSchemasInTableDefinitions() &&
-                    !config.isSchemaDisabled()) {
-                schema = config.getUser();
-                logger.fine("schema not specified for a database that requires one.  using user: '" + schema + "'");
-                if (schema == null)
-                    throw new InvalidConfigurationException("Either a schema ('-s') or a user ('-u') must be specified");
-                config.setSchema(schema);
-            }
-
-            if (catalog == null && schema == null &&
-                    meta.supportsCatalogsInTableDefinitions()) {
-                catalog = dbName;
-                logger.fine("catalog not specified for a database that requires one.  using dbName: '" + catalog + "'");
-                config.setCatalog(catalog);
-            }
+            // set default Catalog and Schema of the connection
+            if(schema == null)
+            	schema = meta.getConnection().getSchema();
+            if(catalog == null)
+            	catalog = meta.getConnection().getCatalog();
 
             SchemaMeta schemaMeta = config.getMeta() == null ? null : new SchemaMeta(config.getMeta(), dbName, schema);
             if (config.isHtmlGenerationEnabled()) {
@@ -479,37 +468,6 @@ public class SchemaAnalyzer {
         //cleanDirectory(outputDir,"/diagrams");
         //cleanDirectory(outputDir,"/tables");
         ResourceWriter.copyResources(url, outputDir, filter);
-    }
-
-    private List<String> getPopulatedSchemas(DatabaseMetaData meta, String schemaSpec, boolean isCatalog) throws SQLException {
-        List<String> populatedSchemas;
-
-        if ((!isCatalog && meta.supportsSchemasInTableDefinitions()) ||
-             (isCatalog && meta.supportsCatalogsInTableDefinitions())) {
-            Pattern schemaRegex = Pattern.compile(schemaSpec);
-
-            populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, isCatalog);
-            Iterator<String> iter = populatedSchemas.iterator();
-            while (iter.hasNext()) {
-                String schema = iter.next();
-                if (!schemaRegex.matcher(schema).matches()) {
-                    if (fineEnabled) {
-                        logger.fine("Excluding schema " + schema +
-                                    ": doesn't match + \"" + schemaRegex + '"');
-                    }
-                    iter.remove(); // remove those that we're not supposed to analyze
-                } else {
-                    if (fineEnabled) {
-                        logger.fine("Including schema " + schema +
-                                    ": matches + \"" + schemaRegex + '"');
-                    }
-                }
-            }
-        } else {
-            populatedSchemas = new ArrayList<String>();
-        }
-
-        return populatedSchemas;
     }
 
     private Connection getConnection(Config config) throws InvalidConfigurationException, IOException {

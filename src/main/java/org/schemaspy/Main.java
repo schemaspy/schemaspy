@@ -64,7 +64,9 @@ public class Main {
             logger.log(Level.WARNING, badLaunch.getMessage(), badLaunch);
         } catch (Exception exc) {
             logger.log(Level.SEVERE, exc.getMessage(), exc);
-        }
+        } finally {
+        	applicationContext.close();
+		}
 
         System.exit(rc);
     }
