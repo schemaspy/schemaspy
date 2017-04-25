@@ -1,0 +1,44 @@
+{
+  "name": "SchemaSpy",
+  "version": "6.0",
+  "authors": [
+    "Rafal Kasa <rafalkasa@gmail.com>"
+  ],
+  "moduleType": [
+    "globals",
+    "yui"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "admin-lte": "2.3.11",
+    "font-awesome": "~4.7.0",
+    "ionicons": "~2.0.1",
+	"DataTables": "1.10.13",
+	"CodeMirror" : "5.25.0"
+  },
+  "cInstall": {
+	"folder": {
+		"js": "js/vendor/",
+		"less": "css/less/",
+		"otf, eot, svg, ttf, woff": "fonts/"
+	},
+	"option": {
+		"default": "public"
+	},
+	"source": {
+		"bootstrap": {
+			"glyphicons-halflings-regular.*": "dist/fonts/*",
+			"bootstrap.js": "dist/js/bootstrap.js",
+			"*.less#bootstrap": "less/*.less"
+		},
+		"fontawesome": {
+			"FontAwesome.otf": "fonts/FontAwesome.otf",
+			"fontawesome-webfont.*": "fonts/fontawesome-webfont.*",
+			"*.less#fontawesome": "less/*.less"
+		},
+		"jquery": {
+			"jquery.js": "dist/jquery.js"
+		}
+	}
+  }
+}
