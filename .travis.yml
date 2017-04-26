@@ -17,7 +17,7 @@ cache:
 deploy:
   provider: pages
   skip_cleanup: true
-  local_dir: /target/*.jar
+  local_dir: target
   github_token: $BUILD_DEPLOY_GITHUB_TOKEN # Set in travis-ci.org dashboard
   on:
     branch: master
