@@ -19,7 +19,6 @@
 package org.schemaspy;
 
 import org.schemaspy.model.ConnectionFailure;
-import org.xeustechnologies.jcl.JarClassLoader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
