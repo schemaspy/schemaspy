@@ -19,6 +19,7 @@
 package org.schemaspy;
 
 import org.schemaspy.model.ConnectionFailure;
+import org.xeustechnologies.jcl.JarClassLoader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,11 +27,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Driver;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +41,7 @@ import java.util.logging.Logger;
 public class DbDriverLoader {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
+    private boolean loadJDBCJars = false;
 
     public Connection getConnection(Config config, String connectionURL,
                                        String driverClass, String driverPath) throws FileNotFoundException, IOException {
@@ -50,6 +52,8 @@ public class DbDriverLoader {
             System.out.println("Using database properties:");
             System.out.println("  " + config.getDbPropertiesLoadedFrom());
         }
+
+        loadJDBCJars = config.isLoadJDBCJarsEnabled();
 
         Driver driver = getDriver(driverClass, driverPath);
 
@@ -105,13 +109,19 @@ public class DbDriverLoader {
      * @throws MalformedURLException
      */
     protected Driver getDriver(String driverClass, String driverPath) throws MalformedURLException {
-        List<URL> classpath = getExistingUrls(driverPath);
+        Set<URL> classpath = getExistingUrls(driverPath);
         if (classpath.size() <= 0) {
             URL url = getClass().getResource(driverPath);
             if (url != null) {
                 classpath = getExistingUrls(url.getPath());
             }
         }
+
+        //If this option is true additional jars used by JDBC Driver will be loaded to the classpath
+        if (loadJDBCJars) {
+            loadAdditionalJarsForDriver(driverPath, classpath);
+        }
+
 
         ClassLoader loader = getDriverClassLoader(classpath);
         Driver driver = null;
@@ -148,13 +158,34 @@ public class DbDriverLoader {
         return driver;
     }
 
+    private void loadAdditionalJarsForDriver(String driverPath, Set<URL> classpath) throws MalformedURLException {
+        File driverFolder = new File(Paths.get(driverPath).getParent().toString());
+
+        if (driverFolder != null) {
+            File[] files = driverFolder.listFiles(
+                    (dir, name) -> {
+                        return name.toLowerCase().endsWith(".jar");
+                    }
+            );
+
+            logger.info("Additional jars will be loaded for JDBC Driver");
+
+            for (File file : files) {
+                if (file.isFile()) {
+                    classpath.add(file.toURI().toURL());
+                    logger.info(file.toURI().toString());
+                }
+            }
+        }
+    }
+
     /**
      * Returns a {@link ClassLoader class loader} to use for resolving {@link Driver}s.
      *
      * @param classpath
      * @return
      */
-    private ClassLoader getDriverClassLoader(List<URL> classpath) {
+    private ClassLoader getDriverClassLoader(Set<URL> classpath) {
         ClassLoader loader = null;
 
         // if a classpath has been specified then use it to find the driver,
@@ -198,8 +229,8 @@ public class DbDriverLoader {
      * @return
      * @throws MalformedURLException
      */
-    private List<URL> getExistingUrls(String path) throws MalformedURLException {
-        List<URL> existingUrls = new ArrayList<URL>();
+    private Set<URL> getExistingUrls(String path) throws MalformedURLException {
+        Set<URL> existingUrls = new HashSet<>();
 
         String[] pieces = path.split(File.pathSeparator);
         for (String piece : pieces) {
