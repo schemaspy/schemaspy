@@ -22,7 +22,10 @@ import org.schemaspy.model.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.model.ProcessExecutionException;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -31,39 +34,44 @@ import java.util.logging.Logger;
 /**
  * @author John Currier
  */
-public class Main {
-    public static void main(String[] argv) throws Exception {
-        Logger logger = Logger.getLogger(Main.class.getName());
+@SpringBootApplication
+public class Main implements CommandLineRunner {
 
-        final AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext("org.schemaspy.service");
-        applicationContext.register(SchemaAnalyzer.class);
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
-        SchemaAnalyzer analyzer = applicationContext.getBean(SchemaAnalyzer.class);
+    @Autowired
+    private SchemaAnalyzer analyzer;
 
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(Main.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
         int rc = 1;
 
         try {
-            rc = analyzer.analyze(new Config(argv)) == null ? 1 : 0;
+            rc = analyzer.analyze(new Config(args)) == null ? 1 : 0;
         } catch (ConnectionFailure couldntConnect) {
-            logger.log(Level.WARNING, "Connection Failure", couldntConnect);
+            LOGGER.log(Level.WARNING, "Connection Failure", couldntConnect);
             rc = 3;
         } catch (EmptySchemaException noData) {
-            logger.log(Level.WARNING, "Empty schema", noData);
+            LOGGER.log(Level.WARNING, "Empty schema", noData);
             rc = 2;
         } catch (InvalidConfigurationException badConfig) {
-            logger.info("");
+            LOGGER.info("");
             if (badConfig.getParamName() != null)
-                logger.log(Level.WARNING, "Bad parameter specified for " + badConfig.getParamName());
-            logger.log(Level.WARNING, "Bad config " + badConfig.getMessage());
+                LOGGER.log(Level.WARNING, "Bad parameter specified for " + badConfig.getParamName());
+            LOGGER.log(Level.WARNING, "Bad config " + badConfig.getMessage());
             if (badConfig.getCause() != null && !badConfig.getMessage().endsWith(badConfig.getMessage()))
-                logger.log(Level.WARNING, " caused by " + badConfig.getCause().getMessage());
+                LOGGER.log(Level.WARNING, " caused by " + badConfig.getCause().getMessage());
 
-            logger.log(Level.FINE, "Command line parameters: " + Arrays.asList(argv));
-            logger.log(Level.FINE, "Invalid configuration detected", badConfig);
+            LOGGER.log(Level.FINE, "Command line parameters: " + Arrays.asList(args));
+            LOGGER.log(Level.FINE, "Invalid configuration detected", badConfig);
         } catch (ProcessExecutionException badLaunch) {
-            logger.log(Level.WARNING, badLaunch.getMessage(), badLaunch);
+            LOGGER.log(Level.WARNING, badLaunch.getMessage(), badLaunch);
         } catch (Exception exc) {
-            logger.log(Level.SEVERE, exc.getMessage(), exc);
+            LOGGER.log(Level.SEVERE, exc.getMessage(), exc);
         }
 
         System.exit(rc);

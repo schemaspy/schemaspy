@@ -285,10 +285,12 @@ public class Config {
     }
 
     public boolean isJarFile() {
-        if (jarFile == null) {
-            jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
-        }
-        return jarFile.isFile();
+        return true;
+        //FIXME what is this good for?
+//        if (jarFile == null) {
+//            jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+//        }
+//        return jarFile.isFile();
     }
 
     public void setDbType(String dbType) {
