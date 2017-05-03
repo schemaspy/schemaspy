@@ -1,6 +1,8 @@
 # [Schema Spy](http://schemaspy.org/) -  [schemaspy.org](http://schemaspy.org/)
 
 [![Build Status](https://travis-ci.org/schemaspy/schemaspy.svg?branch=master)](https://travis-ci.org/schemaspy/schemaspy)
+[![Crates.io](https://img.shields.io/crates/dv/rustc-serialize.svg)](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc1-jar-with-dependencies.jar)
+[![Gem](https://img.shields.io/gem/dtv/rails.svg)](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc1-jar-with-dependencies.jar)
 [![Documentation Status](https://readthedocs.org/projects/schemaspy/badge/?version=latest)](http://schemaspy.readthedocs.io/en/latest/?badge=latest)
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.schemaspy%3Aschemaspy)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 [![Quality Gate](https://sonarqube.com/api/badges/measure?key=org.schemaspy%3Aschemaspy&metric=coverage)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
