@@ -159,7 +159,6 @@ public class DbDriverLoader {
 
     private void loadAdditionalJarsForDriver(String driverPath, Set<URL> classpath) throws MalformedURLException {
         File driverFolder = new File(Paths.get(driverPath).getParent().toString());
-
         if (driverFolder != null) {
             File[] files = driverFolder.listFiles(
                     (dir, name) -> {
@@ -169,10 +168,12 @@ public class DbDriverLoader {
 
             logger.info("Additional jars will be loaded for JDBC Driver");
 
-            for (File file : files) {
-                if (file.isFile()) {
-                    classpath.add(file.toURI().toURL());
-                    logger.info(file.toURI().toString());
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        classpath.add(file.toURI().toURL());
+                        logger.info(file.toURI().toString());
+                    }
                 }
             }
         }
