@@ -106,7 +106,7 @@ public class Config {
     private Boolean lowQuality;
     private Boolean paginationEnabled;
     private String imageFormat;
-    private Boolean loadJDBCJarsEnabled;
+    private Boolean loadJDBCJarsEnabled = false;
     private String schemaSpec;  // used in conjunction with evaluateAll
     private boolean hasOrphans = false;
     private boolean hasRoutines = false;
