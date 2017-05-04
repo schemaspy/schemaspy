@@ -92,7 +92,7 @@ public class MustacheWriter {
 	        	cssStream = new FileInputStream(fileName);
         } else {
             if (Config.getInstance().isJarFile()) {
-                cssStream = StyleSheet.class.getClassLoader().getResourceAsStream(fileName);
+                cssStream = MustacheWriter.class.getClassLoader().getResourceAsStream(fileName);
             }
         }
 
