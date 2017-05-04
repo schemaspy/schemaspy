@@ -98,7 +98,7 @@ public class MustacheWriter {
 
         if (cssStream == null)
             throw new ParseException("Unable to find requested file: " + fileName);
-        String inputStream = IOUtils.toString(cssStream, "UTF-8").toString();
+        String inputStream = IOUtils.toString(cssStream, "UTF-8");
         return new StringReader(inputStream);
     }
 

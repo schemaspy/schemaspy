@@ -16,7 +16,7 @@ public class DatabaseObject implements Comparable<DatabaseObject>{
 
     public DatabaseObject(TableColumn object) {
         this.name = object.getName();
-        this.fullName = new String(object.getTable().getFullName()+"."+ object.getName());
+        this.fullName = object.getTable().getFullName() + "." + object.getName();
         this.typeName = object.getTypeName();
         this.type = object.getType();
         this.length = object.getLength();

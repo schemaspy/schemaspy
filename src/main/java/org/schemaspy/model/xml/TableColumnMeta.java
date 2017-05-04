@@ -79,13 +79,13 @@ public class TableColumnMeta {
         digits = node == null ? 0 : Integer.parseInt(node.getNodeValue());
         
         node = attribs.getNamedItem("nullable");
-        isNullable = node == null ? false : evalBoolean(node.getNodeValue());
+        isNullable = node != null && evalBoolean(node.getNodeValue());
 
         node = attribs.getNamedItem("autoUpdated");
-        isAutoUpdated = node == null ? false : evalBoolean(node.getNodeValue());
+        isAutoUpdated = node != null && evalBoolean(node.getNodeValue());
         
         node = attribs.getNamedItem("primaryKey");
-        isPrimary = node == null ? false : evalBoolean(node.getNodeValue());
+        isPrimary = node != null && evalBoolean(node.getNodeValue());
         
         node = attribs.getNamedItem("defaultValue");
         defaultValue = node == null ? null : node.getNodeValue();
@@ -93,16 +93,21 @@ public class TableColumnMeta {
         node = attribs.getNamedItem("disableImpliedKeys");
         if (node != null) {
             tmp = node.getNodeValue().trim().toLowerCase();
-            if (tmp.equals("to")) {
-                isImpliedChildrenDisabled = true;
-                isImpliedParentsDisabled  = false;
-            } else if (tmp.equals("from")) {
-                isImpliedParentsDisabled  = true;
-                isImpliedChildrenDisabled = false;
-            } else if (tmp.equals("all")) {
-                isImpliedChildrenDisabled = isImpliedParentsDisabled = true;
-            } else {
-                isImpliedChildrenDisabled = isImpliedParentsDisabled = false;
+            switch (tmp) {
+                case "to":
+                    isImpliedChildrenDisabled = true;
+                    isImpliedParentsDisabled = false;
+                    break;
+                case "from":
+                    isImpliedParentsDisabled = true;
+                    isImpliedChildrenDisabled = false;
+                    break;
+                case "all":
+                    isImpliedChildrenDisabled = isImpliedParentsDisabled = true;
+                    break;
+                default:
+                    isImpliedChildrenDisabled = isImpliedParentsDisabled = false;
+                    break;
             }
         } else {
             isImpliedChildrenDisabled = isImpliedParentsDisabled = false;
@@ -111,15 +116,19 @@ public class TableColumnMeta {
         node = attribs.getNamedItem("disableDiagramAssociations");
         if (node != null) {
             tmp = node.getNodeValue().trim().toLowerCase();
-            if (tmp.equals("all")) {
-                isAllExcluded = true;
-                isExcluded = true;
-            } else if (tmp.equals("exceptdirect")) {
-                isAllExcluded = false;
-                isExcluded = true;
-            } else {
-                isAllExcluded = false;
-                isExcluded = false;
+            switch (tmp) {
+                case "all":
+                    isAllExcluded = true;
+                    isExcluded = true;
+                    break;
+                case "exceptdirect":
+                    isAllExcluded = false;
+                    isExcluded = true;
+                    break;
+                default:
+                    isAllExcluded = false;
+                    isExcluded = false;
+                    break;
             }
         } else {
             isAllExcluded = false;
@@ -142,8 +151,8 @@ public class TableColumnMeta {
         if (exp == null)
             return false;
 
-        exp = exp.trim().toLowerCase();
-        return exp.equals("true") || exp.equals("yes") || exp.equals("1");
+        String returnExp = exp.trim().toLowerCase();
+        return "true".equals(returnExp) || "yes".equals(returnExp) || "1".equals(returnExp);
     }
 
     public String getName() {

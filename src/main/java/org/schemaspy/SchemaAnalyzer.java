@@ -89,8 +89,9 @@ public class SchemaAnalyzer {
         }
     }
 
-	public Database analyzeMultipleSchemas(Config config, List<String> schemas)throws SQLException, IOException {
+	public Database analyzeMultipleSchemas(Config config, List<String> schemasToAnalyze)throws SQLException, IOException {
         try {
+            List<String> schemas = schemasToAnalyze;
             Database db = null;
         	String schemaSpec = config.getSchemaSpec();
             Connection connection = this.getConnection(config);
@@ -108,7 +109,6 @@ public class SchemaAnalyzer {
                 	schemas = Arrays.asList(new String[] {config.getUser()});
             }
 
-            Version version = new Version();
         	System.out.println("Analyzing schemas: "+schemas.toString());
         	
 	        boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
@@ -392,11 +392,11 @@ public class SchemaAnalyzer {
 
         // getting implied constraints has a side-effect of associating the parent/child tables, so don't do it
         // here unless they want that behavior
-        List<ImpliedForeignKeyConstraint> impliedConstraints = null;
+        List<ImpliedForeignKeyConstraint> impliedConstraints;
         if (includeImpliedConstraints)
             impliedConstraints = DbAnalyzer.getImpliedConstraints(tables);
         else
-            impliedConstraints = new ArrayList<ImpliedForeignKeyConstraint>();
+            impliedConstraints = new ArrayList<>();
 
         List<Table> orphans = DbAnalyzer.getOrphans(tables);
         config.setHasOrphans(!orphans.isEmpty() && Dot.getInstance().isValid());
@@ -424,7 +424,6 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        dotBaseFilespec = "utilities";
         File orphansDir = new File(outputDir, "diagrams/orphans");
         orphansDir.mkdirs();
         HtmlOrphansPage.getInstance().write(db, orphans, orphansDir, outputDir);

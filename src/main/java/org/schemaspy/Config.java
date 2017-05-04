@@ -482,7 +482,7 @@ public class Config {
     }
 
     public void setMaxDetailedTabled(int maxDetailedTables) {
-        this.maxDetailedTables = new Integer(maxDetailedTables);
+        this.maxDetailedTables = maxDetailedTables;
     }
 
     public int getMaxDetailedTables() {
@@ -496,10 +496,10 @@ public class Config {
                     logger.log(Level.WARNING, e.getMessage(), e);
                 }
             }
-            maxDetailedTables = new Integer(max);
+            maxDetailedTables = max;
         }
 
-        return maxDetailedTables.intValue();
+        return maxDetailedTables;
     }
 
     public String getConnectionPropertiesFile() {
@@ -644,7 +644,7 @@ public class Config {
      * @param fontSize
      */
     public void setFontSize(int fontSize) {
-        this.fontSize = new Integer(fontSize);
+        this.fontSize = fontSize;
     }
 
     /**
@@ -713,7 +713,7 @@ public class Config {
      * @param maxDbThreads
      */
     public void setMaxDbThreads(int maxDbThreads) {
-        this.maxDbThreads = new Integer(maxDbThreads);
+        this.maxDbThreads = maxDbThreads;
     }
 
     /**
@@ -747,10 +747,10 @@ public class Config {
             else if (max == 0)
                 max = 1;
 
-            maxDbThreads = new Integer(max);
+            maxDbThreads = max;
         }
 
-        return maxDbThreads.intValue();
+        return maxDbThreads;
     }
 
     public boolean isLogoEnabled() {
