@@ -73,7 +73,7 @@ public class Main implements CommandLineRunner {
         } catch (Exception exc) {
             LOGGER.log(Level.SEVERE, exc.getMessage(), exc);
         }
-
+        
         System.exit(rc);
     }
 }
