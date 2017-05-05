@@ -106,6 +106,7 @@ public class Config {
     private Boolean lowQuality;
     private Boolean paginationEnabled;
     private String imageFormat;
+    private Boolean loadJDBCJarsEnabled = false;
     private String schemaSpec;  // used in conjunction with evaluateAll
     private boolean hasOrphans = false;
     private boolean hasRoutines = false;
@@ -285,10 +286,12 @@ public class Config {
     }
 
     public boolean isJarFile() {
-        if (jarFile == null) {
-            jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
-        }
-        return jarFile.isFile();
+        return true;
+        //FIXME what is this good for?
+//        if (jarFile == null) {
+//            jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+//        }
+//        return jarFile.isFile();
     }
 
     public void setDbType(String dbType) {
@@ -1374,6 +1377,32 @@ public class Config {
 
         return paginationEnabled;
     }
+
+
+    /**
+     * If enabled SchemaSpy will load from classpath additional jars used by JDBC Driver<p/>
+     * <p>
+     * Defaults to <code>false</code> (enabled).
+     *
+     * @param enabled
+     */
+    public void setLoadJDBCJarsEnabled(boolean enabled) {
+        loadJDBCJarsEnabled = enabled;
+    }
+
+    /**
+     * @return
+     * @see #setLoadJDBCJarsEnabled(boolean)
+     */
+    public boolean isLoadJDBCJarsEnabled() {
+        String loadJars = pullParam("-loadjars");
+        if (loadJars != null && loadJars.equals("true")) {
+            loadJDBCJarsEnabled = true;
+        }
+
+        return loadJDBCJarsEnabled;
+    }
+
     public void setImageFormat(String imageFormat) {
         this.imageFormat = imageFormat;
     }
@@ -1826,6 +1855,8 @@ public class Config {
             params.add("-noviews");
         if (!isPaginationEnabled())
             params.add("-nopages");
+        if (!isLoadJDBCJarsEnabled())
+            params.add("-loadjars");
         if (isRankDirBugEnabled())
             params.add("-rankdirbug");
         if (isRailsEnabled())
