@@ -18,13 +18,16 @@
  */
 package org.schemaspy.view;
 
+import org.apache.commons.io.IOUtils;
+import org.schemaspy.Config;
+import org.schemaspy.model.InvalidConfigurationException;
+import org.schemaspy.util.LineWriter;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -33,11 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-
-import org.apache.commons.io.IOUtils;
-import org.schemaspy.Config;
-import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.util.LineWriter;
 
 /**
  * Represents our CSS style sheet (CSS) with accessors for important
@@ -48,6 +46,7 @@ import org.schemaspy.util.LineWriter;
  * @author John Currier
  */
 public class StyleSheet {
+
     private static StyleSheet instance;
     private final String css;
     private String bodyBackgroundColor;
@@ -159,9 +158,9 @@ public class StyleSheet {
                 cssStream = StyleSheet.class.getClassLoader().getResourceAsStream(cssName);
             }
         }
-
-        if (cssStream == null)
+        if (cssStream == null) {
             throw new ParseException("Unable to find requested file: " + cssName);
+        }
         String inputStream = IOUtils.toString(cssStream, "UTF-8").toString();
         return new StringReader(inputStream);
     }

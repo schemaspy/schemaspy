@@ -230,13 +230,6 @@ public class DotNode {
         return fontWidth;
     }
 
-    private String getFileSystemPath(String fileName) {
-        URL keyPath = getClass().getResource(fileName);
-        String filepath = FilenameUtils.separatorsToSystem(keyPath.getPath());
-        filepath = new File(filepath).getAbsoluteFile().toString();
-        return filepath;
-    }
-
     public static class DotNodeConfig {
         private final boolean showColumns;
         private boolean showTrivialColumns;

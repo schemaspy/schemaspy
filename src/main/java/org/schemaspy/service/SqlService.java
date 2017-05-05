@@ -56,8 +56,9 @@ public class SqlService {
         String driverPath = properties.getProperty("driverPath");
         if (driverPath == null)
             driverPath = "";
+
         if (config.getDriverPath() != null)
-            driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
+            driverPath = config.getDriverPath();
 
         DbDriverLoader driverLoader = new DbDriverLoader();
         connection = driverLoader.getConnection(config, urlBuilder.getConnectionURL(), driverClass, driverPath);

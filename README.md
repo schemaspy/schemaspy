@@ -37,6 +37,7 @@ More detail will came in next days plus I have in plan to start working on all n
 ## Documentation
 
 If you need more info about how to use or install SchemaSpy please read the last documentation at Read the Docs.
+
 [Documentation](http://schemaspy.readthedocs.io/en/latest/)
 
 [Sample Output](http://schemaspy.org/sample/index.html)
@@ -45,6 +46,12 @@ If you need more info about how to use or install SchemaSpy please read the last
 [Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0-rc1)
 
 [Download](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0-rc1/schemaspy-6.0.0-rc1.jar)
+
+## Latest Release
+
+Because a lot of users is testing merged PR and verify the changes in the project you can download easily latest version of SchemaSpy.
+
+Download [schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc1.jar)
 
 ## Bugs and Issues
 

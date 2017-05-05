@@ -59,12 +59,14 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.schemaspy.view.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  * @author John Currier
  */
+@Component
 public class SchemaAnalyzer {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private boolean fineEnabled;
@@ -497,14 +499,6 @@ public class SchemaAnalyzer {
                 logger.fine("Writing details of " + table.getName());
 
             tableFormatter.write(db, table, outputDir, stats);
-        }
-    }
-
-    private void cleanDirectory(File outputDir, String dirName) {
-        File diagramDirectory = new File(outputDir.getPath()+dirName);
-        if (diagramDirectory.exists()) {
-            FileUtils.deleteQuietly(diagramDirectory);
-            diagramDirectory.mkdir();
         }
     }
 
