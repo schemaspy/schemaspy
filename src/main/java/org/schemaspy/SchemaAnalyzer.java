@@ -544,14 +544,6 @@ public class SchemaAnalyzer {
         }
     }
 
-    private void cleanDirectory(File outputDir, String dirName) {
-        File diagramDirectory = new File(outputDir.getPath()+dirName);
-        if (diagramDirectory.exists()) {
-            FileUtils.deleteQuietly(diagramDirectory);
-            diagramDirectory.mkdir();
-        }
-    }
-
     /**
      * dumpNoDataMessage
      *
