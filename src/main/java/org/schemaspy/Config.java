@@ -279,7 +279,7 @@ public class Config {
             templateDirectory = pullParam("-template");
             if (templateDirectory == null) {
                 // default template dir = resources/layout/
-                templateDirectory = getClass().getResource("/layout").getPath();
+                templateDirectory = "/layout";
             }
         }
         return templateDirectory;
