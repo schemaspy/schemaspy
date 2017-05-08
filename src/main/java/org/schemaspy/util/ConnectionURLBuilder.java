@@ -38,7 +38,7 @@ public class ConnectionURLBuilder {
      * @param properties
      */
     public ConnectionURLBuilder(Config config, Properties properties) {
-        List<String> opts = new ArrayList<String>();
+        List<String> opts = new ArrayList<>();
 
         for (String key : config.getDbSpecificOptions().keySet()) {
             opts.add((key.startsWith("-") ? "" : "-") + key);
@@ -48,7 +48,8 @@ public class ConnectionURLBuilder {
 
         DbSpecificConfig dbConfig = new DbSpecificConfig(config.getDbType());
         options = dbConfig.getOptions();
-        connectionURL = buildUrl(opts, properties, config);
+
+        connectionURL = buildUrl(opts, config, properties.getProperty("connectionSpec"));
 
         List<String> remaining = config.getRemainingParameters();
 
@@ -63,8 +64,8 @@ public class ConnectionURLBuilder {
         logger.config("connectionURL: " + connectionURL);
     }
 
-    private String buildUrl(List<String> args, Properties properties, Config config) {
-        String connectionSpec = properties.getProperty("connectionSpec");
+    private String buildUrl(List<String> args, Config config, String connectionSpecification) {
+        String connectionURL = connectionSpecification;
 
         for (DbSpecificOption option : options) {
             option.setValue(getParam(args, option, config));
@@ -72,10 +73,12 @@ public class ConnectionURLBuilder {
             logger.fine(option.toString());
 
             // replace e.g. <host> with myDbHost
-            connectionSpec = connectionSpec.replaceAll("\\<" + option.getName() + "\\>", option.getValue());
+            String optionName = option.getName();
+            String optionValue = option.getValue().replaceAll("\\\\", "/");
+            connectionURL = connectionURL.replaceAll("\\<" + optionName + "\\>", optionValue);
         }
 
-        return connectionSpec;
+        return connectionURL;
     }
 
     public String getConnectionURL() {

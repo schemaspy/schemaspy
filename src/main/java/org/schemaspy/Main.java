@@ -18,6 +18,8 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
@@ -26,14 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author John Currier
- */
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 
@@ -42,12 +42,37 @@ public class Main implements CommandLineRunner {
     @Autowired
     private SchemaAnalyzer analyzer;
 
-    public static void main(String[] args) throws Exception {
+    @Autowired
+    private CommandLineArguments arguments;
+
+    @Autowired
+    private CommandLineArgumentParser commandLineArgumentParser;
+
+    @Autowired
+    private ApplicationContext context;
+
+    public static void main(String... args) throws Exception {
         SpringApplication.run(Main.class, args);
     }
 
     @Override
     public void run(String... args) throws Exception {
+        if (arguments.isHelpRequired()) {
+            commandLineArgumentParser.printUsage();
+            exitApplication(0);
+            return;
+        }
+
+        if (arguments.isDbHelpRequired()) {
+            commandLineArgumentParser.printDatabaseTypesHelp();
+            exitApplication(0);
+            return;
+        }
+
+        runAnalyzer(args);
+    }
+
+    private void runAnalyzer(String... args) {
         int rc = 1;
 
         try {
@@ -73,7 +98,12 @@ public class Main implements CommandLineRunner {
         } catch (Exception exc) {
             LOGGER.log(Level.SEVERE, exc.getMessage(), exc);
         }
-        
-        System.exit(rc);
+
+        exitApplication(rc);
     }
+
+    private void exitApplication(int returnCode) {
+        SpringApplication.exit(context, () -> returnCode);
+    }
+
 }

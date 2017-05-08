@@ -1,17 +1,18 @@
 package org.schemaspy.service;
 
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.Config;
 import org.schemaspy.model.*;
 import org.schemaspy.model.xml.ForeignKeyMeta;
 import org.schemaspy.model.xml.TableColumnMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.util.Markdown;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -22,12 +23,19 @@ import java.util.regex.Pattern;
 @Service
 public class TableService {
 
-    @Autowired
-    SqlService sqlService;
-
     private final static Logger logger = Logger.getLogger(TableService.class.getName());
+
+    private final SqlService sqlService;
+
+    private final CommandLineArguments commandLineArguments;
+
     private final static boolean finerEnabled = logger.isLoggable(Level.FINER);
     private final static boolean fineEnabled = logger.isLoggable(Level.FINE);
+
+    public TableService(SqlService sqlService, CommandLineArguments commandLineArguments) {
+        this.sqlService = Objects.requireNonNull(sqlService);
+        this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
+    }
 
 
     public void gatheringTableDetails(Database db, Table table) throws SQLException {

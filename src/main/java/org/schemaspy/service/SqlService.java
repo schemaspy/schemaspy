@@ -1,5 +1,6 @@
 package org.schemaspy.service;
 
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.Config;
 import org.schemaspy.DbDriverLoader;
 import org.schemaspy.model.Database;
@@ -8,7 +9,6 @@ import org.schemaspy.util.ConnectionURLBuilder;
 import org.schemaspy.util.DbSpecificOption;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -24,11 +24,20 @@ import java.util.logging.Logger;
 @Service
 public class SqlService {
 
+    private final CommandLineArguments commandLineArguments;
+
     private final Logger logger = Logger.getLogger(getClass().getName());
     private final boolean fineEnabled = logger.isLoggable(Level.FINE);
 
     private Connection connection;
     private DatabaseMetaData meta;
+
+    private String defaultSchema;
+    private String databaseName;
+
+    public SqlService(CommandLineArguments commandLineArguments) {
+        this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
+    }
 
     public Connection getConnection() {
         return connection;
@@ -39,18 +48,11 @@ public class SqlService {
     }
 
     public DatabaseMetaData connect(Config config) throws IOException, SQLException {
-        Properties properties = config.determineDbProperties(config.getDbType());
+        Properties properties = config.determineDbProperties(commandLineArguments.getDatabaseType());
 
         ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
         if (config.getDb() == null)
             config.setDb(urlBuilder.getConnectionURL());
-
-        if (config.getRemainingParameters().size() != 0) {
-            StringBuilder msg = new StringBuilder("Unrecognized option(s):");
-            for (String remnant : config.getRemainingParameters())
-                msg.append(" " + remnant);
-            logger.warning(msg.toString());
-        }
 
         String driverClass = properties.getProperty("driver");
         String driverPath = properties.getProperty("driverPath");
@@ -64,6 +66,9 @@ public class SqlService {
         connection = driverLoader.getConnection(config, urlBuilder.getConnectionURL(), driverClass, driverPath);
 
         meta = connection.getMetaData();
+
+        databaseName = config.getDb();
+        defaultSchema = commandLineArguments.getSchema();
 
         if (config.isEvaluateAllEnabled()) {
             List<String> args = config.asList();
