@@ -38,7 +38,7 @@ public class ViewService {
         ResultSet rs = null;
         StringBuilder viewDefinition = new StringBuilder();
         try {
-            stmt = sqlService.prepareStatement(selectViewSql, view.getName());
+            stmt = sqlService.prepareStatement(selectViewSql,db, view.getName());
             rs = stmt.executeQuery();
             while (rs.next()) {
                 try {

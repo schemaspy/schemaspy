@@ -18,17 +18,23 @@
  */
 package org.schemaspy.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
 import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.Table.ByColumnIdComparator;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
-import org.schemaspy.util.LineWriter;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * The page that lists all of the columns in the schema,
@@ -101,10 +107,6 @@ public class HtmlColumnsPage extends HtmlFormatter {
             this.comparator = comparator;
         }
 
-        public String getColumnName() {
-            return columnName;
-        }
-
         public String getLocation() {
             return getLocation(columnName);
         }
@@ -150,113 +152,13 @@ public class HtmlColumnsPage extends HtmlFormatter {
         mw.write("column.html", "columns.html", "column.js");
     }
 
-    public void writeMainTableHeader(boolean hasTableIds, ColumnInfo selectedColumn, LineWriter out) throws IOException {
-        boolean onColumnsPage = selectedColumn != null;
-        List<String> details = null;
-        out.writeln("<a name='columns'></a>");
-        out.writeln("<table id='columns' class='dataTable' border='1' rules='groups'>");
-
-        if (onColumnsPage) {
-            details = new ArrayList<String>(Config.getInstance().getColumnDetails());
-            if (!hasTableIds)
-                details.remove("id");   // simplify subsequent logic by yanking it now
-
-            for (String detail : details) {
-                if (detail.equals("comments"))
-                    out.writeln("<colgroup class='comment'>");
-                else
-                    out.writeln("<colgroup>");
-            }
-        } else {
-            int numCols = hasTableIds ? 9 : 8;
-            for (int i = 0; i < numCols; ++i) {
-                out.writeln("<colgroup>");
-            }
-            out.writeln("<colgroup class='comment'>");
-        }
-
-        out.writeln("<thead align='left'>");
-        out.writeln("<tr>");
-        if (onColumnsPage) {
-            Map<String, String> headings = new HashMap<String, String>();
-            headings.put("id", getTH(selectedColumn, "ID", null, "right"));
-            headings.put("table", getTH(selectedColumn, "Table", null, null));
-            headings.put("column", getTH(selectedColumn, "Column", null, null));
-            headings.put("type", getTH(selectedColumn, "Type", null, null));
-            headings.put("size", getTH(selectedColumn, "Size", null, null));
-            headings.put("nulls", getTH(selectedColumn, "Nulls", "Are nulls allowed?", null));
-            headings.put("auto", getTH(selectedColumn, "Auto", "Is column automatically updated?", null));
-            headings.put("default", getTH(selectedColumn, "Default", "Default value", null));
-            headings.put("children", getTH(selectedColumn, "Children", "Columns in tables that reference this column", null));
-            headings.put("parents", getTH(selectedColumn, "Parents", "Columns in tables that are referenced by this column", null));
-            headings.put("comments", "<th title='Comments' class='comment'><span class='notSortedByColumn'>Comments</span></th>");
-
-            // output the headings in the order specified
-            if (details != null) {  // redundant, but keeps compiler happy
-                for (String detail : details) {
-                    out.writeln(headings.get(detail));
-                }
-            }
-        } else {
-            if (hasTableIds)
-                out.writeln(getTH(selectedColumn, "ID", null, "right"));
-            out.writeln(getTH(selectedColumn, "Column", null, null));
-            out.writeln(getTH(selectedColumn, "Type", null, null));
-            out.writeln(getTH(selectedColumn, "Size", null, null));
-            out.writeln(getTH(selectedColumn, "Nulls", "Are nulls allowed?", null));
-            out.writeln(getTH(selectedColumn, "Auto", "Is column automatically updated?", null));
-            out.writeln(getTH(selectedColumn, "Default", "Default value", null));
-            out.writeln(getTH(selectedColumn, "Children", "Columns in tables that reference this column", null));
-            out.writeln(getTH(selectedColumn, "Parents", "Columns in tables that are referenced by this column", null));
-            out.writeln("  <th title='Comments' class='comment'><span class='notSortedByColumn'>Comments</span></th>");
-        }
-
-        out.writeln("</tr>");
-        out.writeln("</thead>");
-    }
-
-    private String getTH(ColumnInfo selectedColumn, String columnName, String title, String align) {
-        StringBuilder buf = new StringBuilder("  <th");
-
-        if (align != null) {
-            buf.append(" align='");
-            buf.append(align);
-            buf.append("'");
-        }
-
-        if (title != null) {
-            buf.append(" title='");
-            buf.append(title);
-            buf.append("'");
-        }
-
-        if (selectedColumn != null) {
-            if (selectedColumn.getColumnName().equals(columnName)) {
-                buf.append(" class='sortedByColumn'>");
-                buf.append(columnName);
-            } else {
-                buf.append(" class='notSortedByColumn'>");
-                buf.append("<a href='");
-                buf.append(selectedColumn.getLocation(columnName));
-                buf.append("#columns'><span class='notSortedByColumn'>");
-                buf.append(columnName);
-                buf.append("</span></a>");
-            }
-        } else {
-            buf.append('>');
-            buf.append(columnName);
-        }
-        buf.append("</th>");
-
-        return buf.toString();
-    }
-
     @Override
     protected boolean isColumnsPage() {
         return true;
     }
 
     private class ByColumnComparator implements Comparator<TableColumn> {
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             int rc = column1.getName().compareToIgnoreCase(column2.getName());
             if (rc == 0)
@@ -266,6 +168,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     }
 
     private class ByTableComparator implements Comparator<TableColumn> {
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             int rc = column1.getTable().compareTo(column2.getTable());
             if (rc == 0)
@@ -277,6 +180,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     private class ByTypeComparator implements Comparator<TableColumn> {
         private final Comparator<TableColumn> bySize = new BySizeComparator();
 
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             int rc = column1.getTypeName().compareToIgnoreCase(column2.getTypeName());
             if (rc == 0) {
@@ -289,6 +193,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     private class ByCommentsComparator implements Comparator<TableColumn> {
         private final Comparator<TableColumn> byType = new ByTypeComparator();
 
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             String comment1 = column1.getComments();
             if (comment1 == null)
@@ -308,6 +213,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     private class BySizeComparator implements Comparator<TableColumn> {
         private final Comparator<TableColumn> byColumn = new ByColumnComparator();
 
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             int rc = column1.getLength() - column2.getLength();
             if (rc == 0) {
@@ -322,6 +228,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     private class ByNullableComparator implements Comparator<TableColumn> {
         private final Comparator<TableColumn> byColumn = new ByColumnComparator();
 
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             int rc = column1.isNullable() == column2.isNullable() ? 0 : column1.isNullable() ? -1 : 1;
             if (rc == 0)
@@ -333,6 +240,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     private class ByAutoUpdateComparator implements Comparator<TableColumn> {
         private final Comparator<TableColumn> byColumn = new ByColumnComparator();
 
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             int rc = column1.isAutoUpdated() == column2.isAutoUpdated() ? 0 : column1.isAutoUpdated() ? -1 : 1;
             if (rc == 0)
@@ -344,6 +252,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     private class ByDefaultValueComparator implements Comparator<TableColumn> {
         private final Comparator<TableColumn> byNullable = new ByNullableComparator();
 
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             String value1 = String.valueOf(column1.getDefaultValue());
             String value2 = String.valueOf(column2.getDefaultValue());
@@ -358,6 +267,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     private class ByChildrenComparator implements Comparator<TableColumn> {
         private final Comparator<TableColumn> byColumn = new ByColumnComparator();
 
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             Set<String> childTables1 = new TreeSet<String>();
             Set<String> childTables2 = new TreeSet<String>();
@@ -382,6 +292,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     private class ByParentsComparator implements Comparator<TableColumn> {
         private final Comparator<TableColumn> byColumn = new ByColumnComparator();
 
+        @Override
         public int compare(TableColumn column1, TableColumn column2) {
             Set<String> parentTables1 = new TreeSet<String>();
             Set<String> parentTables2 = new TreeSet<String>();

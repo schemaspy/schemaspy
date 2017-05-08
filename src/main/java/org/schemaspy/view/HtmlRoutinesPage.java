@@ -93,10 +93,10 @@ public class HtmlRoutinesPage extends HtmlFormatter {
         html.write(db.getName());
         if (db.getSchema() != null) {
             html.write('.');
-            html.write(db.getSchema());
+            html.write(db.getSchema().getName());
         } else if (db.getCatalog() != null) {
             html.write('.');
-            html.write(db.getCatalog());
+            html.write(db.getCatalog().getName());
         }
         html.write(" contains " + numProcs + " procedures and " + numFuncs + " functions:");
         html.write("</b><br><div class='indent'>");

@@ -443,7 +443,7 @@ public class TableService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, table.getName());
+                stmt = sqlService.prepareStatement(sql,db, table.getName());
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -620,7 +620,7 @@ public class TableService {
         ResultSet rs = null;
 
         try {
-            stmt = sqlService.prepareStatement(selectIndexesSql, table.getName());
+            stmt = sqlService.prepareStatement(selectIndexesSql,db, table.getName());
             rs = stmt.executeQuery();
 
             while (rs.next()) {
