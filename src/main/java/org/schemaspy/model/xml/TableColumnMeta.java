@@ -50,7 +50,7 @@ public class TableColumnMeta {
     private final boolean isImpliedChildrenDisabled;
     private static final Logger logger = Logger.getLogger(TableColumnMeta.class.getName());
 
-    TableColumnMeta(Node colNode) {
+    public TableColumnMeta(Node colNode) {
         NamedNodeMap attribs = colNode.getAttributes();
         String tmp;
 
