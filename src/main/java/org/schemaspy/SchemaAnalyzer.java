@@ -93,7 +93,6 @@ public class SchemaAnalyzer {
         }
     }
 
-
 	public Database analyzeMultipleSchemas(Config config, ProgressListener progressListener)throws SQLException, IOException {
         try {
             // following params will be replaced by something appropriate
