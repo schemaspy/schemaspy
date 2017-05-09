@@ -65,9 +65,9 @@ public class DbSpecificConfig {
         StringTokenizer tokenizer = new StringTokenizer(properties.getProperty("connectionSpec"), "<>", true);
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
-            if (token.equals("<")) {
+            if ("<".equals(token)) {
                 inParam = true;
-            } else if (token.equals(">")) {
+            } else if (">".equals(token)) {
                 inParam = false;
             } else {
                 if (inParam) {

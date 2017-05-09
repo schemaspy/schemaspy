@@ -161,7 +161,7 @@ public class StyleSheet {
         if (cssStream == null) {
             throw new ParseException("Unable to find requested file: " + cssName);
         }
-        String inputStream = IOUtils.toString(cssStream, "UTF-8").toString();
+        String inputStream = IOUtils.toString(cssStream, "UTF-8");
         return new StringReader(inputStream);
     }
 

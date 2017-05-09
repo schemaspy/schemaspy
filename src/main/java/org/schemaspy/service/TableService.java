@@ -174,7 +174,7 @@ public class TableService {
         column.setNullable(rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable);
         column.setDefaultValue(rs.getString("COLUMN_DEF"));
         column.setComments(rs.getString("REMARKS"));
-        column.setId(new Integer(rs.getInt("ORDINAL_POSITION") - 1));
+        column.setId(rs.getInt("ORDINAL_POSITION") - 1);
 
         Pattern excludeIndirectColumns = Config.getInstance().getIndirectColumnExclusions();
         Pattern excludeColumns = Config.getInstance().getColumnExclusions();

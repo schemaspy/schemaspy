@@ -36,7 +36,7 @@ public class DOMUtil {
         // for issues about transformations in Java 5.x
         try {
             // won't work pre-5.x
-            factory.setAttribute("indent-number", new Integer(3));
+            factory.setAttribute("indent-number", 3);
             indentSpecified = true;
         } catch (IllegalArgumentException factoryDoesntSupportIndentNumber) {
         }

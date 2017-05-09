@@ -109,7 +109,7 @@ public class DbDriverLoader {
      */
     protected Driver getDriver(String driverClass, String driverPath) throws MalformedURLException {
         Set<URL> classpath = getExistingUrls(driverPath);
-        if (classpath.size() <= 0) {
+        if (classpath.isEmpty()) {
             URL url = getClass().getResource(driverPath);
             if (url != null) {
                 classpath = getExistingUrls(url.getPath());
@@ -186,13 +186,13 @@ public class DbDriverLoader {
      * @return
      */
     private ClassLoader getDriverClassLoader(Set<URL> classpath) {
-        ClassLoader loader = null;
+        ClassLoader loader;
 
         // if a classpath has been specified then use it to find the driver,
         // otherwise use whatever was used to load this class.
         // thanks to Bruno Leonardo Gonalves for this implementation that he
         // used to resolve issues when running under Maven
-        if (classpath.size() > 0) {
+        if (!classpath.isEmpty()) {
             loader = new URLClassLoader(classpath.toArray(new URL[classpath.size()]));
         } else {
             loader = getClass().getClassLoader();
