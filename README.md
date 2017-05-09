@@ -4,8 +4,6 @@
 [![Documentation Status](https://readthedocs.org/projects/schemaspy/badge/?version=latest)](http://schemaspy.readthedocs.io/en/latest/?badge=latest)
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.schemaspy%3Aschemaspy)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 
-[![Quality Gate](https://sonarqube.com/api/badges/measure?key=org.schemaspy%3Aschemaspy&metric=coverage)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
-
 > Please support a project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
