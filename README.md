@@ -5,8 +5,6 @@
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.schemaspy%3Aschemaspy)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 [![Quality Gate](https://sonarqube.com/api/badges/measure?key=org.schemaspy%3Aschemaspy&metric=coverage)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 
-[![SonarQube Coverage](https://sonarqube.com/api/badges/measure?key=org.schemaspy%3Aschemaspy&metric=coverage)](https://github.com/schemaspy/schemaspy)
-
 > Please support a project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
