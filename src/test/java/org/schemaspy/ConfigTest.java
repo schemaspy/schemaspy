@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Created by wkasa on 2017-03-04.
  */
@@ -17,6 +19,13 @@ public class ConfigTest extends TestCase {
         Assert.assertEquals(2, config.getSchemas().size());
         Assert.assertTrue(config.isHelpRequired());
         Assert.assertFalse(config.isDbHelpRequired());
+        assertThat(config.getDbType()).isEqualToIgnoringCase("mssql05");
+    }
+
+    @Test
+    public void testLoadJars() {
+        Config config = new Config("-loadjars", "true");
+        assertThat(config.isLoadJDBCJarsEnabled()).isTrue();
     }
 
 }

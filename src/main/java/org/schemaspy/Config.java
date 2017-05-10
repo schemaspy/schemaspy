@@ -138,7 +138,7 @@ public class Config {
      *
      * @param argv
      */
-    public Config(String[] argv) {
+    public Config(String... argv) {
 
         setInstance(this);
         options = fixupArgs(Arrays.asList(argv));
