@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -25,8 +26,8 @@ import java.util.HashMap;
 public class MustacheWriter {
     private File outputDir;
     private HashMap<String, Object> scopes;
-    private  String rootPath;
-    private  String rootPathtoHome;
+    private String rootPath;
+    private String rootPathtoHome;
     private String databaseName;
     private boolean isMultipleSchemas;
     private String templateDirectory = Config.getInstance().getTemplateDirectory();
@@ -78,9 +79,28 @@ public class MustacheWriter {
         }
     }
 
-    // TODO this methods needs some refactoring. I feel it can be done in a simpler way.
-    private StringReader getReader(String fileName) throws IOException {
+    private Reader getReader(String fileName) throws IOException {
         String parent = templateDirectory;
+        return getReader(parent, fileName);
+    }
+
+    /**
+     * Returns a {@link Reader} that can be used to read the contents
+     * of the specified file in the parent directory.<p>
+     * Search order is
+     * <ol>
+     * <li><code>fileName</code> as an explicitly-defined file in the parent directory</li>
+     * <li><code>fileName</code> as a file in the user's home directory</li>
+     * <li><code>fileName</code> as a resource from the class path</li>
+     * </ol>
+     * @param parent
+     * @param fileName
+     *
+     * @return
+     * @throws IOException
+     */
+    // TODO this methods needs some refactoring. I feel it can be done in a simpler way.
+    public static Reader getReader(String parent, String fileName) throws IOException {
         InputStream fileStream;
         // first look into the directory where schemaspy is called from
         File file = new File(parent, fileName);
@@ -92,7 +112,7 @@ public class MustacheWriter {
             if (fileInUserHomeDirectory.exists()) {
                 fileStream = new FileInputStream(fileInUserHomeDirectory);
             } else {
-                // fallack to classpath resource
+                // fallback to classpath resource
                 Resource resource = new ClassPathResource(parent + "/" + fileName);
                 fileStream = resource.getInputStream();
             }
