@@ -38,6 +38,10 @@ public class H2MemoryRule extends ExternalResource {
     keepAlive.commit();
   }
 
+  public Connection getConnection() {
+    return keepAlive;
+  }
+
   @Override
   protected void after() {
     try {
