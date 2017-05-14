@@ -162,11 +162,11 @@ public class DbDriverLoader {
         if (driverFolder != null) {
             File[] files = driverFolder.listFiles(
                     (dir, name) -> {
-                        return name.toLowerCase().endsWith(".jar");
+                        return name.toLowerCase().matches(".*\\.?ar$");
                     }
             );
 
-            logger.info("Additional jars will be loaded for JDBC Driver");
+            logger.info("Additional files will be loaded for JDBC Driver");
 
             if (files != null) {
                 for (File file : files) {
