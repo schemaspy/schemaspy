@@ -77,11 +77,7 @@ public class MustacheWriter {
     }
 
     private String getTemplatePath(String templatePath) {
-        String path = "layout/"+templatePath;
-        if (!Config.getInstance().isJarFile()) {
-            path = new File(templateDirectory,templatePath).getPath();
-        }
-        return path;
+        return new File(templateDirectory, templatePath).getPath();
     }
 
     private static StringReader getReader(String fileName) throws IOException {
@@ -91,9 +87,7 @@ public class MustacheWriter {
         }else if (new File(System.getProperty("user.dir"), fileName).exists()){
 	        	cssStream = new FileInputStream(fileName);
         } else {
-            if (Config.getInstance().isJarFile()) {
-                cssStream = MustacheWriter.class.getClassLoader().getResourceAsStream(fileName);
-            }
+            cssStream = MustacheWriter.class.getClassLoader().getResourceAsStream(fileName);
         }
 
         if (cssStream == null)

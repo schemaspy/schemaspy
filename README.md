@@ -4,6 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/schemaspy/badge/?version=latest)](http://schemaspy.readthedocs.io/en/latest/?badge=latest)
 [![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.schemaspy%3Aschemaspy)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
 [![Quality Gate](https://sonarqube.com/api/badges/measure?key=org.schemaspy%3Aschemaspy&metric=coverage)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
+[![Gitter](https://badges.gitter.im/schemaspy/schemaspy.svg)](https://gitter.im/schemaspy/schemaspy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 > Please support a project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
@@ -41,6 +42,8 @@ If you need more info about how to use or install SchemaSpy please read the last
 [Documentation](http://schemaspy.readthedocs.io/en/latest/)
 
 [Sample Output](http://schemaspy.org/sample/index.html)
+
+[![alt tag](http://schemaspy.org/img/example_page.png)](http://schemaspy.org/sample/index.html)
 
 ## SchemaSpy v6.0.0 RC1
 [Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0-rc1)
