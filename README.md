@@ -43,6 +43,8 @@ If you need more info about how to use or install SchemaSpy please read the last
 
 [Sample Output](http://schemaspy.org/sample/index.html)
 
+[![alt tag](http://schemaspy.org/img/example_page.png)](http://schemaspy.org/sample/index.html)
+
 ## SchemaSpy v6.0.0 RC1
 [Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0-rc1)
 
