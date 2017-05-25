@@ -68,3 +68,10 @@ Are very welcome! And remember, contribution is not only PRs and code, but any h
 SchemaSpy is maintained by [Rafal Kasa](malito:rafalkasa@gmail.com) with SchemaSpy community support please contact with me if you have some question or proposition.
 * https://github.com/rafalkasa
 
+## Team Tools
+
+[![alt tag](http://pylonsproject.org/img/logo-jetbrains.png)](https://www.jetbrains.com/) 
+
+SchemaSpy Team would like inform that JetBrains is helping by provided IDE to develop the application. Thanks to its support program for an Open Source projects !
+
+
