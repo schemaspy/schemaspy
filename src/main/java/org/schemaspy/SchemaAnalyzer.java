@@ -30,7 +30,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,7 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 //import javax.xml.validation.Schema;
 
-import org.schemaspy.model.Catalog;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.ConsoleProgressListener;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
@@ -47,14 +46,12 @@ import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
-import org.schemaspy.model.Schema;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.util.*;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.schemaspy.view.*;
@@ -71,25 +68,34 @@ public class SchemaAnalyzer {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private boolean fineEnabled;
 
-    @Autowired
-    private SqlService sqlService;
+    private final SqlService sqlService;
 
-    @Autowired
-    private DatabaseService databaseService;
+    private final DatabaseService databaseService;
+
+    private final CommandLineArguments commandLineArguments;
+
+    public SchemaAnalyzer(SqlService sqlService, DatabaseService databaseService, CommandLineArguments commandLineArguments) {
+        this.sqlService = Objects.requireNonNull(sqlService);
+        this.databaseService = Objects.requireNonNull(databaseService);
+        this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
+    }
 
     public Database analyze(Config config) throws SQLException, IOException {
     	// don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
     	// and not already logging fine details (to keep from obfuscating those)
 
         boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
-        ProgressListener progressListener = new ConsoleProgressListener(render);
+        ProgressListener progressListener = new ConsoleProgressListener(render, commandLineArguments);
         
     	// if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas  
         List<String> schemas = config.getSchemas();
         if (schemas != null || config.isEvaluateAllEnabled()) {
         	return this.analyzeMultipleSchemas(config, progressListener);
-        }else{
-            return analyze(config, progressListener);
+        } else {
+            File outputDirectory = commandLineArguments.getOutputDirectory();
+            Objects.requireNonNull(outputDirectory);
+            String schema = commandLineArguments.getSchema();
+            return analyze(schema, config, outputDirectory, progressListener);
         }
     }
 
@@ -121,7 +127,7 @@ public class SchemaAnalyzer {
         	System.out.println("Analyzing schemas: "+schemas.toString());
         	
 	        String dbName = config.getDb();
-	        File outputDir = config.getOutputDir();
+	        File outputDir = commandLineArguments.getOutputDirectory();
 	        // set flag which later on used for generation rootPathtoHome link.
 	        config.setOneOfMultipleSchemas(true);
 
@@ -135,11 +141,11 @@ public class SchemaAnalyzer {
 	            	config.setDb(schema);
 	            else
 	        		config.setSchema(schema);
-	            config.setOutputDir(new File(outputDir, schema).toString());
-	            
-	            System.out.println("Analyzing " + schema);
-	            System.out.flush();
-				db = this.analyze(config,progressListener);
+
+                System.out.println("Analyzing " + schema);
+                System.out.flush();
+                File outputDirForSchema = new File(outputDir, schema);
+                db = this.analyze(schema, config, outputDirForSchema, progressListener);
                 if (db == null) //if any of analysed schema returns null
                     return db;
                 mustacheSchemas.add(new MustacheSchema(db.getSchema(),""));
@@ -156,18 +162,8 @@ public class SchemaAnalyzer {
         }
     }
 
-    public Database analyze(Config config, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyze(String schema, Config config, File outputDir,  ProgressListener progressListener) throws SQLException, IOException {
         try {
-            if (config.isHelpRequired()) {
-                config.dumpUsage(null, false);
-                return null;
-            }
-
-            if (config.isDbHelpRequired()) {
-                config.dumpUsage(null, true);
-                return null;
-            }
-
             // set the log level for the root logger
             Logger.getLogger("").setLevel(config.getLogLevel());
 
@@ -182,15 +178,13 @@ public class SchemaAnalyzer {
             fineEnabled = logger.isLoggable(Level.FINE);
             logger.info("Starting schema analysis");
 
-            File outputDir = config.getOutputDir();
             if (!outputDir.isDirectory()) {
                 if (!outputDir.mkdirs()) {
                     throw new IOException("Failed to create directory '" + outputDir + "'");
                 }
             }
-          
+
             String dbName = config.getDb();
-            String schema = config.getSchema();
 
             String catalog = config.getCatalog();
 
@@ -307,8 +301,8 @@ public class SchemaAnalyzer {
                 logger.info("Wrote table details in " + duration / 1000 + " seconds");
 
                 if (logger.isLoggable(Level.INFO)) {
-                    logger.info("Wrote relationship details of " + tables.size() + " tables/views to directory '" + config.getOutputDir() + "' in " + overallDuration / 1000 + " seconds.");
-                    logger.info("View the results by opening " + new File(config.getOutputDir(), "index.html"));
+                    logger.info("Wrote relationship details of " + tables.size() + " tables/views to directory '" + outputDir + "' in " + overallDuration / 1000 + " seconds.");
+                    logger.info("View the results by opening " + new File(outputDir, "index.html"));
                 }
             }
 
@@ -472,7 +466,7 @@ public class SchemaAnalyzer {
 
     private Connection getConnection(Config config) throws InvalidConfigurationException, IOException {
 
-        Properties properties = config.determineDbProperties(config.getDbType());
+        Properties properties = config.determineDbProperties(commandLineArguments.getDatabaseType());
 
         ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
         if (config.getDb() == null)

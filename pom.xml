@@ -178,6 +178,11 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.69</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>

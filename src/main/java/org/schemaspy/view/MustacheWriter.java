@@ -8,8 +8,15 @@ import org.apache.commons.io.IOUtils;
 import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.Version;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 
 /**
@@ -44,15 +51,11 @@ public class MustacheWriter {
         MustacheFactory contentMf = new DefaultMustacheFactory();
         StringWriter content = new StringWriter();
         StringWriter result = new StringWriter();
-        FileUtils fileUtils = new FileUtils();
 
-        HashMap<String, Object> mainScope = new HashMap<String, Object>();
-        //URL containerTemplate = getClass().getResource(Paths.get(templateDirectory,"container.html").toString());
-       // URL template = getClass().getResource(templatePath);
+        HashMap<String, Object> mainScope = new HashMap<>();
 
         try {
-            String path = getTemplatePath(templatePath);
-            Mustache mustache = mf.compile(getReader(path),"template");
+            Mustache mustache = mf.compile(getReader(templatePath),"template");
             mustache.execute(result, scopes).flush();
 
             mainScope.put("databaseName", databaseName);
@@ -64,36 +67,42 @@ public class MustacheWriter {
             Version version = new Version();
             mainScope.put("version", version.getVersion());
 
-            path = getTemplatePath("container.html");
-            Mustache mustacheContent = contentMf.compile(getReader(path), "container");
+            Mustache mustacheContent = contentMf.compile(getReader("container.html"), "container");
             mustacheContent.execute(content, mainScope).flush();
 
             File destinationFile = new File(outputDir, destination);
 
-            fileUtils.writeStringToFile(destinationFile, content.toString(), "UTF-8");
+            FileUtils.writeStringToFile(destinationFile, content.toString(), "UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String getTemplatePath(String templatePath) {
-        return new File(templateDirectory, templatePath).getPath();
-    }
-
-    private static StringReader getReader(String fileName) throws IOException {
-    	InputStream cssStream = null;
-        if (new File(fileName).exists()){
-        	cssStream = new FileInputStream(fileName);
-        }else if (new File(System.getProperty("user.dir"), fileName).exists()){
-	        	cssStream = new FileInputStream(fileName);
+    // TODO this methods needs some refactoring. I feel it can be done in a simpler way.
+    private StringReader getReader(String fileName) throws IOException {
+        String parent = templateDirectory;
+        InputStream fileStream;
+        // first look into the directory where schemaspy is called from
+        File file = new File(parent, fileName);
+        if (file.exists()) {
+            fileStream = new FileInputStream(file);
         } else {
-            cssStream = MustacheWriter.class.getClassLoader().getResourceAsStream(fileName);
+            // otherwise look in user's home directory
+            File fileInUserHomeDirectory = new File(System.getProperty("user.dir"), file.getPath());
+            if (fileInUserHomeDirectory.exists()) {
+                fileStream = new FileInputStream(fileInUserHomeDirectory);
+            } else {
+                // fallack to classpath resource
+                Resource resource = new ClassPathResource(parent + "/" + fileName);
+                fileStream = resource.getInputStream();
+            }
         }
 
-        if (cssStream == null)
-            throw new ParseException("Unable to find requested file: " + fileName);
-        String inputStream = IOUtils.toString(cssStream, "UTF-8");
-        return new StringReader(inputStream);
+        if (fileStream == null) {
+            throw new ParseException("Unable to find requested file: " + fileName + " in directory " + parent);
+        }
+        String fileContent = IOUtils.toString(fileStream, "UTF-8");
+        return new StringReader(fileContent);
     }
 
     /**

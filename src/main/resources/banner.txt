@@ -6,3 +6,5 @@
                                              |_|    |___/
 
                                               ${application.version}
+
+SchemaSpy generates an HTML representation of a database schema's relationships.
