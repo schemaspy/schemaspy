@@ -268,15 +268,6 @@ public class Config {
         return templateDirectory;
     }
 
-    public boolean isJarFile() {
-        return true;
-        //FIXME what is this good for?
-//        if (jarFile == null) {
-//            jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
-//        }
-//        return jarFile.isFile();
-    }
-
     public void setDbType(String dbType) {
         this.dbType = dbType;
     }
