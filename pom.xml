@@ -62,6 +62,12 @@
             <email>rafalkasa@gmail.com</email>
         </developer>
     </developers>
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -182,6 +188,12 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.69</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.npetzall.testcontainers-java</groupId>
+            <artifactId>oracle-xe</artifactId>
+            <version>1.2.2-SNAPSHOT-0.3</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

@@ -50,14 +50,14 @@ public class DatabaseServiceIT {
     @Test
     public void gatheringSchemaDetailsTest() throws Exception {
         String[] args = {
-                "-t", "src/test/resources/integrationTesting/h2memory",
+                "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
                 "-db", "DatabaseServiceIT",
                 "-s", "DATABASESERVICEIT",
                 "-o", "target/integrationtesting/databaseServiceIT",
                 "-u", "sa"
         };
         given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/databaseServiceIT"));
-        given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/h2memory");
+        given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
         given(arguments.getUser()).willReturn("sa");
         given(arguments.getSchema()).willReturn("DATABASESERVICEIT");
         given(arguments.getDatabaseName()).willReturn("DatabaseServiceIT");
