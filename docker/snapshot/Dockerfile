@@ -13,7 +13,7 @@ RUN adduser java -h / -D && \
     cd schemaspy && \
     ./mvnw package && \
     cp target/schemaspy*.jar / && \
-    cd / && \doc
+    cd / && \
     rm -rf /opt/build && \
     rm -rf ~/.m2 && \
     apk del curl git unzip openjdk8 && \
