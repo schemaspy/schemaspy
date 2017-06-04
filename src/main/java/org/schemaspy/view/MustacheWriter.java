@@ -7,7 +7,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.util.Version;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -65,8 +64,6 @@ public class MustacheWriter {
             mainScope.put("rootPath", rootPath);
             mainScope.put("rootPathtoHome", rootPathtoHome);
             mainScope.put("isMultipleSchemas", isMultipleSchemas);
-            Version version = new Version();
-            mainScope.put("version", version.getVersion());
 
             Mustache mustacheContent = contentMf.compile(getReader("container.html"), "container");
             mustacheContent.execute(content, mainScope).flush();
