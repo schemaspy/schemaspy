@@ -1,19 +1,31 @@
 package org.schemaspy.service;
 
 import org.schemaspy.Config;
-import org.schemaspy.model.*;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.LogicalTable;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Routine;
+import org.schemaspy.model.RoutineParameter;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+import org.schemaspy.model.TableIndex;
+import org.schemaspy.model.View;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.service.helper.BasicTableMeta;
 import org.schemaspy.validator.NameValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -24,18 +36,20 @@ import java.util.regex.Pattern;
 @Service
 public class DatabaseService {
 
-    @Autowired
-    private TableService tableService;
+    private final TableService tableService;
 
-    @Autowired
-    private ViewService viewService;
+    private final ViewService viewService;
 
-    @Autowired
-    private SqlService sqlService;
+    private final SqlService sqlService;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
     private final boolean fineEnabled = logger.isLoggable(Level.FINE);
 
+    public DatabaseService(TableService tableService, ViewService viewService, SqlService sqlService) {
+        this.tableService = Objects.requireNonNull(tableService);
+        this.viewService = Objects.requireNonNull(viewService);
+        this.sqlService = Objects.requireNonNull(sqlService);
+    }
 
     public void gatheringSchemaDetails(Config config, Database db, ProgressListener listener) throws SQLException {
         logger.info("Gathering schema details");
