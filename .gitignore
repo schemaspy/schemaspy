@@ -7,3 +7,5 @@ schemaspy.iml
 /bin/
 schemaspy.properties
 *.iml
+!ext-lib
+ext-lib/**/*.jar

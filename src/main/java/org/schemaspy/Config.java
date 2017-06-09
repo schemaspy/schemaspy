@@ -18,6 +18,8 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.Dot;
@@ -25,6 +27,7 @@ import org.schemaspy.util.PasswordReader;
 import org.schemaspy.view.DefaultSqlFormatter;
 import org.schemaspy.view.SqlFormatter;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -55,7 +58,6 @@ public class Config {
     private Map<String, String> originalDbSpecificOptions;
     private boolean helpRequired;
     private boolean dbHelpRequired;
-    private File outputDir;
     private File graphvizDir;
     private String dbType;
     private String catalog;
@@ -191,25 +193,6 @@ public class Config {
         return includeImpliedConstraints;
     }
 
-    public void setOutputDir(String outputDirName) {
-        if (outputDirName.endsWith("\""))
-            outputDirName = outputDirName.substring(0, outputDirName.length() - 1);
-
-        setOutputDir(new File(outputDirName));
-    }
-
-    public void setOutputDir(File outputDir) {
-        this.outputDir = outputDir;
-    }
-
-    public File getOutputDir() {
-        if (outputDir == null) {
-            setOutputDir(pullRequiredParam("-o"));
-        }
-
-        return outputDir;
-    }
-
     /**
      * Set the path to Graphviz so we can find dot to generate ER diagrams
      *
@@ -285,19 +268,15 @@ public class Config {
         return templateDirectory;
     }
 
-    public boolean isJarFile() {
-        return true;
-        //FIXME what is this good for?
-//        if (jarFile == null) {
-//            jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
-//        }
-//        return jarFile.isFile();
-    }
-
     public void setDbType(String dbType) {
         this.dbType = dbType;
     }
 
+    /**
+     * @deprecated use {@link CommandLineArguments#getDatabaseType()}
+     * @return
+     */
+    @Deprecated
     public String getDbType() {
         if (dbType == null) {
             dbType = pullParam("-t");
@@ -312,6 +291,11 @@ public class Config {
         this.db = db;
     }
 
+    /**
+     * @deprecated use {@link CommandLineArguments#getDatabaseName()}
+     * @return
+     */
+    @Deprecated
     public String getDb() {
         if (db == null)
             db = pullParam("-db");
@@ -322,6 +306,11 @@ public class Config {
         this.catalog = catalog;
     }
 
+    /**
+     * @deprecated use {@link CommandLineArguments#getCatalog()}
+     * @return
+     */
+    @Deprecated
     public String getCatalog() {
         if (catalog == null)
             catalog = pullParam("-cat");
@@ -332,6 +321,11 @@ public class Config {
         this.schema = schema;
     }
 
+    /**
+     * @deprecated use {@link CommandLineArguments#getSchema()}
+     * @return
+     */
+    @Deprecated
     public String getSchema() {
         if (schema == null)
             schema = pullParam("-s");
@@ -362,17 +356,17 @@ public class Config {
         return host;
     }
 
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
     public Integer getPort() {
-        if (port == null)
-            try {
-                port = Integer.valueOf(pullParam("-port"));
-            } catch (Exception notSpecified) {
-                logger.log(Level.WARNING, notSpecified.getMessage(), notSpecified);
+        if (port == null) {
+            String portAsString = pullParam("-port");
+            if (StringUtils.hasText(portAsString)) {
+                try {
+                    port = Integer.valueOf(portAsString);
+                } catch (NumberFormatException notSpecified) {
+                    logger.log(Level.WARNING, notSpecified.getMessage(), notSpecified);
+                }
             }
+        }
         return port;
     }
 
@@ -1745,6 +1739,12 @@ public class Config {
         return databaseTypes;
     }
 
+    /**
+     * @deprecated use {@link CommandLineArgumentParser#printUsage()} resp. {@link CommandLineArgumentParser#printDatabaseTypesHelp()}
+     * @param errorMessage
+     * @param detailedDb
+     */
+    @Deprecated
     protected void dumpUsage(String errorMessage, boolean detailedDb) {
         if (errorMessage != null) {
             System.out.flush();
@@ -1982,8 +1982,6 @@ public class Config {
         params.add(String.valueOf(getMaxDbThreads()));
         params.add("-maxdet");
         params.add(String.valueOf(getMaxDetailedTables()));
-        params.add("-o");
-        params.add(getOutputDir().toString());
 
         return params;
     }
