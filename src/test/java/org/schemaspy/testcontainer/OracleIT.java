@@ -1,7 +1,6 @@
 package org.schemaspy.testcontainer;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -21,14 +20,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.OracleContainer;
-import org.testcontainers.jdbc.ext.ScriptUtils;
 
 import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
