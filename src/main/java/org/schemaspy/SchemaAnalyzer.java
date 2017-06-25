@@ -186,7 +186,7 @@ public class SchemaAnalyzer {
 
             String dbName = config.getDb();
 
-            String catalog = config.getCatalog();
+            String catalog = commandLineArguments.getCatalog();
 
             DatabaseMetaData meta = sqlService.connect(config);
 
