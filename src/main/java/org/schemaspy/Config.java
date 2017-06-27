@@ -51,7 +51,7 @@ import java.util.regex.PatternSyntaxException;
  *
  * @author John Currier
  */
-public class Config {
+public final class Config {
     private static Config instance;
     private final List<String> options;
     private Map<String, String> dbSpecificOptions;
@@ -60,10 +60,9 @@ public class Config {
     private boolean dbHelpRequired;
     private File graphvizDir;
     private String dbType;
-    private String catalog;
     private String schema;
     private List<String> schemas;
-    private boolean oneOfMultipleSchemas = false;
+    private boolean oneOfMultipleSchemas;
     private String user;
     private Boolean singleSignOn;
     private Boolean noSchema;
@@ -110,9 +109,9 @@ public class Config {
     private String imageFormat;
     private Boolean loadJDBCJarsEnabled = false;
     private String schemaSpec;  // used in conjunction with evaluateAll
-    private boolean hasOrphans = false;
-    private boolean hasRoutines = false;
-    private boolean populating = false;
+    private boolean hasOrphans;
+    private boolean hasRoutines;
+    private boolean populating;
     private List<String> columnDetails;
     public static final String DOT_CHARSET = "UTF-8";
     private static final String ESCAPED_EQUALS = "\\=";
@@ -120,9 +119,8 @@ public class Config {
     private static final String DEFAULT_TABLE_EXCLUSION = "";   // match nothing
     private static final String DEFAULT_COLUMN_EXCLUSION = "[^.]";  // match nothing
     private static final String DEFAULT_PROPERTIES_FILE = "schemaspy.properties";
-    private File jarFile;
     private Properties schemaspyProperties = new Properties();
-    private Logger logger = Logger.getLogger(Config.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
 
     /**
      * Default constructor. Intended for when you want to inject properties
@@ -180,10 +178,6 @@ public class Config {
             generateHtml = !options.remove("-nohtml");
 
         return generateHtml;
-    }
-
-    public void setImpliedConstraintsEnabled(boolean includeImpliedConstraints) {
-        this.includeImpliedConstraints = includeImpliedConstraints;
     }
 
     public boolean isImpliedConstraintsEnabled() {
@@ -268,10 +262,6 @@ public class Config {
         return templateDirectory;
     }
 
-    public void setDbType(String dbType) {
-        this.dbType = dbType;
-    }
-
     /**
      * @deprecated use {@link CommandLineArguments#getDatabaseType()}
      * @return
@@ -300,21 +290,6 @@ public class Config {
         if (db == null)
             db = pullParam("-db");
         return db;
-    }
-
-    public void setCatalog(String catalog) {
-        this.catalog = catalog;
-    }
-
-    /**
-     * @deprecated use {@link CommandLineArguments#getCatalog()}
-     * @return
-     */
-    @Deprecated
-    public String getCatalog() {
-        if (catalog == null)
-            catalog = pullParam("-cat");
-        return catalog;
     }
 
     public void setSchema(String schema) {
@@ -363,7 +338,7 @@ public class Config {
                 try {
                     port = Integer.valueOf(portAsString);
                 } catch (NumberFormatException notSpecified) {
-                    logger.log(Level.WARNING, notSpecified.getMessage(), notSpecified);
+                    LOGGER.log(Level.WARNING, notSpecified.getMessage(), notSpecified);
                 }
             }
         }
@@ -487,7 +462,7 @@ public class Config {
                 try {
                     max = Integer.parseInt(param);
                 } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, e.getMessage(), e);
+                    LOGGER.log(Level.WARNING, e.getMessage(), e);
                 }
             }
             maxDetailedTables = max;
@@ -653,7 +628,7 @@ public class Config {
                 try {
                     size = Integer.parseInt(param);
                 } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, e.getMessage(), e);
+                    LOGGER.log(Level.WARNING, e.getMessage(), e);
                 }
             }
             fontSize = Integer.valueOf(size);
@@ -1682,7 +1657,7 @@ public class Config {
             contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, "UTF-8"));
             this.schemaspyProperties.load(new StringReader(contents.replace("\\", "\\\\")));
         } catch (IOException e) {
-            logger.log(Level.INFO, "Configuration file not found");
+            LOGGER.log(Level.INFO, "Configuration file not found");
         }
     }
 
@@ -1897,11 +1872,6 @@ public class Config {
             // note that we don't pass -pfp since child processes
             // won't have a console
             params.add("-p");
-            params.add(value);
-        }
-        value = getCatalog();
-        if (value != null) {
-            params.add("-cat");
             params.add(value);
         }
         value = getSchema();

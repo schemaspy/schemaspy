@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+echo "dot - graphviz version 2.28.0 (20091210.2329)" >&2
