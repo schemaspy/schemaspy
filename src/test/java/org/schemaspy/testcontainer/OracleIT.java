@@ -1,6 +1,6 @@
 package org.schemaspy.testcontainer;
 
-import org.apache.commons.io.IOUtils;
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -20,20 +20,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.OracleContainer;
-import org.testcontainers.jdbc.ext.ScriptUtils;
-import org.testcontainers.utility.JdbcDriverUtil;
 
 import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
@@ -56,50 +51,40 @@ public class OracleIT {
     @MockBean
     private CommandLineRunner commandLineRunner;
 
-    private static final String driverPath = "ext-lib/ojdbc*";
-
     private static Database database;
 
     @ClassRule
-    public static OracleContainer oracleContainer = new OracleContainer<>()
-            .assumeDocker()
-            .withDrivers(driverPath);
+    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
+            new JdbcContainerRule<>(() -> new OracleContainer())
+            .assumeDockerIsPresent()
+            .withAssumptions(assumeDriverIsPresent())
+            .withInitScript("integrationTesting/dbScripts/oracle.sql");
 
     @Before
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
         if (database == null) {
-            setupOracle();
             createDatabaseRepresentation();
         }
     }
 
-    private void setupOracle() throws SQLException, IOException, ScriptException {
-        Connection conn = oracleContainer.createConnection("");
-        String scriptPath = "/integrationTesting/dbScripts/oracle.sql";
-        String script = IOUtils.toString(this.getClass().getResourceAsStream( scriptPath), StandardCharsets.UTF_8);
-        ScriptUtils.executeSqlScript(conn,scriptPath, script);
-    }
-
     private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
-        Path driverPathPath = Paths.get(JdbcDriverUtil.getDriversFromPath(driverPath).get(0).toURI());
         String[] args = {
                 "-t", "orathin",
-                "-dp", driverPathPath.toString(),
-                "-db", oracleContainer.getSid(),
+                "-db", jdbcContainerRule.getContainer().getSid(),
                 "-s", "ORAIT",
                 "-cat", "%",
                 "-o", "target/integrationtesting/orait",
                 "-u", "orait",
                 "-p", "orait123",
-                "-host", oracleContainer.getContainerIpAddress(),
-                "-port", oracleContainer.getOraclePort().toString()
+                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
+                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
         };
         given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/databaseServiceIT"));
         given(arguments.getDatabaseType()).willReturn("orathin");
         given(arguments.getUser()).willReturn("orait");
         given(arguments.getSchema()).willReturn("ORAIT");
         given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn(oracleContainer.getSid());
+        given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);

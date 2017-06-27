@@ -367,7 +367,8 @@ public class TableService {
             Table parentTable = tables.get(pkTableName);
 
             String parentContainer = pkSchema != null ? pkSchema : pkCatalog != null ? pkCatalog : db.getName();
-            String baseContainer = config.getSchema() != null ? config.getSchema() : config.getCatalog() != null ? config.getCatalog() : db.getName();
+            String catalog = commandLineArguments.getCatalog();
+            String baseContainer = config.getSchema() != null ? config.getSchema() : catalog != null ? catalog : db.getName();
 
             // if named table doesn't exist in this schema
             // or exists here but really referencing same named table in another schema
