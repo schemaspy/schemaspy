@@ -56,6 +56,10 @@ Because a lot of users is testing merged PR and verify the changes in the projec
 
 Download [schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc1.jar)
 
+## Docker  
+
+We publish snapshot and release to [hub.docker.io](https://hub.docker.com/r/schemaspy/schemaspy/)
+
 ## Bugs and Issues
 
 Have a bug or an issue with SchemaSpy? [Open a new issue](https://github.com/schemaspy/schemaspy/issues) here on GitHub.
