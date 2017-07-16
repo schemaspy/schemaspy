@@ -6,7 +6,7 @@ REPO=schemaspy/schemaspy
 
 function build() {
     echo "Building docker image"
-    docker build -t ${REPO}:snapshot .
+    docker build -t ${REPO}:snapshot --build-arg GIT_BRANCH=$TRAVIS_BRANCH --build-arg GIT_REVISION=$TRAVIS_COMMIT .
 }
 
 function deploy() {
