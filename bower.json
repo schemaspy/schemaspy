@@ -13,32 +13,40 @@
     "admin-lte": "2.3.11",
     "font-awesome": "~4.7.0",
     "ionicons": "~2.0.1",
-	"DataTables": "1.10.13",
-	"CodeMirror" : "5.25.0"
+    "DataTables": "1.10.13",
+    "CodeMirror": "5.25.0",
+    "anchor-js": "^4.0.0",
+    "salvattore": "^1.0.9"
   },
-  "cInstall": {
-	"folder": {
-		"js": "js/vendor/",
-		"less": "css/less/",
-		"otf, eot, svg, ttf, woff": "fonts/"
-	},
-	"option": {
-		"default": "public"
-	},
-	"source": {
-		"bootstrap": {
-			"glyphicons-halflings-regular.*": "dist/fonts/*",
-			"bootstrap.js": "dist/js/bootstrap.js",
-			"*.less#bootstrap": "less/*.less"
-		},
-		"fontawesome": {
-			"FontAwesome.otf": "fonts/FontAwesome.otf",
-			"fontawesome-webfont.*": "fonts/fontawesome-webfont.*",
-			"*.less#fontawesome": "less/*.less"
-		},
-		"jquery": {
-			"jquery.js": "dist/jquery.js"
-		}
-	}
+  "install": {
+    "path": "src/main/resources/layout/bower",
+    "sources": {
+      "anchor-js": "bower_components/anchor-js/anchor.min.js",
+      "salvattore": "bower_components/salvattore/dist/salvattore.min.js",
+      "admin-lte": {
+        "mapping": [
+          { "bower_components/admin-lte/bootstrap/**": "bootstrap" },
+          { "bower_components/admin-lte/dist/css/**": "dist/css" },
+          { "bower_components/admin-lte/dist/js/**": "dist/js" },
+          { "bower_components/admin-lte/plugins/fastclick/**": "plugins/fastclick" },
+          { "bower_components/admin-lte/plugins/datatables/**": "plugins/datatables" },
+          { "bower_components/admin-lte/plugins/slimScroll/**": "plugins/slimScroll" },
+          { "bower_components/admin-lte/plugins/jQuery/**": "plugins/jQuery" },
+          { "bower_components/admin-lte/plugins/jQueryUI/**": "plugins/jQueryUI" }
+        ]
+      },
+      "font-awesome": {
+        "mapping": [
+          { "bower_components/font-awesome/css/**": "css" },
+          { "bower_components/font-awesome/fonts/**": "fonts" }
+        ]
+      },
+      "ionicons": {
+        "mapping": [
+          { "bower_components/ionicons/css/**": "css" },
+          { "bower_components/ionicons/fonts/**": "fonts" }
+        ]
+      }
+    }
   }
 }

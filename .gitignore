@@ -6,3 +6,4 @@ schemaspy.iml
 .settings
 /bin/
 schemaspy.properties
+bower_components/
