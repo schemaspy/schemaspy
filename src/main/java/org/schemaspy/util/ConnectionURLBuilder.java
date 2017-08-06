@@ -46,6 +46,9 @@ public class ConnectionURLBuilder {
         }
         opts.addAll(config.getRemainingParameters());
 
+        opts.add("-hostOptionalPort");
+        opts.add(getHostOptionalPort(config, properties));
+
         DbSpecificConfig dbConfig = new DbSpecificConfig(config.getDbType());
         options = dbConfig.getOptions();
 
@@ -62,6 +65,19 @@ public class ConnectionURLBuilder {
         }
 
         logger.config("connectionURL: " + connectionURL);
+    }
+
+    private String getHostOptionalPort(Config config, Properties properties) {
+        String hostAndOrPort = config.getHost() == null ? "" : config.getHost();
+        String hostPortSeparator = properties.getProperty("hostPortSeparator", ":");
+        Integer port = config.getPort();
+        if (hostAndOrPort.contains(hostPortSeparator)) {
+            return hostAndOrPort;
+        }
+        if (port != null) {
+            return hostAndOrPort + hostPortSeparator + port;
+        }
+        return hostAndOrPort;
     }
 
     private String buildUrl(List<String> args, Config config, String connectionSpecification) {
