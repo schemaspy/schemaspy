@@ -13,7 +13,8 @@
     "admin-lte": "2.3.11",
     "font-awesome": "~4.7.0",
     "ionicons": "~2.0.1",
-    "DataTables": "1.10.13",
+    "datatables.net-bs": "1.10.15",
+    "datatables.net-buttons-bs": "1.3.1",
     "CodeMirror": "5.25.0",
     "anchor-js": "^4.0.0",
     "salvattore": "^1.0.9"
@@ -29,7 +30,6 @@
           { "bower_components/admin-lte/dist/css/**": "dist/css" },
           { "bower_components/admin-lte/dist/js/**": "dist/js" },
           { "bower_components/admin-lte/plugins/fastclick/**": "plugins/fastclick" },
-          { "bower_components/admin-lte/plugins/datatables/**": "plugins/datatables" },
           { "bower_components/admin-lte/plugins/slimScroll/**": "plugins/slimScroll" },
           { "bower_components/admin-lte/plugins/jQuery/**": "plugins/jQuery" },
           { "bower_components/admin-lte/plugins/jQueryUI/**": "plugins/jQueryUI" }
@@ -45,6 +45,20 @@
         "mapping": [
           { "bower_components/ionicons/css/**": "css" },
           { "bower_components/ionicons/fonts/**": "fonts" }
+        ]
+      },
+      "datatables.net": "bower_components/datatables.net/js/jquery.dataTables.min.js",
+      "datatables.net-bs": {
+        "mapping": [
+          { "bower_components/datatables.net-bs/css/**": "css" },
+          { "bower_components/datatables.net-bs/js/**": "js" }
+        ]
+      },
+      "datatables.net-buttons": "bower_components/datatables.net-buttons/js/**",
+      "datatables.net-buttons-bs": {
+        "mapping": [
+          { "bower_components/datatables.net-buttons-bs/css/**": "css" },
+          { "bower_components/datatables.net-buttons-bs/js/**": "js" }
         ]
       }
     }
