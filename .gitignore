@@ -7,3 +7,4 @@ schemaspy.iml
 /bin/
 schemaspy.properties
 bower_components/
+*.iml
