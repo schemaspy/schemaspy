@@ -36,7 +36,7 @@ public class Dot {
     private final GraphvizVersion badGraphvizVersion = new GraphvizVersion("2.31");
     private final String lineSeparator = System.getProperty("line.separator");
     private String dotExe;
-    private String format = "svg";
+    private String format = Config.getInstance().getImageFormat();
     private String renderer;
     private final Set<String> validatedRenderers = Collections.synchronizedSet(new HashSet<String>());
     private final Set<String> invalidatedRenderers = Collections.synchronizedSet(new HashSet<String>());
@@ -61,7 +61,7 @@ public class Dot {
             logger.config("GraphvizVersion: \"" + versionLine + "\"");
 
             // look for a number followed numbers or dots
-            Matcher matcher = Pattern.compile("[0-9][0-9.]+").matcher(versionLine);
+            Matcher matcher = Pattern.compile("[0-9]+\\.[0-9]+[^\\.]").matcher(versionLine);
             if (matcher.find()) {
                 versionText = matcher.group();
             } else {

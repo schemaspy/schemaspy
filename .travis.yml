@@ -1,16 +1,33 @@
 language: java
-sudo: false
+sudo: required
 install: true
-
+services:
+  - docker
 jdk:
   - oraclejdk8
 addons:
   apt:
     packages:
       - oracle-java8-installer
+      - graphviz
 script:
   - ./travis.sh
+  - ./docker.sh build
 cache:
   directories:
     - '$HOME/.m2/repository'
     - '$HOME/.sonar/cache'
+
+deploy:
+  - provider: pages
+    skip_cleanup: true
+    local_dir: target
+    github_token:  $GITHUB_TOKEN # Set in travis-ci.org dashboard
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true
+    script: ./docker.sh deploy
+    on:
+      repo: schemaspy/schemaspy
+      branch: master

@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -44,13 +45,16 @@ import java.util.regex.Pattern;
 import org.schemaspy.Config;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.model.xml.TableMeta;
+import org.schemaspy.model.Schema;
+import org.schemaspy.model.Catalog;
 import org.schemaspy.util.CaseInsensitiveMap;
+import org.springframework.context.expression.MapAccessor;
 
 public class Database {
     private final Config config;
-    private final String databaseName;
-    private final String catalog;
-    private final String schema;
+    private final String databaseName ;
+    private final Catalog catalog ;
+    private final Schema schema;
     private final Map<String, Table> tables = new CaseInsensitiveMap<Table>();
     private final Map<String, View> views = new CaseInsensitiveMap<View>();
     private final Map<String, Table> remoteTables = new CaseInsensitiveMap<Table>(); // key: schema.tableName
@@ -70,8 +74,8 @@ public class Database {
         this.meta = meta;
         this.schemaMeta = schemaMeta;
         this.databaseName = name;
-        this.catalog = catalog;
-        this.schema = schema;
+        this.catalog = new Catalog(catalog);
+        this.schema = new Schema(schema);
         this.listener = progressListener;
     }
 
@@ -79,11 +83,11 @@ public class Database {
         return databaseName;
     }
 
-    public String getCatalog() {
+    public Catalog getCatalog() {
         return catalog;
     }
 
-    public String getSchema() {
+    public Schema getSchema() {
         return schema;
     }
 

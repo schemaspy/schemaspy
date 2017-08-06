@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.Collection;
 
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
 
 /**
  * Implementation of {@link ProgressListener} that sends its output to the console.
@@ -29,6 +30,8 @@ import org.schemaspy.Config;
  * @author John Currier
  */
 public class ConsoleProgressListener implements ProgressListener {
+	private final CommandLineArguments commandLineArguments;
+
 	private final boolean render;
 	private long startedAt;
 	private long startedGatheringAt;
@@ -37,9 +40,10 @@ public class ConsoleProgressListener implements ProgressListener {
 	private long startedGraphingDetailsAt;
 	private long finishedAt;
 
-    public ConsoleProgressListener(boolean render) {
+    public ConsoleProgressListener(boolean render, CommandLineArguments commandLineArguments) {
     	this.render = render;
-    	startedAt = System.currentTimeMillis();
+		this.commandLineArguments = commandLineArguments;
+		startedAt = System.currentTimeMillis();
 	}
 
 	@Override
@@ -150,8 +154,8 @@ public class ConsoleProgressListener implements ProgressListener {
 		if (render) {
 	        System.err.flush();
 	        System.out.flush();
-            System.out.println("Wrote relationship details of " + tables.size() + " tables/views to directory '" + config.getOutputDir() + "' in " + duration / 1000 + " seconds.");
-            System.out.println("View the results by opening " + new File(config.getOutputDir(), "index.html"));
+            System.out.println("Wrote relationship details of " + tables.size() + " tables/views to directory '" + commandLineArguments.getOutputDirectory() + "' in " + duration / 1000 + " seconds.");
+            System.out.println("View the results by opening " + new File(commandLineArguments.getOutputDirectory(), "index.html"));
 		}
 
 		return duration;

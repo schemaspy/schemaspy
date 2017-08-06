@@ -372,4 +372,11 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
 
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        int result = parentTable != null ? parentTable.hashCode() : 0;
+        result = 31 * result + (childTable != null ? childTable.hashCode() : 0);
+        return result;
+    }
 }

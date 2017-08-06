@@ -36,7 +36,7 @@ public class Markdown {
     }
 
     private static String addReferenceLink(String markdownText, String rootPath) {
-        String text = new String(markdownText);
+        String text = markdownText;
         String newLine = "\r\n";
 
         Pattern p = Pattern.compile("\\[(.*?)\\]");

@@ -2,18 +2,25 @@ package org.schemaspy.service;
 
 import org.schemaspy.Config;
 import org.schemaspy.DbDriverLoader;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.model.Database;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ConnectionURLBuilder;
 import org.schemaspy.util.DbSpecificOption;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +29,8 @@ import java.util.logging.Logger;
  */
 @Service
 public class SqlService {
+
+    private final CommandLineArguments commandLineArguments;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
     private final boolean fineEnabled = logger.isLoggable(Level.FINE);
@@ -32,6 +41,10 @@ public class SqlService {
     private String defaultSchema;
     private String databaseName;
 
+    public SqlService(CommandLineArguments commandLineArguments) {
+        this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
+    }
+
     public Connection getConnection() {
         return connection;
     }
@@ -41,25 +54,19 @@ public class SqlService {
     }
 
     public DatabaseMetaData connect(Config config) throws IOException, SQLException {
-        Properties properties = config.determineDbProperties(config.getDbType());
+        Properties properties = config.determineDbProperties(commandLineArguments.getDatabaseType());
 
         ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
         if (config.getDb() == null)
             config.setDb(urlBuilder.getConnectionURL());
 
-        if (config.getRemainingParameters().size() != 0) {
-            StringBuilder msg = new StringBuilder("Unrecognized option(s):");
-            for (String remnant : config.getRemainingParameters())
-                msg.append(" " + remnant);
-            logger.warning(msg.toString());
-        }
-
         String driverClass = properties.getProperty("driver");
         String driverPath = properties.getProperty("driverPath");
         if (driverPath == null)
             driverPath = "";
+
         if (config.getDriverPath() != null)
-            driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
+            driverPath = config.getDriverPath();
 
         DbDriverLoader driverLoader = new DbDriverLoader();
         connection = driverLoader.getConnection(config, urlBuilder.getConnectionURL(), driverClass, driverPath);
@@ -67,7 +74,7 @@ public class SqlService {
         meta = connection.getMetaData();
 
         databaseName = config.getDb();
-        defaultSchema = config.getSchema();
+        defaultSchema = commandLineArguments.getSchema();
 
         if (config.isEvaluateAllEnabled()) {
             List<String> args = config.asList();
@@ -102,9 +109,9 @@ public class SqlService {
      * @return PreparedStatement
      * @throws SQLException
      */
-    public PreparedStatement prepareStatement(String sql, String tableName) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, Database db, String tableName) throws SQLException {
         StringBuilder sqlBuf = new StringBuilder(sql);
-        List<String> sqlParams = getSqlParams(defaultSchema, databaseName, sqlBuf, tableName); // modifies sqlBuf
+        List<String> sqlParams = getSqlParams(sqlBuf, db.getName(), db.getCatalog().getName(), db.getSchema().getName(), tableName); // modifies sqlBuf
         if (fineEnabled)
             logger.fine(sqlBuf + " " + sqlParams);
 
@@ -130,17 +137,21 @@ public class SqlService {
      * @return List of Strings
      * @see #prepareStatement(String, String)
      */
-    private List<String> getSqlParams(String schema, String name, StringBuilder sql, String tableName) {
+    private List<String> getSqlParams(StringBuilder sql, String dbName, String catalog, String schema, String tableName) {
         Map<String, String> namedParams = new HashMap<String, String>();
         if (schema == null) {
-            schema = name; // some 'schema-less' db's treat the db name like a schema (unusual case)
+            schema = dbName; // some 'schema-less' db's treat the db name like a schema (unusual case)
         }
-
+        
+        namedParams.put(":dbname", dbName);
         namedParams.put(":schema", schema);
         namedParams.put(":owner", schema); // alias for :schema
         if (tableName != null) {
             namedParams.put(":table", tableName);
             namedParams.put(":view", tableName); // alias for :table
+        }
+        if (catalog != null) {
+            namedParams.put(":catalog", catalog);
         }
 
         List<String> sqlParams = new ArrayList<String>();

@@ -2,8 +2,10 @@
 
 [![Build Status](https://travis-ci.org/schemaspy/schemaspy.svg?branch=master)](https://travis-ci.org/schemaspy/schemaspy)
 [![Documentation Status](https://readthedocs.org/projects/schemaspy/badge/?version=latest)](http://schemaspy.readthedocs.io/en/latest/?badge=latest)
-[![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.schemaspy%3Aschemaspy)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
-[![Quality Gate](https://sonarqube.com/api/badges/measure?key=org.schemaspy%3Aschemaspy&metric=coverage)](https://sonarqube.com/dashboard/index?id=org.schemaspy%3Aschemaspy)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=org.schemaspy%3Aschemaspy)](https://sonarcloud.io/dashboard?id=org.schemaspy%3Aschemaspy)
+[![Quality Gate](https://sonarqube.com/api/badges/measure?key=org.schemaspy%3Aschemaspy&metric=coverage)](https://sonarcloud.io/dashboard?id=org.schemaspy%3Aschemaspy)
+[![Gitter](https://badges.gitter.im/schemaspy/schemaspy.svg)](https://gitter.im/schemaspy/schemaspy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Docker Pulls](https://img.shields.io/docker/pulls/schemaspy/schemaspy.svg)](https://hub.docker.com/r/schemaspy/schemaspy/)
 
 > Please support a project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
@@ -37,19 +39,44 @@ More detail will came in next days plus I have in plan to start working on all n
 ## Documentation
 
 If you need more info about how to use or install SchemaSpy please read the last documentation at Read the Docs.
-[Documentation] (http://schemaspy.readthedocs.io/en/latest/)
+
+[Documentation](http://schemaspy.readthedocs.io/en/latest/)
+
+[Sample Output](http://schemaspy.org/sample/index.html)
+
+[![alt tag](http://schemaspy.org/img/example_page.png)](http://schemaspy.org/sample/index.html)
 
 ## SchemaSpy v6.0.0 RC1
 [Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0-rc1)
 
 [Download](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0-rc1/schemaspy-6.0.0-rc1.jar)
 
+## Latest Release
+
+Because a lot of users is testing merged PR and verify the changes in the project you can download easily latest version of SchemaSpy.
+
+Download [schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc1.jar)
+
+## Docker  
+
+We publish snapshot and release to [hub.docker.io](https://hub.docker.com/r/schemaspy/schemaspy/)
+
 ## Bugs and Issues
 
 Have a bug or an issue with SchemaSpy? [Open a new issue](https://github.com/schemaspy/schemaspy/issues) here on GitHub.
+
+## Contribution
+Are very welcome! And remember, contribution is not only PRs and code, but any help with docs or helping other developers to solve issues are very appreciated! Thanks in advance!
 
 ## Maintained
 
 SchemaSpy is maintained by [Rafal Kasa](malito:rafalkasa@gmail.com) with SchemaSpy community support please contact with me if you have some question or proposition.
 * https://github.com/rafalkasa
+
+## Team Tools
+
+[![alt tag](http://pylonsproject.org/img/logo-jetbrains.png)](https://www.jetbrains.com/) 
+
+SchemaSpy Team would like inform that JetBrains is helping by provided IDE to develop the application. Thanks to its support program for an Open Source projects !
+
 

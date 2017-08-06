@@ -18,20 +18,14 @@
  */
 package org.schemaspy.view;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
 import org.schemaspy.Config;
 import org.schemaspy.Revision;
 import org.schemaspy.model.Database;
@@ -40,7 +34,6 @@ import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.HtmlEncoder;
 import org.schemaspy.util.LineWriter;
-import org.apache.commons.io.FileUtils;
 
 public class HtmlFormatter {
     protected final boolean encodeComments = Config.getInstance().isEncodeCommentsEnabled();
@@ -188,77 +181,6 @@ public class HtmlFormatter {
 
     protected boolean sourceForgeLogoEnabled() {
         return Config.getInstance().isLogoEnabled();
-    }
-
-    protected void writeLegend(boolean tableDetails, LineWriter out) throws IOException {
-        writeLegend(tableDetails, true, out);
-    }
-
-    protected void writeLegend(boolean tableDetails, boolean diagramDetails, LineWriter out) throws IOException {
-        out.writeln(" <table class='legend' border='0'>");
-        out.writeln("  <tr>");
-        out.writeln("   <td class='dataTable' valign='bottom'>Legend:</td>");
-        if (sourceForgeLogoEnabled())
-            out.writeln("   <td class='container' align='right' valign='top'><a href='http://sourceforge.net' target='_blank'><img src='http://sourceforge.net/sflogo.php?group_id=137197&amp;type=1' alt='SourceForge.net' border='0' height='31' width='88'></a></td>");
-        out.writeln("  </tr>");
-        out.writeln("  <tr><td class='container' colspan='2'>");
-        out.writeln("   <table class='dataTable' border='1'>");
-        out.writeln("    <tbody>");
-        out.writeln("    <tr><td class='primaryKey'>Primary key columns</td></tr>");
-        out.writeln("    <tr><td class='indexedColumn'>Columns with indexes</td></tr>");
-        if (tableDetails)
-            out.writeln("    <tr class='impliedRelationship'><td class='detail'><span class='impliedRelationship'>Implied relationships</span></td></tr>");
-        // comment this out until I can figure out a clean way to embed image references
-        //out.writeln("    <tr><td class='container'>Arrows go from children (foreign keys)" + (tableDetails ? "<br>" : " ") + "to parents (primary keys)</td></tr>");
-        if (diagramDetails) {
-            out.writeln("    <tr><td class='excludedColumn'>Excluded column relationships</td></tr>");
-            if (!tableDetails)
-                out.writeln("    <tr class='impliedRelationship'><td class='legendDetail'>Dashed lines show implied relationships</td></tr>");
-            out.writeln("    <tr><td class='legendDetail'>&lt; <em>n</em> &gt; number of related tables</td></tr>");
-        }
-        out.writeln("    </tbody>");
-        out.writeln("   </table>");
-        out.writeln("  </td></tr>");
-        out.writeln(" </table>");
-        out.writeln("&nbsp;");
-    }
-
-    protected void writeExcludedColumns(Set<TableColumn> excludedColumns, Table table, LineWriter html) throws IOException {
-        Set<TableColumn> notInDiagram;
-
-        // diagram INCLUDES relationships directly connected to THIS table's excluded columns
-        if (table == null) {
-            notInDiagram = excludedColumns;
-        } else {
-            notInDiagram = new HashSet<TableColumn>();
-            for (TableColumn column : excludedColumns) {
-                if (column.isAllExcluded() || !column.getTable().equals(table)) {
-                    notInDiagram.add(column);
-                }
-            }
-        }
-
-        if (notInDiagram.size() > 0) {
-            html.writeln("<span class='excludedRelationship'>");
-            html.writeln("<br>Excluded from diagram's relationships: ");
-            for (TableColumn column : notInDiagram) {
-                if (!column.getTable().equals(table)) {
-                    html.write("<a href=\"" + getPathToRoot() + "tables/");
-                    html.write(urlEncode(column.getTable().getName()));
-                    html.write(".html\">");
-                    html.write(column.getTable().getName());
-                    html.write(".");
-                    html.write(column.getName());
-                    html.writeln("</a>&nbsp;");
-                }
-            }
-            html.writeln("</span>");
-        }
-    }
-
-    protected void writeInvalidGraphvizInstallation(LineWriter html) throws IOException {
-        html.writeln("<br>SchemaSpy was unable to generate a diagram of table relationships.");
-        html.writeln("<br>SchemaSpy requires Graphviz " + Dot.getInstance().getSupportedVersions().substring(4) + " from <a href='http://www.graphviz.org' target='_blank'>www.graphviz.org</a>.");
     }
 
     protected void writeFooter(LineWriter html) throws IOException {

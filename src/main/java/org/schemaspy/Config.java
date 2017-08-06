@@ -18,6 +18,8 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.Dot;
@@ -25,6 +27,7 @@ import org.schemaspy.util.PasswordReader;
 import org.schemaspy.view.DefaultSqlFormatter;
 import org.schemaspy.view.SqlFormatter;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -48,20 +51,18 @@ import java.util.regex.PatternSyntaxException;
  *
  * @author John Currier
  */
-public class Config {
+public final class Config {
     private static Config instance;
     private final List<String> options;
     private Map<String, String> dbSpecificOptions;
     private Map<String, String> originalDbSpecificOptions;
     private boolean helpRequired;
     private boolean dbHelpRequired;
-    private File outputDir;
     private File graphvizDir;
     private String dbType;
-    private String catalog;
     private String schema;
     private List<String> schemas;
-    private boolean oneOfMultipleSchemas = false;
+    private boolean oneOfMultipleSchemas;
     private String user;
     private Boolean singleSignOn;
     private Boolean noSchema;
@@ -105,10 +106,12 @@ public class Config {
     private Boolean highQuality;
     private Boolean lowQuality;
     private Boolean paginationEnabled;
+    private String imageFormat;
+    private Boolean loadJDBCJarsEnabled = false;
     private String schemaSpec;  // used in conjunction with evaluateAll
-    private boolean hasOrphans = false;
-    private boolean hasRoutines = false;
-    private boolean populating = false;
+    private boolean hasOrphans;
+    private boolean hasRoutines;
+    private boolean populating;
     private List<String> columnDetails;
     public static final String DOT_CHARSET = "UTF-8";
     private static final String ESCAPED_EQUALS = "\\=";
@@ -116,9 +119,8 @@ public class Config {
     private static final String DEFAULT_TABLE_EXCLUSION = "";   // match nothing
     private static final String DEFAULT_COLUMN_EXCLUSION = "[^.]";  // match nothing
     private static final String DEFAULT_PROPERTIES_FILE = "schemaspy.properties";
-    private File jarFile;
     private Properties schemaspyProperties = new Properties();
-    private Logger logger = Logger.getLogger(Config.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
 
     /**
      * Default constructor. Intended for when you want to inject properties
@@ -136,7 +138,7 @@ public class Config {
      *
      * @param argv
      */
-    public Config(String[] argv) {
+    public Config(String... argv) {
 
         setInstance(this);
         options = fixupArgs(Arrays.asList(argv));
@@ -178,34 +180,11 @@ public class Config {
         return generateHtml;
     }
 
-    public void setImpliedConstraintsEnabled(boolean includeImpliedConstraints) {
-        this.includeImpliedConstraints = includeImpliedConstraints;
-    }
-
     public boolean isImpliedConstraintsEnabled() {
         if (includeImpliedConstraints == null)
             includeImpliedConstraints = !options.remove("-noimplied");
 
         return includeImpliedConstraints;
-    }
-
-    public void setOutputDir(String outputDirName) {
-        if (outputDirName.endsWith("\""))
-            outputDirName = outputDirName.substring(0, outputDirName.length() - 1);
-
-        setOutputDir(new File(outputDirName));
-    }
-
-    public void setOutputDir(File outputDir) {
-        this.outputDir = outputDir;
-    }
-
-    public File getOutputDir() {
-        if (outputDir == null) {
-            setOutputDir(pullRequiredParam("-o"));
-        }
-
-        return outputDir;
     }
 
     /**
@@ -277,23 +256,17 @@ public class Config {
             templateDirectory = pullParam("-template");
             if (templateDirectory == null) {
                 // default template dir = resources/layout/
-                templateDirectory = getClass().getResource("/layout").getPath();
+                templateDirectory = "/layout";
             }
         }
         return templateDirectory;
     }
 
-    public boolean isJarFile() {
-        if (jarFile == null) {
-            jarFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
-        }
-        return jarFile.isFile();
-    }
-
-    public void setDbType(String dbType) {
-        this.dbType = dbType;
-    }
-
+    /**
+     * @deprecated use {@link CommandLineArguments#getDatabaseType()}
+     * @return
+     */
+    @Deprecated
     public String getDbType() {
         if (dbType == null) {
             dbType = pullParam("-t");
@@ -308,26 +281,26 @@ public class Config {
         this.db = db;
     }
 
+    /**
+     * @deprecated use {@link CommandLineArguments#getDatabaseName()}
+     * @return
+     */
+    @Deprecated
     public String getDb() {
         if (db == null)
             db = pullParam("-db");
         return db;
     }
 
-    public void setCatalog(String catalog) {
-        this.catalog = catalog;
-    }
-
-    public String getCatalog() {
-        if (catalog == null)
-            catalog = pullParam("-cat");
-        return catalog;
-    }
-
     public void setSchema(String schema) {
         this.schema = schema;
     }
 
+    /**
+     * @deprecated use {@link CommandLineArguments#getSchema()}
+     * @return
+     */
+    @Deprecated
     public String getSchema() {
         if (schema == null)
             schema = pullParam("-s");
@@ -358,17 +331,17 @@ public class Config {
         return host;
     }
 
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
     public Integer getPort() {
-        if (port == null)
-            try {
-                port = Integer.valueOf(pullParam("-port"));
-            } catch (Exception notSpecified) {
-                logger.log(Level.WARNING, notSpecified.getMessage(), notSpecified);
+        if (port == null) {
+            String portAsString = pullParam("-port");
+            if (StringUtils.hasText(portAsString)) {
+                try {
+                    port = Integer.valueOf(portAsString);
+                } catch (NumberFormatException notSpecified) {
+                    LOGGER.log(Level.WARNING, notSpecified.getMessage(), notSpecified);
+                }
             }
+        }
         return port;
     }
 
@@ -478,7 +451,7 @@ public class Config {
     }
 
     public void setMaxDetailedTabled(int maxDetailedTables) {
-        this.maxDetailedTables = new Integer(maxDetailedTables);
+        this.maxDetailedTables = maxDetailedTables;
     }
 
     public int getMaxDetailedTables() {
@@ -489,13 +462,13 @@ public class Config {
                 try {
                     max = Integer.parseInt(param);
                 } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, e.getMessage(), e);
+                    LOGGER.log(Level.WARNING, e.getMessage(), e);
                 }
             }
-            maxDetailedTables = new Integer(max);
+            maxDetailedTables = max;
         }
 
-        return maxDetailedTables.intValue();
+        return maxDetailedTables;
     }
 
     public String getConnectionPropertiesFile() {
@@ -640,7 +613,7 @@ public class Config {
      * @param fontSize
      */
     public void setFontSize(int fontSize) {
-        this.fontSize = new Integer(fontSize);
+        this.fontSize = fontSize;
     }
 
     /**
@@ -655,7 +628,7 @@ public class Config {
                 try {
                     size = Integer.parseInt(param);
                 } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, e.getMessage(), e);
+                    LOGGER.log(Level.WARNING, e.getMessage(), e);
                 }
             }
             fontSize = Integer.valueOf(size);
@@ -709,7 +682,7 @@ public class Config {
      * @param maxDbThreads
      */
     public void setMaxDbThreads(int maxDbThreads) {
-        this.maxDbThreads = new Integer(maxDbThreads);
+        this.maxDbThreads = maxDbThreads;
     }
 
     /**
@@ -743,10 +716,10 @@ public class Config {
             else if (max == 0)
                 max = 1;
 
-            maxDbThreads = new Integer(max);
+            maxDbThreads = max;
         }
 
-        return maxDbThreads.intValue();
+        return maxDbThreads;
     }
 
     public boolean isLogoEnabled() {
@@ -1374,6 +1347,44 @@ public class Config {
         return paginationEnabled;
     }
 
+
+    /**
+     * If enabled SchemaSpy will load from classpath additional jars used by JDBC Driver<p/>
+     * <p>
+     * Defaults to <code>false</code> (enabled).
+     *
+     * @param enabled
+     */
+    public void setLoadJDBCJarsEnabled(boolean enabled) {
+        loadJDBCJarsEnabled = enabled;
+    }
+
+    /**
+     * @return
+     * @see #setLoadJDBCJarsEnabled(boolean)
+     */
+    public boolean isLoadJDBCJarsEnabled() {
+        String loadJars = pullParam("-loadjars");
+        if (loadJars != null && loadJars.equals("true")) {
+            loadJDBCJarsEnabled = true;
+        }
+
+        return loadJDBCJarsEnabled;
+    }
+
+    public void setImageFormat(String imageFormat) {
+        this.imageFormat = imageFormat;
+    }
+
+    public String getImageFormat() {
+        if (imageFormat == null) {
+            imageFormat = pullParam("-imageformat");
+            if (imageFormat == null)
+                imageFormat = "png";
+        }
+        return imageFormat;
+    }
+
     /**
      * Returns the database properties to use.
      * These should be determined by calling {@link #determineDbProperties(String)}.
@@ -1646,7 +1657,7 @@ public class Config {
             contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, "UTF-8"));
             this.schemaspyProperties.load(new StringReader(contents.replace("\\", "\\\\")));
         } catch (IOException e) {
-            logger.log(Level.INFO, "Configuration file not found");
+            LOGGER.log(Level.INFO, "Configuration file not found");
         }
     }
 
@@ -1703,6 +1714,12 @@ public class Config {
         return databaseTypes;
     }
 
+    /**
+     * @deprecated use {@link CommandLineArgumentParser#printUsage()} resp. {@link CommandLineArgumentParser#printDatabaseTypesHelp()}
+     * @param errorMessage
+     * @param detailedDb
+     */
+    @Deprecated
     protected void dumpUsage(String errorMessage, boolean detailedDb) {
         if (errorMessage != null) {
             System.out.flush();
@@ -1813,6 +1830,8 @@ public class Config {
             params.add("-noviews");
         if (!isPaginationEnabled())
             params.add("-nopages");
+        if (!isLoadJDBCJarsEnabled())
+            params.add("-loadjars");
         if (isRankDirBugEnabled())
             params.add("-rankdirbug");
         if (isRailsEnabled())
@@ -1837,6 +1856,8 @@ public class Config {
         params.add(String.valueOf(getFontSize()));
         params.add("-t");
         params.add(getDbType());
+        params.add("-imageformat");
+        params.add(getImageFormat());
         isHighQuality();    // query to set renderer correctly
         isLowQuality();     // query to set renderer correctly
         params.add("-renderer");  // instead of -hq and/or -lq
@@ -1851,11 +1872,6 @@ public class Config {
             // note that we don't pass -pfp since child processes
             // won't have a console
             params.add("-p");
-            params.add(value);
-        }
-        value = getCatalog();
-        if (value != null) {
-            params.add("-cat");
             params.add(value);
         }
         value = getSchema();
@@ -1936,8 +1952,6 @@ public class Config {
         params.add(String.valueOf(getMaxDbThreads()));
         params.add("-maxdet");
         params.add(String.valueOf(getMaxDetailedTables()));
-        params.add("-o");
-        params.add(getOutputDir().toString());
 
         return params;
     }

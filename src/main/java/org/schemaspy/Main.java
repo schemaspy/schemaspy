@@ -18,60 +18,92 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.model.ProcessExecutionException;
-import org.schemaspy.ui.MainFrame;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author John Currier
- */
-public class Main {
-    public static void main(String[] argv) throws Exception {
-        Logger logger = Logger.getLogger(Main.class.getName());
+@SpringBootApplication
+public class Main implements CommandLineRunner {
 
-        final AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext("org.schemaspy.service");
-        applicationContext.register(SchemaAnalyzer.class);
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
-        if (argv.length == 1 && "-gui".equals(argv[0])) { // warning: serious temp hack
-            new MainFrame().setVisible(true);
+    @Autowired
+    private SchemaAnalyzer analyzer;
+
+    @Autowired
+    private CommandLineArguments arguments;
+
+    @Autowired
+    private CommandLineArgumentParser commandLineArgumentParser;
+
+    @Autowired
+    private ApplicationContext context;
+
+    public static void main(String... args) throws Exception {
+        SpringApplication.run(Main.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (arguments.isHelpRequired()) {
+            commandLineArgumentParser.printUsage();
+            exitApplication(0);
             return;
         }
 
-        SchemaAnalyzer analyzer = applicationContext.getBean(SchemaAnalyzer.class);
+        if (arguments.isDbHelpRequired()) {
+            commandLineArgumentParser.printDatabaseTypesHelp();
+            exitApplication(0);
+            return;
+        }
 
+        runAnalyzer(args);
+    }
+
+    private void runAnalyzer(String... args) {
         int rc = 1;
 
         try {
-            rc = analyzer.analyze(new Config(argv)) == null ? 1 : 0;
+            rc = analyzer.analyze(new Config(args)) == null ? 1 : 0;
         } catch (ConnectionFailure couldntConnect) {
-            logger.log(Level.WARNING, "Connection Failure", couldntConnect);
+            LOGGER.log(Level.WARNING, "Connection Failure", couldntConnect);
             rc = 3;
         } catch (EmptySchemaException noData) {
-            logger.log(Level.WARNING, "Empty schema", noData);
+            LOGGER.log(Level.WARNING, "Empty schema", noData);
             rc = 2;
         } catch (InvalidConfigurationException badConfig) {
-            logger.info("");
+            LOGGER.info("");
             if (badConfig.getParamName() != null)
-                logger.log(Level.WARNING, "Bad parameter specified for " + badConfig.getParamName());
-            logger.log(Level.WARNING, "Bad config " + badConfig.getMessage());
+                LOGGER.log(Level.WARNING, "Bad parameter specified for " + badConfig.getParamName());
+            LOGGER.log(Level.WARNING, "Bad config " + badConfig.getMessage());
             if (badConfig.getCause() != null && !badConfig.getMessage().endsWith(badConfig.getMessage()))
-                logger.log(Level.WARNING, " caused by " + badConfig.getCause().getMessage());
+                LOGGER.log(Level.WARNING, " caused by " + badConfig.getCause().getMessage());
 
-            logger.log(Level.FINE, "Command line parameters: " + Arrays.asList(argv));
-            logger.log(Level.FINE, "Invalid configuration detected", badConfig);
+            LOGGER.log(Level.FINE, "Command line parameters: " + Arrays.asList(args));
+            LOGGER.log(Level.FINE, "Invalid configuration detected", badConfig);
         } catch (ProcessExecutionException badLaunch) {
-            logger.log(Level.WARNING, badLaunch.getMessage(), badLaunch);
+            LOGGER.log(Level.WARNING, badLaunch.getMessage(), badLaunch);
         } catch (Exception exc) {
-            logger.log(Level.SEVERE, exc.getMessage(), exc);
+            LOGGER.log(Level.SEVERE, exc.getMessage(), exc);
         }
 
-        System.exit(rc);
+        exitApplication(rc);
     }
+
+    private void exitApplication(int returnCode) {
+        SpringApplication.exit(context, () -> returnCode);
+    }
+
 }

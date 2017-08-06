@@ -18,13 +18,16 @@
  */
 package org.schemaspy.view;
 
+import org.apache.commons.io.IOUtils;
+import org.schemaspy.Config;
+import org.schemaspy.model.InvalidConfigurationException;
+import org.schemaspy.util.LineWriter;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -33,11 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-
-import org.apache.commons.io.IOUtils;
-import org.schemaspy.Config;
-import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.util.LineWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents our CSS style sheet (CSS) with accessors for important
@@ -48,6 +48,9 @@ import org.schemaspy.util.LineWriter;
  * @author John Currier
  */
 public class StyleSheet {
+
+    private static final Logger LOGGER = Logger.getLogger(StyleSheet.class.getName());
+
     private static StyleSheet instance;
     private final String css;
     private String bodyBackgroundColor;
@@ -59,7 +62,7 @@ public class StyleSheet {
     private String indexedColumnBackgroundColor;
     private String selectedTableBackgroundColor;
     private String excludedColumnBackgroundColor;
-    private final List<String> ids = new ArrayList<String>();
+    private final List<String> ids = new ArrayList<>();
 
     private StyleSheet(BufferedReader cssReader) throws IOException {
         String lineSeparator = System.getProperty("line.separator");
@@ -120,12 +123,15 @@ public class StyleSheet {
      */
     public static StyleSheet getInstance() throws ParseException {
         if (instance == null) {
+            String cssFilename = Config.getInstance().getCss();
+            String templateDirectory = Config.getInstance().getTemplateDirectory();
             try {
-                String path = "layout/"+Config.getInstance().getCss();
-                if (!Config.getInstance().isJarFile()) {
-                    path = new File(Config.getInstance().getTemplateDirectory(), Config.getInstance().getCss()).getPath();
+                if (new File(cssFilename).exists()) {
+                    LOGGER.log(Level.INFO, "Using external StyleSheet file: " + cssFilename);
+                    instance = new StyleSheet(new BufferedReader(MustacheWriter.getReader(null, cssFilename)));
+                } else {
+                    instance = new StyleSheet(new BufferedReader(MustacheWriter.getReader(templateDirectory, cssFilename)));
                 }
-                instance = new StyleSheet(new BufferedReader(getReader(path)));
             } catch (IOException exc) {
                 throw new ParseException(exc);
             }
@@ -134,40 +140,8 @@ public class StyleSheet {
         return instance;
     }
 
-    /**
-     * Returns a {@link Reader} that can be used to read the contents
-     * of the specified css.<p>
-     * Search order is
-     * <ol>
-     * <li><code>cssName</code> as an explicitly-defined file</li>
-     * <li><code>cssName</code> as a file in the user's home directory</li>
-     * <li><code>cssName</code> as a resource from the class path</li>
-     * </ol>
-     *
-     * @param cssName
-     * @return
-     * @throws IOException
-     */
-    private static Reader getReader(String cssName) throws IOException {
-    	InputStream cssStream = null;
-        if (new File(cssName).exists()){
-        	cssStream = new FileInputStream(cssName);
-        }else if (new File(System.getProperty("user.dir"), cssName).exists()){
-	        	cssStream = new FileInputStream(cssName);
-        } else {
-            if (Config.getInstance().isJarFile()) {
-                cssStream = StyleSheet.class.getClassLoader().getResourceAsStream(cssName);
-            }
-        }
-
-        if (cssStream == null)
-            throw new ParseException("Unable to find requested file: " + cssName);
-        String inputStream = IOUtils.toString(cssStream, "UTF-8").toString();
-        return new StringReader(inputStream);
-    }
-
     private Map<String, String> parseAttributes(String data) {
-        Map<String, String> attribs = new HashMap<String, String>();
+        Map<String, String> attribs = new HashMap<>();
 
         try {
             StringTokenizer attrTokenizer = new StringTokenizer(data, ";");
@@ -269,7 +243,7 @@ public class StyleSheet {
          * @param propName name of the missing property in that section
          */
         public MissingCssPropertyException(String cssSection, String propName) {
-            super("Required property '" + propName + "' was not found for the definition of '" + cssSection + "' in " + new File(Config.getInstance().getTemplateDirectory(),Config.getInstance().getCss()).toString());
+            super("Required property '" + propName + "' was not found for the definition of '" + cssSection + "'");
         }
     }
 

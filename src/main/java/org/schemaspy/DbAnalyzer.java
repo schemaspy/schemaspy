@@ -232,12 +232,12 @@ public class DbAnalyzer {
                 String prefix = columnName.substring(0, columnName.length() - numbers.length());
                 long numeric = Long.parseLong(numbers);
                 Long existing = columnPrefixes.get(prefix);
-                if (existing != null && Math.abs(existing.longValue() - numeric) == 1) {
+                if (existing != null && Math.abs(existing - numeric) == 1) {
                     // found one so add it to our list and stop evaluating this table
                     denormalizedTables.add(table);
                     break;
                 }
-                columnPrefixes.put(prefix, new Long(numeric));
+                columnPrefixes.put(prefix, numeric);
             }
         }
 

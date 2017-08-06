@@ -92,7 +92,9 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         scopes.put("database", database);
         scopes.put("databaseName", databaseName);
         scopes.put("paginationEnabled",database.getConfig().isPaginationEnabled());
-
+        scopes.put("schema", new MustacheSchema(database.getSchema(), ""));
+        scopes.put("catalog", new MustacheCatalog(database.getCatalog(), ""));
+        
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", database.getName(), false);
         mw.write("main.html", "index.html", "main.js");
     }
@@ -103,10 +105,10 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         description.append(db.getName());
         if (db.getSchema() != null) {
             description.append('.');
-            description.append(db.getSchema());
+            description.append(db.getSchema().getName());
         } else if (db.getCatalog() != null) {
             description.append('.');
-            description.append(db.getCatalog());
+            description.append(db.getCatalog().getName());
         }
 
         return description.toString();

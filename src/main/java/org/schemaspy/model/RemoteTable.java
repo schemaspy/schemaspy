@@ -18,12 +18,8 @@
  */
 package org.schemaspy.model;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.schemaspy.Config;
 
 /**
  * A table that's outside of the default schema but is referenced
@@ -43,9 +39,8 @@ public class RemoteTable extends Table {
      * @param schema
      * @param name
      * @param baseContainer
-     * @throws SQLException
      */
-    public RemoteTable(Database db, String catalog, String schema, String name, String baseContainer) throws SQLException {
+    public RemoteTable(Database db, String catalog, String schema, String name, String baseContainer) {
         super(db, catalog, schema, name, null);
         this.baseContainer = baseContainer;
     }

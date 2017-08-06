@@ -1,20 +1,31 @@
 package org.schemaspy.service;
 
 import org.schemaspy.Config;
-import org.schemaspy.model.*;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.LogicalTable;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Routine;
+import org.schemaspy.model.RoutineParameter;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+import org.schemaspy.model.TableIndex;
+import org.schemaspy.model.View;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.service.helper.BasicTableMeta;
 import org.schemaspy.validator.NameValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -25,18 +36,20 @@ import java.util.regex.Pattern;
 @Service
 public class DatabaseService {
 
-    @Autowired
-    private TableService tableService;
+    private final TableService tableService;
 
-    @Autowired
-    private ViewService viewService;
+    private final ViewService viewService;
 
-    @Autowired
-    private SqlService sqlService;
+    private final SqlService sqlService;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
     private final boolean fineEnabled = logger.isLoggable(Level.FINE);
 
+    public DatabaseService(TableService tableService, ViewService viewService, SqlService sqlService) {
+        this.tableService = Objects.requireNonNull(tableService);
+        this.viewService = Objects.requireNonNull(viewService);
+        this.sqlService = Objects.requireNonNull(sqlService);
+    }
 
     public void gatheringSchemaDetails(Config config, Database db, ProgressListener listener) throws SQLException {
         logger.info("Gathering schema details");
@@ -48,6 +61,9 @@ public class DatabaseService {
         initTables(config, db, listener, meta);
         if (config.isViewsEnabled())
             initViews(config, db, listener, meta);
+        
+        initCatalogs(config, db, listener);
+        initSchemas(config, db, listener);
 
         initCheckConstraints(config, db, listener);
         initTableIds(config, db);
@@ -63,6 +79,49 @@ public class DatabaseService {
 
         connectTables(db, listener);
         updateFromXmlMetadata(config, db, db.getSchemaMeta());
+    }
+    
+   private void initCatalogs(Config config, Database db, ProgressListener listener) throws SQLException {
+
+            String sql = Config.getInstance().getDbProperties().getProperty("selectCatalogsSql");
+            PreparedStatement stmt = null;
+			ResultSet rs =  null;
+            if (sql != null && db.getCatalog() != null) {
+                try {
+                stmt = sqlService.prepareStatement(sql,db,null);
+                rs = stmt.executeQuery();
+                    while (rs.next()) {
+                         db.getCatalog().setComment(rs.getString("catalog_comment"));
+                         break;
+                    }
+                } catch (SQLException sqlException) {
+                    //db.getSchema().setComment(null);
+                } finally {// 
+                    stmt.close();
+                  	rs.close();
+                }
+            }
+    }
+
+    private void initSchemas(Config config, Database db, ProgressListener listener) throws SQLException {
+    	  String sql = Config.getInstance().getDbProperties().getProperty("selectSchemasSql");
+          PreparedStatement stmt = null;
+			ResultSet rs =  null;
+          if (sql != null &&  db.getSchema() != null) {
+              try {
+              stmt = sqlService.prepareStatement(sql,db,null);
+              rs = stmt.executeQuery();
+                  while (rs.next()) {
+                       db.getSchema().setComment(rs.getString("schema_comment"));
+                       break;
+                  }
+              } catch (SQLException sqlException) {
+                  //db.getSchema().setComment(null);
+              } finally {
+                stmt.close();
+              	rs.close();
+              }
+          }
     }
 
     /**
@@ -188,13 +247,13 @@ public class DatabaseService {
 
                 if (tableMeta.getRemoteSchema() != null || tableMeta.getRemoteCatalog() != null) {
                     // will add it if it doesn't already exist
-                    table = tableService.addRemoteTable(db, tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName(), db.getSchema(), true);
+                    table = tableService.addRemoteTable(db, tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName(), db.getSchema().getName(), true);
                 } else {
                     table = db.getLocals().get(tableMeta.getName());
 
                     if (table == null) {
                         // new table defined only in XML metadata
-                        table = new LogicalTable(db, db.getCatalog(), db.getSchema(), tableMeta.getName(), tableMeta.getComments());
+                        table = new LogicalTable(db, db.getCatalog().getName(), db.getSchema().getName(), tableMeta.getName(), tableMeta.getComments());
                         db.getTablesMap().put(table.getName(), table);
                     }
                 }
@@ -366,7 +425,7 @@ public class DatabaseService {
             PreparedStatement stmt = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -374,7 +433,7 @@ public class DatabaseService {
                     String cat = getOptionalString(rs, clazz + "_catalog");
                     String sch = getOptionalString(rs, clazz + "_schema");
                     if (cat == null && sch == null)
-                        sch = db.getSchema();
+                        sch = db.getSchema().getName();
                     String remarks = getOptionalString(rs, clazz + "_comment");
                     String text = forTables ? null : getOptionalString(rs, "view_definition");
                     String rows = forTables ? getOptionalString(rs, "table_rows") : null;
@@ -397,7 +456,7 @@ public class DatabaseService {
         }
 
         if (basics.isEmpty()) {
-            rs = metadata.getTables(null, db.getSchema(), "%", types);
+            rs = metadata.getTables(null, db.getSchema().getName(), "%", types);
 
             try {
                 while (rs.next()) {
@@ -448,7 +507,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql, db,null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -479,7 +538,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -516,7 +575,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -545,7 +604,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -584,7 +643,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -620,7 +679,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -661,7 +720,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -700,7 +759,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -743,7 +802,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
@@ -785,7 +844,7 @@ public class DatabaseService {
             ResultSet rs = null;
 
             try {
-                stmt = sqlService.prepareStatement(sql, null);
+                stmt = sqlService.prepareStatement(sql,db, null);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {

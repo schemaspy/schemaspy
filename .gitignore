@@ -8,3 +8,5 @@ schemaspy.iml
 schemaspy.properties
 bower_components/
 *.iml
+!ext-lib
+ext-lib/**/*.jar

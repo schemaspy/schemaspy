@@ -32,9 +32,10 @@ import org.schemaspy.Config;
  * @author John Currier
  */
 public class DbSpecificConfig {
+
     private final String type;
-    private       String description;
-    private final List<DbSpecificOption> options = new ArrayList<DbSpecificOption>();
+    private String description;
+    private final List<DbSpecificOption> options = new ArrayList<>();
     private final Config config = new Config();
 
     /**
@@ -42,7 +43,7 @@ public class DbSpecificConfig {
      *
      * @param dbType
      */
-    public DbSpecificConfig(final String dbType) {
+    public DbSpecificConfig(String dbType) {
         type = dbType;
         Properties props;
         try {
@@ -65,9 +66,9 @@ public class DbSpecificConfig {
         StringTokenizer tokenizer = new StringTokenizer(properties.getProperty("connectionSpec"), "<>", true);
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
-            if (token.equals("<")) {
+            if ("<".equals(token)) {
                 inParam = true;
-            } else if (token.equals(">")) {
+            } else if (">".equals(token)) {
                 inParam = false;
             } else {
                 if (inParam) {

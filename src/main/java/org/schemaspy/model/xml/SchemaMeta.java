@@ -131,7 +131,7 @@ public class SchemaMeta {
 
     private Document parse(File file) throws InvalidConfigurationException {
         DocumentBuilder docBuilder;
-        Document doc = null;
+        Document doc;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         factory.setIgnoringElementContentWhitespace(true);
@@ -153,9 +153,7 @@ public class SchemaMeta {
         }
         try {
             validate(doc);
-        } catch (SAXException exc) {
-            logger.warning("Failed to validate " + file + ": " + exc);
-        } catch (IOException exc) {
+        } catch (SAXException | IOException exc) {
             logger.warning("Failed to validate " + file + ": " + exc);
         }
 

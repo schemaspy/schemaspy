@@ -3,12 +3,12 @@ package org.schemaspy.service;
 import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.View;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,10 +18,13 @@ import java.util.logging.Logger;
 @Service
 public class ViewService {
 
-    @Autowired
-    SqlService sqlService;
+    private final SqlService sqlService;
 
-    private final static Logger logger = Logger.getLogger(TableService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ViewService.class.getName());
+
+    public ViewService(SqlService sqlService) {
+        this.sqlService = Objects.requireNonNull(sqlService);
+    }
 
     /**
      * Extract the SQL that describes this view from the database
@@ -31,14 +34,15 @@ public class ViewService {
      */
     public String fetchViewSql(Database db, View view) throws SQLException {
         String selectViewSql = Config.getInstance().getDbProperties().getProperty("selectViewSql");
-        if (selectViewSql == null)
+        if (selectViewSql == null) {
             return null;
+        }
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
         StringBuilder viewDefinition = new StringBuilder();
         try {
-            stmt = sqlService.prepareStatement(selectViewSql, view.getName());
+            stmt = sqlService.prepareStatement(selectViewSql,db, view.getName());
             rs = stmt.executeQuery();
             while (rs.next()) {
                 try {
@@ -49,7 +53,7 @@ public class ViewService {
             }
             return viewDefinition.toString();
         } catch (SQLException sqlException) {
-            System.err.println(selectViewSql);
+            LOGGER.log(Level.SEVERE, selectViewSql);
             throw sqlException;
         } finally {
             if (rs != null)

@@ -22,7 +22,6 @@ import org.schemaspy.model.xml.TableColumnMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.util.CaseInsensitiveMap;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,9 +70,8 @@ public class Table implements Comparable<Table> {
      * @param schema
      * @param name
      * @param comments
-     * @throws SQLException
      */
-    public Table(Database db, String catalog, String schema, String name, String comments) throws SQLException {
+    public Table(Database db, String catalog, String schema, String name, String comments) {
         this.db = db;
         this.catalog = catalog;
         this.schema = schema;

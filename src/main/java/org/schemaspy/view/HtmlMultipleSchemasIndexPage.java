@@ -28,6 +28,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import org.schemaspy.Config;
+import org.schemaspy.model.Catalog;
+import org.schemaspy.model.Schema;
 import org.schemaspy.util.DiagramUtil;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.LineWriter;
@@ -57,11 +59,7 @@ public class HtmlMultipleSchemasIndexPage extends HtmlFormatter {
     }
 
 
-    public void write(File outputDir, String dbName, List<String> populatedSchemas, DatabaseMetaData meta) throws IOException {
-        List<MustacheSchema> schemas = new ArrayList<>();
-        for (String schema : populatedSchemas) {
-            schemas.add(new MustacheSchema(schema));
-        }
+    public void write(File outputDir, String dbName,MustacheCatalog catalog, List<MustacheSchema> schemas, DatabaseMetaData meta) throws IOException {
 
         String connectTime = new SimpleDateFormat("EEE MMM dd HH:mm z yyyy").format(new Date());
 
@@ -71,6 +69,7 @@ public class HtmlMultipleSchemasIndexPage extends HtmlFormatter {
 
         scopes.put("databaseProduct", getDatabaseProduct(meta));
         scopes.put("schemas", schemas);
+        scopes.put("catalog", catalog);
         scopes.put("schemasNumber", Integer.toString(schemas.size()));
 
         scopes.put("multipleSchemas", true);
@@ -154,16 +153,6 @@ public class HtmlMultipleSchemasIndexPage extends HtmlFormatter {
 //        html.writeln("</thead>");
 //        html.writeln("<tbody>");
 //    }
-
-    private void writeLineItem(String schema, LineWriter index) throws IOException {
-        index.writeln(" <tr>");
-        index.write("  <td class='detail'><a href='");
-        index.write(schema);
-        index.write("/index.html'>");
-        index.write(schema);
-        index.writeln("</a></td>");
-        index.writeln(" </tr>");
-    }
 
     /**
      * Copy / paste from Database, but we can't use Database here...
