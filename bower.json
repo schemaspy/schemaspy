@@ -19,8 +19,7 @@
     "anchor-js": "^4.0.0",
     "salvattore": "^1.0.9",
     "html5shiv": "3.7.3",
-    "respond": "1.4.2",
-    "google-fonts": "*"
+    "respond": "1.4.2"
   },
   "install": {
     "path": "src/main/resources/layout/bower",
