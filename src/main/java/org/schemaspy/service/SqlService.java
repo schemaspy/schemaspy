@@ -6,7 +6,6 @@ import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ConnectionURLBuilder;
-import org.schemaspy.util.DbSpecificOption;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,13 +13,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,7 +51,7 @@ public class SqlService {
 
         ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
         if (config.getDb() == null)
-            config.setDb(urlBuilder.getConnectionURL());
+            config.setDb(urlBuilder.build());
 
         String driverClass = properties.getProperty("driver");
         String driverPath = properties.getProperty("driverPath");
@@ -69,7 +62,7 @@ public class SqlService {
             driverPath = config.getDriverPath();
 
         DbDriverLoader driverLoader = new DbDriverLoader();
-        connection = driverLoader.getConnection(config, urlBuilder.getConnectionURL(), driverClass, driverPath);
+        connection = driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);
 
         meta = connection.getMetaData();
 
@@ -77,18 +70,6 @@ public class SqlService {
         defaultSchema = commandLineArguments.getSchema();
 
         if (config.isEvaluateAllEnabled()) {
-            List<String> args = config.asList();
-            for (DbSpecificOption option : urlBuilder.getOptions()) {
-                if (!args.contains("-" + option.getName())) {
-                    args.add("-" + option.getName());
-                    args.add(option.getValue());
-                }
-            }
-
-            String schemaSpec = config.getSchemaSpec();
-            if (schemaSpec == null)
-                schemaSpec = properties.getProperty("schemaSpec", ".*");
-
             return null;    // no database to return
         }
 

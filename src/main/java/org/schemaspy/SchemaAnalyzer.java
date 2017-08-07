@@ -18,6 +18,23 @@
  */
 package org.schemaspy;
 
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.model.*;
+import org.schemaspy.model.xml.SchemaMeta;
+import org.schemaspy.service.DatabaseService;
+import org.schemaspy.service.SqlService;
+import org.schemaspy.util.*;
+import org.schemaspy.view.*;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -31,34 +48,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 //import javax.xml.validation.Schema;
-
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.ConsoleProgressListener;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.EmptySchemaException;
-import org.schemaspy.model.ForeignKeyConstraint;
-import org.schemaspy.model.ImpliedForeignKeyConstraint;
-import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.model.xml.SchemaMeta;
-import org.schemaspy.service.DatabaseService;
-import org.schemaspy.service.SqlService;
-import org.schemaspy.util.*;
-
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.schemaspy.view.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * @author John Currier
@@ -470,7 +460,7 @@ public class SchemaAnalyzer {
 
         ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
         if (config.getDb() == null)
-            config.setDb(urlBuilder.getConnectionURL());
+            config.setDb(urlBuilder.build());
 
         String driverClass = properties.getProperty("driver");
         String driverPath = properties.getProperty("driverPath");
@@ -480,8 +470,8 @@ public class SchemaAnalyzer {
             driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
 
         DbDriverLoader driverLoader = new DbDriverLoader();
-        return driverLoader.getConnection(config, urlBuilder.getConnectionURL(), driverClass, driverPath);
-	}
+        return driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);
+    }
 
     private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
         HtmlTablePage tableFormatter = HtmlTablePage.getInstance();

@@ -18,7 +18,7 @@ public class ConnectionURLBuilderTest {
                 "-u", "aUser");
         Properties properties = config.determineDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
-        assertThat(connectionURLBuilder.getConnectionURL()).isEqualToIgnoringCase("abc.com");
+        assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com");
     }
 
     @Test
@@ -29,7 +29,7 @@ public class ConnectionURLBuilderTest {
                 "-u", "aUser");
         Properties properties = config.determineDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
-        assertThat(connectionURLBuilder.getConnectionURL()).isEqualToIgnoringCase("abc.com");
+        assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com");
     }
 
     @Test
@@ -41,7 +41,7 @@ public class ConnectionURLBuilderTest {
                 "-u", "aUser");
         Properties properties = config.determineDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
-        assertThat(connectionURLBuilder.getConnectionURL()).isEqualToIgnoringCase("abc.com:1234");
+        assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com:1234");
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ConnectionURLBuilderTest {
                 "-u", "aUser");
         Properties properties = config.determineDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
-        assertThat(connectionURLBuilder.getConnectionURL()).isEqualToIgnoringCase("abc.com:4321");
+        assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com:4321");
     }
 
     @Test
@@ -65,6 +65,6 @@ public class ConnectionURLBuilderTest {
                 "-u", "aUser");
         Properties properties = config.determineDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
-        assertThat(connectionURLBuilder.getConnectionURL()).isEqualToIgnoringCase("abc.com|1234");
+        assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com|1234");
     }
 }
