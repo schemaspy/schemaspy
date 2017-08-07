@@ -7,35 +7,36 @@
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.5 -->
-  <link rel="stylesheet" href="{{rootPath}}bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/admin-lte/bootstrap/css/bootstrap.min.css">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/font-awesome/css/font-awesome.min.css">
   <!-- Ionicons -->
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/ionicons/css/ionicons.min.css">
   <!-- DataTables -->
-  <link rel="stylesheet" href="{{rootPath}}plugins/datatables/dataTables.bootstrap.css">  
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.11/css/dataTables.bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.1.2/css/buttons.bootstrap.min.css">  
+  <link rel="stylesheet" href="{{rootPath}}bower/admin-lte/plugins/datatables/dataTables.bootstrap.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
   <!-- Code Mirror -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/codemirror.min.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/codemirror/codemirror.css">
   <!-- Fonts -->
-  <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
-  
+  <link href='{{rootPath}}fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='{{rootPath}}fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
   <!-- Theme style -->
-  <link rel="stylesheet" href="{{rootPath}}dist/css/AdminLTE.min.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/admin-lte/dist/css/AdminLTE.min.css">
   <!-- Salvattore -->
-  <link rel="stylesheet" href="{{rootPath}}plugins/salvattore/salvattore.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/salvattore/salvattore.css">
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
-  <link rel="stylesheet" href="{{rootPath}}dist/css/skins/all-skins.min.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/admin-lte/dist/css/skins/_all-skins.min.css">
   <!-- SchemaSpy -->
   <link rel="stylesheet" href="{{rootPath}}schemaSpy.css">
   
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <script src="{{rootPath}}bower/html5shiv/html5shiv.min.js"></script>
+  <script src="{{rootPath}}bower/respond/respond.min.js"></script>
   <![endif]-->
 </head>
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
@@ -94,37 +95,32 @@
 <!-- ./wrapper -->
 
 <!-- jQuery 2.1.4 -->
-<script src="{{rootPath}}plugins/jQuery/jQuery-2.1.4.min.js"></script>
-<script src="{{rootPath}}plugins/jQueryUI/jquery-ui.min.js"></script>
+<script src="{{rootPath}}bower/admin-lte/plugins/jQuery/jQuery-2.2.3.min.js"></script>
+<script src="{{rootPath}}bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
 <!-- Bootstrap 3.3.5 -->
-<script src="{{rootPath}}bootstrap/js/bootstrap.min.js"></script>
+<script src="{{rootPath}}bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
 <!-- DataTables -->
-<script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.11/js/dataTables.bootstrap.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.1.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
-<script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
-<script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.print.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.1.2/js/buttons.colVis.min.js"></script>
+<script src="{{rootPath}}bower/datatables.net/jquery.dataTables.min.js"></script>
+<script src="{{rootPath}}bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="{{rootPath}}bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+<script src="{{rootPath}}bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="{{rootPath}}bower/datatables.net-buttons/buttons.html5.min.js"></script>
+<script src="{{rootPath}}bower/datatables.net-buttons/buttons.print.min.js"></script>
+<script src="{{rootPath}}bower/datatables.net-buttons/buttons.colVis.min.js"></script>
 
 <!-- SlimScroll -->
-<script src="{{rootPath}}plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<script src="{{rootPath}}bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
 <!-- FastClick -->
-<script src="{{rootPath}}plugins/fastclick/fastclick.js"></script>
+<script src="{{rootPath}}bower/admin-lte/plugins/fastclick/fastclick.js"></script>
 <!-- Salvattore -->
-<script src="{{rootPath}}plugins/salvattore/salvattore.min.js"></script>
+<script src="{{rootPath}}bower/salvattore/salvattore.min.js"></script>
 <!-- AnchorJS -->
-<script src="{{rootPath}}plugins/anchorjs/anchor.min.js"></script>
+<script src="{{rootPath}}bower/anchor-js/anchor.min.js"></script>
 <!-- CodeMirror -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/mode/sql/sql.min.js"></script>
+<script src="{{rootPath}}bower/codemirror/codemirror.js"></script>
+<script src="{{rootPath}}bower/codemirror/sql.js"></script>
 <!-- AdminLTE App -->
-<script src="{{rootPath}}dist/js/app.min.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="{{rootPath}}dist/js/demo.js"></script>
+<script src="{{rootPath}}bower/admin-lte/dist/js/app.min.js"></script>
 <script src="{{pageScript}}"></script>
 <script src="{{rootPath}}schemaSpy.js"></script>
 </body>

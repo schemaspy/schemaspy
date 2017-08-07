@@ -1,0 +1,77 @@
+{
+  "name": "SchemaSpy",
+  "version": "6.0",
+  "authors": [
+    "Rafal Kasa <rafalkasa@gmail.com>"
+  ],
+  "moduleType": [
+    "globals",
+    "yui"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "admin-lte": "2.3.11",
+    "font-awesome": "~4.7.0",
+    "ionicons": "~2.0.1",
+    "datatables.net-bs": "1.10.15",
+    "datatables.net-buttons-bs": "1.3.1",
+    "codemirror": "5.27.4",
+    "anchor-js": "^4.0.0",
+    "salvattore": "^1.0.9",
+    "html5shiv": "3.7.3",
+    "respond": "1.4.2",
+    "google-fonts": "*"
+  },
+  "install": {
+    "path": "src/main/resources/layout/bower",
+    "sources": {
+      "anchor-js":  "bower_components/anchor-js/anchor.min.js",
+      "salvattore": "bower_components/salvattore/dist/salvattore.min.js",
+      "html5shiv":  "bower_components/html5shiv/dist/html5shiv.min.js",
+      "respond":    "bower_components/respond/dest/respond.min.js",
+      "admin-lte": {
+        "mapping": [
+          { "bower_components/admin-lte/bootstrap/**": "bootstrap" },
+          { "bower_components/admin-lte/dist/css/**": "dist/css" },
+          { "bower_components/admin-lte/dist/js/**": "dist/js" },
+          { "bower_components/admin-lte/plugins/fastclick/**": "plugins/fastclick" },
+          { "bower_components/admin-lte/plugins/slimScroll/**": "plugins/slimScroll" },
+          { "bower_components/admin-lte/plugins/jQuery/**": "plugins/jQuery" },
+          { "bower_components/admin-lte/plugins/jQueryUI/**": "plugins/jQueryUI" }
+        ]
+      },
+      "font-awesome": {
+        "mapping": [
+          { "bower_components/font-awesome/css/**": "css" },
+          { "bower_components/font-awesome/fonts/**": "fonts" }
+        ]
+      },
+      "ionicons": {
+        "mapping": [
+          { "bower_components/ionicons/css/**": "css" },
+          { "bower_components/ionicons/fonts/**": "fonts" }
+        ]
+      },
+      "datatables.net": "bower_components/datatables.net/js/jquery.dataTables.min.js",
+      "datatables.net-bs": {
+        "mapping": [
+          { "bower_components/datatables.net-bs/css/**": "css" },
+          { "bower_components/datatables.net-bs/js/**": "js" }
+        ]
+      },
+      "datatables.net-buttons": "bower_components/datatables.net-buttons/js/**",
+      "datatables.net-buttons-bs": {
+        "mapping": [
+          { "bower_components/datatables.net-buttons-bs/css/**": "css" },
+          { "bower_components/datatables.net-buttons-bs/js/**": "js" }
+        ]
+      },
+      "codemirror": {
+        "mapping": [
+          { "bower_components/codemirror/lib/**": "" },
+          { "bower_components/codemirror/mode/sql/sql.js": "sql.js" }
+        ]
+      }
+    }
+  }
+}
