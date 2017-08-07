@@ -15,15 +15,20 @@
     "ionicons": "~2.0.1",
     "datatables.net-bs": "1.10.15",
     "datatables.net-buttons-bs": "1.3.1",
-    "CodeMirror": "5.25.0",
+    "codemirror": "5.27.4",
     "anchor-js": "^4.0.0",
-    "salvattore": "^1.0.9"
+    "salvattore": "^1.0.9",
+    "html5shiv": "3.7.3",
+    "respond": "1.4.2",
+    "google-fonts": "*"
   },
   "install": {
     "path": "src/main/resources/layout/bower",
     "sources": {
-      "anchor-js": "bower_components/anchor-js/anchor.min.js",
+      "anchor-js":  "bower_components/anchor-js/anchor.min.js",
       "salvattore": "bower_components/salvattore/dist/salvattore.min.js",
+      "html5shiv":  "bower_components/html5shiv/dist/html5shiv.min.js",
+      "respond":    "bower_components/respond/dest/respond.min.js",
       "admin-lte": {
         "mapping": [
           { "bower_components/admin-lte/bootstrap/**": "bootstrap" },
@@ -59,6 +64,12 @@
         "mapping": [
           { "bower_components/datatables.net-buttons-bs/css/**": "css" },
           { "bower_components/datatables.net-buttons-bs/js/**": "js" }
+        ]
+      },
+      "codemirror": {
+        "mapping": [
+          { "bower_components/codemirror/lib/**": "" },
+          { "bower_components/codemirror/mode/sql/sql.js": "sql.js" }
         ]
       }
     }

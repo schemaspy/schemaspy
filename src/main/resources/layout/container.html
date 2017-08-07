@@ -17,10 +17,11 @@
   <link rel="stylesheet" href="{{rootPath}}bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
   <link rel="stylesheet" href="{{rootPath}}bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
   <!-- Code Mirror -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/codemirror.min.css">
+  <link rel="stylesheet" href="{{rootPath}}bower/codemirror/codemirror.css">
   <!-- Fonts -->
-  <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
-  
+  <link href='{{rootPath}}fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+  <link href='{{rootPath}}fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
   <!-- Theme style -->
   <link rel="stylesheet" href="{{rootPath}}bower/admin-lte/dist/css/AdminLTE.min.css">
   <!-- Salvattore -->
@@ -34,8 +35,8 @@
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <script src="{{rootPath}}bower/html5shiv/html5shiv.min.js"></script>
+  <script src="{{rootPath}}bower/respond/respond.min.js"></script>
   <![endif]-->
 </head>
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
@@ -106,9 +107,6 @@
 <script src="{{rootPath}}bower/datatables.net-buttons/buttons.html5.min.js"></script>
 <script src="{{rootPath}}bower/datatables.net-buttons/buttons.print.min.js"></script>
 <script src="{{rootPath}}bower/datatables.net-buttons/buttons.colVis.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
-<script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
-<script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
 
 <!-- SlimScroll -->
 <script src="{{rootPath}}bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
@@ -119,8 +117,8 @@
 <!-- AnchorJS -->
 <script src="{{rootPath}}bower/anchor-js/anchor.min.js"></script>
 <!-- CodeMirror -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.2/mode/sql/sql.min.js"></script>
+<script src="{{rootPath}}bower/codemirror/codemirror.js"></script>
+<script src="{{rootPath}}bower/codemirror/sql.js"></script>
 <!-- AdminLTE App -->
 <script src="{{rootPath}}bower/admin-lte/dist/js/app.min.js"></script>
 <script src="{{pageScript}}"></script>
