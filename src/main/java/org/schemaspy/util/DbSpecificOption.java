@@ -40,7 +40,7 @@ public final class DbSpecificOption {
     }
 
     public void setValue(String value) {
-        this.value = value;
+        this.value = value.replaceAll("\\\\", "/");
     }
 
     //TODO This method may return null. Consider changing the return type to Optional<String> and return Optional.empty instead of null

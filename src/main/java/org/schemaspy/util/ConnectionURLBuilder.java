@@ -29,8 +29,8 @@ import java.util.logging.Logger;
  * @author John Currier
  */
 public class ConnectionURLBuilder {
-    private final String connectionURL;
-    private final List<DbSpecificOption> options;
+    private final Config config;
+    private final Properties dbType;
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     /**
@@ -38,22 +38,27 @@ public class ConnectionURLBuilder {
      * @param properties
      */
     public ConnectionURLBuilder(Config config, Properties properties) {
-        List<String> opts = new ArrayList<>();
+        this.config = config;
+        this.dbType = properties;
+    }
 
-        for (String key : config.getDbSpecificOptions().keySet()) {
-            opts.add((key.startsWith("-") ? "" : "-") + key);
-            opts.add(config.getDbSpecificOptions().get(key));
-        }
-        opts.addAll(config.getRemainingParameters());
-
-        DbSpecificConfig dbConfig = new DbSpecificConfig(config.getDbType());
-        options = dbConfig.getOptions();
-
-        connectionURL = buildUrl(opts, config, properties.getProperty("connectionSpec"));
-
+    public String build() {
+        List<String> args = getArgs();
         List<String> remaining = config.getRemainingParameters();
+        args.addAll(remaining);
 
-        for (DbSpecificOption option : options) {
+        String connectionURL = dbType.getProperty("connectionSpec");
+        DbSpecificConfig dbConfig = new DbSpecificConfig(config.getDbType());
+        for (DbSpecificOption option : dbConfig.getOptions()) {
+            option.setValue(getParam(args, option));
+
+            logger.fine(option.toString());
+
+            // replace e.g. <host> with myDbHost
+            connectionURL = connectionURL.replaceAll("\\<" + option.getName() + "\\>", option.getValue());
+        }
+
+        for (DbSpecificOption option : dbConfig.getOptions()) {
             int idx = remaining.indexOf("-" + option.getName());
             if (idx >= 0) {
                 remaining.remove(idx);  // -paramKey
@@ -62,40 +67,21 @@ public class ConnectionURLBuilder {
         }
 
         logger.config("connectionURL: " + connectionURL);
+
+        return connectionURL;
     }
 
-    private String buildUrl(List<String> args, Config config, String connectionSpecification) {
-        String connectionURL = connectionSpecification;
+    private List<String> getArgs() {
+        List<String> args = new ArrayList<>();
 
-        for (DbSpecificOption option : options) {
-            option.setValue(getParam(args, option, config));
-
-            logger.fine(option.toString());
-
-            // replace e.g. <host> with myDbHost
-            String optionName = option.getName();
-            String optionValue = option.getValue().replaceAll("\\\\", "/");
-            connectionURL = connectionURL.replaceAll("\\<" + optionName + "\\>", optionValue);
+        for (String key : config.getDbSpecificOptions().keySet()) {
+            args.add((key.startsWith("-") ? "" : "-") + key);
+            args.add(config.getDbSpecificOptions().get(key));
         }
-
-        return connectionURL;
+        return args;
     }
 
-    public String getConnectionURL() {
-        return connectionURL;
-    }
-
-    /**
-     * Returns a {@link List} of populated {@link DbSpecificOption}s that are applicable to
-     * the specified database type.
-     *
-     * @return
-     */
-    public List<DbSpecificOption> getOptions() {
-        return options;
-    }
-
-    private String getParam(List<String> args, DbSpecificOption option, Config config) {
+    private String getParam(List<String> args, DbSpecificOption option) {
         String param = null;
         int paramIndex = args.indexOf("-" + option.getName());
 
@@ -103,6 +89,9 @@ public class ConnectionURLBuilder {
             if (config != null)
                 param = config.getParam(option.getName());  // not in args...might be one of
             // the common db params
+            if ("hostOptionalPort".equals(option.getName())) {
+                param = getHostOptionalPort();
+            }
             if (param == null)
                 throw new Config.MissingRequiredParameterException(option.getName(), option.getDescription(), true);
         } else {
@@ -112,5 +101,21 @@ public class ConnectionURLBuilder {
         }
 
         return param;
+    }
+
+    private String getHostOptionalPort() {
+        String hostOptionalPort = config.getHost();
+        if (hostOptionalPort == null) {
+            return null;
+        }
+        String hostPortSeparator = dbType.getProperty("hostPortSeparator", ":");
+        Integer port = config.getPort();
+        if (hostOptionalPort.contains(hostPortSeparator)) {
+            return hostOptionalPort;
+        }
+        if (port != null) {
+            return hostOptionalPort + hostPortSeparator + port;
+        }
+        return hostOptionalPort;
     }
 }
