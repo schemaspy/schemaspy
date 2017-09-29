@@ -37,16 +37,6 @@ import java.util.*;
 public class HtmlTablePage extends HtmlFormatter {
     private static final HtmlTablePage instance = new HtmlTablePage();
 
-    private final Map<String, String> defaultValueAliases = new HashMap<>();
-
-    {
-        defaultValueAliases.put("CURRENT TIMESTAMP", "now"); // DB2
-        defaultValueAliases.put("CURRENT TIME", "now");      // DB2
-        defaultValueAliases.put("CURRENT DATE", "now");      // DB2
-        defaultValueAliases.put("SYSDATE", "now");           // Oracle
-        defaultValueAliases.put("CURRENT_DATE", "now");      // Oracle
-    }
-
     /**
      * Singleton: Don't allow instantiation
      */

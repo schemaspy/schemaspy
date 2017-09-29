@@ -64,6 +64,7 @@ public class MustacheWriter {
             mainScope.put("rootPath", rootPath);
             mainScope.put("rootPathtoHome", rootPathtoHome);
             mainScope.put("isMultipleSchemas", isMultipleSchemas);
+            mainScope.putAll(scopes);
 
             Mustache mustacheContent = contentMf.compile(getReader("container.html"), "container");
             mustacheContent.execute(content, mainScope).flush();
