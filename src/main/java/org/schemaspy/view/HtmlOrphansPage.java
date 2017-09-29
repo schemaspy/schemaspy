@@ -124,9 +124,4 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
         } finally {
         }
     }
-
-    @Override
-    protected boolean isOrphansPage() {
-        return true;
-    }
 }
