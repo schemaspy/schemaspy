@@ -1,10 +1,27 @@
       <!-- Content Header (Page header) -->
       <section class="content-header">
         <h1>Tables</h1></br>
-		<div class="callout callout-info"> 		
-			<h4>SchemaSpy Analysis of {{databaseName}}</h4>
-			<p>Generated on {{database.connectTime}}</p>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="callout callout-info">
+					<h4>SchemaSpy Analysis of {{databaseName}}</h4>
+					<p>Generated on {{database.connectTime}}</p>
+				</div>
+			</div>
 		</div>
+
+		{{#description}}
+		<div class="row">
+		  <div class="col-md-12">
+			<div class="box box-solid">
+			  <div class="box-body">
+				  <p>{{{description}}}</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		{{/description}}
+
         <a href="{{databaseName}}.xml" title="XML Representation">XML Representation</a></br>
 		<a href="insertionOrder.txt" title="Useful for loading data into a database">Insertion Order</a>
         <a href="deletionOrder.txt" title="Useful for purging data from a database">Deletion Order</a>	

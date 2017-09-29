@@ -152,11 +152,6 @@ public class HtmlColumnsPage extends HtmlFormatter {
         mw.write("column.html", "columns.html", "column.js");
     }
 
-    @Override
-    protected boolean isColumnsPage() {
-        return true;
-    }
-
     private class ByColumnComparator implements Comparator<TableColumn> {
         @Override
         public int compare(TableColumn column1, TableColumn column2) {

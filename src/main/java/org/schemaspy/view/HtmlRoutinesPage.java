@@ -61,16 +61,16 @@ public class HtmlRoutinesPage extends HtmlFormatter {
             write(routine, html);
         }
 
-        writeFooter(html);
+        //writeFooter(html);
     }
 
     private void writeHeader(Database db, Collection<Routine> routines, LineWriter html) throws IOException {
-        writeHeader(db, null, "Procedures and Functions", html);
+        //writeHeader(db, null, "Procedures and Functions", html);
 
         html.writeln("<table width='100%'>");
         html.writeln(" <tr>");
         html.write("  <td class='container'>");
-        writeGeneratedOn(db.getConnectTime(), html);
+        //writeGeneratedOn(db.getConnectTime(), html);
         html.writeln("  </td>");
         if (sourceForgeLogoEnabled())
             html.writeln("  <td class='container' align='right' valign='top' colspan='2'><a href='http://sourceforge.net' target='_blank'><img src='http://sourceforge.net/sflogo.php?group_id=137197&amp;type=1' alt='SourceForge.net' border='0' height='31' width='88'></a></td>");
@@ -158,17 +158,5 @@ public class HtmlRoutinesPage extends HtmlFormatter {
         html.writeln("</code><pre>");
         html.writeln(routine.getDefinition());
         html.writeln("</pre>");
-    }
-
-
-    @Override
-    protected void writeFooter(LineWriter html) throws IOException {
-        html.writeln("</td></tr></table>");
-        super.writeFooter(html);
-    }
-
-    @Override
-    protected boolean isRoutinesPage() {
-        return true;
     }
 }
