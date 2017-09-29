@@ -140,9 +140,4 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
     private Object anyRelationships(boolean hasRealRelationships, boolean hasImpliedRelationships) {
         return !hasRealRelationships && !hasImpliedRelationships ? new Object() : null;
     }
-
-    @Override
-    protected boolean isRelationshipsPage() {
-        return true;
-    }
 }

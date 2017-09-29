@@ -74,9 +74,4 @@ public class HtmlAnomaliesPage extends HtmlFormatter {
         MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName(), false);
         mw.write("anomalies.html", "anomalies.html", "anomalies.js");
     }
-
-    @Override
-    protected boolean isAnomaliesPage() {
-        return true;
-    }
 }
