@@ -24,7 +24,6 @@ import java.util.*;
 
 import org.schemaspy.DbAnalyzer;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.Markdown;
 
@@ -64,7 +63,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         tmp = new TreeSet<Table>(sorter);
         tmp.addAll(remotes);
 
-        String databaseName = getDatabaseDescription(database);
+        String databaseName = getDatabaseName(database);
 
         List<MustacheTable> mustacheTables = new ArrayList<>();
 
@@ -91,6 +90,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         scopes.put("tables", mustacheTables);
         scopes.put("database", database);
         scopes.put("databaseName", databaseName);
+        scopes.put("description", database.getDescription());
         scopes.put("paginationEnabled",database.getConfig().isPaginationEnabled());
         scopes.put("schema", new MustacheSchema(database.getSchema(), ""));
         scopes.put("catalog", new MustacheCatalog(database.getCatalog(), ""));
@@ -99,7 +99,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         mw.write("main.html", "index.html", "main.js");
     }
 
-    private String getDatabaseDescription(Database db) {
+    private String getDatabaseName(Database db) {
         StringBuilder description = new StringBuilder();
 
         description.append(db.getName());
@@ -112,10 +112,5 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         }
 
         return description.toString();
-    }
-
-    @Override
-    protected boolean isMainIndex() {
-        return true;
     }
 }
