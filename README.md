@@ -46,16 +46,16 @@ If you need more info about how to use or install SchemaSpy please read the last
 
 [![alt tag](http://schemaspy.org/img/example_page.png)](http://schemaspy.org/sample/index.html)
 
-## SchemaSpy v6.0.0 RC1
-[Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0-rc1)
+## SchemaSpy v6.0.0 RC2
+[Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0-rc2)
 
-[Download](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0-rc1/schemaspy-6.0.0-rc1.jar)
+[Download](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0-rc2/schemaspy-6.0.0-rc2.jar)
 
 ## Latest Release
 
 Because a lot of users is testing merged PR and verify the changes in the project you can download easily latest version of SchemaSpy.
 
-Download [schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc1.jar)
+Download [schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc2.jar)
 
 ## Docker  
 
