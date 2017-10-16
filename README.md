@@ -51,11 +51,11 @@ If you need more info about how to use or install SchemaSpy please read the last
 
 [Download](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0-rc2/schemaspy-6.0.0-rc2.jar)
 
-## Latest Release
+## Latest Build
 
-Because a lot of users is testing merged PR and verify the changes in the project you can download easily latest version of SchemaSpy.
+To verify fixes and new features you can download our latest build.
 
-Download [schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc2.jar)
+[schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc2.jar)
 
 ## Docker  
 
@@ -67,6 +67,20 @@ Have a bug or an issue with SchemaSpy? [Open a new issue](https://github.com/sch
 
 ## Contribution
 Are very welcome! And remember, contribution is not only PRs and code, but any help with docs or helping other developers to solve issues are very appreciated! Thanks in advance!
+
+### Build Instructions
+#### Application
+SchemaSpy is built using maven and we utilize the maven wrapper.  
+__Windows__ `mvnw.cmd build`    
+__Linux__ `./mvnw build`  
+The resulting application can be found in `target`
+
+#### Documentation
+You'll need sphinx installed http://www.sphinx-doc.org    
+Navigate into `docs`  
+__Windows__ `make.bat html`  
+__Linux__ `make html`  
+The resulting documentation can be found in `docs/build/html`
 
 ## Maintained
 
