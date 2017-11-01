@@ -18,7 +18,8 @@ $(document).ready(function() {
     var table = $('#constraint_table').DataTable( {
         lengthChange: false,		
 		bSort: true,
-		bPaginate: false,
+		paging: config.paggination,
+		pageLength: 50,
 		autoWidth: true,
 		bDeferRender: true,
 		bProcessing: true,

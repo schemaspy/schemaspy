@@ -147,6 +147,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
 
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("columns", tableColumns);
+        scopes.put("paginationEnabled",database.getConfig().isPaginationEnabled());
 
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), database.getName(), false);
         mw.write("column.html", "columns.html", "column.js");
