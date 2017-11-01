@@ -58,11 +58,7 @@ public class CaseInsensitiveMap<V> extends HashMap<String, V>
 
     @Override
     public void putAll(Map<? extends String, ? extends V> map) {
-        Iterator<? extends Map.Entry<? extends String, ? extends V>> iter
-                        = map.entrySet().iterator();
-
-        while (iter.hasNext()) {
-            Map.Entry<? extends String, ? extends V> e = iter.next();
+        for (Entry<? extends String, ? extends V> e : map.entrySet()) {
             put(e.getKey(), e.getValue());
         }
     }

@@ -29,7 +29,7 @@ public class NameValidator {
         this.clazz = clazz;
         this.include = include;
         this.exclude = exclude;
-        this.validTypes = new HashSet<String>();
+        this.validTypes = new HashSet<>();
         for (String type : validTypes)
         {
             this.validTypes.add(type.toUpperCase());
@@ -50,7 +50,7 @@ public class NameValidator {
 
         // Oracle 10g introduced problematic flashback tables
         // with bizarre illegal names
-        if (name.indexOf("$") != -1) {
+        if (name.contains("$")) {
             if (fineEnabled) {
                 logger.fine("Excluding " + clazz + " " + name +
                         ": embedded $ implies illegal name");

@@ -18,6 +18,8 @@
  */
 package org.schemaspy;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,33 +37,21 @@ public class Revision {
     }
 
     private static void initialize() {
-        InputStream in = null;
-        BufferedReader reader = null;
+		try (InputStream in = Revision.class.getResourceAsStream(resourceName)) {
+			if (in != null) {
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 
-        try {
-            in = Revision.class.getResourceAsStream(resourceName);
+					String line;
 
-            if (in != null) {
-                reader = new BufferedReader(new InputStreamReader(in));
-
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    if (line.startsWith("Implementation-Build:")) {
-                        rev = line.split(" ")[1];
-                        break;
-                    }
-                }
-            }
-        } catch (IOException exc) {
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                } else if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ignore) {}
+					while ((line = reader.readLine()) != null) {
+						if (line.startsWith("Implementation-Build:")) {
+							rev = line.split(" ")[1];
+							break;
+						}
+					}
+				}
+			}
+        } catch (IOException ignored) {
         }
     }
 
