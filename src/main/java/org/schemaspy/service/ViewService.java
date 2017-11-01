@@ -38,12 +38,10 @@ public class ViewService {
             return null;
         }
 
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
         StringBuilder viewDefinition = new StringBuilder();
-        try {
-            stmt = sqlService.prepareStatement(selectViewSql,db, view.getName());
-            rs = stmt.executeQuery();
+        try (PreparedStatement stmt = sqlService.prepareStatement(selectViewSql, db, view.getName());
+             ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 try {
                     viewDefinition.append(rs.getString("view_definition"));
@@ -55,11 +53,6 @@ public class ViewService {
         } catch (SQLException sqlException) {
             LOGGER.log(Level.SEVERE, selectViewSql);
             throw sqlException;
-        } finally {
-            if (rs != null)
-                rs.close();
-            if (stmt != null)
-                stmt.close();
         }
     }
 }

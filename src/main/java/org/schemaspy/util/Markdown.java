@@ -48,7 +48,7 @@ public class Markdown {
             links.add(m.group(1));
         }
 
-        if (links.size() > 0) {
+        if (!links.isEmpty()) {
             text = text + newLine + newLine;
         }
 

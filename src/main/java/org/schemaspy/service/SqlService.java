@@ -96,17 +96,12 @@ public class SqlService {
         if (fineEnabled)
             logger.fine(sqlBuf + " " + sqlParams);
 
-        PreparedStatement stmt = connection.prepareStatement(sqlBuf.toString());
-        try {
+        try (PreparedStatement stmt = connection.prepareStatement(sqlBuf.toString())) {
             for (int i = 0; i < sqlParams.size(); ++i) {
-                stmt.setString(i + 1, sqlParams.get(i).toString());
+                stmt.setString(i + 1, sqlParams.get(i));
             }
-        } catch (SQLException exc) {
-            stmt.close();
-            throw exc;
+            return stmt;
         }
-
-        return stmt;
     }
 
     /**
