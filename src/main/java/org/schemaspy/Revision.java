@@ -37,20 +37,20 @@ public class Revision {
     }
 
     private static void initialize() {
-		try (InputStream in = Revision.class.getResourceAsStream(resourceName)) {
-			if (in != null) {
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+        try (InputStream in = Revision.class.getResourceAsStream(resourceName)) {
+            if (in != null) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 
-					String line;
+                    String line;
 
-					while ((line = reader.readLine()) != null) {
-						if (line.startsWith("Implementation-Build:")) {
-							rev = line.split(" ")[1];
-							break;
-						}
-					}
-				}
-			}
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("Implementation-Build:")) {
+                            rev = line.split(" ")[1];
+                            break;
+                        }
+                    }
+                }
+            }
         } catch (IOException ignored) {
         }
     }
