@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HtmlFormatterTest {
 
     @Test
-    public void urlEncode() {
+    public void escapeHtml() {
         assertThat(HtmlFormatter.escapeHtml("string")).isEqualTo("string");
         assertThat(HtmlFormatter.escapeHtml("string with spaces")).isEqualTo("string with spaces");
     }
