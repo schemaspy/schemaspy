@@ -18,7 +18,6 @@
  */
 package org.schemaspy.view;
 
-import org.apache.commons.io.FilenameUtils;
 import org.schemaspy.Config;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
@@ -28,7 +27,6 @@ import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.io.File;
-import java.net.URL;
 import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.List;
@@ -203,8 +201,8 @@ public class DotNode {
 
         buf.append("    </TABLE>>" + lineSeparator);
         if (!table.isRemote() || Config.getInstance().isOneOfMultipleSchemas())
-            buf.append("    URL=\"" + path + HtmlFormatter.urlEncode(tableName) + ".html\"" + lineSeparator);
-        buf.append("    tooltip=\"" + HtmlFormatter.urlEncode(fqTableName) + "\"" + lineSeparator);
+            buf.append("    URL=\"" + path + HtmlFormatter.urlEncodeLink(tableName) + ".html\"" + lineSeparator);
+        buf.append("    tooltip=\"" + HtmlFormatter.escapeHtml(fqTableName) + "\"" + lineSeparator);
         buf.append("  ];");
 
         return buf.toString();
