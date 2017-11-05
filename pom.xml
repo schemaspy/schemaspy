@@ -186,19 +186,19 @@
         <dependency>
             <groupId>com.github.npetzall.testcontainers.junit</groupId>
             <artifactId>jdbc</artifactId>
-            <version>0.0.4</version>
+            <version>0.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>oracle-xe</artifactId>
-            <version>1.2.1</version>
+            <version>1.4.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>mysql</artifactId>
-            <version>1.3.0</version>
+            <version>1.4.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
