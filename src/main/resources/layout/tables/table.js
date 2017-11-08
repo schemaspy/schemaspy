@@ -67,14 +67,18 @@ $(document).ready(function() {
 
  $(function() {
 	$("#recordNumber").digits();
- }); 
- 
- var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-	lineNumbers: true,  
-	mode: 'text/x-sql',
-    indentWithTabs: true,
-    smartIndent: true,
-    lineNumbers: true,
-    matchBrackets : true,
-    autofocus: true	
-});
+ });
+
+var codeElement = document.getElementById("code");
+var editor = null;
+if (null != codeElement) {
+	editor = CodeMirror.fromTextArea(codeElement, {
+		lineNumbers: true,
+		mode: 'text/x-sql',
+		indentWithTabs: true,
+		smartIndent: true,
+		lineNumbers: true,
+		matchBrackets: true,
+		autofocus: true
+	});
+}
