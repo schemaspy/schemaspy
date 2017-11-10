@@ -69,7 +69,7 @@ $(document).ready(function() {
 	$("#recordNumber").digits();
  });
 
-var codeElement = document.getElementById("code");
+var codeElement = document.getElementById("sql-script-codemirror");
 var editor = null;
 if (null != codeElement) {
 	editor = CodeMirror.fromTextArea(codeElement, {
