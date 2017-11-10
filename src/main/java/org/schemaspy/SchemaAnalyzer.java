@@ -423,9 +423,7 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        out = new LineWriter(new File(outputDir, "routines.html"), 16 * 1024, config.getCharset());
-        HtmlRoutinesPage.getInstance().write(db, out);
-        out.close();
+        HtmlRoutinesPage.getInstance().write(db, outputDir);
 
         // create detailed diagrams
 
