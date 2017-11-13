@@ -18,35 +18,6 @@ $(document).ready(function() {
         .appendTo('#standard_table_wrapper .col-sm-6:eq(0)' );    	
 } );
 
-$(document).ready(function() {
-    var indexes = $('#indexes_table').DataTable( {
-        lengthChange: false,
-		bPaginate: false,
-		bSort: false
-    } );
- 
-    
-} );
-
-
- $(function() {
-	var $imgs = $('img.diagram');
-
-	$imgs.each(function () {
-		eval("$('#"+$(this).attr('id')+"').draggable();")
-	});	 
- });
- 
- $.fn.digits = function(){ 
-    return this.each(function(){ 
-        $(this).text( $(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "1 ") ); 
-    })
- } 
-
- $(function() {
-	$("#recordNumber").digits();
- });
-
 var codeElement = document.getElementById("sql-script-codemirror");
 var editor = null;
 if (null != codeElement) {
