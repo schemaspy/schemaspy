@@ -43,9 +43,7 @@ public class DbDriverLoader {
     private boolean loadJDBCJars = false;
 
     public Connection getConnection(Config config, String connectionURL,
-                                       String driverClass, String driverPath) throws FileNotFoundException, IOException {
-        LOGGER.info("Using database properties:");
-        LOGGER.info("  {}", config.getDbPropertiesLoadedFrom());
+                                       String driverClass, String driverPath) throws IOException {
 
         loadJDBCJars = config.isLoadJDBCJarsEnabled();
 
@@ -68,9 +66,6 @@ public class DbDriverLoader {
                 System.err.println("  " + connectionURL);
                 System.err.println("with this driver:");
                 System.err.println("  " + driverClass);
-                System.err.println();
-                System.err.println("Additional connection information may be available in ");
-                System.err.println("  " + config.getDbPropertiesLoadedFrom());
                 throw new ConnectionFailure("Cannot connect to '" + connectionURL +"' with driver '" + driverClass + "'");
             }
         } catch (UnsatisfiedLinkError badPath) {
