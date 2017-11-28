@@ -18,55 +18,37 @@
  */
 package org.schemaspy;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * @author John Currier
  */
 public class Revision {
-    private static String rev = "Unknown";
-    private static final String resourceName = "/META-INF/MANIFEST.MF";
+	private static final Logger logger       = LoggerFactory.getLogger(Revision.class);
+	private static       String rev          = "Unknown";
+	private static final String resourceName = "/META-INF/MANIFEST.MF";
 
-    static {
-        initialize();
-    }
+	static {
+		initialize();
+	}
 
-    private static void initialize() {
-        InputStream in = null;
-        BufferedReader reader = null;
+	private static void initialize() {
+		try (InputStream in = Revision.class.getResourceAsStream(resourceName)) {
+			Manifest   manifest = new Manifest(in);
+			Attributes main     = manifest.getMainAttributes();
+			rev = (String) main.getOrDefault("Implementation-Build","Unknown");
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+		}
+	}
 
-        try {
-            in = Revision.class.getResourceAsStream(resourceName);
-
-            if (in != null) {
-                reader = new BufferedReader(new InputStreamReader(in));
-
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    if (line.startsWith("Implementation-Build:")) {
-                        rev = line.split(" ")[1];
-                        break;
-                    }
-                }
-            }
-        } catch (IOException exc) {
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                } else if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ignore) {}
-        }
-    }
-
-    @Override
-    public String toString() {
-        return rev;
-    }
+	@Override
+	public String toString() {
+		return rev;
+	}
 }

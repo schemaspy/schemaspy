@@ -18,20 +18,21 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by rkasa on 2016-03-22.
  */
 public class MustacheWriter {
     private File outputDir;
-    private HashMap<String, Object> scopes;
+    private Map<String, Object> scopes;
     private String rootPath;
     private String rootPathtoHome;
     private String databaseName;
     private boolean isMultipleSchemas;
     private String templateDirectory = Config.getInstance().getTemplateDirectory();
 
-    public MustacheWriter(File outputDir, HashMap<String, Object> scopes, String rootPath, String databaseName, boolean isMultipleSchemas) {
+    public MustacheWriter(File outputDir, Map<String, Object> scopes, String rootPath, String databaseName, boolean isMultipleSchemas) {
         this.outputDir = outputDir;
         this.scopes = scopes;
         this.rootPath = rootPath;
@@ -55,6 +56,7 @@ public class MustacheWriter {
         HashMap<String, Object> mainScope = new HashMap<>();
 
         try {
+
             Mustache mustache = mf.compile(getReader(templatePath),"template");
             mustache.execute(result, scopes).flush();
 
@@ -73,6 +75,7 @@ public class MustacheWriter {
 
             FileUtils.writeStringToFile(destinationFile, content.toString(), "UTF-8");
         } catch (IOException e) {
+            //TODO: Wouldn't we want an exception thrown here?
             e.printStackTrace();
         }
     }
@@ -119,7 +122,12 @@ public class MustacheWriter {
         if (fileStream == null) {
             throw new ParseException("Unable to find requested file: " + fileName + " in directory " + parent);
         }
-        String fileContent = IOUtils.toString(fileStream, "UTF-8");
+        String fileContent;
+        try {
+            fileContent = IOUtils.toString(fileStream, "UTF-8");
+        } finally {
+            IOUtils.closeQuietly(fileStream);
+        }
         return new StringReader(fileContent);
     }
 
@@ -128,13 +136,6 @@ public class MustacheWriter {
      */
     public static class ParseException extends InvalidConfigurationException {
         private static final long serialVersionUID = 1L;
-
-        /**
-         * @param cause root exception that caused the failure
-         */
-        public ParseException(Exception cause) {
-            super(cause);
-        }
 
         /**
          * @param msg textual description of the failure
