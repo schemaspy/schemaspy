@@ -60,7 +60,7 @@ public class Routine implements Comparable<Routine> {
         this.type = type;
         this.returnType = returnType;
         this.definitionLanguage = definitionLanguage;
-        this.definition = definition;
+        this.definition = coalesce(definition, "");
         this.dataAccess = dataAccess;
         this.securityType = securityType;
         this.deterministic = deterministic;
@@ -159,5 +159,9 @@ public class Routine implements Comparable<Routine> {
         if (rc == 0)
             rc = getDefinition().compareTo(other.getDefinition());
         return rc;
+    }
+
+    private <T> T coalesce(T a, T b) {
+        return a!=null ? a : b;
     }
 }
