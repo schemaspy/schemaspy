@@ -18,8 +18,8 @@
  */
 package org.schemaspy;
 
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.app.cli.CommandLineArgumentParser;
+import org.schemaspy.app.cli.CommandLineArguments;
 import org.schemaspy.db.config.PropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
@@ -215,8 +215,7 @@ public final class Config {
      * Return the path to Graphviz (used to find the dot executable to run to
      * generate ER diagrams).<p/>
      * <p>
-     * Returns graphiz path or null
-     * was not specified.
+     * Returns supplied -gv argument or null
      *
      * @return
      */

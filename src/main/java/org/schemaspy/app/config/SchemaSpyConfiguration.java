@@ -1,11 +1,7 @@
-package org.schemaspy;
+package org.schemaspy.app.config;
 
 import com.beust.jcommander.ParameterException;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.cli.ConfigFileArgumentParser;
-import org.schemaspy.cli.PropertyFileDefaultProvider;
-import org.schemaspy.cli.PropertyFileDefaultProviderFactory;
+import org.schemaspy.app.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

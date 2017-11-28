@@ -1,11 +1,11 @@
-package org.schemaspy.testcontainer;
+package org.schemaspy.app.integrationtesting;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.schemaspy.Main;
+import org.schemaspy.app.Main;
 import org.schemaspy.testing.IgnoreUsingXPath;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testcontainers.containers.MySQLContainer;
@@ -32,7 +32,7 @@ public class MysqlXMLIT {
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>())
+            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5.7.18"))
             .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
             .withQueryString("?useSSL=false")
             .withInitScript("integrationTesting/dbScripts/mysqlxmlit.sql");
