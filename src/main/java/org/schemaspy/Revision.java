@@ -24,11 +24,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author John Currier
  */
 public class Revision {
+    private static final Logger logger = Logger.getLogger(Revision.class.getName());
     private static String rev = "Unknown";
     private static final String resourceName = "/META-INF/MANIFEST.MF";
 
@@ -51,7 +54,8 @@ public class Revision {
                     }
                 }
             }
-        } catch (IOException ignored) {
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE,ex.getMessage(),ex);
         }
     }
 
