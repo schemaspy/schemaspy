@@ -52,6 +52,24 @@ public class DbAnalyzerTest {
 
         assertThat(impliedForeignKeyConstraintList).containsExactlyInAnyOrder(invoiceLineTrackId, trackAlbumId, albumArtistId);
     }
+    @Test
+    public void testGetImpliedConstraintsWithObscureTableAndColumnNames() throws Exception {
+        // Given
+        Table parent = createTableWithObscureNamesParent();
+        Table child = createTableWithObscureNamesChild1();
+
+        List<Table> tables = new ArrayList<>();
+        tables.add(parent);
+        tables.add(child);
+
+        // When
+        List<ImpliedForeignKeyConstraint> impliedForeignKeyConstraintList = DbAnalyzer.getImpliedConstraints(tables);
+
+        // Then
+        ImpliedForeignKeyConstraint obscureId = new ImpliedForeignKeyConstraint(parent.getColumn("{ColumnName}"), child.getColumn("ObscureParentTable{ColumnName}"));
+
+        assertThat(impliedForeignKeyConstraintList).containsExactlyInAnyOrder(obscureId);
+    }
 
     private Table createAlbumTable() {
         Table table = new Table(database, catalog, schema, "ALbum", "This is comment for database on PostgresSQL [Invoice] link is also working");
@@ -237,6 +255,54 @@ public class DbAnalyzerTest {
         table.setColumns(columns);
 
         table.setPrimaryColumn(column1);
+        return table;
+    }
+
+    private Table createTableWithObscureNamesParent() {
+        Table table = new Table(database, catalog, schema, "ObscureParentTable", "");
+        TableColumn column1 = new TableColumn(table);
+        column1.setName("{ColumnName}");
+        column1.setTypeName("varchar");
+        column1.setType(12);
+        column1.setLength(160);
+
+        TableColumn column2 = new TableColumn(table);
+        column2.setName("{ColumnName2}");
+        column2.setTypeName("varchar");
+        column2.setType(12);
+        column2.setLength(160);
+
+        CaseInsensitiveMap<TableColumn> columns = new CaseInsensitiveMap<>();
+        columns.put(column1.getName(), column1);
+        columns.put(column2.getName(), column2);
+        table.setColumns(columns);
+
+        table.setPrimaryColumn(column1);
+
+        return table;
+    }
+
+    private Table createTableWithObscureNamesChild1() {
+        Table table = new Table(database, catalog, schema, "Obscure{Child}Table", "");
+        TableColumn column1 = new TableColumn(table);
+        column1.setName("*()?@\",.#^$&/\\=");
+        column1.setTypeName("varchar");
+        column1.setType(12);
+        column1.setLength(160);
+
+        TableColumn column2 = new TableColumn(table);
+        column2.setName("ObscureParentTable{ColumnName}");
+        column2.setTypeName("varchar");
+        column2.setType(12);
+        column2.setLength(160);
+
+        CaseInsensitiveMap<TableColumn> columns = new CaseInsensitiveMap<>();
+        columns.put(column1.getName(), column1);
+        columns.put(column2.getName(), column2);
+        table.setColumns(columns);
+
+        table.setPrimaryColumn(column1);
+
         return table;
     }
 
