@@ -92,7 +92,8 @@ public class DatabaseService {
                          db.getCatalog().setComment(rs.getString("catalog_comment"));
                     }
                 } catch (SQLException sqlException) {
-                    //db.getSchema().setComment(null);
+                    logger.severe(sql);
+                    throw sqlException;
                 }
             }
     }
@@ -108,7 +109,8 @@ public class DatabaseService {
                        db.getSchema().setComment(rs.getString("schema_comment"));
                   }
               } catch (SQLException sqlException) {
-                  //db.getSchema().setComment(null);
+                  logger.severe(sql);
+                  throw sqlException;
               }
           }
     }
