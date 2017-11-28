@@ -8,7 +8,6 @@ import org.schemaspy.service.helper.BasicTableMeta;
 import org.schemaspy.validator.NameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
@@ -21,7 +20,6 @@ import java.util.regex.Pattern;
 /**
  * Created by rkasa on 2016-12-10.
  */
-@Service
 public class DatabaseService {
 
     private final TableService tableService;

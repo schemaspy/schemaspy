@@ -2,14 +2,13 @@ package org.schemaspy.app.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import org.schemaspy.app.config.SchemaSpyConfiguration;
 
 import java.io.File;
 
 /**
  * Holds all supported command line arguments.
  * <p>
- * An instance of this class registered as singleton bean in {@link SchemaSpyConfiguration} via {@link CommandLineArgumentParser}.
+ * An instance of this class registered as singleton bean in {@link org.schemaspy.app.config.ApplicationConfiguration} via {@link CommandLineArgumentParser}.
  * Therefore it can be injected in other beans, for example:
  * <p>
  * <pre>

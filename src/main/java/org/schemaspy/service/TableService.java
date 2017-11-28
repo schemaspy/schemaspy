@@ -9,7 +9,6 @@ import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.util.Markdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.sql.*;
 
@@ -23,7 +22,6 @@ import java.util.regex.Pattern;
 /**
  * Created by rkasa on 2016-12-05.
  */
-@Service
 public class TableService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

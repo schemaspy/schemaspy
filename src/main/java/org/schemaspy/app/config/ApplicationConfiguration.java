@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Configuration
-public class SchemaSpyConfiguration {
+public class ApplicationConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -23,9 +23,6 @@ public class SchemaSpyConfiguration {
 
     @Autowired
     private PropertyFileDefaultProviderFactory factory;
-
-    @Autowired
-    private ApplicationArguments applicationArguments;
 
     @Bean
     public CommandLineArguments commandLineArguments(ApplicationArguments applicationArguments, CommandLineArgumentParser commandLineArgumentParser) {
