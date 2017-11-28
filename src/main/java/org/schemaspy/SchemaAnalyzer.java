@@ -211,7 +211,6 @@ public class SchemaAnalyzer {
 
             schemaMeta = null; // done with it so let GC reclaim it
 
-            LineWriter out;
             Collection<Table> tables = new ArrayList<Table>(db.getTables());
             tables.addAll(db.getViews());
 
@@ -255,14 +254,11 @@ public class SchemaAnalyzer {
             if (schema != null)
                 xmlName += '.' + schema;
 
-            out = new LineWriter(new File(outputDir, xmlName + ".xml"), Config.DOT_CHARSET);
-            try {
-                document.getDocumentElement().normalize();
+            document.getDocumentElement().normalize();
+            try (LineWriter out = new LineWriter(new File(outputDir, xmlName + ".xml"), Config.DOT_CHARSET)) {
                 DOMUtil.printDOM(document, out);
-			} catch (TransformerException exc) {
-				throw new IOException(exc);
-			} finally {
-                out.close();
+            } catch (TransformerException exc) {
+                throw new IOException(exc);
             }
 
             // 'try' to make some memory available for the sorting process
@@ -423,9 +419,7 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        out = new LineWriter(new File(outputDir, "routines.html"), 16 * 1024, config.getCharset());
-        HtmlRoutinesPage.getInstance().write(db, out);
-        out.close();
+        HtmlRoutinesPage.getInstance().write(db, outputDir);
 
         // create detailed diagrams
 
