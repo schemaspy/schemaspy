@@ -1446,7 +1446,6 @@ public final class Config {
         }
 
         Properties props = asProperties(bundle);
-        bundle = null;
         String saveLoadedFrom = dbPropertiesLoadedFrom; // keep original thru recursion
 
         // bring in key/values pointed to by the include directive
@@ -1577,7 +1576,7 @@ public final class Config {
             return null;
         }
         options.remove(paramIndex);
-        String param = options.get(paramIndex).toString();
+        String param = options.get(paramIndex);
         options.remove(paramIndex);
         return param;
     }

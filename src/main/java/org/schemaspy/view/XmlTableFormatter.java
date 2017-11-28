@@ -216,7 +216,7 @@ public class XmlTableFormatter {
                 tableNode.appendChild(constraintNode);
 
                 DOMUtil.appendAttribute(constraintNode, "name", name);
-                DOMUtil.appendAttribute(constraintNode, "constraint", constraints.get(name).toString());
+                DOMUtil.appendAttribute(constraintNode, "constraint", constraints.get(name));
             }
         }
     }

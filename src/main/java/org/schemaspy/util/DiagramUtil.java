@@ -54,14 +54,14 @@ public class DiagramUtil {
 
     public static Object diagramExists(List<MustacheTableDiagram> diagrams) {
         Object exists = null;
-        if  (diagrams.size() > 0) {
+        if  (!diagrams.isEmpty()) {
             exists = new Object();
         }
         return exists;
     }
 
     public static void markFirstAsActive(List<MustacheTableDiagram> diagrams) {
-        if (diagrams != null && diagrams.size() > 0) {
+        if (diagrams != null && !diagrams.isEmpty()) {
             MustacheTableDiagram diagram = diagrams.get(0);
             if (diagram != null) {
                 diagram.setActive(true);
