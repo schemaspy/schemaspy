@@ -62,7 +62,7 @@ public class TableService {
 
 
         synchronized (Table.class) {
-            try (ResultSet rs = db.getMetaData().getColumns(table.getCatalog(), table.getSchema(), table.getName(), "%")) {
+            try (ResultSet rs = db.getMetaData().getColumns(table.getCatalog(), table.getSchema(), db.getQuotedIdentifier(table.getName()), "%")) {
                 while (rs.next())
                     addColumn(table, rs);
             } catch (SQLException exc) {
@@ -97,17 +97,10 @@ public class TableService {
         // so we can ask if the columns are auto updated
         // Ugh!!!  Should have been in DatabaseMetaData instead!!!
         StringBuilder sql = new StringBuilder("select * from ");
-        if (table.getSchema() != null) {
-            sql.append(table.getSchema());
-            sql.append('.');
-        } else if (table.getCatalog() != null) {
-            sql.append(table.getCatalog());
-            sql.append('.');
-        }
+        sql.append(getSchemaOrCatalog(db, table, forceQuotes));
 
         if (forceQuotes) {
-            String quote = db.getMetaData().getIdentifierQuoteString().trim();
-            sql.append(quote + table.getName() + quote);
+            sql.append(db.quoteIdentifier(table.getName()));
         } else
             sql.append(db.getQuotedIdentifier(table.getName()));
 
@@ -378,17 +371,10 @@ public class TableService {
         StringBuilder sql = new StringBuilder("select ");
         sql.append(clause);
         sql.append(" from ");
-        if (table.getSchema() != null) {
-            sql.append(table.getSchema());
-            sql.append('.');
-        } else if (table.getCatalog() != null) {
-            sql.append(table.getCatalog());
-            sql.append('.');
-        }
+        sql.append(getSchemaOrCatalog(db, table, forceQuotes));
 
         if (forceQuotes) {
-            String quote = db.getMetaData().getIdentifierQuoteString().trim();
-            sql.append(quote + table.getName() + quote);
+            sql.append(db.quoteIdentifier(table.getName()));
         } else
             sql.append(db.getQuotedIdentifier(table.getName()));
 
@@ -406,6 +392,23 @@ public class TableService {
                 throw exc;
 
             return fetchNumRows(db, table, clause, true);
+        }
+    }
+
+    private String getSchemaOrCatalog(Database db, Table table, boolean forceQuotes) throws SQLException {
+        String schemaOrCatalog = null;
+        if (table.getSchema() != null) {
+            schemaOrCatalog = table.getSchema();
+        } else if (table.getCatalog() != null) {
+            schemaOrCatalog = table.getCatalog();
+        }
+        if (schemaOrCatalog == null) {
+            return "";
+        }
+        if (forceQuotes) {
+            return db.quoteIdentifier(schemaOrCatalog) + ".";
+        } else {
+            return db.getQuotedIdentifier(schemaOrCatalog) + ".";
         }
     }
 

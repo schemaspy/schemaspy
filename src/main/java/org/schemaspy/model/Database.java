@@ -18,37 +18,17 @@
  */
 package org.schemaspy.model;
 
-import java.sql.Connection;
+import org.schemaspy.Config;
+import org.schemaspy.model.xml.SchemaMeta;
+import org.schemaspy.util.CaseInsensitiveMap;
+
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.MissingResourceException;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.schemaspy.Config;
-import org.schemaspy.model.xml.SchemaMeta;
-import org.schemaspy.model.xml.TableMeta;
-import org.schemaspy.model.Schema;
-import org.schemaspy.model.Catalog;
-import org.schemaspy.util.CaseInsensitiveMap;
-import org.springframework.context.expression.MapAccessor;
 
 public class Database {
     private final Config config;
@@ -275,12 +255,16 @@ public class Database {
 
         if (quotesRequired) {
             // name contains something that must be quoted
-            String quote = getMetaData().getIdentifierQuoteString().trim();
-            return quote + id + quote;
+            return quoteIdentifier(id);
         }
 
         // no quoting necessary
         return id;
+    }
+
+    public String quoteIdentifier(String id) throws SQLException {
+        String quote = getMetaData().getIdentifierQuoteString().trim();
+        return quote + id + quote;
     }
 
     /**
