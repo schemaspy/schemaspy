@@ -3,20 +3,14 @@ package org.schemaspy.view;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.schemaspy.util.ResourceFinder;
+import org.schemaspy.util.ResourceNotFoundException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +18,9 @@ import java.util.Map;
  * Created by rkasa on 2016-03-22.
  */
 public class MustacheWriter {
+
+    private static final ResourceFinder resourceFinder = new ResourceFinder();
+
     private File outputDir;
     private Map<String, Object> scopes;
     private String rootPath;
@@ -72,8 +69,7 @@ public class MustacheWriter {
             mustacheContent.execute(content, mainScope).flush();
 
             File destinationFile = new File(outputDir, destination);
-
-            FileUtils.writeStringToFile(destinationFile, content.toString(), "UTF-8");
+            Files.write(destinationFile.toPath(), content.toString().getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             //TODO: Wouldn't we want an exception thrown here?
             e.printStackTrace();
@@ -91,6 +87,7 @@ public class MustacheWriter {
      * Search order is
      * <ol>
      * <li><code>fileName</code> as an explicitly-defined file in the parent directory</li>
+     * <li><code>fileName</code> as a file in the user's working directory</li>
      * <li><code>fileName</code> as a file in the user's home directory</li>
      * <li><code>fileName</code> as a resource from the class path</li>
      * </ol>
@@ -100,35 +97,14 @@ public class MustacheWriter {
      * @return
      * @throws IOException
      */
-    // TODO this methods needs some refactoring. I feel it can be done in a simpler way.
-    public static Reader getReader(String parent, String fileName) throws IOException {
-        InputStream fileStream;
-        // first look into the directory where schemaspy is called from
-        File file = new File(parent, fileName);
-        if (file.exists()) {
-            fileStream = new FileInputStream(file);
-        } else {
-            // otherwise look in user's home directory
-            File fileInUserHomeDirectory = new File(System.getProperty("user.dir"), file.getPath());
-            if (fileInUserHomeDirectory.exists()) {
-                fileStream = new FileInputStream(fileInUserHomeDirectory);
-            } else {
-                // fallback to classpath resource
-                Resource resource = new ClassPathResource(parent + "/" + fileName);
-                fileStream = resource.getInputStream();
-            }
-        }
 
-        if (fileStream == null) {
-            throw new ParseException("Unable to find requested file: " + fileName + " in directory " + parent);
-        }
-        String fileContent;
+    public static Reader getReader(String parent, String fileName) throws IOException {
         try {
-            fileContent = IOUtils.toString(fileStream, "UTF-8");
-        } finally {
-            IOUtils.closeQuietly(fileStream);
+            InputStream inputStream = resourceFinder.find(parent, fileName);
+            return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        } catch (ResourceNotFoundException rnfe) {
+            throw new ParseException("Unable to find requested file: " + fileName + " in directory " + parent, rnfe);
         }
-        return new StringReader(fileContent);
     }
 
     /**
@@ -137,11 +113,8 @@ public class MustacheWriter {
     public static class ParseException extends InvalidConfigurationException {
         private static final long serialVersionUID = 1L;
 
-        /**
-         * @param msg textual description of the failure
-         */
-        public ParseException(String msg) {
-            super(msg);
+        public ParseException(String msg, Throwable cause) {
+            super(msg, cause);
         }
     }
 
