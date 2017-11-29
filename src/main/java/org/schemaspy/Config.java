@@ -260,7 +260,6 @@ public final class Config {
         if (templateDirectory == null) {
             templateDirectory = pullParam("-template");
             if (templateDirectory == null) {
-                // default template dir = resources/layout/
                 templateDirectory = "/layout";
             }
         }
