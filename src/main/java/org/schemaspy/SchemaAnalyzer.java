@@ -18,6 +18,7 @@
  */
 package org.schemaspy;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.schemaspy.cli.CommandLineArguments;
@@ -39,6 +40,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -168,11 +170,7 @@ public class SchemaAnalyzer {
             fineEnabled = logger.isLoggable(Level.FINE);
             logger.info("Starting schema analysis");
 
-            if (!outputDir.isDirectory()) {
-                if (!outputDir.mkdirs()) {
-                    throw new IOException("Failed to create directory '" + outputDir + "'");
-                }
-            }
+            FileUtils.forceMkdir(outputDir);
 
             String dbName = config.getDb();
 
@@ -191,8 +189,8 @@ public class SchemaAnalyzer {
 
             SchemaMeta schemaMeta = config.getMeta() == null ? null : new SchemaMeta(config.getMeta(), dbName, schema);
             if (config.isHtmlGenerationEnabled()) {
-                new File(outputDir, "tables").mkdirs();
-                new File(outputDir, "diagrams/summary").mkdirs();
+                FileUtils.forceMkdir(new File(outputDir, "tables"));
+                FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
                 logger.info("Connected to " + meta.getDatabaseProductName() + " - " + meta.getDatabaseProductVersion());
 
@@ -384,7 +382,7 @@ public class SchemaAnalyzer {
             DotFormatter.getInstance().writeAllRelationships(db, tables, false, showDetailedTables, stats, out, outputDir);
             out.close();
         } else {
-            impliedDotFile.delete();
+            Files.deleteIfExists(impliedDotFile.toPath());
         }
 
         HtmlRelationshipsPage.getInstance().write(db, summaryDir, dotBaseFilespec, hasRealRelationships, hasImplied, excludedColumns,
@@ -393,7 +391,7 @@ public class SchemaAnalyzer {
         progressListener.graphingSummaryProgressed();
 
         File orphansDir = new File(outputDir, "diagrams/orphans");
-        orphansDir.mkdirs();
+        FileUtils.forceMkdir(orphansDir);
         HtmlOrphansPage.getInstance().write(db, orphans, orphansDir, outputDir);
         out.close();
 
@@ -493,9 +491,7 @@ public class SchemaAnalyzer {
         Exception failure = null;
         try {
             schemas = DbAnalyzer.getSchemas(meta);
-        } catch (SQLException exc) {
-            failure = exc;
-        } catch (RuntimeException exc) {
+        } catch (SQLException | RuntimeException exc) {
             failure = exc;
         }
 

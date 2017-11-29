@@ -18,9 +18,12 @@
  */
 package org.schemaspy.util;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.schemaspy.Config;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -302,18 +305,13 @@ public class Dot {
         } catch (InterruptedException interrupted) {
             throw new RuntimeException(interrupted);
         } catch (DotFailure failed) {
-            diagramFile.delete();
+            FileUtils.deleteQuietly(diagramFile);
             throw failed;
         } catch (IOException failed) {
-            diagramFile.delete();
+            FileUtils.deleteQuietly(diagramFile);
             throw new DotFailure("'" + commandLine + "' failed with exception " + failed);
         } finally {
-            if (mapReader != null) {
-                try {
-                    mapReader.close();
-                } catch (IOException ignore) {
-                }
-            }
+            IOUtils.closeQuietly(mapReader);
         }
     }
 

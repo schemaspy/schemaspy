@@ -27,6 +27,7 @@ import org.schemaspy.util.Markdown;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -160,14 +161,14 @@ public class HtmlTablePage extends HtmlFormatter {
 
         // delete before we start because we'll use the existence of these files to determine
         // if they should be turned into pngs & presented
-        oneDegreeDotFile.delete();
-        oneDegreeDiagramFile.delete();
-        twoDegreesDotFile.delete();
-        twoDegreesDiagramFile.delete();
-        oneImpliedDotFile.delete();
-        oneImpliedDiagramFile.delete();
-        twoImpliedDotFile.delete();
-        twoImpliedDiagramFile.delete();
+        Files.deleteIfExists(oneDegreeDotFile.toPath());
+        Files.deleteIfExists(oneDegreeDiagramFile.toPath());
+        Files.deleteIfExists(twoDegreesDotFile.toPath());
+        Files.deleteIfExists(twoDegreesDiagramFile.toPath());
+        Files.deleteIfExists(oneImpliedDotFile.toPath());
+        Files.deleteIfExists(oneImpliedDiagramFile.toPath());
+        Files.deleteIfExists(twoImpliedDotFile.toPath());
+        Files.deleteIfExists(twoImpliedDiagramFile.toPath());
 
 
         if (table.getMaxChildren() + table.getMaxParents() > 0) {
@@ -185,7 +186,7 @@ public class HtmlTablePage extends HtmlFormatter {
             dotOut.close();
 
             if (oneStats.getNumTablesWritten() + oneStats.getNumViewsWritten() == twoStats.getNumTablesWritten() + twoStats.getNumViewsWritten()) {
-                twoDegreesDotFile.delete(); // no different than before, so don't show it
+                Files.deleteIfExists(twoDegreesDotFile.toPath()); // no different than before, so don't show it
             }
 
             if (!impliedConstraints.isEmpty()) {
