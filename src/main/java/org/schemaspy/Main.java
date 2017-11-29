@@ -24,20 +24,21 @@ import org.schemaspy.model.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.model.ProcessExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
     private SchemaAnalyzer analyzer;
@@ -78,25 +79,25 @@ public class Main implements CommandLineRunner {
         try {
             rc = analyzer.analyze(new Config(args)) == null ? 1 : 0;
         } catch (ConnectionFailure couldntConnect) {
-            LOGGER.log(Level.WARNING, "Connection Failure", couldntConnect);
+            LOGGER.warn("Connection Failure", couldntConnect);
             rc = 3;
         } catch (EmptySchemaException noData) {
-            LOGGER.log(Level.WARNING, "Empty schema", noData);
+            LOGGER.warn("Empty schema", noData);
             rc = 2;
         } catch (InvalidConfigurationException badConfig) {
             LOGGER.info("");
             if (badConfig.getParamName() != null)
-                LOGGER.log(Level.WARNING, "Bad parameter specified for " + badConfig.getParamName());
-            LOGGER.log(Level.WARNING, "Bad config " + badConfig.getMessage());
+                LOGGER.warn("Bad parameter specified for {}", badConfig.getParamName());
+            LOGGER.warn("Bad config {}", badConfig.getMessage());
             if (badConfig.getCause() != null && !badConfig.getMessage().endsWith(badConfig.getMessage()))
-                LOGGER.log(Level.WARNING, " caused by " + badConfig.getCause().getMessage());
+                LOGGER.warn(" caused by {}", badConfig.getCause().getMessage());
 
-            LOGGER.log(Level.FINE, "Command line parameters: " + Arrays.asList(args));
-            LOGGER.log(Level.FINE, "Invalid configuration detected", badConfig);
+            LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
+            LOGGER.debug("Invalid configuration detected", badConfig);
         } catch (ProcessExecutionException badLaunch) {
-            LOGGER.log(Level.WARNING, badLaunch.getMessage(), badLaunch);
+            LOGGER.warn(badLaunch.getMessage(), badLaunch);
         } catch (Exception exc) {
-            LOGGER.log(Level.SEVERE, exc.getMessage(), exc);
+            LOGGER.error(exc.getMessage(), exc);
         }
 
         exitApplication(rc);

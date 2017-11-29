@@ -19,11 +19,14 @@
 package org.schemaspy.util;
 
 import org.schemaspy.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
+
 
 /**
  * @author John Currier
@@ -31,7 +34,7 @@ import java.util.logging.Logger;
 public class ConnectionURLBuilder {
     private final Config config;
     private final Properties dbType;
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * @param config
@@ -52,7 +55,7 @@ public class ConnectionURLBuilder {
         for (DbSpecificOption option : dbConfig.getOptions()) {
             option.setValue(getParam(args, option));
 
-            logger.fine(option.toString());
+            LOGGER.debug(option.toString());
 
             // replace e.g. <host> with myDbHost
             connectionURL = connectionURL.replaceAll("\\<" + option.getName() + "\\>", option.getValue());
@@ -66,7 +69,7 @@ public class ConnectionURLBuilder {
             }
         }
 
-        logger.config("connectionURL: " + connectionURL);
+        LOGGER.trace("connectionURL: {}", connectionURL);
 
         return connectionURL;
     }

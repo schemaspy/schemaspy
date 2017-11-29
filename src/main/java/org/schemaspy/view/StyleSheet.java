@@ -18,26 +18,22 @@
  */
 package org.schemaspy.view;
 
-import org.apache.commons.io.IOUtils;
 import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.LineWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Represents our CSS style sheet (CSS) with accessors for important
@@ -49,7 +45,7 @@ import java.util.logging.Logger;
  */
 public class StyleSheet {
 
-    private static final Logger LOGGER = Logger.getLogger(StyleSheet.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static StyleSheet instance;
     private final String css;
@@ -127,7 +123,7 @@ public class StyleSheet {
             String templateDirectory = Config.getInstance().getTemplateDirectory();
             try {
                 if (new File(cssFilename).exists()) {
-                    LOGGER.log(Level.INFO, "Using external StyleSheet file: " + cssFilename);
+                    LOGGER.info("Using external StyleSheet file: {}", cssFilename);
                     instance = new StyleSheet(new BufferedReader(MustacheWriter.getReader(null, cssFilename)));
                 } else {
                     instance = new StyleSheet(new BufferedReader(MustacheWriter.getReader(templateDirectory, cssFilename)));

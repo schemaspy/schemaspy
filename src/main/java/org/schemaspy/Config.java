@@ -26,6 +26,9 @@ import org.schemaspy.util.Dot;
 import org.schemaspy.util.PasswordReader;
 import org.schemaspy.view.DefaultSqlFormatter;
 import org.schemaspy.view.SqlFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
 
@@ -34,6 +37,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.*;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.DatabaseMetaData;
@@ -41,8 +45,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -90,7 +92,6 @@ public final class Config {
     private String description;
     private Properties dbProperties;
     private String dbPropertiesLoadedFrom;
-    private Level logLevel;
     private SqlFormatter sqlFormatter;
     private String sqlFormatterClass;
     private Boolean generateHtml;
@@ -120,7 +121,7 @@ public final class Config {
     private static final String DEFAULT_COLUMN_EXCLUSION = "[^.]";  // match nothing
     private static final String DEFAULT_PROPERTIES_FILE = "schemaspy.properties";
     private Properties schemaspyProperties = new Properties();
-    private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Default constructor. Intended for when you want to inject properties
@@ -338,7 +339,7 @@ public final class Config {
                 try {
                     port = Integer.valueOf(portAsString);
                 } catch (NumberFormatException notSpecified) {
-                    LOGGER.log(Level.WARNING, notSpecified.getMessage(), notSpecified);
+                    LOGGER.warn(notSpecified.getMessage(), notSpecified);
                 }
             }
         }
@@ -462,7 +463,7 @@ public final class Config {
                 try {
                     max = Integer.parseInt(param);
                 } catch (NumberFormatException e) {
-                    LOGGER.log(Level.WARNING, e.getMessage(), e);
+                    LOGGER.warn(e.getMessage(), e);
                 }
             }
             maxDetailedTables = max;
@@ -628,7 +629,7 @@ public final class Config {
                 try {
                     size = Integer.parseInt(param);
                 } catch (NumberFormatException e) {
-                    LOGGER.log(Level.WARNING, e.getMessage(), e);
+                    LOGGER.warn(e.getMessage(), e);
                 }
             }
             fontSize = Integer.valueOf(size);
@@ -1221,57 +1222,6 @@ public final class Config {
     }
 
     /**
-     * Set the level of logging to perform.<p/>
-     * The levels in descending order are:
-     * <ul>
-     * <li><code>severe</code> (highest - least detail)
-     * <li><code>warning</code> (default)
-     * <li><code>info</code>
-     * <li><code>config</code>
-     * <li><code>fine</code>
-     * <li><code>finer</code>
-     * <li><code>finest</code>  (lowest - most detail)
-     * </ul>
-     *
-     * @param logLevel
-     */
-    public void setLogLevel(String logLevel) {
-        if (logLevel == null) {
-            this.logLevel = Level.WARNING;
-            return;
-        }
-
-        Map<String, Level> levels = new LinkedHashMap<>();
-        levels.put("severe", Level.SEVERE);
-        levels.put("warning", Level.WARNING);
-        levels.put("info", Level.INFO);
-        levels.put("config", Level.CONFIG);
-        levels.put("fine", Level.FINE);
-        levels.put("finer", Level.FINER);
-        levels.put("finest", Level.FINEST);
-
-        this.logLevel = levels.get(logLevel.toLowerCase());
-        if (this.logLevel == null) {
-            throw new InvalidConfigurationException("Invalid logLevel: '" + logLevel +
-                    "'. Must be one of: " + levels.keySet());
-        }
-    }
-
-    /**
-     * Returns the level of logging to perform.
-     * See {@link #setLogLevel(String)}.
-     *
-     * @return
-     */
-    public Level getLogLevel() {
-        if (logLevel == null) {
-            setLogLevel(pullParam("-loglevel"));
-        }
-
-        return logLevel;
-    }
-
-    /**
      * Returns <code>true</code> if the options indicate that the user wants
      * to see some help information.
      *
@@ -1656,7 +1606,7 @@ public final class Config {
             contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, "UTF-8"));
             this.schemaspyProperties.load(new StringReader(contents.replace("\\", "\\\\")));
         } catch (IOException e) {
-            LOGGER.log(Level.INFO, "Configuration file not found");
+            LOGGER.info("Configuration file not found");
         }
     }
 
@@ -1935,8 +1885,7 @@ public final class Config {
             params.add("-gv");
             params.add(getGraphvizDir().toString());
         }
-        params.add("-loglevel");
-        params.add(getLogLevel().toString().toLowerCase());
+
         params.add("-sqlFormatter");
         params.add(getSqlFormatter().getClass().getName());
         params.add("-i");

@@ -19,38 +19,33 @@
 package org.schemaspy;
 
 import org.schemaspy.model.ConnectionFailure;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Rafal Kasa on 2016-08-01.
  */
 public class DbDriverLoader {
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private boolean loadJDBCJars = false;
 
     public Connection getConnection(Config config, String connectionURL,
                                        String driverClass, String driverPath) throws FileNotFoundException, IOException {
-        if (logger.isLoggable(Level.INFO)) {
-            logger.info("Using database properties:");
-            logger.info("  " + config.getDbPropertiesLoadedFrom());
-        } else {
-            System.out.println("Using database properties:");
-            System.out.println("  " + config.getDbPropertiesLoadedFrom());
-        }
+        LOGGER.info("Using database properties:");
+        LOGGER.info("  {}", config.getDbPropertiesLoadedFrom());
 
         loadJDBCJars = config.isLoadJDBCJarsEnabled();
 
@@ -166,13 +161,13 @@ public class DbDriverLoader {
                     }
             );
 
-            logger.info("Additional files will be loaded for JDBC Driver");
+            LOGGER.info("Additional files will be loaded for JDBC Driver");
 
             if (files != null) {
                 for (File file : files) {
                     if (file.isFile()) {
                         classpath.add(file.toURI().toURL());
-                        logger.info(file.toURI().toString());
+                        LOGGER.info(file.toURI().toString());
                     }
                 }
             }

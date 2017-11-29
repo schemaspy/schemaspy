@@ -21,9 +21,10 @@ package org.schemaspy.model.xml;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,6 +36,8 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,7 +54,7 @@ public class SchemaMeta {
     private final List<TableMeta> tables = new ArrayList<TableMeta>();
     private final String comments;
     private final File metaFile;
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public SchemaMeta(String xmlMeta, String dbName, String schema) throws InvalidConfigurationException {
         File meta = new File(xmlMeta);
@@ -62,7 +65,7 @@ public class SchemaMeta {
             if (!meta.exists()) {
                 if (Config.getInstance().isOneOfMultipleSchemas()) {
                     // don't force all of the "one of many" schemas to have metafiles
-                    logger.info("Meta directory \"" + xmlMeta + "\" should contain a file named \"" + filename + '\"');
+                    LOGGER.info("Meta directory \"{}\" should contain a file named \"{}" + '\"', xmlMeta, filename);
                     comments = null;
                     metaFile = null;
                     return;
@@ -144,7 +147,7 @@ public class SchemaMeta {
         }
 
         try {
-            logger.info("Parsing " + file);
+            LOGGER.info("Parsing {}", file);
             doc = docBuilder.parse(file);
         } catch (SAXException exc) {
             throw new InvalidConfigurationException("Failed to parse " + file, exc);
@@ -154,7 +157,7 @@ public class SchemaMeta {
         try {
             validate(doc);
         } catch (SAXException | IOException exc) {
-            logger.warning("Failed to validate " + file + ": " + exc);
+            LOGGER.warn("Failed to validate {}: {}", file, exc);
         }
 
         return doc;

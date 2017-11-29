@@ -6,16 +6,19 @@ import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ConnectionURLBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+
 
 /**
  * Created by rkasa on 2016-12-10.
@@ -25,8 +28,7 @@ public class SqlService {
 
     private final CommandLineArguments commandLineArguments;
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
-    private final boolean fineEnabled = logger.isLoggable(Level.FINE);
+    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private Connection connection;
     private DatabaseMetaData meta;
@@ -93,8 +95,7 @@ public class SqlService {
     public PreparedStatement prepareStatement(String sql, Database db, String tableName) throws SQLException {
         StringBuilder sqlBuf = new StringBuilder(sql);
         List<String> sqlParams = getSqlParams(sqlBuf, db.getName(), db.getCatalog().getName(), db.getSchema().getName(), tableName); // modifies sqlBuf
-        if (fineEnabled)
-            logger.fine(sqlBuf + " " + sqlParams);
+        LOGGER.debug("{} {}", sqlBuf, sqlParams);
 
         PreparedStatement stmt = connection.prepareStatement(sqlBuf.toString());
         try {

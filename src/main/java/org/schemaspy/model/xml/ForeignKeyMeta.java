@@ -18,9 +18,13 @@
  */
 package org.schemaspy.model.xml;
 
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * Additional metadata about a foreign key relationship as expressed in XML
@@ -33,7 +37,7 @@ public class ForeignKeyMeta {
     private final String columnName;
     private final String remoteCatalog;
     private final String remoteSchema;
-    private final static Logger logger = Logger.getLogger(ForeignKeyMeta.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public ForeignKeyMeta(Node foreignKeyNode) {
         NamedNodeMap attribs = foreignKeyNode.getAttributes();
@@ -50,8 +54,7 @@ public class ForeignKeyMeta {
         node = attribs.getNamedItem("remoteCatalog");
         remoteCatalog = node == null ? null : node.getNodeValue();
 
-        logger.finer("Found XML FK metadata for " + tableName + "." + columnName +
-                " remoteCatalog: " + remoteCatalog + " remoteSchema: " + remoteSchema);
+		LOGGER.debug("Found XML FK metadata for {}.{} remoteCatalog: {} remoteSchema: {}", tableName, columnName, remoteCatalog, remoteSchema);
     }
 
     public String getTableName() {

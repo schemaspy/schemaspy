@@ -3,8 +3,6 @@ package org.schemaspy.validator;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,8 +16,6 @@ public class NameValidatorTest {
 
     @Before
     public void setup() {
-        Logger.getLogger(NameValidator.class.getName()).setLevel(Level.FINE);
-
         nameValidator = new NameValidator("table", includeWithTable, exclude, new String[]{"TABLE"});
     }
 

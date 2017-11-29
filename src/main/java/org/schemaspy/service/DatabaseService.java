@@ -14,8 +14,11 @@ import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.service.helper.BasicTableMeta;
 import org.schemaspy.validator.NameValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,8 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+
 import java.util.regex.Pattern;
 
 /**
@@ -42,8 +45,7 @@ public class DatabaseService {
 
     private final SqlService sqlService;
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
-    private final boolean fineEnabled = logger.isLoggable(Level.FINE);
+    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public DatabaseService(TableService tableService, ViewService viewService, SqlService sqlService) {
         this.tableService = Objects.requireNonNull(tableService);
@@ -52,7 +54,7 @@ public class DatabaseService {
     }
 
     public void gatheringSchemaDetails(Config config, Database db, ProgressListener listener) throws SQLException {
-        logger.info("Gathering schema details");
+        LOGGER.info("Gathering schema details");
 
         listener.startedGatheringDetails();
 
@@ -92,7 +94,7 @@ public class DatabaseService {
                          db.getCatalog().setComment(rs.getString("catalog_comment"));
                     }
                 } catch (SQLException sqlException) {
-                    logger.severe(sql);
+                    LOGGER.error(sql);
                     throw sqlException;
                 }
             }
@@ -109,7 +111,7 @@ public class DatabaseService {
                        db.getSchema().setComment(rs.getString("schema_comment"));
                   }
               } catch (SQLException sqlException) {
-                  logger.severe(sql);
+                  LOGGER.error(sql);
                   throw sqlException;
               }
           }
@@ -190,9 +192,7 @@ public class DatabaseService {
                 db.getViewsMap().put(view.getName(), view);
                 listener.gatheringDetailsProgressed(view);
 
-                if (fineEnabled) {
-                    logger.fine("Found details of view " + view.getName());
-                }
+                LOGGER.debug("Found details of view {}", view.getName());
             }
         }
     }
@@ -311,9 +311,7 @@ public class DatabaseService {
 
             listener.gatheringDetailsProgressed(table);
 
-            if (logger.isLoggable(Level.FINE)) {
-                logger.fine("Retrieved details of " + table.getFullName());
-            }
+            LOGGER.debug("Retrieved details of {}", table.getFullName());
         }
 
         /**
@@ -435,7 +433,7 @@ public class DatabaseService {
                 // don't die just because this failed
                 String msg = listener.recoverableExceptionEncountered("Failed to retrieve " + clazz + " names with custom SQL", sqlException, sql);
                 if (msg != null) {
-                    logger.warning(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }
@@ -498,7 +496,7 @@ public class DatabaseService {
                 // don't die just because this failed
                 String msg = listener.recoverableExceptionEncountered("Failed to retrieve check constraints", sqlException, sql);
                 if (msg != null) {
-                    logger.warning(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }
@@ -527,7 +525,7 @@ public class DatabaseService {
                 // don't die just because this failed
                 String msg = listener.recoverableExceptionEncountered("Failed to retrieve column type details", sqlException, sql);
                 if (msg != null) {
-                    logger.warning(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }
@@ -602,7 +600,7 @@ public class DatabaseService {
                 // don't die just because this failed
                 String msg = listener.recoverableExceptionEncountered("Failed to retrieve table/view comments", sqlException, sql);
                 if (msg != null) {
-                    logger.warning(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }
@@ -633,7 +631,7 @@ public class DatabaseService {
                 // don't die just because this failed
                 String msg = listener.recoverableExceptionEncountered("Failed to retrieve table/view comments", sqlException, sql);
                 if (msg != null) {
-                    logger.warning(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }
@@ -666,7 +664,7 @@ public class DatabaseService {
                 // don't die just because this failed
                 String msg = listener.recoverableExceptionEncountered("Failed to retrieve column comments", sqlException, sql);
                 if (msg != null) {
-                    logger.warning(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }
@@ -700,7 +698,7 @@ public class DatabaseService {
                 // don't die just because this failed
                 String msg = listener.recoverableExceptionEncountered("Failed to retrieve view column comments", sqlException, sql);
                 if (msg != null) {
-                    logger.warning(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }
@@ -739,7 +737,7 @@ public class DatabaseService {
                 // don't die just because this failed
                 String msg = listener.recoverableExceptionEncountered("Failed to retrieve stored procedure/function details", sqlException, sql);
                 if (msg != null) {
-                    logger.warning(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }
@@ -769,7 +767,7 @@ public class DatabaseService {
                 // don't die just because this failed
                 String msg = listener.recoverableExceptionEncountered("Failed to retrieve stored procedure/function details", sqlException, sql);
                 if (msg != null) {
-                    logger.warning(msg);
+                    LOGGER.warn(msg);
                 }
             }
         }

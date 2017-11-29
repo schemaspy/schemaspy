@@ -6,20 +6,21 @@ import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.ConfigFileArgumentParser;
 import org.schemaspy.cli.PropertyFileDefaultProvider;
 import org.schemaspy.cli.PropertyFileDefaultProviderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Configuration
 public class SchemaSpyConfiguration {
 
-    private static final Logger LOGGER = Logger.getLogger(SchemaSpyConfiguration.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
     private ConfigFileArgumentParser configFileArgumentParser;
@@ -63,7 +64,7 @@ public class SchemaSpyConfiguration {
         try {
             return commandLineArgumentParser.parse(args);
         } catch (ParameterException e) {
-            LOGGER.log(Level.SEVERE, e.getLocalizedMessage());
+            LOGGER.error(e.getLocalizedMessage());
             System.exit(1);
             return null;
         }
