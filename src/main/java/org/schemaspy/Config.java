@@ -30,8 +30,7 @@ import org.schemaspy.view.SqlFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.StringUtils;
+
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -41,6 +40,8 @@ import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.DatabaseMetaData;
 import java.util.*;
 import java.util.Map.Entry;
@@ -48,6 +49,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Configuration of a SchemaSpy run
@@ -336,7 +339,7 @@ public final class Config {
     public Integer getPort() {
         if (port == null) {
             String portAsString = pullParam("-port");
-            if (StringUtils.hasText(portAsString)) {
+            if (hasText(portAsString)) {
                 try {
                     port = Integer.valueOf(portAsString);
                 } catch (NumberFormatException notSpecified) {
@@ -345,6 +348,10 @@ public final class Config {
             }
         }
         return port;
+    }
+
+    private boolean hasText(String string) {
+        return Objects.nonNull(string) && !string.trim().isEmpty();
     }
 
     public void setServer(String server) {
@@ -1496,11 +1503,11 @@ public final class Config {
     }
 
     private void loadProperties(String path) {
-        File configFile = new File(path);
-        String contents;
-        try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
-            contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, "UTF-8"));
-            this.schemaspyProperties.load(new StringReader(contents.replace("\\", "\\\\")));
+        try (Stream<String> lineStream = Files.lines(Paths.get(path))) {
+            String content = lineStream
+                    .map(l -> l.replace("\\", "\\\\"))
+                    .collect(Collectors.joining(System.lineSeparator()));
+            this.schemaspyProperties.load(new StringReader(content));
         } catch (IOException e) {
             LOGGER.info("Configuration file not found");
         }

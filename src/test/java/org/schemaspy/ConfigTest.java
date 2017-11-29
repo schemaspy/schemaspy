@@ -1,7 +1,5 @@
 package org.schemaspy;
 
-import junit.framework.TestCase;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -21,9 +19,9 @@ public class ConfigTest {
         String[] args = {"-t", "mssql05", "-schemas", "dbo, sys", "-h"};
 
         Config config = new Config(args);
-        Assert.assertEquals(2, config.getSchemas().size());
-        Assert.assertTrue(config.isHelpRequired());
-        Assert.assertFalse(config.isDbHelpRequired());
+        assertThat(config.getSchemas().size()).isEqualTo(2);
+        assertThat(config.isHelpRequired()).isTrue();
+        assertThat(config.isDbHelpRequired()).isFalse();
         assertThat(config.getDbType()).isEqualToIgnoringCase("mssql05");
     }
 
@@ -31,6 +29,15 @@ public class ConfigTest {
     public void testLoadJars() {
         Config config = new Config("-loadjars", "true");
         assertThat(config.isLoadJDBCJarsEnabled()).isTrue();
+    }
+
+    @Test
+    public void testLoadProperties() {
+        Config config = new Config("-configFile", "src/test/resources/configTest/loadpropertiesTest.properties");
+        assertThat(config.getSchema()).isEqualToIgnoringCase("schema");
+        assertThat(config.getPassword()).isEqualToIgnoringCase("database_password");
+        assertThat(config.getUser()).isEqualToIgnoringCase("database_user");
+        assertThat(config.getPort()).isEqualTo(123);
     }
 
     @Test
