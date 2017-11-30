@@ -1,14 +1,13 @@
-package org.schemaspy.testcontainer;
+package org.schemaspy.app.integrationtesting;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.app.cli.CommandLineArguments;
 import org.schemaspy.model.*;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
@@ -32,13 +31,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Ignore
-/*
- https://github.com/schemaspy/schemaspy/pull/174#issuecomment-352158979
- Summary: mysql-connector-java has a bug regarding dots in tablePattern.
- https://bugs.mysql.com/bug.php?id=63992
-*/
-public class MysqlSpacesIT {
+public class MysqlSpacesNoDotsIT {
 
     @Autowired
     private SqlService sqlService;
@@ -62,7 +55,7 @@ public class MysqlSpacesIT {
             new JdbcContainerRule<>(() -> new MySQLContainer())
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/dbScripts/mysql_spaces.sql")
+                    .withInitScript("integrationTesting/dbScripts/mysql_spaces_no_dots.sql")
                     .withInitUser("root", "test");
 
     @Before
@@ -75,21 +68,21 @@ public class MysqlSpacesIT {
     private void doCreateDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
         String[] args = {
                 "-t", "mysql",
-                "-db", "TEST 1.0",
-                "-s", "TEST 1.0",
+                "-db", "TEST 1",
+                "-s", "TEST 1",
                 "-cat", "%",
-                "-o", "target/integrationtesting/mysql_spaces",
+                "-o", "target/integrationtesting/mysql_spaces_no_dots",
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysql_spaces"));
+        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysql_spaces_no_dots"));
         given(arguments.getDatabaseType()).willReturn("mysql");
         given(arguments.getUser()).willReturn("test");
-        given(arguments.getSchema()).willReturn("TEST 1.0");
+        given(arguments.getSchema()).willReturn("TEST 1");
         given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn("TEST 1.0");
+        given(arguments.getDatabaseName()).willReturn("TEST 1");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
@@ -100,33 +93,33 @@ public class MysqlSpacesIT {
     @Test
     public void databaseShouldExist() {
         assertThat(database).isNotNull();
-        assertThat(database.getName()).isEqualToIgnoringCase("TEST 1.0");
+        assertThat(database.getName()).isEqualToIgnoringCase("TEST 1");
     }
 
     @Test
     public void databaseShouldHaveTable() {
-        assertThat(database.getTables()).extracting(Table::getName).contains("TABLE 1.0");
+        assertThat(database.getTables()).extracting(Table::getName).contains("TABLE 1");
     }
 
     @Test
     public void tableShouldHavePKWithAutoIncrement() {
-        assertThat(database.getTablesByName().get("TABLE 1.0").getColumns()).extracting(TableColumn::getName).contains("id");
-        assertThat(database.getTablesByName().get("TABLE 1.0").getColumn("id").isPrimary()).isTrue();
-        assertThat(database.getTablesByName().get("TABLE 1.0").getColumn("id").isAutoUpdated()).isTrue();
+        assertThat(database.getTablesByName().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("id");
+        assertThat(database.getTablesByName().get("TABLE 1").getColumn("id").isPrimary()).isTrue();
+        assertThat(database.getTablesByName().get("TABLE 1").getColumn("id").isAutoUpdated()).isTrue();
     }
 
     @Test
     public void tableShouldHaveForeignKey() {
-        assertThat(database.getTablesByName().get("TABLE 1.0").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
+        assertThat(database.getTablesByName().get("TABLE 1").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
     }
 
     @Test
     public void tableShouldHaveUniqueKey() {
-        assertThat(database.getTablesByName().get("TABLE 1.0").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
+        assertThat(database.getTablesByName().get("TABLE 1").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
     }
 
     @Test
     public void tableShouldHaveColumnWithSpaceInIt() {
-        assertThat(database.getTablesByName().get("TABLE 1.0").getColumns()).extracting(TableColumn::getName).contains("link id");
+        assertThat(database.getTablesByName().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("link id");
     }
 }

@@ -1,23 +1,26 @@
-package org.schemaspy.testcontainer;
+package org.schemaspy.app.integrationtesting;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.app.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
+import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.OracleContainer;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -32,8 +35,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MysqlKeyWordTable {
-
+public class OracleSpacesIT {
     @Autowired
     private SqlService sqlService;
 
@@ -51,38 +53,44 @@ public class MysqlKeyWordTable {
 
     private static Database database;
 
-    @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MySQLContainer())
+    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
+            new JdbcContainerRule<>(() -> new OracleContainer())
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/dbScripts/mysql_keyword.sql");
+                    .withInitScript("integrationTesting/oracleSpacesIT/dbScripts/spaces_in_table_names.sql");
+
+    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+
+    @ClassRule
+    public static final TestRule chain = RuleChain
+            .outerRule(jdbcContainerRule)
+            .around(jdbcDriverClassPresentRule);
 
     @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
+    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
         if (database == null) {
-            doCreateDatabaseRepresentation();
+            createDatabaseRepresentation();
         }
     }
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
         String[] args = {
-                "-t", "mysql",
-                "-db", "test",
-                "-s", "test",
+                "-t", "orathin",
+                "-db", jdbcContainerRule.getContainer().getSid(),
+                "-s", "ORASPACEIT",
                 "-cat", "%",
-                "-o", "target/integrationtesting/mysql_keywords",
-                "-u", "test",
-                "-p", "test",
+                "-o", "target/integrationtesting/ORASPACEIT",
+                "-u", "oraspaceit",
+                "-p", "oraspaceit123",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
+                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysql_keywords"));
-        given(arguments.getDatabaseType()).willReturn("mysql");
-        given(arguments.getUser()).willReturn("test");
-        given(arguments.getSchema()).willReturn("test");
+        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/ORASPACEIT"));
+        given(arguments.getDatabaseType()).willReturn("orathin");
+        given(arguments.getUser()).willReturn("orait");
+        given(arguments.getSchema()).willReturn("ORASPACEIT");
         given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn("test");
+        given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
@@ -91,7 +99,7 @@ public class MysqlKeyWordTable {
     }
 
     @Test
-    public void hasATableNamedDistinct() {
-        assertThat(database.getTables()).extracting(t -> t.getName()).contains("DISTINCT");
+    public void databaseShouldHaveTableWithSpaces() {
+        assertThat(database.getTables()).extracting(t -> t.getName()).contains("test 1.0");
     }
 }

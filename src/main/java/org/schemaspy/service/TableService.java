@@ -10,10 +10,8 @@ import org.schemaspy.util.Markdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-
 import java.lang.invoke.MethodHandles;
-
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
