@@ -110,8 +110,7 @@ public class TableService {
             if (forceQuotes) {
                 if (!table.isLogical()) {
                     // don't completely choke just because we couldn't do this....
-                    LOGGER.warn("Failed to determine auto increment status: {}", exc);
-                    LOGGER.warn("SQL: {}", sql.toString());
+                    LOGGER.warn("Failed to determine auto increment status using SQL: {}", sql.toString(), exc);
                 }
             } else {
                 initColumnAutoUpdate(db, table, true);
@@ -183,7 +182,7 @@ public class TableService {
 
         column.setAllExcluded(column.matches(excludeColumns));
         column.setExcluded(column.isAllExcluded() || column.matches(excludeIndirectColumns));
-        LOGGER.trace("Excluding column {}" + '.' + "{}: matches {}:{} {}:{}", column.getTable(), column.getName(), excludeColumns, column.isAllExcluded(), excludeIndirectColumns, column.matches(excludeIndirectColumns));
+        LOGGER.debug("Excluding column {}" + '.' + "{}: matches {}:{} {}:{}", column.getTable(), column.getName(), excludeColumns, column.isAllExcluded(), excludeIndirectColumns, column.matches(excludeIndirectColumns));
 
         return column;
     }
@@ -196,7 +195,7 @@ public class TableService {
      * @throws SQLException
      */
     public void connectForeignKeys(Database db, Table table, Map<String, Table> tables) throws SQLException {
-        LOGGER.trace("Connecting foreign keys to {}", table.getFullName());
+        LOGGER.debug("Connecting foreign keys to {}", table.getFullName());
 
 
         try (ResultSet rs = db.getMetaData().getImportedKeys(table.getCatalog(), table.getSchema(), table.getName())) {
@@ -263,7 +262,7 @@ public class TableService {
      * @throws SQLException
      */
     private void connectForeignKeysRemoteTable(Database db, RemoteTable remoteTable, Map<String, Table> tables) throws SQLException {
-        LOGGER.trace("Connecting foreign keys to {}", remoteTable.getFullName());
+        LOGGER.debug("Connecting foreign keys to {}", remoteTable.getFullName());
 
         try (ResultSet rs = db.getMetaData().getImportedKeys(remoteTable.getCatalog(), remoteTable.getSchema(), remoteTable.getName())){
             // get remote table's FKs that reference PKs in our schema
@@ -374,7 +373,7 @@ public class TableService {
         } else
             sql.append(db.getQuotedIdentifier(table.getName()));
 
-        LOGGER.trace(sql.toString());
+        LOGGER.debug(sql.toString());
         try (PreparedStatement stmt = sqlService.prepareStatement(sql.toString());
              ResultSet rs = stmt.executeQuery()) {
 

@@ -58,7 +58,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      */
     public ForeignKeyConstraint(Table child, String name, int updateRule, int deleteRule) {
         this.name = name; // implied constraints will have a null name and override getName()
-        LOGGER.trace("Adding foreign key constraint '{}' to {}", getName(), child.getFullName());
+        LOGGER.debug("Adding foreign key constraint '{}' to {}", getName(), child.getFullName());
         childTable = child;
         this.deleteRule = deleteRule;
         this.updateRule = updateRule;
