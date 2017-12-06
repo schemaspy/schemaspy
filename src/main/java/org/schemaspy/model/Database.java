@@ -21,16 +21,21 @@ package org.schemaspy.model;
 import org.schemaspy.Config;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.util.CaseInsensitiveMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Database {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final Config config;
     private final String databaseName ;
     private final Catalog catalog ;
@@ -45,7 +50,6 @@ public class Database {
     private final String connectTime = new SimpleDateFormat("EEE MMM dd HH:mm z yyyy").format(new Date());
     private Set<String> sqlKeywords;
     private Pattern invalidIdentifierPattern;
-    private final Logger logger = Logger.getLogger(getClass().getName());
 	private final ProgressListener listener;
 
     public Database(Config config, DatabaseMetaData meta, String name, String catalog, String schema, SchemaMeta schemaMeta,
@@ -153,10 +157,10 @@ public class Database {
     /**
      * Return an uppercased <code>Set</code> of all SQL keywords used by a database
      *
+     *
      * @return
-     * @throws SQLException
      */
-    public Set<String> getSqlKeywords() throws SQLException {
+    public Set<String> getSqlKeywords() {
         if (sqlKeywords == null) {
             // from http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt:
             String[] sql92Keywords =
@@ -223,7 +227,13 @@ public class Database {
                 "| YEAR" +
                 "| ZONE").split("[| ]+");
 
-            String[] nonSql92Keywords = getMetaData().getSQLKeywords().toUpperCase().split(",\\s*");
+            String[] nonSql92Keywords = new String[0];
+            try {
+                nonSql92Keywords = getMetaData().getSQLKeywords().toUpperCase().split(",\\s*");
+            } catch (SQLException sqle) {
+                LOGGER.warn("Failed to retrieve SQLKeywords from metadata, using only SQL92 keywords");
+                LOGGER.debug("Failed to retrieve SQLKeywords from metadata, using only SQL92 keywords", sqle);
+            }
 
             sqlKeywords = new HashSet<String>() {
                 private static final long serialVersionUID = 1L;
@@ -280,7 +290,7 @@ public class Database {
             for (int i = 0; i < extraValidChars.length(); ++i) {
                 char ch = extraValidChars.charAt(i);
                 if (reservedRegexChars.indexOf(ch) >= 0)
-                    validChars += "\\";
+                    validChars += "" + "\\";
                 validChars += ch;
             }
 

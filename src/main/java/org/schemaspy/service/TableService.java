@@ -2,25 +2,14 @@ package org.schemaspy.service;
 
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ForeignKey;
-import org.schemaspy.model.ForeignKeyConstraint;
-import org.schemaspy.model.LogicalRemoteTable;
-import org.schemaspy.model.RemoteTable;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.model.TableIndex;
+import org.schemaspy.model.*;
 import org.schemaspy.model.xml.ForeignKeyMeta;
 import org.schemaspy.model.xml.TableColumnMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.util.Markdown;
 import org.springframework.stereotype.Service;
 
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
@@ -111,7 +100,11 @@ public class TableService {
 
             ResultSetMetaData rsMeta = rs.getMetaData();
             for (int i = rsMeta.getColumnCount(); i > 0; --i) {
-                TableColumn column = table.getColumn(rsMeta.getColumnName(i));
+                String columnName = rsMeta.getColumnName(i);
+                TableColumn column = getColumn(table, columnName);
+                if (Objects.isNull(column)) {
+                    throw new InconsistencyException("Column information from DatabaseMetaData differs from ResultSetMetaData, expected to find column named: "+ columnName);
+                }
                 column.setIsAutoUpdated(rsMeta.isAutoIncrement(i));
             }
         } catch (SQLException exc) {
@@ -125,6 +118,18 @@ public class TableService {
                 initColumnAutoUpdate(db, table, true);
             }
         }
+    }
+
+    private TableColumn getColumn(Table table, String columnName) {
+        TableColumn column = table.getColumn(columnName);
+        if (Objects.isNull(column)) {
+            if (columnName.startsWith(table.getName())) {
+                column = table.getColumn(columnName.substring(table.getName().length() + 1 ));
+            } else if(columnName.startsWith(table.getFullName())) {
+                column = table.getColumn(columnName.substring(table.getFullName().length() + 1 ));
+            }
+        }
+        return column;
     }
 
     /**
@@ -252,6 +257,9 @@ public class TableService {
                         addRemoteTable(db, otherCatalog, otherSchema, exportedKey.getFKTABLE_NAME(), table.getSchema(), false);
                     }
                 }
+            } catch (SQLException sqlex) {
+                LOGGER.log(Level.WARNING, "Failed to getExportedKeys");
+                LOGGER.log(Level.FINE, "Failed to getExportedKeys", sqlex);
             }
         }
     }
