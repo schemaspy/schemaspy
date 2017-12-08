@@ -3,10 +3,7 @@ package org.schemaspy.cli;
 import com.beust.jcommander.IDefaultProvider;
 import org.springframework.util.FileCopyUtils;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -31,10 +28,9 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
     }
 
     private static Properties loadProperties(String path) {
-        try {
-            FileInputStream inputStream = new FileInputStream(path);
+        try (Reader reader = new InputStreamReader(new FileInputStream(path), "UTF-8")){
             Properties properties = new Properties();
-            String contents = FileCopyUtils.copyToString(new InputStreamReader(inputStream, "UTF-8"));
+            String contents = FileCopyUtils.copyToString(reader);
             // Replace backslashes with double backslashes to escape windows path separator.
             // Example input: schemaspy.o=C:\tools\schemaspy\output
             properties.load(new StringReader(contents.replace("\\", "\\\\")));

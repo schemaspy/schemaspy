@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.List;
 
 /**
@@ -13,13 +14,14 @@ import java.util.List;
  */
 public class DiagramUtil {
 
-    public static void generateDiagram(String diagramName, Dot dot, File dotFile, File diagramFile, List<MustacheTableDiagram> diagrams, boolean isActive, boolean isImplied) throws Dot.DotFailure {
+    public static void generateDiagram(String diagramName, Dot dot, File dotFile, File diagramFile, List<MustacheTableDiagram> diagrams, boolean isActive, boolean isImplied) throws IOException {
         if (dotFile.exists()) {
             String mapDegreesDotFile = dot.generateDiagram(dotFile, diagramFile);
             createDiagram(diagramName, diagramFile, mapDegreesDotFile, diagrams, isActive, isImplied);
         } else {
-            dotFile.delete();
-            diagramFile.delete();
+            Files.deleteIfExists(dotFile.toPath());
+            Files.deleteIfExists(diagramFile.toPath());
+
         }
     }
 

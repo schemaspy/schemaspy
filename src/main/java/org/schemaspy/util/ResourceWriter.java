@@ -94,7 +94,7 @@ public class ResourceWriter {
 
 
                     if (jarEntry.isDirectory()) {
-                        currentFile.mkdirs();
+                        FileUtils.forceMkdir(currentFile);
                     } else {
                         if (filter == null || filter.accept(currentFile)) {
                             InputStream is = jarFile.getInputStream(jarEntry);
