@@ -6,6 +6,7 @@
    home
    installation
    started
+   configuration
 
 
 Indices and tables
