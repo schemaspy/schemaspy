@@ -18,12 +18,15 @@
  */
 package org.schemaspy.model.xml;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
+import org.schemaspy.Config;
+import org.schemaspy.model.InvalidConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -34,15 +37,12 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import org.schemaspy.Config;
-import org.schemaspy.model.InvalidConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Additional metadata about a schema as expressed in XML instead of from
@@ -82,8 +82,6 @@ public class SchemaMeta {
         Document doc = parse(metaFile);
 
         NodeList commentsNodes = doc.getElementsByTagName("comments");
-        if (commentsNodes == null)
-            commentsNodes = doc.getElementsByTagName("remarks");
         if (commentsNodes != null && commentsNodes.getLength() > 0)
             comments = commentsNodes.item(0).getTextContent();
         else
