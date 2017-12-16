@@ -51,7 +51,7 @@ public class TableService {
 
 
         synchronized (Table.class) {
-            try (ResultSet rs = db.getMetaData().getColumns(table.getCatalog(), table.getSchema(), db.getQuotedIdentifier(table.getName()), "%")) {
+            try (ResultSet rs = db.getMetaData().getColumns(table.getCatalog(), table.getSchema(), table.getName(), "%")) {
                 while (rs.next())
                     addColumn(table, rs);
             } catch (SQLException exc) {
