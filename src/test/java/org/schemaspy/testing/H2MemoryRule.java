@@ -1,24 +1,42 @@
 package org.schemaspy.testing;
 
-import java.io.InputStream;
+import org.h2.Driver;
+import org.junit.rules.ExternalResource;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.h2.Driver;
-import org.junit.rules.ExternalResource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class H2MemoryRule extends ExternalResource {
 
   private final String connectionString;
-  private final String[] sqls;
+  private String scriptPath;
+  private List<String> sqls = new ArrayList<>();
 
   private Connection keepAlive;
 
-  public H2MemoryRule(String name, String...sqls) {
+  public H2MemoryRule(String name) {
     this.connectionString = "jdbc:h2:mem:" + name;
-    this.sqls = sqls;
+  }
+
+  public H2MemoryRule addSqls(String...sqls) {
+    Arrays.stream(sqls).forEach(s -> this.sqls.add(s));
+    return this;
+  }
+
+  public H2MemoryRule addSqlScript(String scriptPath) {
+    this.scriptPath = scriptPath;
+    return this;
   }
 
   public String getConnectionURL() {
@@ -27,15 +45,26 @@ public class H2MemoryRule extends ExternalResource {
 
   @Override
   protected void before() throws Throwable {
+    loadScript();
     Driver.load();
     String user = "sa";
     keepAlive = DriverManager.getConnection(connectionString, "sa", "");
-    Statement statement = keepAlive.createStatement();
-    for (String sql : sqls) {
-      statement.addBatch(sql);
+    if (!sqls.isEmpty()) {
+      Statement statement = keepAlive.createStatement();
+      for (String sql : sqls) {
+        statement.addBatch(sql.trim());
+      }
+      statement.executeBatch();
+      keepAlive.commit();
     }
-    statement.executeBatch();
-    keepAlive.commit();
+  }
+
+  private void loadScript() throws IOException {
+    if (Objects.nonNull(scriptPath) && !scriptPath.trim().isEmpty()) {
+      Path p = Paths.get(scriptPath);
+      String[] sqlStatements = Files.readAllLines(p).stream().map(String::trim).collect(Collectors.joining()).split(";");
+      Arrays.stream(sqlStatements).forEach(s -> this.sqls.add(s + ";"));
+    }
   }
 
   public Connection getConnection() {

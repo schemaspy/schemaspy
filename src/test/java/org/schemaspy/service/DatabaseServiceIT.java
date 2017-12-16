@@ -30,7 +30,7 @@ public class DatabaseServiceIT {
     private static String CREATE_TABLE = "CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))";
 
     @Rule
-    public H2MemoryRule h2MemoryRule = new H2MemoryRule("DatabaseServiceIT", CREATE_SCHEMA, SET_SCHEMA, CREATE_TABLE);
+    public H2MemoryRule h2MemoryRule = new H2MemoryRule("DatabaseServiceIT").addSqls(CREATE_SCHEMA, SET_SCHEMA, CREATE_TABLE);
 
     @Autowired
     private SqlService sqlService;
