@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.schemaspy.view;
+package org.schemaspy.output.xml.dom;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -28,7 +28,6 @@ import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
-import org.schemaspy.util.DOMUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
