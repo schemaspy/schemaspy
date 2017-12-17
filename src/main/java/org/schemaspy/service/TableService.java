@@ -7,14 +7,17 @@ import org.schemaspy.model.xml.ForeignKeyMeta;
 import org.schemaspy.model.xml.TableColumnMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.util.Markdown;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
+
+import java.lang.invoke.MethodHandles;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -23,14 +26,11 @@ import java.util.regex.Pattern;
 @Service
 public class TableService {
 
-    private static final Logger LOGGER = Logger.getLogger(TableService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
 
     private final CommandLineArguments commandLineArguments;
-
-    private final static boolean finerEnabled = LOGGER.isLoggable(Level.FINER);
-    private final static boolean fineEnabled = LOGGER.isLoggable(Level.FINE);
 
     public TableService(SqlService sqlService, CommandLineArguments commandLineArguments) {
         this.sqlService = Objects.requireNonNull(sqlService);
@@ -111,8 +111,8 @@ public class TableService {
             if (forceQuotes) {
                 if (!table.isLogical()) {
                     // don't completely choke just because we couldn't do this....
-                    LOGGER.warning("Failed to determine auto increment status: " + exc);
-                    LOGGER.warning("SQL: " + sql.toString());
+                    LOGGER.warn("Failed to determine auto increment status: {}", exc);
+                    LOGGER.warn("SQL: {}", sql.toString());
                 }
             } else {
                 initColumnAutoUpdate(db, table, true);
@@ -184,11 +184,7 @@ public class TableService {
 
         column.setAllExcluded(column.matches(excludeColumns));
         column.setExcluded(column.isAllExcluded() || column.matches(excludeIndirectColumns));
-        if (column.isExcluded() && finerEnabled) {
-            LOGGER.finer("Excluding column " + column.getTable() + '.' + column.getName() +
-                    ": matches " + excludeColumns + ":" + column.isAllExcluded() + " " +
-                    excludeIndirectColumns + ":" + column.matches(excludeIndirectColumns));
-        }
+        LOGGER.trace("Excluding column {}" + '.' + "{}: matches {}:{} {}:{}", column.getTable(), column.getName(), excludeColumns, column.isAllExcluded(), excludeIndirectColumns, column.matches(excludeIndirectColumns));
 
         return column;
     }
@@ -201,8 +197,7 @@ public class TableService {
      * @throws SQLException
      */
     public void connectForeignKeys(Database db, Table table, Map<String, Table> tables) throws SQLException {
-        if (finerEnabled)
-            LOGGER.finer("Connecting foreign keys to " + table.getFullName());
+        LOGGER.trace("Connecting foreign keys to {}", table.getFullName());
 
 
         try (ResultSet rs = db.getMetaData().getImportedKeys(table.getCatalog(), table.getSchema(), table.getName())) {
@@ -258,8 +253,7 @@ public class TableService {
                     }
                 }
             } catch (SQLException sqlex) {
-                LOGGER.log(Level.WARNING, "Failed to getExportedKeys");
-                LOGGER.log(Level.FINE, "Failed to getExportedKeys", sqlex);
+                LOGGER.warn("Failed to getExportedKeys", sqlex);
             }
         }
     }
@@ -269,8 +263,7 @@ public class TableService {
      * @throws SQLException
      */
     private void connectForeignKeysRemoteTable(Database db, RemoteTable remoteTable, Map<String, Table> tables) throws SQLException {
-        if (finerEnabled)
-            LOGGER.finer("Connecting foreign keys to " + remoteTable.getFullName());
+        LOGGER.trace("Connecting foreign keys to {}", remoteTable.getFullName());
 
         try (ResultSet rs = db.getMetaData().getImportedKeys(remoteTable.getCatalog(), remoteTable.getSchema(), remoteTable.getName())){
             // get remote table's FKs that reference PKs in our schema
@@ -323,8 +316,7 @@ public class TableService {
         Pattern exclude = Config.getInstance().getTableExclusions();
 
         if (!include.matcher(pkTableName).matches() || exclude.matcher(pkTableName).matches()) {
-            if (fineEnabled)
-                LOGGER.fine("Ignoring " + table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName) + " referenced by FK " + fkName);
+            LOGGER.debug("Ignoring {} referenced by FK {}", table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName), fkName);
             return;
         }
 
@@ -349,8 +341,7 @@ public class TableService {
             // if named table doesn't exist in this schema
             // or exists here but really referencing same named table in another schema
             if (parentTable == null || !baseContainer.equals(parentContainer)) {
-                if (fineEnabled)
-                    LOGGER.fine("Adding remote table " + table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName));
+                LOGGER.debug("Adding remote table {}", table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName));
                 parentTable = addRemoteTable(db, pkCatalog, pkSchema, pkTableName, baseContainer, false);
             }
 
@@ -362,16 +353,13 @@ public class TableService {
                     childColumn.addParent(parentColumn, foreignKey);
                     parentColumn.addChild(childColumn, foreignKey);
                 } else {
-                    LOGGER.warning("Couldn't add FK '" + foreignKey.getName() + "' to table '" + table.getName() +
-                            "' - Column '" + pkColName + "' doesn't exist in table '" + parentTable + "'");
+                    LOGGER.warn("Couldn't add FK '{}' to table '{}' - Column '{}' doesn't exist in table '{}'", foreignKey.getName(), table.getName(), pkColName, parentTable);
                 }
             } else {
-                LOGGER.warning("Couldn't add FK '" + foreignKey.getName() + "' to table '" + table.getName() +
-                        "' - Unknown Referenced Table '" + pkTableName + "'");
+                LOGGER.warn("Couldn't add FK '{}' to table '{}' - Unknown Referenced Table '{}'", foreignKey.getName(), table.getName(), pkTableName);
             }
         } else {
-            LOGGER.warning("Couldn't add FK '" + foreignKey.getName() + "' to table '" + table.getName() +
-                    "' - Column '" + fkColName + "' doesn't exist");
+            LOGGER.warn("Couldn't add FK '{}' to table '{}' - Column '{}' doesn't exist", foreignKey.getName(), table.getName(), fkColName);
         }
     }
 
@@ -386,8 +374,7 @@ public class TableService {
         } else
             sql.append(db.getQuotedIdentifier(table.getName()));
 
-        if (finerEnabled)
-            LOGGER.finer(sql.toString());
+        LOGGER.trace(sql.toString());
         try (PreparedStatement stmt = sqlService.prepareStatement(sql.toString());
              ResultSet rs = stmt.executeQuery()) {
 
@@ -460,12 +447,12 @@ public class TableService {
                 return fetchNumRows(db, table, "count(1)", false);
             } catch (SQLException try3Exception) {
                 if (!table.isLogical()) {
-                    LOGGER.warning("Unable to extract the number of rows for table " + table.getName() + ", using '-1'");
+                    LOGGER.warn("Unable to extract the number of rows for table {}, using '-1'", table.getName());
                     if (originalFailure != null)
-                        LOGGER.warning(originalFailure.toString());
-                    LOGGER.warning(try2Exception.toString());
+                        LOGGER.warn(originalFailure.toString());
+                    LOGGER.warn(try2Exception.toString());
                     if (!String.valueOf(try2Exception.toString()).equals(try3Exception.toString()))
-                        LOGGER.warning(try3Exception.toString());
+                        LOGGER.warn(try3Exception.toString());
                 }
                 return -1;
             }
@@ -476,8 +463,7 @@ public class TableService {
         String fullName = db.getRemoteTableKey(remoteCatalog, remoteSchema, remoteTableName);
         RemoteTable remoteTable = (RemoteTable)db.getRemoteTablesMap().get(fullName);
         if (remoteTable == null) {
-            if (fineEnabled)
-                LOGGER.fine("Creating remote table " + fullName);
+            LOGGER.debug("Creating remote table {}", fullName);
 
             if (logical)
                 remoteTable = new LogicalRemoteTable(db, remoteCatalog, remoteSchema, remoteTableName, baseContainer);
@@ -486,8 +472,7 @@ public class TableService {
                 this.initColumns(db, remoteTable);
             }
 
-            if (fineEnabled)
-                LOGGER.fine("Adding remote table " + fullName);
+            LOGGER.debug("Adding remote table {}", fullName);
 
             db.getRemoteTablesMap().put(fullName, remoteTable);
             connectForeignKeysRemoteTable(db, remoteTable, db.getLocals());
@@ -527,7 +512,7 @@ public class TableService {
                         TableColumn parentColumn = parent.getColumn(fk.getColumnName());
 
                         if (parentColumn == null) {
-                            LOGGER.warning("Undefined column '" + parent.getName() + '.' + fk.getColumnName() + "' referenced by '" + col.getTable()+ '.' + col + "' in XML metadata");
+                            LOGGER.warn("Undefined column '{}" + '.' + "{}' referenced by '{}" + '.' + "{}' in XML metadata", parent.getName(), fk.getColumnName(), col.getTable(), col);
                         } else {
                             /**
                              * Merely instantiating a foreign key constraint ties it
@@ -543,16 +528,16 @@ public class TableService {
 
                             // they forgot to say it was a primary key
                             if (!parentColumn.isPrimary()) {
-                                LOGGER.warning("Assuming " + parentColumn.getTable() + '.' + parentColumn + " is a primary key due to being referenced by " + col.getTable() + '.' + col);
+                                LOGGER.warn("Assuming {}" + '.' + "{} is a primary key due to being referenced by {}" + '.' + "{}", parentColumn.getTable(), parentColumn, col.getTable(), col);
                                 parent.setPrimaryColumn(parentColumn);
                             }
                         }
                     } else {
-                        LOGGER.warning("Undefined table '" + fk.getTableName() + "' referenced by '" + table.getName() + '.' + col.getName() + "' in XML metadata");
+                        LOGGER.warn("Undefined table '{}' referenced by '{}" + '.' + "{}' in XML metadata", fk.getTableName(), table.getName(), col.getName());
                     }
                 }
             } else {
-                LOGGER.warning("Undefined column '" + table.getName() + '.' + colMeta.getName() + "' in XML metadata");
+                LOGGER.warn("Undefined column '{}" + '.' + "{}' in XML metadata", table.getName(), colMeta.getName());
             }
         }
     }
@@ -583,7 +568,7 @@ public class TableService {
             }
         } catch (SQLException exc) {
             if (!table.isLogical())
-                LOGGER.warning("Unable to extract index info for table '" + table.getName() + "' in schema '" + table.getContainer() + "': " + exc);
+                LOGGER.warn("Unable to extract index info for table '{}' in schema '{}': {}", table.getName(), table.getContainer(), exc);
         }
     }
 
@@ -605,8 +590,8 @@ public class TableService {
                     addIndex(table, rs);
             }
         } catch (SQLException sqlException) {
-            LOGGER.warning("Failed to query index information with SQL: " + selectIndexesSql);
-            LOGGER.warning(sqlException.toString());
+            LOGGER.warn("Failed to query index information with SQL: {}", selectIndexesSql);
+            LOGGER.warn(sqlException.toString());
             return false;
         }
 
@@ -640,8 +625,7 @@ public class TableService {
      */
     private void initPrimaryKeys(Database db, Table table) throws SQLException {
 
-        if (fineEnabled)
-            LOGGER.fine("Querying primary keys for " + table.getFullName());
+        LOGGER.debug("Querying primary keys for {}", table.getFullName());
         try (ResultSet rs = db.getMetaData().getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName())){
             while (rs.next())
                 setPrimaryColumn(table, rs);

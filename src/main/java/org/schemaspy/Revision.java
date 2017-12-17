@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -29,7 +30,7 @@ import java.util.jar.Manifest;
  * @author John Currier
  */
 public class Revision {
-	private static final Logger logger       = LoggerFactory.getLogger(Revision.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private static       String rev          = "Unknown";
 	private static final String resourceName = "/META-INF/MANIFEST.MF";
 
@@ -43,7 +44,7 @@ public class Revision {
 			Attributes main     = manifest.getMainAttributes();
 			rev = (String) main.getOrDefault("Implementation-Build","Unknown");
 		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
+			LOGGER.error(ex.getMessage(), ex);
 		}
 	}
 

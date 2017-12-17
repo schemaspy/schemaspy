@@ -1,11 +1,12 @@
 package org.schemaspy.cli;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This class creates instances of {@link PropertyFileDefaultProvider} based on a name of the {@link java.util.Properties} file.
@@ -13,7 +14,7 @@ import java.util.logging.Logger;
 @Component
 public class PropertyFileDefaultProviderFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(PropertyFileDefaultProviderFactory.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String DEFAULT_PROPERTIES_FILE_NAME = "schemaspy.properties";
 
@@ -35,18 +36,18 @@ public class PropertyFileDefaultProviderFactory {
     public Optional<PropertyFileDefaultProvider> create(String propertiesFilename) {
         if (propertiesFilename != null) {
             if (exists(propertiesFilename)) {
-                LOGGER.log(Level.INFO, "Found configuration file: " + propertiesFilename);
+				LOGGER.info("Found configuration file: {}", propertiesFilename);
                 PropertyFileDefaultProvider value = new PropertyFileDefaultProvider(propertiesFilename);
                 return Optional.of(value);
             } else {
-                LOGGER.log(Level.SEVERE, "Could not find config file: " + propertiesFilename);
+				LOGGER.error("Could not find config file: {}", propertiesFilename);
                 System.exit(0);
                 return null;
             }
         }
 
         if (exists(DEFAULT_PROPERTIES_FILE_NAME)) {
-            LOGGER.log(Level.INFO, "Found configuration file: " + DEFAULT_PROPERTIES_FILE_NAME);
+            LOGGER.info("Found configuration file: {}",DEFAULT_PROPERTIES_FILE_NAME);
             return Optional.of(new PropertyFileDefaultProvider(DEFAULT_PROPERTIES_FILE_NAME));
         }
         return Optional.empty();

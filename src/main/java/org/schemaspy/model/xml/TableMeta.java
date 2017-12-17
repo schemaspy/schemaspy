@@ -18,9 +18,12 @@
  */
 package org.schemaspy.model.xml;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -38,7 +41,8 @@ public class TableMeta {
     private final List<TableColumnMeta> columns = new ArrayList<TableColumnMeta>();
     private final String remoteCatalog;
     private final String remoteSchema;
-    private static final Logger logger = Logger.getLogger(TableMeta.class.getName());
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     TableMeta(Node tableNode) {
         NamedNodeMap attribs = tableNode.getAttributes();
@@ -61,10 +65,7 @@ public class TableMeta {
         node = attribs.getNamedItem("remoteCatalog");
         remoteCatalog = node == null ? null : node.getNodeValue().trim();
 
-        logger.fine("Found XML table metadata for " + name +
-                    " remoteCatalog: " + remoteCatalog +
-                    " remoteSchema: " + remoteSchema +
-                    " comments: " + comments);
+        LOGGER.debug("Found XML table metadata for {} remoteCatalog: {} remoteSchema: {} comments: {}", name, remoteCatalog, remoteSchema, comments);
 
         NodeList columnNodes = ((Element)tableNode.getChildNodes()).getElementsByTagName("column");
 

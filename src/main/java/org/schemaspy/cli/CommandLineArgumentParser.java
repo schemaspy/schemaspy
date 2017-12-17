@@ -2,18 +2,19 @@ package org.schemaspy.cli;
 
 import com.beust.jcommander.JCommander;
 import org.schemaspy.Config;
-import org.schemaspy.SchemaSpyConfiguration;
 import org.schemaspy.util.DbSpecificConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.lang.invoke.MethodHandles;
+
 
 /**
  * This class uses {@link JCommander} to parse the SchemaSpy command line arguments represented by {@link CommandLineArguments}.
  */
 public class CommandLineArgumentParser {
 
-    private static final Logger LOGGER = Logger.getLogger(CommandLineArgumentParser.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final JCommander jCommander;
 
@@ -62,7 +63,7 @@ public class CommandLineArgumentParser {
         builder.append(System.lineSeparator());
         builder.append(System.lineSeparator());
 
-        LOGGER.log(Level.INFO, builder.toString());
+        LOGGER.info(builder.toString());
     }
 
     /**
@@ -72,11 +73,11 @@ public class CommandLineArgumentParser {
     public void printDatabaseTypesHelp() {
         String schemaspyJarFileName = Config.getLoadedFromJar();
 
-        LOGGER.log(Level.INFO,"Built-in database types and their required connection parameters:");
+        LOGGER.info("Built-in database types and their required connection parameters:");
         for (String type : Config.getBuiltInDatabaseTypes(schemaspyJarFileName)) {
             new DbSpecificConfig(type).dumpUsage();
         }
-        LOGGER.log(Level.INFO,"You can use your own database types by specifying the filespec of a .properties file with -t.");
-        LOGGER.log(Level.INFO,"Grab one out of " + schemaspyJarFileName + " and modify it to suit your needs.");
+        LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
+        LOGGER.info("Grab one out of {} and modify it to suit your needs.", schemaspyJarFileName);
     }
 }

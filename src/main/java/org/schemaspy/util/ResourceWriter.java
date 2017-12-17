@@ -20,22 +20,24 @@ package org.schemaspy.util;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Logger;
 
 public class ResourceWriter {
-    private static final Logger logger = Logger.getLogger(ResourceWriter.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Copies resources to target folder.
@@ -107,7 +109,7 @@ public class ResourceWriter {
                 }
             }
         } catch (IOException e) {
-            logger.warning(e.getMessage());
+            LOGGER.warn(e.getMessage(),e);
         }
     }
 }

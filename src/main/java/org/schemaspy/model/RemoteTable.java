@@ -18,8 +18,8 @@
  */
 package org.schemaspy.model;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+
 
 /**
  * A table that's outside of the default schema but is referenced
@@ -30,8 +30,6 @@ import java.util.logging.Logger;
 public class RemoteTable extends Table {
 
     private final String baseContainer;
-    private final static Logger logger = Logger.getLogger(RemoteTable.class.getName());
-    private final static boolean finerEnabled = logger.isLoggable(Level.FINER);
 
     /**
      * @param db

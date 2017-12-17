@@ -28,6 +28,8 @@ import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.util.*;
 import org.schemaspy.view.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -39,16 +41,13 @@ import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 //import javax.xml.validation.Schema;
 
@@ -57,8 +56,7 @@ import java.util.logging.Logger;
  */
 @Component
 public class SchemaAnalyzer {
-    private final Logger logger = Logger.getLogger(getClass().getName());
-    private boolean fineEnabled;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
 
@@ -76,7 +74,7 @@ public class SchemaAnalyzer {
     	// don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
     	// and not already logging fine details (to keep from obfuscating those)
 
-        boolean render = config.isHtmlGenerationEnabled() && !fineEnabled;
+        boolean render = config.isHtmlGenerationEnabled();
         ProgressListener progressListener = new ConsoleProgressListener(render, commandLineArguments);
         
     	// if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas  
@@ -113,7 +111,7 @@ public class SchemaAnalyzer {
                 if (schemas.isEmpty())
                 	schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
                 if (schemas.isEmpty())
-                	schemas = Arrays.asList(new String[] {config.getUser()});
+                	schemas = Arrays.asList(config.getUser());
             }
 
         	System.out.println("Analyzing schemas: "+schemas.toString());
@@ -156,19 +154,7 @@ public class SchemaAnalyzer {
 
     public Database analyze(String schema, Config config, File outputDir,  ProgressListener progressListener) throws SQLException, IOException {
         try {
-            // set the log level for the root logger
-            Logger.getLogger("").setLevel(config.getLogLevel());
-
-            // clean-up console output a bit
-            for (Handler handler : Logger.getLogger("").getHandlers()) {
-                if (handler instanceof ConsoleHandler) {
-                    ((ConsoleHandler)handler).setFormatter(new LogFormatter());
-                    handler.setLevel(config.getLogLevel());
-                }
-            }
-
-            fineEnabled = logger.isLoggable(Level.FINE);
-            logger.info("Starting schema analysis");
+            LOGGER.info("Starting schema analysis");
 
             FileUtils.forceMkdir(outputDir);
 
@@ -178,8 +164,8 @@ public class SchemaAnalyzer {
 
             DatabaseMetaData meta = sqlService.connect(config);
 
-            logger.fine("supportsSchemasInTableDefinitions: " + meta.supportsSchemasInTableDefinitions());
-            logger.fine("supportsCatalogsInTableDefinitions: " + meta.supportsCatalogsInTableDefinitions());
+            LOGGER.debug("supportsSchemasInTableDefinitions: {}", meta.supportsSchemasInTableDefinitions());
+            LOGGER.debug("supportsCatalogsInTableDefinitions: {}", meta.supportsCatalogsInTableDefinitions());
 
             // set default Catalog and Schema of the connection
             if(schema == null)
@@ -192,10 +178,10 @@ public class SchemaAnalyzer {
                 FileUtils.forceMkdir(new File(outputDir, "tables"));
                 FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
-                logger.info("Connected to " + meta.getDatabaseProductName() + " - " + meta.getDatabaseProductVersion());
+                LOGGER.info("Connected to {} - {}", meta.getDatabaseProductName(), meta.getDatabaseProductVersion());
 
                 if (schemaMeta != null && schemaMeta.getFile() != null) {
-                    logger.info("Using additional metadata from " + schemaMeta.getFile());
+                    LOGGER.info("Using additional metadata from {}", schemaMeta.getFile());
                 }
             }
 
@@ -282,12 +268,10 @@ public class SchemaAnalyzer {
             long overallDuration = progressListener.finished(tables, config);
 
             if (config.isHtmlGenerationEnabled()) {
-                logger.info("Wrote table details in " + duration / 1000 + " seconds");
+                LOGGER.info("Wrote table details in {} seconds", duration / 1000);
 
-                if (logger.isLoggable(Level.INFO)) {
-                    logger.info("Wrote relationship details of " + tables.size() + " tables/views to directory '" + outputDir + "' in " + overallDuration / 1000 + " seconds.");
-                    logger.info("View the results by opening " + new File(outputDir, "index.html"));
-                }
+                LOGGER.info("Wrote relationship details of {} tables/views to directory '{}' in {} seconds.", tables.size(), outputDir, overallDuration / 1000);
+                LOGGER.info("View the results by opening {}", new File(outputDir, "index.html"));
             }
 
             return db;
@@ -321,8 +305,8 @@ public class SchemaAnalyzer {
 
     private void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
         LineWriter out;
-        logger.info("Gathered schema details in " + duration / 1000 + " seconds");
-        logger.info("Writing/graphing summary");
+        LOGGER.info("Gathered schema details in {} seconds", duration / 1000);
+        LOGGER.info("Writing/graphing summary");
 
         prepareLayoutFiles(outputDir);
 
@@ -423,8 +407,8 @@ public class SchemaAnalyzer {
 
         duration = progressListener.startedGraphingDetails();
 
-        logger.info("Completed summary in " + duration / 1000 + " seconds");
-        logger.info("Writing/diagramming details");
+        LOGGER.info("Completed summary in {} seconds", duration / 1000);
+        LOGGER.info("Writing/diagramming details");
 
         generateTables(progressListener, outputDir, db, tables, stats);
         HtmlComponentPage.getInstance().write(db, tables, outputDir);
@@ -469,8 +453,7 @@ public class SchemaAnalyzer {
         HtmlTablePage tableFormatter = HtmlTablePage.getInstance();
         for (Table table : tables) {
             progressListener.graphingDetailsProgressed(table);
-            if (fineEnabled)
-                logger.fine("Writing details of " + table.getName());
+            LOGGER.debug("Writing details of {}", table.getName());
 
             tableFormatter.write(db, table, outputDir, stats);
         }

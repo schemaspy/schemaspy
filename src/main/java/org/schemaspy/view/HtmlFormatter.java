@@ -18,28 +18,19 @@
  */
 package org.schemaspy.view;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 import java.net.URLEncoder;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
 
-import com.github.mustachejava.MustacheVisitor;
 import com.github.mustachejava.util.HtmlEscaper;
 import org.schemaspy.Config;
-import org.schemaspy.Revision;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.util.Dot;
-import org.schemaspy.util.HtmlEncoder;
-import org.schemaspy.util.LineWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HtmlFormatter {
-    private static final Logger logger = Logger.getLogger(HtmlFormatter.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     protected final boolean encodeComments = Config.getInstance().isEncodeCommentsEnabled();
     private   final boolean isMetered = Config.getInstance().isMeterEnabled();
     protected final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
@@ -78,7 +69,7 @@ public class HtmlFormatter {
         try {
             return URLEncoder.encode(string, Config.DOT_CHARSET).replace("+","%20");
         } catch (UnsupportedEncodingException e) {
-            logger.info("Error trying to urlEncode string [" + string + "] with encoding [" + Config.DOT_CHARSET + "]");
+            LOGGER.info("Error trying to urlEncode string [{}] with encoding [" + Config.DOT_CHARSET + "]", string);
             return string;
         }
     }

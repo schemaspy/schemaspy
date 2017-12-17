@@ -1,9 +1,13 @@
 package org.schemaspy.validator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+
 import java.util.regex.Pattern;
 
 /**
@@ -16,8 +20,7 @@ public class NameValidator {
     private final Pattern exclude;
     private final Set<String> validTypes;
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
-    private final boolean fineEnabled = logger.isLoggable(Level.FINE);
+    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * @param clazz table or view
@@ -51,30 +54,20 @@ public class NameValidator {
         // Oracle 10g introduced problematic flashback tables
         // with bizarre illegal names
         if (name.contains("$")) {
-            if (fineEnabled) {
-                logger.fine("Excluding " + clazz + " " + name +
-                        ": embedded $ implies illegal name");
-            }
+            LOGGER.debug("Excluding {} {}: embedded $ implies illegal name", clazz, name);
             return false;
         }
 
         if (exclude.matcher(name).matches()) {
-            if (fineEnabled) {
-                logger.fine("Excluding " + clazz + " " + name +
-                        ": matches exclusion pattern \"" + exclude + '"');
-            }
+            LOGGER.debug("Excluding {} {}: matches exclusion pattern \"{}" + '"', clazz, name, exclude);
             return false;
         }
 
         boolean valid = include.matcher(name).matches();
-        if (fineEnabled) {
-            if (valid) {
-                logger.fine("Including " + clazz + " " + name +
-                        ": matches inclusion pattern \"" + include + '"');
-            } else {
-                logger.fine("Excluding " + clazz + " " + name +
-                        ": doesn't match inclusion pattern \"" + include + '"');
-            }
+        if (valid) {
+            LOGGER.debug("Including {} {}: matches inclusion pattern \"{}" + '"', clazz, name, include);
+        } else {
+            LOGGER.debug("Excluding {} {}: doesn't match inclusion pattern \"{}" + '"', clazz, name, include);
         }
         return valid;
     }

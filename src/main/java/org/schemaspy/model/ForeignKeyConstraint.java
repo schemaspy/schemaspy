@@ -18,15 +18,20 @@
  */
 package org.schemaspy.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static java.sql.DatabaseMetaData.importedKeyCascade;
 import static java.sql.DatabaseMetaData.importedKeyNoAction;
 import static java.sql.DatabaseMetaData.importedKeyRestrict;
 import static java.sql.DatabaseMetaData.importedKeySetNull;
+
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+
 
 /**
  * Represents a <a href='http://en.wikipedia.org/wiki/Foreign_key'>
@@ -41,8 +46,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
     private final List<TableColumn> childColumns = new ArrayList<TableColumn>();
     private final int deleteRule;
     private final int updateRule;
-    private final static Logger logger = Logger.getLogger(ForeignKeyConstraint.class.getName());
-    private final static boolean finerEnabled = logger.isLoggable(Level.FINER);
+    private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Construct a foreign key for the specified child table.
@@ -54,8 +58,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      */
     public ForeignKeyConstraint(Table child, String name, int updateRule, int deleteRule) {
         this.name = name; // implied constraints will have a null name and override getName()
-        if (finerEnabled)
-            logger.finer("Adding foreign key constraint '" + getName() + "' to " + child.getFullName());
+        LOGGER.debug("Adding foreign key constraint '{}' to {}", getName(), child.getFullName());
         childTable = child;
         this.deleteRule = deleteRule;
         this.updateRule = updateRule;

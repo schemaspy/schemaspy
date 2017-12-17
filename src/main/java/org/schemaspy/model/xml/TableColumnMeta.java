@@ -18,9 +18,12 @@
  */
 package org.schemaspy.model.xml;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -48,7 +51,8 @@ public class TableColumnMeta {
     private final boolean isAllExcluded;
     private final boolean isImpliedParentsDisabled;
     private final boolean isImpliedChildrenDisabled;
-    private static final Logger logger = Logger.getLogger(TableColumnMeta.class.getName());
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public TableColumnMeta(Node colNode) {
         NamedNodeMap attribs = colNode.getAttributes();
@@ -135,9 +139,7 @@ public class TableColumnMeta {
             isExcluded = false;
         }
 
-        logger.finer("Found XML column metadata for " + name +
-                    " isPrimaryKey: " + isPrimary +
-                    " comments: " + comments);
+		LOGGER.debug("Found XML column metadata for {} isPrimaryKey: {} comments: {}", name, isPrimary, comments);
 
         NodeList fkNodes = ((Element)colNode.getChildNodes()).getElementsByTagName("foreignKey");
 

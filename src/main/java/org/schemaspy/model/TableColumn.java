@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class TableColumn {
@@ -46,14 +44,12 @@ public class TableColumn {
     private Boolean isUnique;
     private Object defaultValue;
     private String comments;
-    private final Map<TableColumn, ForeignKeyConstraint> parents = new HashMap<TableColumn, ForeignKeyConstraint>();
-    private final Map<TableColumn, ForeignKeyConstraint> children = new TreeMap<TableColumn, ForeignKeyConstraint>(new ColumnComparator());
+    private final Map<TableColumn, ForeignKeyConstraint> parents = new HashMap<>();
+    private final Map<TableColumn, ForeignKeyConstraint> children = new TreeMap<>(new ColumnComparator());
     private boolean allowImpliedParents = true;
     private boolean allowImpliedChildren = true;
     private boolean isExcluded = false;
     private boolean isAllExcluded = false;
-    private static final Logger logger = Logger.getLogger(TableColumn.class.getName());
-    private static final boolean finerEnabled = logger.isLoggable(Level.FINER);
 
     /**
      * Create a column associated with a table.
