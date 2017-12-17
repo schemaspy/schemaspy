@@ -227,7 +227,7 @@ public class SchemaAnalyzer {
                             outputProducer.generate(db, outputDir);
                         } catch (OutputException oe) {
                            if (config.isOneOfMultipleSchemas()) {
-                               logger.log(Level.WARNING, "Failed to produce output", oe);
+                               LOGGER.warn("Failed to produce output", oe);
                            } else {
                                throw oe;
                            }
