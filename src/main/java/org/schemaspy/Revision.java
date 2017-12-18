@@ -32,14 +32,14 @@ import java.util.jar.Manifest;
 public class Revision {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private static       String rev          = "Unknown";
-	private static final String resourceName = "/META-INF/MANIFEST.MF";
+	private static final String RESOURCE_NAME = "/META-INF/MANIFEST.MF";
 
 	static {
 		initialize();
 	}
 
 	private static void initialize() {
-		try (InputStream in = Revision.class.getResourceAsStream(resourceName)) {
+		try (InputStream in = Revision.class.getResourceAsStream(RESOURCE_NAME)) {
 			Manifest   manifest = new Manifest(in);
 			Attributes main     = manifest.getMainAttributes();
 			rev = (String) main.getOrDefault("Implementation-Build","Unknown");
