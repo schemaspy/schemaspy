@@ -29,8 +29,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +43,7 @@ public class Dot {
     private String renderer;
     private final Set<String> validatedRenderers = Collections.synchronizedSet(new HashSet<String>());
     private final Set<String> invalidatedRenderers = Collections.synchronizedSet(new HashSet<String>());
+    private JDot jDot;
 
     private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -78,7 +77,12 @@ public class Dot {
                 }
             }
         } catch (Exception validDotDoesntExist) {
-            if (Config.getInstance().isHtmlGenerationEnabled()) {
+            if(Config.getInstance().getRenderDotInJvm()) {
+                jDot = new JDot();
+                versionText = jDot.getVersion();
+                format = "svg";
+            }
+            if (versionText==null && Config.getInstance().isHtmlGenerationEnabled()) {
                 System.err.println();
                 LOGGER.warn("Failed to query Graphviz graphvizVersion information");
                 LOGGER.warn("  with: {}", getDisplayableCommand(dotCommand));
@@ -210,6 +214,9 @@ public class Dot {
      * @return
      */
     public boolean supportsRenderer(@SuppressWarnings("hiding") String renderer) {
+        if(jDot!=null){
+            return false;
+        }
         if (!exists())
             return false;
 
@@ -271,6 +278,10 @@ public class Dot {
      * Using the specified .dot file generates an image returning the image's image map.
      */
     public String generateDiagram(File dotFile, File diagramFile) throws DotFailure {
+        if(jDot!=null) {
+            return jDot.renderDotByJvm(dotFile, diagramFile);
+        }
+
         StringBuilder mapBuffer = new StringBuilder(1024);
 
         BufferedReader mapReader = null;
@@ -317,7 +328,7 @@ public class Dot {
         }
     }
 
-    public class DotFailure extends IOException {
+    public static class DotFailure extends IOException {
         private static final long serialVersionUID = 3833743270181351987L;
 
         public DotFailure(String msg) {
