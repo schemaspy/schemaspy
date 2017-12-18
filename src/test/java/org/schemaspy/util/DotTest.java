@@ -42,9 +42,9 @@ public class DotTest {
 
     private Dot createDot() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         assumeThat(System.getProperty("os.name"), is("Linux"));
-        Constructor<Dot> ctor = Dot.class.getDeclaredConstructor(new Class[0]);
+        Constructor<Dot> ctor = Dot.class.getDeclaredConstructor(new Class[]{Boolean.TYPE, String.class});
         ctor.setAccessible(true);
-        Dot dot = ctor.newInstance();
+        Dot dot = ctor.newInstance(false, null);
         return dot;
     }
 

@@ -1,5 +1,6 @@
 package org.schemaspy.util;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.schemaspy.Config;
 
@@ -9,6 +10,11 @@ import java.util.Properties;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConnectionURLBuilderTest {
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        Dot.setInstance(false, null);
+    }
 
     @Test
     public void shouldReplaceHostInConnectionSpec() throws IOException {
