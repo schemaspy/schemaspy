@@ -33,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Dot {
-    private static Dot instance = new Dot();
+    private static Dot instance;
     private final GraphvizVersion graphvizVersion;
     private final GraphvizVersion supportedGraphvizVersion = new GraphvizVersion("2.26");
     private final GraphvizVersion badGraphvizVersion = new GraphvizVersion("2.31");
@@ -51,7 +51,7 @@ public class Dot {
     private static final String GD_RENDERER = ":gd";
     private static final String EMPTY_RENDERER = "";
 
-    private Dot() {
+    private Dot(boolean renderDotInJvm, String outputDirectoryName) {
         String versionText = null;
         // dot -V should return something similar to:
         //  dot graphvizVersion 2.8 (Fri Feb  3 22:38:53 UTC 2006)
@@ -77,8 +77,8 @@ public class Dot {
                 }
             }
         } catch (Exception validDotDoesntExist) {
-            if(Config.getInstance().getRenderDotInJvm()) {
-                jDot = new JDot();
+            if(renderDotInJvm) {
+                jDot = new JDot(outputDirectoryName);
                 versionText = jDot.getVersion();
                 format = "svg";
             }
@@ -97,6 +97,10 @@ public class Dot {
 
     public static Dot getInstance() {
         return instance;
+    }
+
+    public static void setInstance(boolean renderDotInJvm, String outputDirectoryName) {
+        Dot.instance = new Dot(renderDotInJvm, outputDirectoryName);
     }
 
     public boolean exists() {

@@ -26,23 +26,18 @@ import org.schemaspy.model.*;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
-import org.schemaspy.output.xml.dom.DOMUtil;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
-import org.schemaspy.output.xml.dom.XmlTableFormatter;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
-import org.schemaspy.util.*;
+import org.schemaspy.util.ConnectionURLBuilder;
+import org.schemaspy.util.Dot;
+import org.schemaspy.util.LineWriter;
+import org.schemaspy.util.ResourceWriter;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -76,6 +71,9 @@ public class SchemaAnalyzer {
         this.databaseService = Objects.requireNonNull(databaseService);
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
         addOutputProducer(new XmlProducerUsingDOM());
+        if(commandLineArguments.isRenderDotInJvm()){
+            Dot.setInstance(commandLineArguments.isRenderDotInJvm(), commandLineArguments.getOutputDirectory().getName());
+        }
     }
 
     public SchemaAnalyzer addOutputProducer(OutputProducer outputProducer) {

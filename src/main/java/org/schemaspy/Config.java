@@ -107,7 +107,6 @@ public final class Config {
     private Boolean highQuality;
     private Boolean lowQuality;
     private Boolean paginationEnabled;
-    private Boolean renderDotInJvm;
     private String imageFormat;
     private Boolean loadJDBCJarsEnabled = false;
     private String schemaSpec;  // used in conjunction with evaluateAll
@@ -1298,18 +1297,6 @@ public final class Config {
         return paginationEnabled;
     }
 
-
-    public void setRenderDotInJvm(Boolean renderDotInJvm) {
-        this.renderDotInJvm = renderDotInJvm;
-    }
-
-    public Boolean getRenderDotInJvm() {
-        if (renderDotInJvm == null) {
-            String dotInJvmString = pullParam("-dotinjvm");
-            renderDotInJvm = dotInJvmString != null && Boolean.parseBoolean(dotInJvmString);
-        }
-        return renderDotInJvm;
-    }
 
     /**
      * If enabled SchemaSpy will load from classpath additional jars used by JDBC Driver<p/>
