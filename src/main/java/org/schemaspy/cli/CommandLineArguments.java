@@ -186,6 +186,15 @@ public class CommandLineArguments {
     )
     private Integer port;
 
+    @Parameter(
+            names = {
+                    "-dv", "-dotinjvm", "schemaspy.dotInJvm"
+            },
+            descriptionKey = "dotInJvm",
+            required = false
+    )
+    private boolean renderDotInJvm;
+
     public boolean isHelpRequired() {
         return helpRequired;
     }
@@ -240,5 +249,9 @@ public class CommandLineArguments {
 
     public Integer getPort() {
         return port;
+    }
+
+    public boolean isRenderDotInJvm() {
+        return renderDotInJvm;
     }
 }

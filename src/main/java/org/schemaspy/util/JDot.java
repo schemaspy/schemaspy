@@ -13,11 +13,12 @@ import java.io.InputStream;
 public class JDot {
 
     private static final String SIMULATE_VERSION = "2.26";
-    private static final String FK = "[FK] ";
-    private static final String PK = "[PK] ";
+    private static final String ICON_SIZE = " , width: \"261px\" , height: \"261px\"";
     protected ScriptEngine scriptEngine;
+    protected String outputDirectoryName;
 
-    public JDot() {
+    public JDot(String outputDirectoryName) {
+        this.outputDirectoryName=outputDirectoryName;
         try {
             InputStream vizJs = JDot.class.getResourceAsStream("/viz.js");
             if (vizJs == null) {
@@ -34,8 +35,10 @@ public class JDot {
     protected String toSvg(String dotSource, int memSize) {
         try {
             scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("dotSource", dotSource);
-            scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("memSize", memSize);
-            return (String) scriptEngine.eval("Viz(dotSource,{ totalMemory: memSize })");
+            return (String) scriptEngine.eval("Viz(dotSource,options = { totalMemory: "+memSize
+                    +" , images: [" +
+                    "{ path: \""+outputDirectoryName+"/images/foreignKeys.png\"" + ICON_SIZE + " }," +
+                    "{ path: \""+outputDirectoryName+"/images/primaryKeys.png\"" + ICON_SIZE + " }]})");
         } catch (ScriptException e) {
             throw new IllegalArgumentException(e);
         }
@@ -47,9 +50,7 @@ public class JDot {
 
     public String renderDotByJvm(File dotFile, File diagramFile) throws Dot.DotFailure {
         try {
-            String dotSource = IOUtils.toString(dotFile.toURI().toURL(), "UTF-8")
-                    .replaceAll("<IMG SRC=\".*/images/foreignKeys.png\"/>", FK)
-                    .replaceAll("<IMG SRC=\".*/images/primaryKeys.png\"/>", PK);
+            String dotSource = IOUtils.toString(dotFile.toURI().toURL(), "UTF-8");
             String svg = toSvg(dotSource, 1 << 30);
             try (FileWriter diagramWriter = new FileWriter(diagramFile)){
                 IOUtils.write(svg, diagramWriter);
