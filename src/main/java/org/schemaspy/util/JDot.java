@@ -14,7 +14,7 @@ public class JDot {
 
     private static final String SIMULATE_VERSION = "2.26";
     private static final String ICON_SIZE = " , width: \"261px\" , height: \"261px\"";
-    private static final int JAVA_SCRIPT_ENGINE_MEMORY_SIZE = 1 << 30;
+    private static final int ONE_GB = 1 << 30;
     protected ScriptEngine scriptEngine;
     protected String outputDirectoryName;
 
@@ -52,7 +52,7 @@ public class JDot {
     public String renderDotByJvm(File dotFile, File diagramFile) throws DotFailure {
         try {
             String dotSource = IOUtils.toString(dotFile.toURI().toURL(), "UTF-8");
-            String svg = toSvg(dotSource, JAVA_SCRIPT_ENGINE_MEMORY_SIZE);
+            String svg = toSvg(dotSource, ONE_GB);
             try (FileWriter diagramWriter = new FileWriter(diagramFile)){
                 IOUtils.write(svg, diagramWriter);
             }
