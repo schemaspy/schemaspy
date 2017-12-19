@@ -332,14 +332,6 @@ public class Dot {
         }
     }
 
-    public static class DotFailure extends IOException {
-        private static final long serialVersionUID = 3833743270181351987L;
-
-        public DotFailure(String msg) {
-            super(msg);
-        }
-    }
-
     private static String getDisplayableCommand(String[] command) {
         StringBuilder displayable = new StringBuilder();
         for (int i = 0; i < command.length; ++i) {

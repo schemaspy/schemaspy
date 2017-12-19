@@ -30,6 +30,7 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.DiagramUtil;
 import org.schemaspy.util.Dot;
+import org.schemaspy.util.DotFailure;
 
 /**
  * The page that contains the overview entity relationship diagrams.
@@ -85,7 +86,7 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
                 try {
                 	listener.graphingSummaryProgressed();
                     DiagramUtil.generateDiagram("Large", dot, largeRelationshipsDotFile, largeRelationshipsDiagramFile, diagrams, false, false);
-                } catch (Dot.DotFailure dotFailure) {
+                } catch (DotFailure dotFailure) {
                     System.err.println("dot failed to generate all of the relationships diagrams:");
                     System.err.println(dotFailure);
                     System.err.println("...but the relationships page may still be usable.");
@@ -100,7 +101,7 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
                 	listener.graphingSummaryProgressed();
                     DiagramUtil.generateDiagram("Large Implied", dot, largeImpliedDotFile, largeImpliedDiagramFile, diagrams, false, true);
                 }
-            } catch (Dot.DotFailure dotFailure) {
+            } catch (DotFailure dotFailure) {
                 System.err.println("dot failed to generate all of the relationships diagrams:");
                 System.err.println(dotFailure);
                 System.err.println("...but the relationships page may still be usable.");
@@ -124,7 +125,7 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
             MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
             mw.write("relationships.html", "relationships.html", "relationships.js");
             return true;
-        } catch (Dot.DotFailure dotFailure) {
+        } catch (DotFailure dotFailure) {
             System.err.println(dotFailure);
             return false;
         } catch (IOException ioExc) {

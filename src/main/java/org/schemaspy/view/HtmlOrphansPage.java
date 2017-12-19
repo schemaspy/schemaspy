@@ -26,6 +26,7 @@ import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.Dot;
+import org.schemaspy.util.DotFailure;
 import org.schemaspy.util.LineWriter;
 
 /**
@@ -101,7 +102,7 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
 
                 try {
                     maps.append(dot.generateDiagram(dotFile, imgFile));
-                } catch (Dot.DotFailure dotFailure) {
+                } catch (DotFailure dotFailure) {
                     System.err.println(dotFailure);
                     return false;
                 }

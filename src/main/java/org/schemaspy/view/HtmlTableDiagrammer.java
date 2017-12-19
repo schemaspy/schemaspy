@@ -25,6 +25,7 @@ import java.util.List;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.DiagramUtil;
 import org.schemaspy.util.Dot;
+import org.schemaspy.util.DotFailure;
 
 public class HtmlTableDiagrammer extends HtmlDiagramFormatter {
     private static HtmlTableDiagrammer instance = new HtmlTableDiagrammer();
@@ -56,7 +57,7 @@ public class HtmlTableDiagrammer extends HtmlDiagramFormatter {
             DiagramUtil.generateDiagram("One implied", dot, oneImpliedDotFile, oneImpliedDiagramFile, diagrams, false, true);
             DiagramUtil.generateDiagram("Two implied", dot, twoImpliedDotFile, twoImpliedDiagramFile, diagrams, false, true);
 
-        } catch (Dot.DotFailure dotFailure) {
+        } catch (DotFailure dotFailure) {
             System.err.println(dotFailure);
             return false;
         } catch (IOException ioExc) {

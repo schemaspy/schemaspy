@@ -14,6 +14,7 @@ public class JDot {
 
     private static final String SIMULATE_VERSION = "2.26";
     private static final String ICON_SIZE = " , width: \"261px\" , height: \"261px\"";
+    private static final int JAVA_SCRIPT_ENGINE_MEMORY_SIZE = 1 << 30;
     protected ScriptEngine scriptEngine;
     protected String outputDirectoryName;
 
@@ -32,10 +33,10 @@ public class JDot {
         }
     }
 
-    protected String toSvg(String dotSource, int memSize) {
+    protected String toSvg(String dotSource, int jsEngineMemorySize) {
         try {
             scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("dotSource", dotSource);
-            return (String) scriptEngine.eval("Viz(dotSource,options = { totalMemory: "+memSize
+            return (String) scriptEngine.eval("Viz(dotSource,options = { totalMemory: "+jsEngineMemorySize
                     +" , images: [" +
                     "{ path: \""+outputDirectoryName+"/images/foreignKeys.png\"" + ICON_SIZE + " }," +
                     "{ path: \""+outputDirectoryName+"/images/primaryKeys.png\"" + ICON_SIZE + " }]})");
@@ -48,16 +49,16 @@ public class JDot {
         return SIMULATE_VERSION;
     }
 
-    public String renderDotByJvm(File dotFile, File diagramFile) throws Dot.DotFailure {
+    public String renderDotByJvm(File dotFile, File diagramFile) throws DotFailure {
         try {
             String dotSource = IOUtils.toString(dotFile.toURI().toURL(), "UTF-8");
-            String svg = toSvg(dotSource, 1 << 30);
+            String svg = toSvg(dotSource, JAVA_SCRIPT_ENGINE_MEMORY_SIZE);
             try (FileWriter diagramWriter = new FileWriter(diagramFile)){
                 IOUtils.write(svg, diagramWriter);
             }
             return "";
         } catch (Exception e) {
-            throw new Dot.DotFailure(e.getMessage());
+            throw new DotFailure(e.getMessage());
         }
     }
 }
