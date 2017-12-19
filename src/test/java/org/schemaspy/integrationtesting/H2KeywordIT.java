@@ -12,6 +12,7 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.H2MemoryRule;
+import org.schemaspy.util.Dot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,6 +74,7 @@ public class H2KeywordIT {
         given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());
         given(arguments.getSchema()).willReturn(h2MemoryRule.getConnection().getSchema());
         given(arguments.getDatabaseName()).willReturn("h2keyword");
+        Dot.setInstance(false, null);
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);

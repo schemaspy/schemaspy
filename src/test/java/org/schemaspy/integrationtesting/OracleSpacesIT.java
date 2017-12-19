@@ -12,6 +12,7 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
+import org.schemaspy.util.Dot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -82,6 +83,7 @@ public class OracleSpacesIT {
         given(arguments.getSchema()).willReturn("ORASPACEIT");
         given(arguments.getCatalog()).willReturn("%");
         given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
+        Dot.setInstance(false, null);
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
