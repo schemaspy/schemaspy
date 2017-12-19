@@ -145,7 +145,7 @@ So additional columns are ok, but you might need to alias columns so that they a
     **selectRoutineParametersSql=**
         specific_name, parameter_name, dtd_identifier, parameter_mode
     **selectViewSql=**
-        view_definition, text
+        view_definition, text (text has been deprecated)
     **selectCheckConstraintsSql=**
         table_name, constraint_name
     **selectTableIdsSql=**
@@ -157,6 +157,6 @@ So additional columns are ok, but you might need to alias columns so that they a
     **selectColumnCommentsSql=**
         table_name, column_name, comments
 
-**Extend the types of views that exist**
+**Define viewTypes**
     **viewTypes=**
         default is VIEW

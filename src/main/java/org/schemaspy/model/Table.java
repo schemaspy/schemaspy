@@ -25,16 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 
 
@@ -50,12 +41,12 @@ public class Table implements Comparable<Table> {
     private final String name;
     private final String fullName;
     private final String container;
-    protected CaseInsensitiveMap<TableColumn> columns = new CaseInsensitiveMap<TableColumn>();
-    private final List<TableColumn> primaryKeys = new ArrayList<TableColumn>();
-    private final CaseInsensitiveMap<ForeignKeyConstraint> foreignKeys = new CaseInsensitiveMap<ForeignKeyConstraint>();
-    private final CaseInsensitiveMap<TableIndex> indexes = new CaseInsensitiveMap<TableIndex>();
+    protected CaseInsensitiveMap<TableColumn> columns = new CaseInsensitiveMap<>();
+    private final List<TableColumn> primaryKeys = new ArrayList<>();
+    private final CaseInsensitiveMap<ForeignKeyConstraint> foreignKeys = new CaseInsensitiveMap<>();
+    private final CaseInsensitiveMap<TableIndex> indexes = new CaseInsensitiveMap<>();
     private Object id;
-    private final Map<String, String> checkConstraints = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+    private final Map<String, String> checkConstraints = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private long numRows;
     protected final Database db;
     private String comments;
@@ -240,7 +231,7 @@ public class Table implements Comparable<Table> {
      * @return
      */
     public Set<TableIndex> getIndexes() {
-        return new HashSet<TableIndex>(indexes.values());
+        return new HashSet<>(indexes.values());
     }
 
     /**
@@ -301,9 +292,9 @@ public class Table implements Comparable<Table> {
      * @return
      */
     public List<TableColumn> getColumns() {
-        Set<TableColumn> sorted = new TreeSet<TableColumn>(new ByColumnIdComparator());
+        Set<TableColumn> sorted = new TreeSet<>(new ByColumnIdComparator());
         sorted.addAll(columns.values());
-        return new ArrayList<TableColumn>(sorted);
+        return new ArrayList<>(sorted);
     }
 
     public void setColumns(CaseInsensitiveMap<TableColumn> columns) {
@@ -455,7 +446,7 @@ public class Table implements Comparable<Table> {
      * @return
      */
     public List<ForeignKeyConstraint> removeNonRealForeignKeys() {
-        List<ForeignKeyConstraint> nonReals = new ArrayList<ForeignKeyConstraint>();
+        List<ForeignKeyConstraint> nonReals = new ArrayList<>();
 
         for (TableColumn column : columns.values()) {
             for (TableColumn parentColumn : column.getParents()) {
@@ -617,7 +608,7 @@ public class Table implements Comparable<Table> {
      * @return
      * @see #isView()
      */
-    public String getViewSql() {
+    public String getViewDefinition() {
         return null;
     }
 

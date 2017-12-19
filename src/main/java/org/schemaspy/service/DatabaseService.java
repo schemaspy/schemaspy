@@ -166,12 +166,12 @@ public class DatabaseService {
         for (BasicTableMeta entry : getBasicTableMeta(config, db, listener, metadata, false, types)) {
             if (validator.isValid(entry.getName(), entry.getType())) {
                 View view = new View(db, entry.getCatalog(), entry.getSchema(), entry.getName(),
-                        entry.getRemarks(), entry.getViewSql());
+                        entry.getRemarks(), entry.getViewDefinition());
 
                 tableService.gatheringTableDetails(db, view);
 
-                if (entry.getViewSql() == null) {
-                    view.setViewSql(viewService.fetchViewSql(db, view));
+                if (entry.getViewDefinition() == null) {
+                    view.setViewDefinition(viewService.fetchViewDefinition(db, view));
                 }
 
                 db.getViewsMap().put(view.getName(), view);
@@ -192,7 +192,7 @@ public class DatabaseService {
      */
     private String[] getTypes(Config config, String propName, String defaultValue) {
         String value = config.getDbProperties().getProperty(propName, defaultValue);
-        List<String> types = new ArrayList<String>();
+        List<String> types = new ArrayList<>();
         for (String type : value.split(",")) {
             type = type.trim();
             if (type.length() > 0)
@@ -313,7 +313,7 @@ public class DatabaseService {
      * Multi-threaded implementation of a class that creates tables
      */
     private class ThreadedTableCreator extends TableCreator {
-        private final Set<Thread> threads = new HashSet<Thread>();
+        private final Set<Thread> threads = new HashSet<>();
         private final int maxThreads;
 
         ThreadedTableCreator(int maxThreads) {
@@ -393,7 +393,7 @@ public class DatabaseService {
                                                    String... types) throws SQLException {
         String queryName = forTables ? "selectTablesSql" : "selectViewsSql";
         String sql = config.getDbProperties().getProperty(queryName);
-        List<BasicTableMeta> basics = new ArrayList<BasicTableMeta>();
+        List<BasicTableMeta> basics = new ArrayList<>();
 
 
         if (sql != null) {
@@ -410,11 +410,11 @@ public class DatabaseService {
                     if (cat == null && sch == null)
                         sch = db.getSchema().getName();
                     String remarks = getOptionalString(rs, clazz + "_comment");
-                    String text = forTables ? null : getOptionalString(rs, "view_definition");
+                    String viewDefinition = forTables ? null : getOptionalString(rs, "view_definition");
                     String rows = forTables ? getOptionalString(rs, "table_rows") : null;
                     long numRows = rows == null ? -1 : Long.parseLong(rows);
 
-                    basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, text, numRows));
+                    basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, viewDefinition, numRows));
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed

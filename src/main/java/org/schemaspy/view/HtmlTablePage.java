@@ -105,15 +105,15 @@ public class HtmlTablePage extends HtmlFormatter {
     private Set<Table> sqlReferences(Table table, Database db) {
         Set<Table> references = null;
 
-        if (table.isView() && table.getViewSql() != null) {
+        if (table.isView() && table.getViewDefinition() != null) {
             DefaultSqlFormatter formatter = new DefaultSqlFormatter();
-            references = formatter.getReferencedTables(table.getViewSql(), db);
+            references = formatter.getReferencedTables(table.getViewDefinition(), db);
         }
         return references;
     }
 
     private String sqlCode(Table table) {
-        return table.getViewSql() != null ? table.getViewSql().trim() : "";
+        return table.getViewDefinition() != null ? table.getViewDefinition().trim() : "";
     }
 
     private Object indexExists(Table table, Set<MustacheTableIndex> indexedColumns) {
@@ -126,7 +126,7 @@ public class HtmlTablePage extends HtmlFormatter {
 
     private Object definitionExists(Table table) {
         Object exists = null;
-        if (table.isView() && table.getViewSql() != null) {
+        if (table.isView() && table.getViewDefinition() != null) {
             exists = new Object();
         }
         return exists;
@@ -141,7 +141,7 @@ public class HtmlTablePage extends HtmlFormatter {
      * two degrees of separation.
      *
      * @param table       Table
-     * @param diagramsDir File
+     * @param diagramDir File
      * @return boolean <code>true</code> if the table has implied relatives within two
      * degrees of separation.
      * @throws IOException
