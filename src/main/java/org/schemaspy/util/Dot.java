@@ -46,7 +46,7 @@ public class Dot {
     private final Set<String> validatedRenderers = Collections.synchronizedSet(new HashSet<String>());
     private final Set<String> invalidatedRenderers = Collections.synchronizedSet(new HashSet<String>());
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String CAIRO_RENDERER = ":cairo";
     private static final String GD_RENDERER = ":gd";
@@ -336,6 +336,7 @@ public class Dot {
     }
 
     private static class ProcessOutputReader extends Thread {
+		private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
         private final BufferedReader processReader;
         private final String command;
 
