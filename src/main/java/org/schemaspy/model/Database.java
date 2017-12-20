@@ -284,14 +284,14 @@ public class Database {
      */
     private Pattern getInvalidIdentifierPattern() throws SQLException {
         if (invalidIdentifierPattern == null) {
-            String validChars = "a-zA-Z0-9_";
+            StringBuilder validChars = new StringBuilder("a-zA-Z0-9_");
             String reservedRegexChars = "-&^";
             String extraValidChars = getMetaData().getExtraNameCharacters();
             for (int i = 0; i < extraValidChars.length(); ++i) {
                 char ch = extraValidChars.charAt(i);
                 if (reservedRegexChars.indexOf(ch) >= 0)
-                    validChars += "" + "\\";
-                validChars += ch;
+                    validChars.append("" + "\\");
+                validChars.append(ch);
             }
 
             invalidIdentifierPattern = Pattern.compile("[^" + validChars + "]");

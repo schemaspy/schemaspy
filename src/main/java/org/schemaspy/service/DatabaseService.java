@@ -321,14 +321,14 @@ public class DatabaseService {
         }
 
         @Override
-        void create(Database db, BasicTableMeta tableMeta, ProgressListener listener) throws SQLException {
+        void create(Database db, BasicTableMeta tableMeta, ProgressListener listener) {
             Thread runner = new Thread() {
                 @Override
                 public void run() {
                     try {
                         createImpl(db, tableMeta, listener);
                     } catch (SQLException exc) {
-                        exc.printStackTrace(); // nobody above us in call stack...dump it here
+                        LOGGER.error("SQL exception",exc);
                     } finally {
                         synchronized (threads) {
                             threads.remove(this);

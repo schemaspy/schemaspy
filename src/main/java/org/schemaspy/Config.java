@@ -1624,15 +1624,14 @@ public final class Config {
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(Config.class);
             PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-            for (int i = 0; i < props.length; ++i) {
-                PropertyDescriptor prop = props[i];
+            for (PropertyDescriptor prop : props) {
                 if (prop.getName().equalsIgnoreCase(paramName)) {
                     Object result = prop.getReadMethod().invoke(this, (Object[]) null);
                     return result == null ? null : result.toString();
                 }
             }
         } catch (Exception failed) {
-            failed.printStackTrace();
+            LOGGER.error("Unable to get parameter {}",paramName,failed);
         }
 
         return null;
@@ -1649,8 +1648,9 @@ public final class Config {
         List<String> params = new ArrayList<>();
 
         if (originalDbSpecificOptions != null) {
-            for (String key : originalDbSpecificOptions.keySet()) {
-                String value = originalDbSpecificOptions.get(key);
+            for (Entry<String,String> entry : originalDbSpecificOptions.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
                 if (!key.startsWith("-"))
                     key = "-" + key;
                 params.add(key);

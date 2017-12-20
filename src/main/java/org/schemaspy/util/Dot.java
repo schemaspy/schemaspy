@@ -46,7 +46,7 @@ public class Dot {
     private final Set<String> validatedRenderers = Collections.synchronizedSet(new HashSet<String>());
     private final Set<String> invalidatedRenderers = Collections.synchronizedSet(new HashSet<String>());
 
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String CAIRO_RENDERER = ":cairo";
     private static final String GD_RENDERER = ":gd";
@@ -234,7 +234,7 @@ public class Dot {
             }
             process.waitFor();
         } catch (Exception exc) {
-            exc.printStackTrace();
+            LOGGER.error("Error determining if a renderer is supported",exc);
         }
 
         if (!validatedRenderers.contains(renderer)) {
@@ -355,13 +355,9 @@ public class Dot {
                         System.err.println(command + ": " + line);
                 }
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                LOGGER.error("Error reading from process",ioException);
             } finally {
-                try {
-                    processReader.close();
-                } catch (Exception exc) {
-                    exc.printStackTrace(); // shouldn't ever get here...but...
-                }
+                IOUtils.closeQuietly(processReader);
             }
         }
     }

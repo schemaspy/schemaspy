@@ -19,25 +19,22 @@
 package org.schemaspy.model;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.schemaspy.util.CaseInsensitiveMap;
 
 public final class Catalog implements Comparable<Catalog>{
     private String name;
     private String comment = null;
-    private Map<String, Schema> schemas = new CaseInsensitiveMap<Schema>();
-    
+
 	public Catalog(String name) {
 		super();
-		 if (name == null)
-	            throw new IllegalArgumentException("Catalog name can't be null");
+		Objects.requireNonNull(name);
 		this.name = name;
 	}
 	
 	public Catalog(String name, String comment) {
-		super();
-		 if (name == null)
-	            throw new IllegalArgumentException("Catalog name can't be null");
+		this(name);
 		this.name = name;
 		this.comment = comment;
 	}
@@ -61,5 +58,16 @@ public final class Catalog implements Comparable<Catalog>{
     public String toString() {
         return name;
     }
-    
+
+	@Override public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Catalog catalog = (Catalog) o;
+		return Objects.equals(name, catalog.name);
+	}
+
+	@Override public int hashCode() {
+
+		return Objects.hash(name);
+	}
 }

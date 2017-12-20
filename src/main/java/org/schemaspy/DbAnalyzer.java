@@ -58,7 +58,6 @@ public class DbAnalyzer {
         }
 
         sortColumnsByTable(columnsWithoutParents);
-        Set<DatabaseObject> primaryColumns = keyedTablesByPrimary.keySet();
         List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<ImpliedForeignKeyConstraint>();
         
         for (TableColumn childColumn : columnsWithoutParents) {

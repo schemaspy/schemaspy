@@ -57,7 +57,7 @@ public class DbDriverLoader {
             connectionProperties.put("password", config.getPassword());
         }
 
-        Connection connection = null;
+        Connection connection;
         try {
             connection = driver.connect(connectionURL, connectionProperties);
             if (connection == null) {
@@ -113,7 +113,7 @@ public class DbDriverLoader {
 
 
         ClassLoader loader = getDriverClassLoader(classpath);
-        Driver driver = null;
+        Driver driver;
 
         try {
             driver = (Driver)Class.forName(driverClass, true, loader).newInstance();
