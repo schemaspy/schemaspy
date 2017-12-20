@@ -415,7 +415,7 @@ public class SchemaAnalyzer {
 
     private Connection getConnection(Config config) throws InvalidConfigurationException, IOException {
 
-        Properties properties = config.determineDbProperties(commandLineArguments.getDatabaseType());
+        Properties properties = config.getDbProperties();
 
         ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
         if (config.getDb() == null)
