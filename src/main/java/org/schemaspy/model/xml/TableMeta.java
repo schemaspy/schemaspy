@@ -18,16 +18,18 @@
  */
 package org.schemaspy.model.xml;
 
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 
 /**
  * Additional metadata about a table as expressed in XML instead of from
@@ -50,8 +52,12 @@ public class TableMeta {
         name = attribs.getNamedItem("name").getNodeValue();
 
         Node node = attribs.getNamedItem("comments");
-        if (node == null)
+        if (node == null) {
             node = attribs.getNamedItem("remarks");
+            if (Objects.nonNull(node)) {
+                LOGGER.warn("<remarks> has been deprecated");
+            }
+        }
         if (node != null) {
             String tmp = node.getNodeValue().trim();
             comments = tmp.length() == 0 ? null : tmp;
