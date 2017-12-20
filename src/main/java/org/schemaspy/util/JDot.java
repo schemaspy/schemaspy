@@ -38,8 +38,8 @@ public class JDot {
             scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("dotSource", dotSource);
             return (String) scriptEngine.eval("Viz(dotSource,options = { totalMemory: "+jsEngineMemorySize
                     +" , images: [" +
-                    "{ path: \""+outputDirectoryName+"/images/foreignKeys.png\"" + ICON_SIZE + " }," +
-                    "{ path: \""+outputDirectoryName+"/images/primaryKeys.png\"" + ICON_SIZE + " }]})");
+                    "{ path: \""+outputDirectoryName+File.separatorChar+"images"+File.separatorChar+"foreignKeys.png\"" + ICON_SIZE + " }," +
+                    "{ path: \""+outputDirectoryName+File.separatorChar+"images"+File.separatorChar+"primaryKeys.png\"" + ICON_SIZE + " }]})");
         } catch (ScriptException e) {
             throw new IllegalArgumentException(e);
         }
