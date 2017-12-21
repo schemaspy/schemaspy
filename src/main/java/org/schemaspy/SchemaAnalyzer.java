@@ -71,9 +71,7 @@ public class SchemaAnalyzer {
         this.databaseService = Objects.requireNonNull(databaseService);
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
         addOutputProducer(new XmlProducerUsingDOM());
-        if(commandLineArguments.isRenderDotInJvm()){
-            Dot.setInstance(commandLineArguments.isRenderDotInJvm(), commandLineArguments.getOutputDirectory().getName());
-        }
+        Dot.setInstance(commandLineArguments.isRenderDotInJvm(), commandLineArguments.getOutputDirectory().getName());
     }
 
     public SchemaAnalyzer addOutputProducer(OutputProducer outputProducer) {
