@@ -24,28 +24,23 @@ import java.util.Objects;
 import org.schemaspy.util.CaseInsensitiveMap;
 
 public final class Catalog implements Comparable<Catalog>{
-    private String name;
-    private String comment = null;
+    private final String name;
+    private String comment;
 
 	public Catalog(String name) {
-		super();
-		Objects.requireNonNull(name);
-		this.name = name;
+		this(name,null);
+
 	}
 	
 	public Catalog(String name, String comment) {
-		this(name);
-		this.name = name;
+		this.name = Objects.requireNonNull(name);
 		this.comment = comment;
 	}
 	
 	public String getName() {
 		return name;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	
+
 	public String getComment() {
 		return comment;
 	}
@@ -67,7 +62,6 @@ public final class Catalog implements Comparable<Catalog>{
 	}
 
 	@Override public int hashCode() {
-
-		return Objects.hash(name);
+		return name.hashCode();
 	}
 }
