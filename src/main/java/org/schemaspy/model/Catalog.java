@@ -18,10 +18,7 @@
  */
 package org.schemaspy.model;
 
-import java.util.Map;
 import java.util.Objects;
-
-import org.schemaspy.util.CaseInsensitiveMap;
 
 public final class Catalog implements Comparable<Catalog>{
     private final String name;
