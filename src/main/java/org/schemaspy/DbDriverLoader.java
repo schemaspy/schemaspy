@@ -151,9 +151,7 @@ public class DbDriverLoader {
         File driverFolder = new File(Paths.get(driverPath).getParent().toString());
         if (driverFolder != null) {
             File[] files = driverFolder.listFiles(
-                    (dir, name) -> {
-                        return name.toLowerCase().matches(".*\\.?ar$");
-                    }
+                    (dir, name) -> name.toLowerCase().matches(".*\\.?ar$")
             );
 
             LOGGER.info("Additional files will be loaded for JDBC Driver");

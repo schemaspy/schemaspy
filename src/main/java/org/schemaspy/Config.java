@@ -488,7 +488,7 @@ public final class Config {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public void setConnectionPropertiesFile(String propertiesFilename) throws FileNotFoundException, IOException {
+    public void setConnectionPropertiesFile(String propertiesFilename) throws IOException {
         if (userConnectionProperties == null)
             userConnectionProperties = new Properties();
         userConnectionProperties.load(new FileInputStream(propertiesFilename));
@@ -504,11 +504,11 @@ public final class Config {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public Properties getConnectionProperties() throws FileNotFoundException, IOException {
+    public Properties getConnectionProperties() throws IOException {
         if (userConnectionProperties == null) {
             String props = pullParam("-connprops");
             if (props != null) {
-                if (props.indexOf(ESCAPED_EQUALS) != -1) {
+                if (props.contains(ESCAPED_EQUALS)) {
                     setConnectionProperties(props);
                 } else {
                     setConnectionPropertiesFile(props);
@@ -634,10 +634,10 @@ public final class Config {
                     LOGGER.warn(e.getMessage(), e);
                 }
             }
-            fontSize = Integer.valueOf(size);
+            fontSize = size;
         }
 
-        return fontSize.intValue();
+        return fontSize;
     }
 
     /**
@@ -1521,8 +1521,8 @@ public final class Config {
 
             BeanInfo beanInfo = Introspector.getBeanInfo(Config.class);
             PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-            for (int i = 0; i < props.length; ++i) {
-                Method readMethod = props[i].getReadMethod();
+            for (PropertyDescriptor prop : props) {
+                Method readMethod = prop.getReadMethod();
                 if (readMethod != null)
                     readMethod.invoke(this, (Object[]) null);
             }
@@ -1541,7 +1541,7 @@ public final class Config {
 
             while ((entry = jar.getNextJarEntry()) != null) {
                 String entryName = entry.getName();
-                if (entryName.indexOf("types") != -1) {
+                if (entryName.contains("types")) {
                     int dotPropsIndex = entryName.indexOf(".properties");
                     if (dotPropsIndex != -1)
                         databaseTypes.add(entryName.substring(0, dotPropsIndex));

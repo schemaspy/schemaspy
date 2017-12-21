@@ -46,7 +46,7 @@ public class PropertiesFinder implements ResourceFinder {
             try {
                 return path.toUri().toURL();
             } catch (MalformedURLException e) {
-                LOGGER.debug("Couldn't convert existing file: "+path.toString(), e);
+                LOGGER.debug("Couldn't convert existing file: {}", path.toString(), e);
                 return null;
             }
         }

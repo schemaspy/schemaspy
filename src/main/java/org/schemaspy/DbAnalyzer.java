@@ -41,7 +41,7 @@ public class DbAnalyzer {
         // gather all the primary key columns and columns without parents
         for (Table table : tables) {
             List<TableColumn> tablePrimaries = table.getPrimaryColumns();
-            if (tablePrimaries.size() == 1 || tablePrimaries.stream().filter(t-> t.getName().equals("LanguageId")).count() > 0) { // can't match up multiples...yet...
+            if (tablePrimaries.size() == 1 || tablePrimaries.stream().anyMatch(t -> t.getName().equals("LanguageId"))) { // can't match up multiples...yet...
             	TableColumn tableColumn = tablePrimaries.get(0);
                 DatabaseObject primary = new DatabaseObject(tableColumn);
                 if (tableColumn.allowsImpliedChildren()) {
@@ -257,25 +257,17 @@ public class DbAnalyzer {
     }
 
     public static List<Table> sortTablesByName(List<Table> tables) {
-        Collections.sort(tables, new Comparator<Table>() {
-            @Override
-			public int compare(Table table1, Table table2) {
-                return table1.compareTo(table2);
-            }
-        });
+        tables.sort(Table::compareTo);
 
         return tables;
     }
 
     public static List<TableColumn> sortColumnsByTable(List<TableColumn> columns) {
-        Collections.sort(columns, new Comparator<TableColumn>() {
-            @Override
-			public int compare(TableColumn column1, TableColumn column2) {
-                int rc = column1.getTable().compareTo(column2.getTable());
-                if (rc == 0)
-                    rc = column1.getName().compareToIgnoreCase(column2.getName());
-                return rc;
-            }
+        columns.sort((column1, column2) -> {
+            int rc = column1.getTable().compareTo(column2.getTable());
+            if (rc == 0)
+                rc = column1.getName().compareToIgnoreCase(column2.getName());
+            return rc;
         });
 
         return columns;

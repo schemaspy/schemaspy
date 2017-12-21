@@ -60,9 +60,7 @@ public class PropertiesResolver {
         Map<String,String> includes = props.entrySet().stream()
                 .filter(isInclude)
                 .collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().toString()));
-        includes.keySet().forEach(k -> {
-                    props.remove(k);
-        });
+        includes.keySet().forEach(props::remove);
         includes.values().stream()
                 .map( s -> s.split("::"))
                 .forEach( ref -> {
@@ -92,7 +90,7 @@ public class PropertiesResolver {
         Properties parentProperties;
         if (Objects.nonNull(parentDbType)) {
             parentProperties = resolve(parentDbType.trim(), resolutionInfo);
-            parentProperties.forEach((k,v) -> props.putIfAbsent(k,v));
+            parentProperties.forEach(props::putIfAbsent);
         }
     }
 

@@ -133,7 +133,7 @@ public class TableIndex implements Comparable<TableIndex> {
      * @return
      */
     public boolean isAscending(TableColumn column) {
-        return columnsAscending.get(columns.indexOf(column)).booleanValue();
+        return columnsAscending.get(columns.indexOf(column));
     }
 
     /**
