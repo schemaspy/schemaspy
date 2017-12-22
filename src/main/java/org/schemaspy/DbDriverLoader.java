@@ -57,7 +57,7 @@ public class DbDriverLoader {
             connectionProperties.put("password", config.getPassword());
         }
 
-        Connection connection = null;
+        Connection connection;
         try {
             connection = driver.connect(connectionURL, connectionProperties);
             if (connection == null) {
@@ -113,7 +113,7 @@ public class DbDriverLoader {
 
 
         ClassLoader loader = getDriverClassLoader(classpath);
-        Driver driver = null;
+        Driver driver;
 
         try {
             driver = (Driver)Class.forName(driverClass, true, loader).newInstance();
@@ -151,9 +151,7 @@ public class DbDriverLoader {
         File driverFolder = new File(Paths.get(driverPath).getParent().toString());
         if (driverFolder != null) {
             File[] files = driverFolder.listFiles(
-                    (dir, name) -> {
-                        return name.toLowerCase().matches(".*\\.?ar$");
-                    }
+                    (dir, name) -> name.toLowerCase().matches(".*\\.?ar$")
             );
 
             LOGGER.info("Additional files will be loaded for JDBC Driver");

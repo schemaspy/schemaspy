@@ -19,29 +19,22 @@
 package org.schemaspy.model;
 
 
+import java.util.Objects;
+
 public final class Schema implements Comparable<Schema>{
-	public String name;
+	public final String name;
 	public String comment =null;
     
 	public Schema(String name, String comment) {
-		super();
-		 if (name == null)
-	            throw new IllegalArgumentException("Schema name can't be null");
-		this.name = name;
+		this.name = Objects.requireNonNull(name);
 		this.comment = comment;
 	}
 	public Schema(String name) {
-		super();
-		 if (name == null)
-	            throw new IllegalArgumentException("Schema name can't be null");
-		this.name = name;
+		this(name,null);
 	}
 	
 	public String getName() {
 		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
 	}
 	
 	public String getComment() {
@@ -56,4 +49,15 @@ public final class Schema implements Comparable<Schema>{
     public String toString() {
         return name;
     }
+
+	@Override public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Schema schema = (Schema) o;
+		return Objects.equals(name, schema.name);
+	}
+
+	@Override public int hashCode() {
+		return name.hashCode();
+	}
 }

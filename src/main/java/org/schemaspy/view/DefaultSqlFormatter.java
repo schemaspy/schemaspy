@@ -240,8 +240,8 @@ public class DefaultSqlFormatter implements SqlFormatter {
                     meta.getStringFunctions(),
                     meta.getTimeDateFunctions()
                 };
-                for (int i = 0; i < keywordsArray.length; ++i) {
-                    StringTokenizer tokenizer = new StringTokenizer(keywordsArray[i].toUpperCase(), ",");
+                for (String aKeywordsArray : keywordsArray) {
+                    StringTokenizer tokenizer = new StringTokenizer(aKeywordsArray.toUpperCase(), ",");
 
                     while (tokenizer.hasMoreTokens()) {
                         keywords.add(tokenizer.nextToken().trim());
