@@ -20,10 +20,7 @@ package org.schemaspy.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class TableIndex implements Comparable<TableIndex> {
     private final String name;
@@ -38,8 +35,12 @@ public class TableIndex implements Comparable<TableIndex> {
      * @throws java.sql.SQLException
      */
     public TableIndex(ResultSet rs) throws SQLException {
-        name = rs.getString("INDEX_NAME");
-        isUnique = !rs.getBoolean("NON_UNIQUE");
+        this(rs.getString("INDEX_NAME"),!rs.getBoolean("NON_UNIQUE"));
+
+    }
+    public TableIndex(String name, boolean unique) {
+        this.name = name;
+        this.isUnique = unique;
     }
 
     public void setId(Object id) {
@@ -132,7 +133,7 @@ public class TableIndex implements Comparable<TableIndex> {
      * @return
      */
     public boolean isAscending(TableColumn column) {
-        return columnsAscending.get(columns.indexOf(column)).booleanValue();
+        return columnsAscending.get(columns.indexOf(column));
     }
 
     /**
@@ -153,5 +154,27 @@ public class TableIndex implements Comparable<TableIndex> {
         if (thisId instanceof Number)
             return ((Number)thisId).intValue() - ((Number)otherId).intValue();
         return thisId.toString().compareToIgnoreCase(otherId.toString());
+    }
+
+    @Override public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
+        Object thisId = getId();
+        Object otherId = ((TableIndex)other).getId();
+        if (thisId == null || otherId == null)
+            return getName().equalsIgnoreCase(((TableIndex)other).getName());
+        if (thisId instanceof Number)
+            return thisId.equals(otherId);
+        return thisId.toString().equalsIgnoreCase(otherId.toString());
+    }
+    @Override public int hashCode() {
+        Object thisId = getId();
+        if (thisId == null) {
+        	return Objects.hash(name);
+		}
+        if (thisId instanceof Number) {
+            return (Objects.hash(thisId));
+        }
+        return Objects.hash(thisId.toString().toLowerCase());
     }
 }

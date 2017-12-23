@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schemaMeta xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemaspy.org/xsd/schemaMeta.xsd" >
+    <comments>Set from SchemaMeta</comments>
+    <tables>
+        <table name="ACCOUNT" comments="Set from SchemaMeta">
+            <column name="name" comments="Set from SchemaMeta"/>
+        </table>
+    </tables>
+</schemaMeta>

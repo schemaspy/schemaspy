@@ -18,13 +18,14 @@
  */
 package org.schemaspy.util;
 
+import org.schemaspy.Config;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import org.schemaspy.Config;
 
 /**
  * Configuration of a specific type of database (as specified by -t)
@@ -53,6 +54,12 @@ public class DbSpecificConfig {
         } catch (IOException exc) {
             description = exc.toString();
         }
+    }
+
+    public DbSpecificConfig(String dbType, Properties props) {
+        type = dbType;
+        description = props.getProperty("description");
+        loadOptions(props);
     }
 
     /**

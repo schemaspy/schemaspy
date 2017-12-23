@@ -1,11 +1,14 @@
 package org.schemaspy.util;
 
 import org.schemaspy.view.MustacheTableDiagram;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -13,6 +16,7 @@ import java.util.List;
  * Created by rkasa on 2016-04-16.
  */
 public class DiagramUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static void generateDiagram(String diagramName, Dot dot, File dotFile, File diagramFile, List<MustacheTableDiagram> diagrams, boolean isActive, boolean isImplied) throws IOException {
         if (dotFile.exists()) {
@@ -36,7 +40,6 @@ public class DiagramUtil {
         diagram.setMapName(diagramMapName(diagramMap));
         diagram.setIsImplied(isImplied);
         diagrams.add(diagram);
-        diagramMap = null;
     }
 
     private static String diagramMapName(String diagramMap) {
@@ -49,7 +52,7 @@ public class DiagramUtil {
                 diagramMapName = line.substring(9,line.indexOf("name")-2);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error reading diagram map",e);
         }
         return diagramMapName;
     }

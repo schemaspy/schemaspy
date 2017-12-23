@@ -369,11 +369,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
             return false;
         }
 
-        if (this.parentTable != ((ForeignKeyConstraint)obj).parentTable) {
-            return false;
-        }
-
-        return true;
+        return this.parentTable == ((ForeignKeyConstraint) obj).parentTable;
     }
 
     @Override
