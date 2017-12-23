@@ -56,7 +56,7 @@ public class DotNode {
     public DotNode(Table table, String path, File outputDir, DotNodeConfig config) {
         this.table = table;
         this.path = path + (table.isRemote() ? ("../../" + table.getContainer() + "/tables/") : "");
-        this.outputDir = outputDir.toString();
+        this.outputDir = outputDir.getAbsolutePath();
         this.config = config;
     }
 
