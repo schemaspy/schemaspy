@@ -26,7 +26,6 @@ import java.util.List;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.DiagramUtil;
 import org.schemaspy.util.Dot;
-import org.schemaspy.util.DotFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +60,7 @@ public class HtmlTableDiagrammer extends HtmlDiagramFormatter {
             DiagramUtil.generateDiagram("One implied", dot, oneImpliedDotFile, oneImpliedDiagramFile, diagrams, false, true);
             DiagramUtil.generateDiagram("Two implied", dot, twoImpliedDotFile, twoImpliedDiagramFile, diagrams, false, true);
 
-        } catch (IOException | DotFailure dotFailure) {
+        } catch (IOException dotFailure) {
             LOGGER.error("There was an error writing a dot file",dotFailure);
             return false;
         }
