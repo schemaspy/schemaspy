@@ -20,6 +20,7 @@ package org.schemaspy;
 
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.db.config.PropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.Dot;
@@ -90,6 +91,7 @@ public final class Config {
     private String font;
     private Integer fontSize;
     private String description;
+    private PropertiesResolver propertiesResolver = new PropertiesResolver();
     private Properties dbProperties;
     private String dbPropertiesLoadedFrom;
     private SqlFormatter sqlFormatter;
@@ -213,7 +215,7 @@ public final class Config {
      * Return the path to Graphviz (used to find the dot executable to run to
      * generate ER diagrams).<p/>
      * <p>
-     * Returns {@link #getDefaultGraphvizPath()} if a specific Graphviz path
+     * Returns graphiz path or null
      * was not specified.
      *
      * @return
@@ -486,7 +488,7 @@ public final class Config {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public void setConnectionPropertiesFile(String propertiesFilename) throws FileNotFoundException, IOException {
+    public void setConnectionPropertiesFile(String propertiesFilename) throws IOException {
         if (userConnectionProperties == null)
             userConnectionProperties = new Properties();
         userConnectionProperties.load(new FileInputStream(propertiesFilename));
@@ -502,11 +504,11 @@ public final class Config {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public Properties getConnectionProperties() throws FileNotFoundException, IOException {
+    public Properties getConnectionProperties() throws IOException {
         if (userConnectionProperties == null) {
             String props = pullParam("-connprops");
             if (props != null) {
-                if (props.indexOf(ESCAPED_EQUALS) != -1) {
+                if (props.contains(ESCAPED_EQUALS)) {
                     setConnectionProperties(props);
                 } else {
                     setConnectionPropertiesFile(props);
@@ -632,10 +634,10 @@ public final class Config {
                     LOGGER.warn(e.getMessage(), e);
                 }
             }
-            fontSize = Integer.valueOf(size);
+            fontSize = size;
         }
 
-        return fontSize.intValue();
+        return fontSize;
     }
 
     /**
@@ -692,13 +694,7 @@ public final class Config {
      */
     public int getMaxDbThreads() throws InvalidConfigurationException {
         if (maxDbThreads == null) {
-            Properties properties;
-            try {
-                properties = determineDbProperties(getDbType());
-            } catch (IOException exc) {
-                throw new InvalidConfigurationException("Failed to load properties for " + getDbType() + ": " + exc)
-                        .setParamName("-type");
-            }
+            Properties properties = getDbProperties();
 
             final int defaultMax = 15;  // not scientifically derived
             int max = defaultMax;
@@ -884,7 +880,7 @@ public final class Config {
      * Set the columns to exclude from relationship diagrams where the specified
      * columns aren't directly referenced by the focal table.
      *
-     * @param columnExclusions regular expression of the columns to
+     * @param fullColumnExclusions regular expression of the columns to
      *                         exclude
      */
     public void setIndirectColumnExclusions(String fullColumnExclusions) {
@@ -944,7 +940,7 @@ public final class Config {
     /**
      * Set the tables to exclude as a regular expression
      *
-     * @param tableInclusions
+     * @param tableExclusions
      */
     public void setTableExclusions(String tableExclusions) {
         this.tableExclusions = Pattern.compile(tableExclusions);
@@ -1254,7 +1250,7 @@ public final class Config {
 
     /**
      * @return
-     * @see #setHasOrphans()
+     * @see #setHasOrphans(boolean)
      */
     public boolean hasOrphans() {
         return hasOrphans;
@@ -1269,7 +1265,7 @@ public final class Config {
 
     /**
      * @return
-     * @see #setHasRoutines()
+     * @see #setHasRoutines(boolean)
      */
     public boolean hasRoutines() {
         return hasRoutines;
@@ -1344,20 +1340,13 @@ public final class Config {
      */
     public Properties getDbProperties() throws InvalidConfigurationException {
         if (dbProperties == null) {
-            try {
-                dbProperties = determineDbProperties(getDbType());
-            } catch (IOException exc) {
-                throw new InvalidConfigurationException(exc);
-            }
+            dbProperties = propertiesResolver.getDbProperties(getDbType());
         }
-
         return dbProperties;
     }
 
     /**
      * Determines the database properties associated with the specified type.
-     * A call to {@link #setDbProperties(Properties)} is expected after determining
-     * the complete set of properties.
      *
      * @param type
      * @return
@@ -1365,82 +1354,7 @@ public final class Config {
      * @throws InvalidConfigurationException if db properties are incorrectly formed
      */
     public Properties determineDbProperties(String type) throws IOException, InvalidConfigurationException {
-        ResourceBundle bundle = null;
-
-        try {
-            File propertiesFile = new File(type);
-            bundle = new PropertyResourceBundle(new FileInputStream(propertiesFile));
-            dbPropertiesLoadedFrom = propertiesFile.getAbsolutePath();
-        } catch (FileNotFoundException notFoundOnFilesystemWithoutExtension) {
-            try {
-                File propertiesFile = new File(type + ".properties");
-                bundle = new PropertyResourceBundle(new FileInputStream(propertiesFile));
-                dbPropertiesLoadedFrom = propertiesFile.getAbsolutePath();
-            } catch (FileNotFoundException notFoundOnFilesystemWithExtensionTackedOn) {
-                try {
-                    bundle = ResourceBundle.getBundle(type);
-                    dbPropertiesLoadedFrom = "[" + getLoadedFromJar() + "]" + File.separator + type + ".properties";
-                } catch (Exception notInJarWithoutPath) {
-                    try {
-                        String path = TableOrderer.class.getPackage().getName() + ".types." + type;
-                        path = path.replace('.', '/');
-                        bundle = ResourceBundle.getBundle(path);
-                        dbPropertiesLoadedFrom = "[" + getLoadedFromJar() + "]/" + path + ".properties";
-                    } catch (Exception notInJar) {
-                        notInJar.printStackTrace();
-                        notFoundOnFilesystemWithExtensionTackedOn.printStackTrace();
-                        throw notFoundOnFilesystemWithoutExtension;
-                    }
-                }
-            }
-        }
-
-        Properties props = asProperties(bundle);
-        String saveLoadedFrom = dbPropertiesLoadedFrom; // keep original thru recursion
-
-        // bring in key/values pointed to by the include directive
-        // example: include.1=mysql::selectRowCountSql
-        for (int i = 1; true; ++i) {
-            String include = (String) props.remove("include." + i);
-            if (include == null)
-                break;
-
-            int separator = include.indexOf("::");
-            if (separator == -1)
-                throw new InvalidConfigurationException("include directive in " + dbPropertiesLoadedFrom + " must have '::' between dbType and key");
-
-            String refdType = include.substring(0, separator).trim();
-            String refdKey = include.substring(separator + 2).trim();
-
-            // recursively resolve the ref'd properties file and the ref'd key
-            Properties refdProps = determineDbProperties(refdType);
-            props.put(refdKey, refdProps.getProperty(refdKey));
-        }
-
-        // bring in base properties files pointed to by the extends directive
-        String baseDbType = (String) props.remove("extends");
-        if (baseDbType != null) {
-            baseDbType = baseDbType.trim();
-            Properties baseProps = determineDbProperties(baseDbType);
-
-            // overlay our properties on top of the base's
-            baseProps.putAll(props);
-            props = baseProps;
-        }
-
-        // done with this level of recursion...restore original
-        dbPropertiesLoadedFrom = saveLoadedFrom;
-
-        // this won't be correct until the final recursion exits
-        dbProperties = props;
-
-        return props;
-    }
-
-    protected String getDbPropertiesLoadedFrom() throws IOException {
-        if (dbPropertiesLoadedFrom == null)
-            determineDbProperties(getDbType());
-        return dbPropertiesLoadedFrom;
+        return propertiesResolver.getDbProperties(type);
     }
 
     public List<String> getRemainingParameters() {
@@ -1476,23 +1390,6 @@ public final class Config {
         if (dbSpecificOptions == null)
             dbSpecificOptions = new HashMap<>();
         return dbSpecificOptions;
-    }
-
-    /**
-     * Returns a {@link Properties} populated with the contents of <code>bundle</code>
-     *
-     * @param bundle ResourceBundle
-     * @return Properties
-     */
-    public static Properties asProperties(ResourceBundle bundle) {
-        Properties props = new Properties();
-        Enumeration<String> iter = bundle.getKeys();
-        while (iter.hasMoreElements()) {
-            String key = iter.nextElement();
-            props.put(key, bundle.getObject(key));
-        }
-
-        return props;
     }
 
     /**
@@ -1624,8 +1521,8 @@ public final class Config {
 
             BeanInfo beanInfo = Introspector.getBeanInfo(Config.class);
             PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-            for (int i = 0; i < props.length; ++i) {
-                Method readMethod = props[i].getReadMethod();
+            for (PropertyDescriptor prop : props) {
+                Method readMethod = prop.getReadMethod();
                 if (readMethod != null)
                     readMethod.invoke(this, (Object[]) null);
             }
@@ -1644,7 +1541,7 @@ public final class Config {
 
             while ((entry = jar.getNextJarEntry()) != null) {
                 String entryName = entry.getName();
-                if (entryName.indexOf("types") != -1) {
+                if (entryName.contains("types")) {
                     int dotPropsIndex = entryName.indexOf(".properties");
                     if (dotPropsIndex != -1)
                         databaseTypes.add(entryName.substring(0, dotPropsIndex));
@@ -1727,15 +1624,14 @@ public final class Config {
         try {
             BeanInfo beanInfo = Introspector.getBeanInfo(Config.class);
             PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-            for (int i = 0; i < props.length; ++i) {
-                PropertyDescriptor prop = props[i];
+            for (PropertyDescriptor prop : props) {
                 if (prop.getName().equalsIgnoreCase(paramName)) {
                     Object result = prop.getReadMethod().invoke(this, (Object[]) null);
                     return result == null ? null : result.toString();
                 }
             }
         } catch (Exception failed) {
-            failed.printStackTrace();
+            LOGGER.error("Unable to get parameter {}",paramName,failed);
         }
 
         return null;
@@ -1752,8 +1648,9 @@ public final class Config {
         List<String> params = new ArrayList<>();
 
         if (originalDbSpecificOptions != null) {
-            for (String key : originalDbSpecificOptions.keySet()) {
-                String value = originalDbSpecificOptions.get(key);
+            for (Entry<String,String> entry : originalDbSpecificOptions.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
                 if (!key.startsWith("-"))
                     key = "-" + key;
                 params.add(key);

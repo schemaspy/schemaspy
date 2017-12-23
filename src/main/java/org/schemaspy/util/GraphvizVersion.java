@@ -44,7 +44,7 @@ public class GraphvizVersion implements Comparable<GraphvizVersion> {
             while (tokenizer.hasMoreTokens()) {
                 Integer segment = new Integer(tokenizer.nextToken());
                 segments.add(segment);
-                hash += segment.intValue();
+                hash += segment;
             }
         }
 

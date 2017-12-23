@@ -207,7 +207,7 @@ public class Dot {
      * @see #setHighQuality(boolean)
      */
     public boolean isHighQuality() {
-        return getRenderer().indexOf(CAIRO_RENDERER) != -1;
+        return getRenderer().contains(CAIRO_RENDERER);
     }
 
     /**
@@ -245,7 +245,7 @@ public class Dot {
             }
             process.waitFor();
         } catch (Exception exc) {
-            exc.printStackTrace();
+            LOGGER.error("Error determining if a renderer is supported",exc);
         }
 
         if (!validatedRenderers.contains(renderer)) {
@@ -343,6 +343,7 @@ public class Dot {
     }
 
     private static class ProcessOutputReader extends Thread {
+		private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
         private final BufferedReader processReader;
         private final String command;
 
@@ -358,17 +359,13 @@ public class Dot {
                 String line;
                 while ((line = processReader.readLine()) != null) {
                     // don't report port id unrecognized or unrecognized port
-                    if (line.indexOf("unrecognized") == -1 && line.indexOf("port") == -1)
+                    if (!line.contains("unrecognized") && !line.contains("port"))
                         System.err.println(command + ": " + line);
                 }
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                LOGGER.error("Error reading from process",ioException);
             } finally {
-                try {
-                    processReader.close();
-                } catch (Exception exc) {
-                    exc.printStackTrace(); // shouldn't ever get here...but...
-                }
+                IOUtils.closeQuietly(processReader);
             }
         }
     }

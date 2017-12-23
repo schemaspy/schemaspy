@@ -203,8 +203,6 @@ public class SchemaAnalyzer {
 
             long duration = progressListener.startedGraphingSummaries();
 
-            schemaMeta = null; // done with it so let GC reclaim it
-
             Collection<Table> tables = new ArrayList<Table>(db.getTables());
             tables.addAll(db.getViews());
 
@@ -230,8 +228,6 @@ public class SchemaAnalyzer {
                            }
                         }
                     });
-
-            meta = null;
 
             List<ForeignKeyConstraint> recursiveConstraints = new ArrayList<ForeignKeyConstraint>();
 
@@ -401,7 +397,6 @@ public class SchemaAnalyzer {
      */
     private void prepareLayoutFiles(File outputDir) throws IOException {
         URL url = getClass().getResource("/layout");
-        File directory = new File(url.getPath());
 
         IOFileFilter notHtmlFilter = FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter(".html"));
         FileFilter filter = FileFilterUtils.and(notHtmlFilter);
@@ -412,7 +407,7 @@ public class SchemaAnalyzer {
 
     private Connection getConnection(Config config) throws InvalidConfigurationException, IOException {
 
-        Properties properties = config.determineDbProperties(commandLineArguments.getDatabaseType());
+        Properties properties = config.getDbProperties();
 
         ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
         if (config.getDb() == null)

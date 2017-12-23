@@ -49,7 +49,7 @@ public class SqlService {
     }
 
     public DatabaseMetaData connect(Config config) throws IOException, SQLException {
-        Properties properties = config.determineDbProperties(commandLineArguments.getDatabaseType());
+        Properties properties = config.getDbProperties();
 
         ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
         if (config.getDb() == null)
@@ -117,7 +117,7 @@ public class SqlService {
      * @param sql       StringBuffer input SQL with named parameters, output named params are replaced with ?'s.
      * @param tableName String
      * @return List of Strings
-     * @see #prepareStatement(String, String)
+     * @see #prepareStatement(String, Database, String)
      */
     private List<String> getSqlParams(StringBuilder sql, String dbName, String catalog, String schema, String tableName) {
         Map<String, String> namedParams = new HashMap<String, String>();

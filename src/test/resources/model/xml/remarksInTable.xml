@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schemaMeta xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemaspy.org/xsd/schemaMeta.xsd" >
+    <tables>
+        <table name="ACCOUNT" remarks="isDeprecated">
+            <column name="accountId"/>
+        </table>
+    </tables>
+</schemaMeta>

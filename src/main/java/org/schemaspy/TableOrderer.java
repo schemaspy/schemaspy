@@ -121,11 +121,7 @@ public class TableOrderer {
         List<Table> ordered = new ArrayList<Table>(heads.size() + tails.size());
 
         ordered.addAll(heads);
-        heads = null; // allow gc ASAP
-
         ordered.addAll(tails);
-        tails = null; // allow gc ASAP
-
         ordered.addAll(unattached);
 
         return ordered;
