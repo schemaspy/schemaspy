@@ -19,7 +19,9 @@
     "anchor-js": "^4.0.0",
     "salvattore": "^1.0.9",
     "html5shiv": "3.7.3",
-    "respond": "1.4.2"
+    "respond": "1.4.2",
+    "js-xlsx": "0.11.14",
+    "pdfmake": "0.1.35"
   },
   "install": {
     "path": "src/main/resources/layout/bower",
@@ -28,6 +30,7 @@
       "salvattore": "bower_components/salvattore/dist/salvattore.min.js",
       "html5shiv":  "bower_components/html5shiv/dist/html5shiv.min.js",
       "respond":    "bower_components/respond/dest/respond.min.js",
+      "js-xlsx":    "bower_components/js-xlsx/dist/xlsx.full.min.js",
       "admin-lte": {
         "mapping": [
           { "bower_components/admin-lte/bootstrap/**": "bootstrap" },
@@ -70,7 +73,11 @@
           { "bower_components/codemirror/lib/**": "" },
           { "bower_components/codemirror/mode/sql/sql.js": "sql.js" }
         ]
-      }
+      },
+      "pdfmake": [
+        "bower_components/pdfmake/build/pdfmake.min.js",
+        "bower_components/pdfmake/build/vfs_fonts.js"
+      ]
     }
   }
 }
