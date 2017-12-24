@@ -154,3 +154,11 @@ td.diagram  {
 .logo-text {
   font-family: "Indie Flower", "Helvetica Neue", Helvetica, Arial, cursive;
 }
+
+.dataTables_filter {
+  padding-top: 4px;
+}
+
+.dataTables_filter .input-sm {
+  padding-left: 13px;
+}
