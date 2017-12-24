@@ -1,5 +1,3 @@
-/* required colors MUST be specified in RGB hex notation or the diagrams won't have correct colors */
-
 /* background must be specified for it to propagate into diagrams */
 .diagram {
   margin: 0px;
