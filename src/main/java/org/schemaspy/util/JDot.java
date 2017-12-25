@@ -19,7 +19,7 @@ public class JDot {
     protected String outputDirectoryName;
 
     public JDot(String outputDirectoryName) {
-        this.outputDirectoryName=outputDirectoryName;
+        this.outputDirectoryName=replaceBackslash(outputDirectoryName);
         try {
             InputStream vizJs = JDot.class.getResourceAsStream("/viz.js");
             if (vizJs == null) {
@@ -35,14 +35,18 @@ public class JDot {
 
     protected String toSvg(String dotSource, int jsEngineMemorySize) {
         try {
-            scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("dotSource", dotSource);
+            scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("dotSource", replaceBackslash(dotSource));
             return (String) scriptEngine.eval("Viz(dotSource,options = { totalMemory: "+jsEngineMemorySize
                     +" , images: [" +
-                    "{ path: \""+outputDirectoryName+File.separatorChar+"images"+File.separatorChar+"foreignKeys.png\"" + ICON_SIZE + " }," +
-                    "{ path: \""+outputDirectoryName+File.separatorChar+"images"+File.separatorChar+"primaryKeys.png\"" + ICON_SIZE + " }]})");
+                    "{ path: \""+outputDirectoryName+"/images/foreignKeys.png\"" + ICON_SIZE + " }," +
+                    "{ path: \""+outputDirectoryName+"/images/primaryKeys.png\"" + ICON_SIZE + " }]})");
         } catch (ScriptException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    private String replaceBackslash(String source) {
+        return source==null?null:source.replaceAll("\\\\","/");
     }
 
     public String getVersion(){
