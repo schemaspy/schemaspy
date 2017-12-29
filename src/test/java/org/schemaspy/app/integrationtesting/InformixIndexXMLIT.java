@@ -1,4 +1,4 @@
-package org.schemaspy.testcontainer;
+package org.schemaspy.app.integrationtesting;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.BeforeClass;
@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import org.schemaspy.Main;
+import org.schemaspy.app.Main;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.schemaspy.testing.IgnoreUsingXPath;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

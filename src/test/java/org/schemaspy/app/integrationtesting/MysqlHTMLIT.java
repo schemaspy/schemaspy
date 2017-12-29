@@ -76,7 +76,7 @@ public class MysqlHTMLIT {
     }
 
     @Test
-    public void producesSameContet() throws IOException {
+    public void producesSameContent() throws IOException {
         String target = "target/mysqlhtml";
         Path expectedPath = Paths.get("src/test/resources/integrationTesting/expecting/mysqlhtml");
         List<Path> expectations;

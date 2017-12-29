@@ -1,14 +1,13 @@
-package org.schemaspy.testcontainer;
+package org.schemaspy.app.integrationtesting;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.app.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
@@ -20,12 +19,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MSSQLServerContainer;
-import org.testcontainers.containers.OracleContainer;
-import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.jdbc.ContainerDatabaseDriver;
 
 import javax.script.ScriptException;
 import java.io.File;

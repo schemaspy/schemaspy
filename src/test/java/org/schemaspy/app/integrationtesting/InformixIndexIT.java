@@ -1,4 +1,4 @@
-package org.schemaspy.testcontainer;
+package org.schemaspy.app.integrationtesting;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
@@ -9,7 +9,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.app.cli.CommandLineArguments;
 import org.schemaspy.model.*;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;

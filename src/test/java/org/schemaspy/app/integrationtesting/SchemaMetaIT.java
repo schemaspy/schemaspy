@@ -1,4 +1,4 @@
-package org.schemaspy.integrationtesting;
+package org.schemaspy.app.integrationtesting;
 
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.app.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.xml.SchemaMeta;
