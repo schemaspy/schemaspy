@@ -1,8 +1,12 @@
+/*
+ * Copyright (C) 2016, 2017 Rafal Kasa
+ * Copyright (C) 2017 Nils Petzaell
+ */
+
 package org.schemaspy.service;
 
 import org.schemaspy.Config;
 import org.schemaspy.DbDriverLoader;
-import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ConnectionURLBuilder;
@@ -18,27 +22,19 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
-
-
 /**
  * Created by rkasa on 2016-12-10.
+ *
+ * @author Rafal Kasa
+ * @author Nils Petzaell
  */
 @Service
 public class SqlService {
 
-    private final CommandLineArguments commandLineArguments;
-
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private Connection connection;
     private DatabaseMetaData meta;
-
-    private String defaultSchema;
-    private String databaseName;
-
-    public SqlService(CommandLineArguments commandLineArguments) {
-        this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
-    }
 
     public Connection getConnection() {
         return connection;
@@ -52,24 +48,21 @@ public class SqlService {
         Properties properties = config.getDbProperties();
 
         ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
-        if (config.getDb() == null)
+        if (Objects.isNull(config.getDb()))
             config.setDb(urlBuilder.build());
 
         String driverClass = properties.getProperty("driver");
         String driverPath = properties.getProperty("driverPath");
-        if (driverPath == null)
+        if (Objects.isNull(driverPath))
             driverPath = "";
 
-        if (config.getDriverPath() != null)
+        if (Objects.nonNull(config.getDriverPath()))
             driverPath = config.getDriverPath();
 
         DbDriverLoader driverLoader = new DbDriverLoader();
         connection = driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);
 
         meta = connection.getMetaData();
-
-        databaseName = config.getDb();
-        defaultSchema = commandLineArguments.getSchema();
 
         if (config.isEvaluateAllEnabled()) {
             return null;    // no database to return
@@ -120,28 +113,28 @@ public class SqlService {
      * @see #prepareStatement(String, Database, String)
      */
     private List<String> getSqlParams(StringBuilder sql, String dbName, String catalog, String schema, String tableName) {
-        Map<String, String> namedParams = new HashMap<String, String>();
-        if (schema == null) {
+        Map<String, String> namedParams = new HashMap<>();
+        if (Objects.isNull(schema)) {
             schema = dbName; // some 'schema-less' db's treat the db name like a schema (unusual case)
         }
         
         namedParams.put(":dbname", dbName);
         namedParams.put(":schema", schema);
         namedParams.put(":owner", schema); // alias for :schema
-        if (tableName != null) {
+        if (Objects.nonNull(tableName)) {
             namedParams.put(":table", tableName);
             namedParams.put(":view", tableName); // alias for :table
         }
-        if (catalog != null) {
+        if (Objects.nonNull(catalog)) {
             namedParams.put(":catalog", catalog);
         }
 
-        List<String> sqlParams = new ArrayList<String>();
+        List<String> sqlParams = new ArrayList<>();
         int nextColon = sql.indexOf(":");
         while (nextColon != -1) {
             String paramName = new StringTokenizer(sql.substring(nextColon), " ,\"')").nextToken();
             String paramValue = namedParams.get(paramName);
-            if (paramValue == null)
+            if (Objects.isNull(paramValue))
                 throw new InvalidConfigurationException("Unexpected named parameter '" + paramName + "' found in SQL '" + sql + "'");
             sqlParams.add(paramValue);
             sql.replace(nextColon, nextColon + paramName.length(), "?"); // replace with a ?

@@ -1,6 +1,9 @@
+/*
+ * Copyright (C) 2017 Wojciech Kasa
+ * Copyright (C) 2017 Nils Petzaell
+ */
 package org.schemaspy;
 
-import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by wkasa on 2017-03-04.
+ * @author Wojciech Kasa
+ * @author Nils Petzaell
  */
 public class ConfigTest {
 
