@@ -136,6 +136,8 @@ So additional columns are ok, but you might need to alias columns so that they a
         table_name, table_catalog, table_schema, table_comment, table_rows
     **selectViewsSql=**
         view_name, view_catalog, view_schema, view_comment, view_definition
+    **selectIndexesSql=**
+        INDEX_NAME, TYPE, NON_UNIQUE, COLUMN_NAME, ASC_OR_DESC
     **selectRowCountSql=**
         row_count
     **selectColumnTypesSql=**
