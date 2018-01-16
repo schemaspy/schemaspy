@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schemaMeta xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemaspy.org/xsd/schemaMeta.xsd" >
+    <tables>
+        <table name="AGENT">
+            <column name="accountId" type="INT">
+                <foreignKey table="ACCOUNT" column="accountId" />
+            </column>
+            <column name="companyId" type="INT">
+                <foreignKey table="COMPANY" column="companyId" />
+            </column>
+        </table>
+    </tables>
+</schemaMeta>

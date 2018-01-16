@@ -17,7 +17,7 @@ public class MustacheTableIndex {
     }
 
     public String getKey() {
-        String keyType = "";
+        String keyType;
 
         if (index.isPrimaryKey()) {
             keyType = " class='primaryKey' title='Primary Key'";

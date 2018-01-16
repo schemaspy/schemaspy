@@ -287,9 +287,9 @@ public class XmlTableFormatter {
     private String asBinary(String str) {
         byte[] bytes = str.getBytes();
         StringBuilder buf = new StringBuilder(bytes.length * 2);
-        for (int i = 0; i < bytes.length; ++i) {
-            buf.append(String.format("%02X", bytes[i]));
-        }
+		for (byte aByte : bytes) {
+			buf.append(String.format("%02X", aByte));
+		}
         return buf.toString();
     }
 }

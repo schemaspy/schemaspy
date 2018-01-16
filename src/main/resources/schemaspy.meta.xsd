@@ -3,17 +3,18 @@
     <xs:element name="schemaMeta">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="comments"/>
+                <xs:element ref="comments" minOccurs="0"/>
                 <xs:element ref="tables"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="comments" type="xs:string"/>
-    <xs:element name="remarks" type="xs:string">
         <xs:annotation>
-            <xs:documentation>Alias for "comments".</xs:documentation>
+            <xs:documentation>
+                Will add comments/remarks to output (html/xsd)
+                Will replace comments/remarks that have been retrieved from database.
+            </xs:documentation>
         </xs:annotation>
-    </xs:element>
     <xs:element name="tables">
         <xs:complexType>
             <xs:sequence>
@@ -27,10 +28,17 @@
                 <xs:element ref="column" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>
-            <xs:attribute name="comments" type="xs:string"/>
+            <xs:attribute name="comments" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        Will add comments/remarks to output (html/xsd)
+                        Will replace comments/remarks that have been retrieved from database.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="remarks" type="xs:string">
             <xs:annotation>
-                <xs:documentation>Alias for "comments".</xs:documentation>
+                <xs:documentation>Deprecated and will be removed if future version</xs:documentation>
             </xs:annotation>
             </xs:attribute>
             <xs:attribute name="remoteCatalog" type="xs:string">
@@ -56,15 +64,22 @@
         			maxOccurs="unbounded" />
         	</xs:sequence>
         	<xs:attribute name="name" type="xs:string" use="required" />
-        	<xs:attribute name="type" type="xs:string"></xs:attribute>
-        	<xs:attribute name="id" type="xs:string"></xs:attribute>
-        	<xs:attribute name="size" type="xs:int"></xs:attribute>
-        	<xs:attribute name="digits" type="xs:int"></xs:attribute>
-        	<xs:attribute name="nullable" type="xs:boolean"></xs:attribute>
-        	<xs:attribute name="comments" type="xs:string" />
+        	<xs:attribute name="type" type="xs:string"/>
+        	<xs:attribute name="id" type="xs:string"/>
+        	<xs:attribute name="size" type="xs:int"/>
+        	<xs:attribute name="digits" type="xs:int"/>
+        	<xs:attribute name="nullable" type="xs:boolean"/>
+        	<xs:attribute name="comments" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        Will add comments/remarks to output (html/xsd)
+                        Will replace comments/remarks that have been retrieved from database.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
         	<xs:attribute name="remarks" type="xs:string">
                 <xs:annotation>
-                    <xs:documentation>Alias for "comments".</xs:documentation>
+                    <xs:documentation>Deprecated and will be removed if future version</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         	<xs:attribute name="primaryKey" type="xs:boolean">
@@ -75,8 +90,8 @@
         			</xs:documentation>
         		</xs:annotation>
         	</xs:attribute>
-        	<xs:attribute name="autoUpdated" type="xs:boolean"></xs:attribute>
-            <xs:attribute name="defaultValue" type="xs:string"></xs:attribute>
+        	<xs:attribute name="autoUpdated" type="xs:boolean"/>
+            <xs:attribute name="defaultValue" type="xs:string"/>
             <xs:attribute name="disableImpliedKeys">
         		<xs:annotation>
         			<xs:documentation>
@@ -149,6 +164,7 @@
         		</xs:annotation>
         	</xs:attribute>
         	<xs:attribute name="table" type="xs:string" use="required" />
-        	<xs:attribute name="column" type="xs:string" use="required" />        </xs:complexType>
+        	<xs:attribute name="column" type="xs:string" use="required" />
+        </xs:complexType>
     </xs:element>
 </xs:schema>

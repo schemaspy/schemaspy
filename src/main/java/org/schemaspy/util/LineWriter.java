@@ -40,7 +40,7 @@ public class LineWriter extends BufferedWriter {
         this(new FileOutputStream(file), charset);
     }
 
-    public LineWriter(File file, int sz, String charset) throws UnsupportedEncodingException, IOException {
+    public LineWriter(File file, int sz, String charset) throws IOException {
         this(new FileOutputStream(file), sz, charset);
     }
 

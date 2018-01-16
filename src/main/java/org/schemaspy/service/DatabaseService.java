@@ -1,15 +1,7 @@
 package org.schemaspy.service;
 
 import org.schemaspy.Config;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.LogicalTable;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.Routine;
-import org.schemaspy.model.RoutineParameter;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.model.TableIndex;
-import org.schemaspy.model.View;
+import org.schemaspy.model.*;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.service.helper.BasicTableMeta;
@@ -23,14 +15,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -225,7 +210,9 @@ public class DatabaseService {
      */
     private void updateFromXmlMetadata(Config config, Database db, SchemaMeta schemaMeta) throws SQLException {
         if (schemaMeta != null) {
-            config.setDescription(schemaMeta.getComments());
+            if (Objects.nonNull(schemaMeta.getComments())) {
+                config.setDescription(schemaMeta.getComments());
+            }
 
             // done in three passes:
             // 1: create any new tables
@@ -334,14 +321,14 @@ public class DatabaseService {
         }
 
         @Override
-        void create(Database db, BasicTableMeta tableMeta, ProgressListener listener) throws SQLException {
+        void create(Database db, BasicTableMeta tableMeta, ProgressListener listener) {
             Thread runner = new Thread() {
                 @Override
                 public void run() {
                     try {
                         createImpl(db, tableMeta, listener);
                     } catch (SQLException exc) {
-                        exc.printStackTrace(); // nobody above us in call stack...dump it here
+                        LOGGER.error("SQL exception",exc);
                     } finally {
                         synchronized (threads) {
                             threads.remove(this);

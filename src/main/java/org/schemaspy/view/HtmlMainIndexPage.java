@@ -78,7 +78,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         }
 
         long tablesAmount = tables.stream().filter(t -> !t.isView()).count();
-        long viewsAmount = tables.stream().filter(v -> v.isView()).count();
+        long viewsAmount = tables.stream().filter(Table::isView).count();
         long constraintsAmount = DbAnalyzer.getForeignKeyConstraints(tables).size();
 
         HashMap<String, Object> scopes = new HashMap<String, Object>();

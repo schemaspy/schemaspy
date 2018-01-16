@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schemaMeta xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemaspy.org/xsd/schemaMeta.xsd" >
+    <comments/>
+    <tables>
+        <table name="CONTRACT" remoteCatalog="other" remoteSchema="other" comments="From Other">
+            <column name="contractId" autoUpdated="true" primaryKey="true" type="INT"/>
+            <column name="accountId" type="INT">
+                <foreignKey table="ACCOUNT" column="accountId"/>
+            </column>
+            <column name="agentId" type="INT"/>
+        </table>
+    </tables>
+</schemaMeta>
