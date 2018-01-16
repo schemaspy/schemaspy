@@ -75,7 +75,7 @@ public class MSSQLServerIT {
 
     private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
         String[] args = {
-                "-t", "mssql12",
+                "-t", "mssql08",
                 "-db", "test",
                 "-s", "dbo",
                 "-cat", "%",
@@ -85,8 +85,8 @@ public class MSSQLServerIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(1433).toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/databaseServiceIT"));
-        given(arguments.getDatabaseType()).willReturn("mssql12");
+        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mssql"));
+        given(arguments.getDatabaseType()).willReturn("mssql08");
         given(arguments.getUser()).willReturn("sa");
         given(arguments.getSchema()).willReturn("dbo");
         given(arguments.getCatalog()).willReturn("%");
@@ -119,6 +119,6 @@ public class MSSQLServerIT {
     }
 
     private Table getTable(String tableName) {
-        return database.getTables().stream().filter(table -> table.getName().equals(tableName)).findFirst().get();
+        return database.getTablesByName().get(tableName);
     }
 }
