@@ -166,7 +166,7 @@
                                     {{#diagrams}}
                                     <div class="chart tab-pane {{active}}" id="{{id}}-chart" style="position: relative; overflow-x:auto;">
                                         {{{map}}}
-                                        <a name='diagram'><img id='{{id}}' src='../diagrams/{{fileName}}' usemap='#{{mapName}}' class='diagram' border='0' alt='' align='left'></a>
+                                        <a name='diagram'><{{#isEmbed}}embed{{/isEmbed}}{{^isEmbed}}img{{/isEmbed}} id='{{id}}' src='../diagrams/{{fileName}}' usemap='#{{mapName}}' class='diagram' border='0' alt='' align='left' /></a>
                                     </div>
                                     {{/diagrams}}
                                 </div>

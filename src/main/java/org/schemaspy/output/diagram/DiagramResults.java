@@ -29,8 +29,9 @@ public class DiagramResults {
     private final File diagramFile;
     private final String diagramMapName;
     private final String diagramMap;
+    private final String imageFormat;
 
-    public DiagramResults(File diagramFile, String diagramMapName, String diagramMap) {
+    public DiagramResults(File diagramFile, String diagramMapName, String diagramMap, String imageFormat) {
         this.diagramFile = diagramFile;
         this.diagramMapName = diagramMapName;
         if (Objects.nonNull(diagramMap)) {
@@ -38,7 +39,7 @@ public class DiagramResults {
         } else {
             this.diagramMap = "";
         }
-
+        this.imageFormat = imageFormat;
     }
 
     public File getDiagramFile() {
@@ -51,5 +52,9 @@ public class DiagramResults {
 
     public String getDiagramMap() {
         return diagramMap;
+    }
+
+    public String getImageFormat() {
+        return imageFormat;
     }
 }

@@ -57,6 +57,7 @@ public class MustacheDiagramFactory {
         mustacheTableDiagram.setFileName(diagramResults.getDiagramFile().getName());
         mustacheTableDiagram.setMap(diagramResults.getDiagramMap());
         mustacheTableDiagram.setMapName(diagramResults.getDiagramMapName());
+        mustacheTableDiagram.setEmbed(diagramResults.getImageFormat().equalsIgnoreCase("svg"));
         return mustacheTableDiagram;
     }
 

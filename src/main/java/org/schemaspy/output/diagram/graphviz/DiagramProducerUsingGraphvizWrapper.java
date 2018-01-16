@@ -67,7 +67,7 @@ public class DiagramProducerUsingGraphvizWrapper implements DiagramProducer {
         try {
             File diagramFile = new File(orphanDir, diagramName + "." + graphvizWrapper.getFormat());
             String diagramMap = graphvizWrapper.generateDiagram(dotFile, diagramFile);
-            return new DiagramResults(diagramFile, diagramMapName(diagramMap), diagramMap);
+            return new DiagramResults(diagramFile, diagramMapName(diagramMap), diagramMap, graphvizWrapper.getFormat());
         } catch (Dot.DotFailure dotFailure) {
             throw new DiagramException("Failed to generate Orphan diagram", dotFailure);
         }
@@ -78,7 +78,7 @@ public class DiagramProducerUsingGraphvizWrapper implements DiagramProducer {
         try {
             File diagramFile = new File(diagramDir, diagramName + "." + graphvizWrapper.getFormat());
             String diagramMap = graphvizWrapper.generateDiagram(dotFile, diagramFile);
-            return new DiagramResults(diagramFile, diagramMapName(diagramMap), diagramMap);
+            return new DiagramResults(diagramFile, diagramMapName(diagramMap), diagramMap, graphvizWrapper.getFormat());
         } catch (Dot.DotFailure dotFailure) {
             throw new DiagramException("Failed to generate Table diagram", dotFailure);
         }
@@ -89,7 +89,7 @@ public class DiagramProducerUsingGraphvizWrapper implements DiagramProducer {
         try {
             File diagramFile = new File(summaryDir, diagramName + "." + graphvizWrapper.getFormat());
             String diagramMap = graphvizWrapper.generateDiagram(dotFile, diagramFile);
-            return new DiagramResults(diagramFile, diagramMapName(diagramMap), diagramMap);
+            return new DiagramResults(diagramFile, diagramMapName(diagramMap), diagramMap, graphvizWrapper.getFormat());
         } catch (Dot.DotFailure dotFailure) {
             throw new DiagramException("Failed to generate summary diagram", dotFailure);
         }
