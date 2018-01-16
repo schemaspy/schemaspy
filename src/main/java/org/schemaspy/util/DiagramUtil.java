@@ -39,6 +39,7 @@ public class DiagramUtil {
         diagram.setId(diagramId + "DegreeImg");
         diagram.setMapName(diagramMapName(diagramMap));
         diagram.setIsImplied(isImplied);
+        diagram.setEmbed(diagramFile.getName().endsWith(".svg"));
         diagrams.add(diagram);
     }
 

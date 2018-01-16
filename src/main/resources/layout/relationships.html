@@ -34,7 +34,7 @@
 						{{/hasOnlyImpliedRelationships}}						
 					{{/isImplied}}																
 					{{{map}}}
-					<a name='diagram'><img id='{{id}}' src='diagrams/summary/{{fileName}}' usemap='#{{mapName}}' class='diagram' border='0' alt='' align='left'></a>							
+					<a name='diagram'><{{#isEmbed}}embed{{/isEmbed}}{{^isEmbed}}img{{/isEmbed}} id='{{id}}' src='diagrams/summary/{{fileName}}' usemap='#{{mapName}}' class='diagram' border='0' alt='' align='left'></a>
 				</div>
 			  	{{/diagrams}}			  
 			</div>

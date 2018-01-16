@@ -11,6 +11,7 @@ public class MustacheTableDiagram {
     private String mapName;
     private String active;
     private boolean isImplied;
+    private boolean isEmbed;
 
     public String getName() {
         return name;
@@ -66,5 +67,13 @@ public class MustacheTableDiagram {
 
     public void setIsImplied(boolean isImplied) {
         this.isImplied = isImplied;
+    }
+
+    public boolean isEmbed() {
+        return isEmbed;
+    }
+
+    public void setEmbed(boolean embed) {
+        isEmbed = embed;
     }
 }
