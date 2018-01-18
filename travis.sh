@@ -13,7 +13,7 @@ if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
 	#
 	# Analysis is done only on master so that build of branches don't push analyses to the same project and therefore "pollute" the results
 	echo "Starting analysis by SonarQube..."
-	mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify sonar:sonar -B -e -V \
+	mvn -P sonar clean verify -e -V \
 		-Dsonar.host.url=$SONAR_HOST_URL \
 		-Dsonar.login=$SONAR_TOKEN
 
@@ -25,7 +25,7 @@ elif [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ -n "${GITHUB_TOKEN-}" ]; then
 	# http://docs.travis-ci.com/user/pull-requests/#Security-Restrictions-when-testing-Pull-Requests
 	# That's why the analysis does not need to be executed if the variable GITHUB_TOKEN is not defined.
 	echo "Build and analyze internal pull request..."
-	mvn clean verify sonar:sonar -B -e -V \
+	mvn -P sonar clean verify  -e -V \
 		-Dsonar.host.url=$SONAR_HOST_URL \
 		-Dsonar.login=$SONAR_TOKEN \
 		-Dsonar.analysis.mode=preview \
