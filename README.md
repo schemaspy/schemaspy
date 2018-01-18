@@ -73,7 +73,17 @@ Are very welcome! And remember, contribution is not only PRs and code, but any h
 SchemaSpy is built using maven and we utilize the maven wrapper.  
 __Windows__ `mvnw.cmd build`    
 __Linux__ `./mvnw build`  
-The resulting application can be found in `target`
+The resulting application can be found in `target`  
+
+##### Analyzing
+You need your own SonarQube:  
+https://hub.docker.com/_/sonarqube/  
+__Windows__ `mvnw.cmd -P sonar clean verify -Dsonar.host.url=http://$(boot2docker ip):9000 -Dsonar.jdbc.url="jdbc:h2:tcp://$(boot2docker ip)/sonar"`  
+__Linux__ `./mvnw -P sonar clean verify`  
+
+Watch results at:  
+__Linux__ `http://localhost:9000`  
+__Windows__ `http://$(boot2docker ip):9000`  
 
 #### Documentation
 You'll need sphinx installed http://www.sphinx-doc.org    
