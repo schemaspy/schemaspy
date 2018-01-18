@@ -321,11 +321,9 @@ public class SchemaAnalyzer {
 
         // getting implied constraints has a side-effect of associating the parent/child tables, so don't do it
         // here unless they want that behavior
-        List<ImpliedForeignKeyConstraint> impliedConstraints;
+        List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList();
         if (includeImpliedConstraints)
-            impliedConstraints = DbAnalyzer.getImpliedConstraints(tables);
-        else
-            impliedConstraints = new ArrayList<>();
+            impliedConstraints.addAll(DbAnalyzer.getImpliedConstraints(tables));
 
         List<Table> orphans = DbAnalyzer.getOrphans(tables);
         config.setHasOrphans(!orphans.isEmpty() && Dot.getInstance().isValid());
@@ -360,7 +358,7 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlMainIndexPage.getInstance().write(db, tables, db.getRemoteTables(), outputDir);
+        HtmlMainIndexPage.getInstance().write(db, tables, impliedConstraints, outputDir);
 
         progressListener.graphingSummaryProgressed();
 
