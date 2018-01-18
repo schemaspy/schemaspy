@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004-2011 John Currier
+ * Copyright (C) 2018 Nils Petzaell
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,12 +20,6 @@
  */
 package org.schemaspy.output.xml.dom;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
@@ -32,12 +28,25 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+
 /**
  * Formats {@link Table}s into an XML DOM tree.
  *
  * @author John Currier
+ * @author Nils Petzaell
  */
 public class XmlTableFormatter {
+
+    private static final String CATALOG = "catalog";
+    private static final String SCHEMA = "schema";
+    private static final String TABLE = "table";
+    private static final String COLUMN = "column";
+
     private static final XmlTableFormatter instance = new XmlTableFormatter();
 
     // valid chars came from http://www.w3.org/TR/REC-xml/#charsets
@@ -67,11 +76,9 @@ public class XmlTableFormatter {
      * @param tables
      */
     public void appendTables(Element schemaNode, Collection<Table> tables) {
-        Set<Table> byName = new TreeSet<Table>(new Comparator<Table>() {
-            public int compare(Table table1, Table table2) {
-                return table1.getName().compareToIgnoreCase(table2.getName());
-            }
-        });
+        Set<Table> byName = new TreeSet<>((table1, table2) ->
+                table1.getName().compareToIgnoreCase(table2.getName())
+        );
         byName.addAll(tables);
 
         Document document = schemaNode.getOwnerDocument();
@@ -89,12 +96,12 @@ public class XmlTableFormatter {
      */
     private void appendTable(Element tablesNode, Table table) {
         Document document = tablesNode.getOwnerDocument();
-        Element tableNode = document.createElement("table");
+        Element tableNode = document.createElement(TABLE);
         tablesNode.appendChild(tableNode);
         if (table.getId() != null)
             DOMUtil.appendAttribute(tableNode, "id", String.valueOf(table.getId()));
-        DOMUtil.appendAttribute(tableNode, "catalog", table.getCatalog());
-        DOMUtil.appendAttribute(tableNode, "schema", table.getSchema());
+        DOMUtil.appendAttribute(tableNode, CATALOG, table.getCatalog());
+        DOMUtil.appendAttribute(tableNode, SCHEMA, table.getSchema());
         DOMUtil.appendAttribute(tableNode, "name", table.getName());
         if (table.getNumRows() >= 0)
             DOMUtil.appendAttribute(tableNode, "numRows", String.valueOf(table.getNumRows()));
@@ -128,7 +135,7 @@ public class XmlTableFormatter {
      */
     private Node appendColumn(Node tableNode, TableColumn column) {
         Document document = tableNode.getOwnerDocument();
-        Node columnNode = document.createElement("column");
+        Node columnNode = document.createElement(COLUMN);
         tableNode.appendChild(columnNode);
 
         DOMUtil.appendAttribute(columnNode, "id", String.valueOf(column.getId()));
@@ -156,10 +163,10 @@ public class XmlTableFormatter {
             columnNode.appendChild(childNode);
             ForeignKeyConstraint constraint = column.getChildConstraint(childColumn);
             DOMUtil.appendAttribute(childNode, "foreignKey", constraint.getName());
-            DOMUtil.appendAttribute(childNode, "catalog", table.getCatalog());
-            DOMUtil.appendAttribute(childNode, "schema", table.getSchema());
-            DOMUtil.appendAttribute(childNode, "table", table.getName());
-            DOMUtil.appendAttribute(childNode, "column", childColumn.getName());
+            DOMUtil.appendAttribute(childNode, CATALOG, table.getCatalog());
+            DOMUtil.appendAttribute(childNode, SCHEMA, table.getSchema());
+            DOMUtil.appendAttribute(childNode, TABLE, table.getName());
+            DOMUtil.appendAttribute(childNode, COLUMN, childColumn.getName());
             DOMUtil.appendAttribute(childNode, "implied", String.valueOf(constraint.isImplied()));
             DOMUtil.appendAttribute(childNode, "onDeleteCascade", String.valueOf(constraint.isCascadeOnDelete()));
         }
@@ -170,10 +177,10 @@ public class XmlTableFormatter {
             columnNode.appendChild(parentNode);
             ForeignKeyConstraint constraint = column.getParentConstraint(parentColumn);
             DOMUtil.appendAttribute(parentNode, "foreignKey", constraint.getName());
-            DOMUtil.appendAttribute(parentNode, "catalog", table.getCatalog());
-            DOMUtil.appendAttribute(parentNode, "schema", table.getSchema());
-            DOMUtil.appendAttribute(parentNode, "table", table.getName());
-            DOMUtil.appendAttribute(parentNode, "column", parentColumn.getName());
+            DOMUtil.appendAttribute(parentNode, CATALOG, table.getCatalog());
+            DOMUtil.appendAttribute(parentNode, SCHEMA, table.getSchema());
+            DOMUtil.appendAttribute(parentNode, TABLE, table.getName());
+            DOMUtil.appendAttribute(parentNode, COLUMN, parentColumn.getName());
             DOMUtil.appendAttribute(parentNode, "implied", String.valueOf(constraint.isImplied()));
             DOMUtil.appendAttribute(parentNode, "onDeleteCascade", String.valueOf(constraint.isCascadeOnDelete()));
         }
@@ -195,7 +202,7 @@ public class XmlTableFormatter {
             Node primaryKeyNode = document.createElement("primaryKey");
             tableNode.appendChild(primaryKeyNode);
 
-            DOMUtil.appendAttribute(primaryKeyNode, "column", primaryKeyColumn.getName());
+            DOMUtil.appendAttribute(primaryKeyNode, COLUMN, primaryKeyColumn.getName());
             DOMUtil.appendAttribute(primaryKeyNode, "sequenceNumberInPK", String.valueOf(index++));
         }
     }
@@ -210,13 +217,13 @@ public class XmlTableFormatter {
         Document document = tableNode.getOwnerDocument();
         Map<String, String> constraints = table.getCheckConstraints();
         if (constraints != null && !constraints.isEmpty()) {
-            for (String name : constraints.keySet()) {
+            constraints.forEach((name, value) -> {
                 Node constraintNode = document.createElement("checkConstraint");
                 tableNode.appendChild(constraintNode);
 
                 DOMUtil.appendAttribute(constraintNode, "name", name);
-                DOMUtil.appendAttribute(constraintNode, "constraint", constraints.get(name));
-            }
+                DOMUtil.appendAttribute(constraintNode, "constraint", value);
+            });
         }
     }
 
@@ -230,7 +237,7 @@ public class XmlTableFormatter {
         boolean showId = table.getId() != null;
         Set<TableIndex> indexes = table.getIndexes();
         if (indexes != null && !indexes.isEmpty()) {
-            indexes = new TreeSet<TableIndex>(indexes); // sort primary keys first
+            indexes = new TreeSet<>(indexes); // sort primary keys first
             Document document = tableNode.getOwnerDocument();
 
             for (TableIndex index : indexes) {
@@ -242,7 +249,7 @@ public class XmlTableFormatter {
                 DOMUtil.appendAttribute(indexNode, "unique", String.valueOf(index.isUnique()));
 
                 for (TableColumn column : index.getColumns()) {
-                    Node columnNode = document.createElement("column");
+                    Node columnNode = document.createElement(COLUMN);
 
                     DOMUtil.appendAttribute(columnNode, "name", column.getName());
                     DOMUtil.appendAttribute(columnNode, "ascending", String.valueOf(index.isAscending(column)));
