@@ -10,33 +10,37 @@
               <h3 class="box-title">Columns</h3>
             </div>	
             <div class="box-body">
+				<div class="row">
+					<div id="button_group_one" class="col-md-3 col-sm-6"></div>
+					<div id="button_group_two" class="col-md-2 col-sm-4 pull-right text-right"></div>
+				</div>
 				<table id="column_table" class="table table-bordered table-striped dataTable" role="grid">
 				<thead align='left'>
-				<tr>
-				  <th>Table</th>
-				  <th>Type</th>
-				  <th>Column</th>				  
-				  <th>Type</th>
-				  <th>Size</th>
-				  <th title='Are nulls allowed?'>Nulls</th>
-				  <th title='Is column automatically updated?'>Auto</th>
-				  <th title='Default value'>Default</th>
-				  <th title='Comments' class="toggle"><span>Comments</span></th>
-				</tr>
+					<tr>
+					  <th>Table</th>
+					  <th>Type</th>
+					  <th>Column</th>
+					  <th>Type</th>
+					  <th>Size</th>
+					  <th title='Are nulls allowed?'>Nulls</th>
+					  <th title='Is column automatically updated?'>Auto</th>
+					  <th title='Default value'>Default</th>
+					  <th title='Comments' class="toggle"><span>Comments</span></th>
+					</tr>
 				</thead>
 				<tbody>
 				{{#columns}}
-				<tr>
-				 <td>{{column.table.name}}</td>
-				 <td>{{column.table.type}}</td>
-				 <td{{{key}}}>{{{keyIcon}}}{{column.name}}</td>
-				 <td>{{column.typeName}}</td>
-				 <td>{{column.length}}</td>
-				 <td title='{{titleNullable}}'>{{nullable}}</td>
-				 <td title='{{titleAutoUpdated}}'>{{autoUpdated}}</td>
-				 <td>{{defaultValue}}</td>
-				 <td>{{{comments}}}</td>
-				</tr>
+					<tr>
+					 <td>{{column.table.name}}</td>
+					 <td>{{column.table.type}}</td>
+					 <td{{{key}}}>{{{keyIcon}}}{{column.name}}</td>
+					 <td>{{column.typeName}}</td>
+					 <td>{{column.length}}</td>
+					 <td title='{{titleNullable}}'>{{nullable}}</td>
+					 <td title='{{titleAutoUpdated}}'>{{autoUpdated}}</td>
+					 <td>{{defaultValue}}</td>
+					 <td>{{{comments}}}</td>
+					</tr>
 				{{/columns}}				
 				</tbody>
 				</table>				

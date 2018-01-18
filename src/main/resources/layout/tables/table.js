@@ -12,32 +12,32 @@ $(document).ready(function() {
 		bPaginate: false,
 		autoWidth: true,		
 		buttons: [ 
-						{
-							text: 'Related columns',
-							action: function ( e, dt, node, config ) {
-								$(".relatedKey").toggle();
-								this.active( !this.active() );
-								table.columns.adjust().draw();
-							}
-						},
-						{
-							text: 'Constraint',
-							action: function ( e, dt, node, config ) {
-								$(".constraint").toggle();
-								this.active( !this.active() );
-								table.columns.adjust().draw();
-							}
-						},						
-						{
-							extend: 'columnsToggle',
-							columns: '.toggle'
+					{
+						text: 'Related columns',
+						action: function ( e, dt, node, config ) {
+							$(".relatedKey").toggle();
+							this.active( !this.active() );
+							table.columns.adjust().draw();
 						}
-					]					
+					},
+					{
+						text: 'Constraint',
+						action: function ( e, dt, node, config ) {
+							$(".constraint").toggle();
+							this.active( !this.active() );
+							table.columns.adjust().draw();
+						}
+					},
+					{
+						extend: 'columnsToggle',
+						columns: '.toggle'
+					}
+				]
 					
     } );
- 
-    table.buttons().container()
-        .appendTo('#standard_table_wrapper .col-sm-6:eq(0)' );    	
+
+    //schemaSpy.js
+    dataTableExportButtons(table);
 } );
 
 $(document).ready(function() {
