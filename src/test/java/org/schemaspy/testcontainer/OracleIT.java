@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
@@ -15,14 +16,17 @@ import org.schemaspy.model.TableColumn;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.OracleContainer;
 
 import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.DatabaseMetaData;
@@ -30,11 +34,39 @@ import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class OracleIT {
+
+    @ClassRule
+    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
+            new JdbcContainerRule<>(() -> new OracleContainer())
+                    .assumeDockerIsPresent()
+                    .withAssumptions(assumeDriverIsPresent())
+                    .withInitScript("integrationTesting/dbScripts/oracle.sql");
+
+    @Configuration
+    @ComponentScan(basePackages = {"org.schemaspy"}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = Main.class))
+    static class OracleITConfig {
+        @Bean
+        public ApplicationArguments applicationArguments() {
+            return new DefaultApplicationArguments(new String[]{
+                    "-t", "orathin",
+                    "-db", jdbcContainerRule.getContainer().getSid(),
+                    "-s", "ORAIT",
+                    "-cat", "%",
+                    "-o", "target/integrationtesting/orait",
+                    "-u", "orait",
+                    "-p", "orait123",
+                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
+                    "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
+            });
+        }
+    }
+
+    @Autowired
+    private Config config;
 
     @Autowired
     private SqlService sqlService;
@@ -42,23 +74,13 @@ public class OracleIT {
     @Autowired
     private DatabaseService databaseService;
 
+    @Autowired
+    private CommandLineArguments commandLineArguments;
+
     @Mock
     private ProgressListener progressListener;
 
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
-
     private static Database database;
-
-    @ClassRule
-    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer())
-            .assumeDockerIsPresent()
-            .withAssumptions(assumeDriverIsPresent())
-            .withInitScript("integrationTesting/dbScripts/oracle.sql");
 
     @Before
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
@@ -68,26 +90,8 @@ public class OracleIT {
     }
 
     private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
-        String[] args = {
-                "-t", "orathin",
-                "-db", jdbcContainerRule.getContainer().getSid(),
-                "-s", "ORAIT",
-                "-cat", "%",
-                "-o", "target/integrationtesting/orait",
-                "-u", "orait",
-                "-p", "orait123",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
-        };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/databaseServiceIT"));
-        given(arguments.getDatabaseType()).willReturn("orathin");
-        given(arguments.getUser()).willReturn("orait");
-        given(arguments.getSchema()).willReturn("ORAIT");
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
-        Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
+        Database database = new Database(config, databaseMetaData, commandLineArguments.getDatabaseName(), commandLineArguments.getCatalog(), commandLineArguments.getSchema(), null, progressListener);
         databaseService.gatheringSchemaDetails(config, database, progressListener);
         this.database = database;
     }

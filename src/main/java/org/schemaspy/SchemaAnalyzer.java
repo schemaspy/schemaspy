@@ -22,27 +22,22 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.input.db.driver.Adapter;
 import org.schemaspy.model.*;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
-import org.schemaspy.output.xml.dom.DOMUtil;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
-import org.schemaspy.output.xml.dom.XmlTableFormatter;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
-import org.schemaspy.util.*;
+import org.schemaspy.util.Dot;
+import org.schemaspy.util.LineWriter;
+import org.schemaspy.util.ResourceWriter;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -63,18 +58,23 @@ import java.util.*;
 public class SchemaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private final Config config;
+
     private final SqlService sqlService;
 
     private final DatabaseService databaseService;
 
     private final CommandLineArguments commandLineArguments;
 
-    private List<OutputProducer> outputProducers = new ArrayList<>();
+    private final Adapter adapter;
 
-    public SchemaAnalyzer(SqlService sqlService, DatabaseService databaseService, CommandLineArguments commandLineArguments) {
+    private List<OutputProducer> outputProducers = new ArrayList<>();
+    public SchemaAnalyzer(Config config, SqlService sqlService, DatabaseService databaseService, CommandLineArguments commandLineArguments, Adapter adapter) {
+        this.config = Objects.requireNonNull(config);
         this.sqlService = Objects.requireNonNull(sqlService);
         this.databaseService = Objects.requireNonNull(databaseService);
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
+        this.adapter = Objects.requireNonNull(adapter);
         addOutputProducer(new XmlProducerUsingDOM());
     }
 
@@ -83,8 +83,8 @@ public class SchemaAnalyzer {
         return this;
     }
 
-    public Database analyze(Config config) throws SQLException, IOException {
-    	// don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
+    public Database analyze() throws SQLException, IOException {
+        // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
     	// and not already logging fine details (to keep from obfuscating those)
 
         boolean render = config.isHtmlGenerationEnabled();
@@ -93,16 +93,16 @@ public class SchemaAnalyzer {
     	// if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas  
         List<String> schemas = config.getSchemas();
         if (schemas != null || config.isEvaluateAllEnabled()) {
-        	return this.analyzeMultipleSchemas(config, progressListener);
+            return this.analyzeMultipleSchemas(progressListener);
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
-            return analyze(schema, config, outputDirectory, progressListener);
+            return analyze(schema, outputDirectory, progressListener);
         }
     }
 
-	public Database analyzeMultipleSchemas(Config config, ProgressListener progressListener)throws SQLException, IOException {
+    public Database analyzeMultipleSchemas(ProgressListener progressListener) throws SQLException, IOException {
         try {
             // following params will be replaced by something appropriate
             List<String> args = config.asList();
@@ -112,7 +112,7 @@ public class SchemaAnalyzer {
             List<String> schemas = config.getSchemas();
             Database db = null;
         	String schemaSpec = config.getSchemaSpec();
-            Connection connection = this.getConnection(config);
+            Connection connection = getConnection();
             DatabaseMetaData meta = connection.getMetaData();
             //-all(evaluteAll) given then get list of the database schemas
             if (schemas == null || config.isEvaluateAllEnabled()) {
@@ -148,7 +148,7 @@ public class SchemaAnalyzer {
                 System.out.println("Analyzing " + schema);
                 System.out.flush();
                 File outputDirForSchema = new File(outputDir, schema);
-                db = this.analyze(schema, config, outputDirForSchema, progressListener);
+                db = this.analyze(schema, outputDirForSchema, progressListener);
                 if (db == null) //if any of analysed schema returns null
                     return db;
                 mustacheSchemas.add(new MustacheSchema(db.getSchema(),""));
@@ -165,7 +165,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    public Database analyze(String schema, Config config, File outputDir,  ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyze(String schema, File outputDir, ProgressListener progressListener) throws SQLException, IOException {
         try {
             LOGGER.info("Starting schema analysis");
 
@@ -216,7 +216,7 @@ public class SchemaAnalyzer {
             }
 
             if (config.isHtmlGenerationEnabled()) {
-                generateHtmlDoc(config, progressListener, outputDir, db, duration, tables);
+                generateHtmlDoc(progressListener, outputDir, db, duration, tables);
             }
 
             outputProducers.forEach(
@@ -282,7 +282,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    private void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
+    private void generateHtmlDoc(ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
         LineWriter out;
         LOGGER.info("Gathered schema details in {} seconds", duration / 1000);
         LOGGER.info("Writing/graphing summary");
@@ -406,23 +406,8 @@ public class SchemaAnalyzer {
         ResourceWriter.copyResources(url, outputDir, filter);
     }
 
-    private Connection getConnection(Config config) throws InvalidConfigurationException, IOException {
-
-        Properties properties = config.getDbProperties();
-
-        ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
-        if (config.getDb() == null)
-            config.setDb(urlBuilder.build());
-
-        String driverClass = properties.getProperty("driver");
-        String driverPath = properties.getProperty("driverPath");
-        if (driverPath == null)
-            driverPath = "";
-        if (config.getDriverPath() != null)
-            driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
-
-        DbDriverLoader driverLoader = new DbDriverLoader();
-        return driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);
+    private Connection getConnection() throws InvalidConfigurationException, IOException {
+        return adapter.getConnection();
     }
 
     private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {

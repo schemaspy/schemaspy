@@ -1,8 +1,8 @@
 package org.schemaspy.service;
 
 import org.schemaspy.Config;
-import org.schemaspy.DbDriverLoader;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.input.db.driver.Adapter;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ConnectionURLBuilder;
@@ -27,17 +27,16 @@ import java.util.*;
 public class SqlService {
 
     private final CommandLineArguments commandLineArguments;
+    private final Adapter adapter;
 
     private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private Connection connection;
     private DatabaseMetaData meta;
 
-    private String defaultSchema;
-    private String databaseName;
-
-    public SqlService(CommandLineArguments commandLineArguments) {
+    public SqlService(CommandLineArguments commandLineArguments, Adapter adapter) {
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
+        this.adapter = Objects.requireNonNull(adapter);
     }
 
     public Connection getConnection() {
@@ -49,27 +48,8 @@ public class SqlService {
     }
 
     public DatabaseMetaData connect(Config config) throws IOException, SQLException {
-        Properties properties = config.getDbProperties();
-
-        ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
-        if (config.getDb() == null)
-            config.setDb(urlBuilder.build());
-
-        String driverClass = properties.getProperty("driver");
-        String driverPath = properties.getProperty("driverPath");
-        if (driverPath == null)
-            driverPath = "";
-
-        if (config.getDriverPath() != null)
-            driverPath = config.getDriverPath();
-
-        DbDriverLoader driverLoader = new DbDriverLoader();
-        connection = driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);
-
+        connection = adapter.getConnection();
         meta = connection.getMetaData();
-
-        databaseName = config.getDb();
-        defaultSchema = commandLineArguments.getSchema();
 
         if (config.isEvaluateAllEnabled()) {
             return null;    // no database to return

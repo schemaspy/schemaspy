@@ -8,14 +8,21 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.*;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 
@@ -40,23 +47,6 @@ import static org.mockito.BDDMockito.given;
 */
 public class MysqlSpacesIT {
 
-    @Autowired
-    private SqlService sqlService;
-
-    @Autowired
-    private DatabaseService databaseService;
-
-    @Mock
-    private ProgressListener progressListener;
-
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
-
-    private static Database database;
-
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
             new JdbcContainerRule<>(() -> new MySQLContainer())
@@ -65,34 +55,54 @@ public class MysqlSpacesIT {
                     .withInitScript("integrationTesting/dbScripts/mysql_spaces.sql")
                     .withInitUser("root", "test");
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
+    @Configuration
+    @ComponentScan(basePackages = {"org.schemaspy"}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = Main.class))
+    static class MysqlSpacesITConfig {
+        @Bean
+        public ApplicationArguments applicationArguments() {
+            MySQLContainer container = jdbcContainerRule.getContainer();
+            return new DefaultApplicationArguments(new String[]{
+                    "-t", "mysql",
+                    "-db", "TEST 1.0",
+                    "-s", "TEST 1.0",
+                    "-cat", "%",
+                    "-o", "target/integrationtesting/mysql_spaces",
+                    "-u", "test",
+                    "-p", "test",
+                    "-connprops", "useSSL\\=false",
+                    "-host", container.getContainerIpAddress() + ":" + String.valueOf(container.getMappedPort(3306)),
+                    "-port", String.valueOf(container.getMappedPort(3306))
+            });
         }
     }
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
-        String[] args = {
-                "-t", "mysql",
-                "-db", "TEST 1.0",
-                "-s", "TEST 1.0",
-                "-cat", "%",
-                "-o", "target/integrationtesting/mysql_spaces",
-                "-u", "test",
-                "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
-        };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysql_spaces"));
-        given(arguments.getDatabaseType()).willReturn("mysql");
-        given(arguments.getUser()).willReturn("test");
-        given(arguments.getSchema()).willReturn("TEST 1.0");
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn("TEST 1.0");
-        Config config = new Config(args);
+    @Autowired
+    private Config config;
+
+    @Autowired
+    private SqlService sqlService;
+
+    @Autowired
+    private DatabaseService databaseService;
+
+    @Autowired
+    private CommandLineArguments commandLineArguments;
+
+    @Mock
+    private ProgressListener progressListener;
+
+    private static Database database;
+
+    @Before
+    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
+        if (database == null) {
+            createDatabaseRepresentation();
+        }
+    }
+
+    private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
+        Database database = new Database(config, databaseMetaData, commandLineArguments.getDatabaseName(), commandLineArguments.getCatalog(), commandLineArguments.getSchema(), null, progressListener);
         databaseService.gatheringSchemaDetails(config, database, progressListener);
         this.database = database;
     }

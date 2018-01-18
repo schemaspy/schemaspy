@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
@@ -17,9 +18,13 @@ import org.schemaspy.util.LineWriter;
 import org.schemaspy.view.DotFormatter;
 import org.schemaspy.view.WriteStats;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
@@ -30,7 +35,6 @@ import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -41,6 +45,22 @@ public class SchemaMetaIT {
 
     @ClassRule
     public static H2MemoryRule h2MemoryRule = new H2MemoryRule("SchemaMetaIT").addSqlScript("src/test/resources/integrationTesting/schemaMetaIT/dbScripts/shemaMetaIT.h2.sql");
+
+
+    @Configuration
+    @ComponentScan(basePackages = {"org.schemaspy"}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = Main.class))
+    static class H2SpacesITConfig {
+        @Bean
+        public ApplicationArguments applicationArguments() {
+            return new DefaultApplicationArguments(new String[]{
+                    "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
+                    "-db", "SchemaMetaIT",
+                    "-s", "SCHEMAMETAIT",
+                    "-o", "target/integrationtesting/schemaMetaIT",
+                    "-u", "sa"
+            });
+        }
+    }
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -54,32 +74,18 @@ public class SchemaMetaIT {
     @Mock
     private ProgressListener progressListener;
 
-    @MockBean
+    @Autowired
+    private Config config;
+
+    @Autowired
     private CommandLineArguments arguments;
 
-    @MockBean
-    private CommandLineRunner commandLineRunner;
-
-    private Config config;
     private DatabaseMetaData databaseMetaData;
     private String schema;
     private String catalog;
 
     @Before
     public void setup() throws IOException, SQLException {
-        String[] args = {
-                "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
-                "-db", "SchemaMetaIT",
-                "-s", "SCHEMAMETAIT",
-                "-o", "target/integrationtesting/schemaMetaIT",
-                "-u", "sa"
-        };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/schemaMetaIT"));
-        given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
-        given(arguments.getUser()).willReturn("sa");
-        given(arguments.getSchema()).willReturn("SCHEMAMETAIT");
-        given(arguments.getDatabaseName()).willReturn("SchemaMetaIT");
-        config = new Config(args);
         databaseMetaData = sqlService.connect(config);
         schema = h2MemoryRule.getConnection().getSchema();
         catalog = h2MemoryRule.getConnection().getCatalog();

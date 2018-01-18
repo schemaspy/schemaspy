@@ -77,7 +77,7 @@ public class Main implements CommandLineRunner {
         int rc = 1;
 
         try {
-            rc = analyzer.analyze(new Config(args)) == null ? 1 : 0;
+            rc = analyzer.analyze() == null ? 1 : 0;
         } catch (ConnectionFailure couldntConnect) {
             LOGGER.warn("Connection Failure", couldntConnect);
             rc = 3;

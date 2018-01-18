@@ -61,6 +61,9 @@ Commonly used parameters:
 [-dp pathToDrivers]
     Looks for drivers here before looking in driverPath in [databaseType].properties.
     The drivers are usually contained in .jar or .zip files and are typically provided by your database vendor.
+    Multiple paths can be supplied using path separator (win ``;``, linux ``:``)
+    If path is a directory it will be added and also any files inside ending with ar like nar, war, jar will be added.
+    If path is a file it will be added irregardless of ending.
 [-hq] or [-lq]
     Generate higher or lower-quality diagrams. Various installations of Graphviz (depending on OS and/or version) will default to generat /ing 
     either higher or lower quality images. That is, some might not have the "lower quality" libraries and others might not have the "higher quality" libraries.
@@ -123,8 +126,7 @@ Now we are going to connect to mysql thru unix socket, put on your helmets
 #. Now run schemaspy with the following options::
 
     java -jar [schemaspy.jar] -t my-mysq-socket \
-    -dp lib/mysql-connector-java-[version].jar \
-    -loadjars \
+    -dp lib \
     -db [DBName] \
     -host localhost \
     -port 3306 \

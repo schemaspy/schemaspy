@@ -10,3 +10,6 @@ bower_components/
 *.iml
 !ext-lib
 ext-lib/**/*.jar
+/src/test/resources/driverFolder/dummy/DummyDriver.class
+/src/test/resources/driverFolder/dummy/DummyDriverAbstract.class
+/src/test/resources/driverFolder/dummy/DummyDriverPrivateCtor.class

@@ -1,11 +1,9 @@
 package org.schemaspy;
 
 import com.beust.jcommander.ParameterException;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.cli.ConfigFileArgumentParser;
-import org.schemaspy.cli.PropertyFileDefaultProvider;
-import org.schemaspy.cli.PropertyFileDefaultProviderFactory;
+import org.schemaspy.cli.*;
+import org.schemaspy.input.db.driver.Adapter;
+import org.schemaspy.input.db.driver.Loader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +26,8 @@ public class SchemaSpyConfiguration {
     @Autowired
     private PropertyFileDefaultProviderFactory factory;
 
-    @Autowired
-    private ApplicationArguments applicationArguments;
-
     @Bean
-    public CommandLineArguments commandLineArguments(ApplicationArguments applicationArguments, CommandLineArgumentParser commandLineArgumentParser) {
+    public CommandLineArguments commandLineArguments(final ApplicationArguments applicationArguments, CommandLineArgumentParser commandLineArgumentParser) {
         Objects.requireNonNull(applicationArguments);
         Objects.requireNonNull(commandLineArgumentParser);
 
@@ -68,6 +63,16 @@ public class SchemaSpyConfiguration {
             System.exit(1);
             return null;
         }
+    }
+
+    @Bean
+    public Config config(final ApplicationArguments applicationArguments) {
+        return new Config(applicationArguments.getSourceArgs());
+    }
+
+    @Bean
+    public Adapter adapter(final CommandLineArguments commandLineArguments, final Config config) {
+        return new Adapter(new AdapterConfigDelegate(commandLineArguments, config), new Loader(new LoaderConfigDelegate(commandLineArguments, config)));
     }
 
 }
