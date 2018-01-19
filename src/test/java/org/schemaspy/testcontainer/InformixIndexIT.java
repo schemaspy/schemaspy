@@ -10,10 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
+import org.schemaspy.model.*;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
@@ -22,12 +19,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.OracleContainer;
+import org.testcontainers.containers.InformixContainer;
 
-import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
@@ -37,8 +32,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class OracleIT {
-
+public class InformixIndexIT {
     @Autowired
     private SqlService sqlService;
 
@@ -56,13 +50,13 @@ public class OracleIT {
 
     private static Database database;
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
 
-    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer())
-            .assumeDockerIsPresent()
-            .withAssumptions(assumeDriverIsPresent())
-            .withInitScript("integrationTesting/dbScripts/oracle.sql");
+    public static JdbcContainerRule<InformixContainer> jdbcContainerRule =
+            new JdbcContainerRule<>(() -> new InformixContainer())
+                    .assumeDockerIsPresent()
+                    .withAssumptions(assumeDriverIsPresent())
+                    .withInitScript("integrationTesting/informixIndexXMLIT/dbScripts/informix.sql");
 
     @ClassRule
     public static final TestRule chain = RuleChain
@@ -70,30 +64,31 @@ public class OracleIT {
             .around(jdbcDriverClassPresentRule);
 
     @Before
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
+    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
         if (database == null) {
             createDatabaseRepresentation();
         }
     }
 
-    private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
-                "-t", "orathin",
-                "-db", jdbcContainerRule.getContainer().getSid(),
-                "-s", "ORAIT",
-                "-cat", "%",
-                "-o", "target/integrationtesting/orait",
-                "-u", "orait",
-                "-p", "orait123",
+                "-t", "informix",
+                "-db", "test",
+                "-s", "informix",
+                "-cat", "test",
+                "-server", "dev",
+                "-o", "target/integrationtesting/informix",
+                "-u", jdbcContainerRule.getContainer().getUsername(),
+                "-p", jdbcContainerRule.getContainer().getPassword(),
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
+                "-port", jdbcContainerRule.getContainer().getJdbcPort().toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/databaseServiceIT"));
-        given(arguments.getDatabaseType()).willReturn("orathin");
-        given(arguments.getUser()).willReturn("orait");
-        given(arguments.getSchema()).willReturn("ORAIT");
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
+        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/informix"));
+        given(arguments.getDatabaseType()).willReturn("informix");
+        given(arguments.getUser()).willReturn(jdbcContainerRule.getContainer().getUsername());
+        given(arguments.getSchema()).willReturn("informix");
+        given(arguments.getCatalog()).willReturn("test");
+        given(arguments.getDatabaseName()).willReturn("test");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
@@ -103,22 +98,27 @@ public class OracleIT {
 
     @Test
     public void databaseShouldBePopulatedWithTableTest() {
-        Table table = getTable("TEST");
+        Table table = getTable("test");
         assertThat(table).isNotNull();
     }
 
     @Test
     public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
-        Table table = getTable("TEST");
-        TableColumn column = table.getColumn("NAME");
+        Table table = getTable("test");
+        TableColumn column = table.getColumn("firstname");
         assertThat(column).isNotNull();
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTestAndHaveColumnNameWithComment() {
-        Table table = getTable("TEST");
-        TableColumn column = table.getColumn("NAME");
-        assertThat(column.getComments()).isEqualToIgnoringCase("the name");
+    public void tableTestShouldHaveTwoIndexes() {
+        Table table = getTable("test");
+        assertThat(table.getIndexes().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void tableTestIndex_test_index_shouldHaveThreeColumns() {
+        TableIndex index = getTable("test").getIndex("test_index");
+        assertThat(index.getColumns().size()).isEqualTo(3);
     }
 
     private Table getTable(String tableName) {

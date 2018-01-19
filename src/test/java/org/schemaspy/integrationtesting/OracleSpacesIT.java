@@ -4,6 +4,8 @@ import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
@@ -12,6 +14,7 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
+import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,12 +53,18 @@ public class OracleSpacesIT {
 
     private static Database database;
 
-    @ClassRule
     public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
             new JdbcContainerRule<>(() -> new OracleContainer())
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitScript("integrationTesting/oracleSpacesIT/dbScripts/spaces_in_table_names.sql");
+
+    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+
+    @ClassRule
+    public static final TestRule chain = RuleChain
+            .outerRule(jdbcContainerRule)
+            .around(jdbcDriverClassPresentRule);
 
     @Before
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {

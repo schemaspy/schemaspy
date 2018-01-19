@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="test" schema="informix" type="Informix Dynamic Server - 12.10.FC9W1DE">
+   <tables>
+      <table catalog="test" name="sysdomains" numRows="0" remarks="" schema="informix" type="VIEW">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial"/>
+         <column autoUpdated="false" digits="0" id="1" name="owner" nullable="true" remarks="" size="32" type="char"/>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="true" remarks="" size="128" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="type" nullable="true" remarks="" size="5" type="smallint"/>
+      </table>
+      <table catalog="test" name="sysindexes" numRows="0" remarks="" schema="informix" type="VIEW">
+         <column autoUpdated="false" digits="0" id="0" name="idxname" nullable="true" remarks="" size="128" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="1" name="owner" nullable="true" remarks="" size="32" type="char"/>
+         <column autoUpdated="false" digits="0" id="2" name="tabid" nullable="true" remarks="" size="10" type="integer"/>
+         <column autoUpdated="false" digits="0" id="3" name="idxtype" nullable="true" remarks="" size="1" type="char"/>
+         <column autoUpdated="false" digits="0" id="4" name="clustered" nullable="true" remarks="" size="1" type="char"/>
+         <column autoUpdated="false" digits="0" id="5" name="part1" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="6" name="part2" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="7" name="part3" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="8" name="part4" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="9" name="part5" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="10" name="part6" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="11" name="part7" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="12" name="part8" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="13" name="part9" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="14" name="part10" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="15" name="part11" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="16" name="part12" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="17" name="part13" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="18" name="part14" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="19" name="part15" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="20" name="part16" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="21" name="levels" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="22" name="leaves" nullable="true" remarks="" size="17" type="float"/>
+         <column autoUpdated="false" digits="0" id="23" name="nunique" nullable="true" remarks="" size="17" type="float"/>
+         <column autoUpdated="false" digits="0" id="24" name="clust" nullable="true" remarks="" size="17" type="float"/>
+      </table>
+      <table catalog="test" name="test" numRows="0" remarks="" schema="informix" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="integer"/>
+         <column autoUpdated="false" digits="0" id="1" name="firstname" nullable="true" remarks="" size="32" type="char"/>
+         <column autoUpdated="false" digits="0" id="2" name="lastname" nullable="true" remarks="" size="32" type="char"/>
+         <column autoUpdated="false" digits="0" id="3" name="age" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="4" name="weight" nullable="true" remarks="" size="5" type="smallint"/>
+         <column autoUpdated="false" digits="0" id="5" name="height" nullable="true" remarks="" size="5" type="smallint"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="100_1" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="test_index" unique="false">
+            <column ascending="true" name="firstname"/>
+            <column ascending="true" name="lastname"/>
+            <column ascending="true" name="age"/>
+         </index>
+      </table>
+   </tables>
+</database>
