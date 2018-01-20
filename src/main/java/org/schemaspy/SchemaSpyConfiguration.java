@@ -1,17 +1,16 @@
 package org.schemaspy;
 
 import com.beust.jcommander.ParameterException;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.cli.ConfigFileArgumentParser;
-import org.schemaspy.cli.PropertyFileDefaultProvider;
-import org.schemaspy.cli.PropertyFileDefaultProviderFactory;
+import org.schemaspy.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.logging.LogLevel;
+import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
@@ -29,20 +28,7 @@ public class SchemaSpyConfiguration {
     private PropertyFileDefaultProviderFactory factory;
 
     @Autowired
-    private ApplicationArguments applicationArguments;
-
-    @Bean
-    public CommandLineArguments commandLineArguments(ApplicationArguments applicationArguments, CommandLineArgumentParser commandLineArgumentParser) {
-        Objects.requireNonNull(applicationArguments);
-        Objects.requireNonNull(commandLineArgumentParser);
-
-        String[] args = applicationArguments.getSourceArgs();
-        Objects.requireNonNull(args);
-
-        CommandLineArguments arguments = parseArgumentsOrExit(commandLineArgumentParser, args);
-
-        return arguments;
-    }
+    private LoggingSystem loggingSystem;
 
     @Bean
     public CommandLineArgumentParser commandLineArgumentParser(ApplicationArguments applicationArguments) {
@@ -60,6 +46,21 @@ public class SchemaSpyConfiguration {
         return factory.create(configFileName.orElse(null));
     }
 
+    @Bean
+    public CommandLineArguments commandLineArguments(ApplicationArguments applicationArguments, CommandLineArgumentParser commandLineArgumentParser, ConfigurableEnvironment environment) {
+        Objects.requireNonNull(applicationArguments);
+        Objects.requireNonNull(commandLineArgumentParser);
+
+        String[] args = applicationArguments.getSourceArgs();
+        Objects.requireNonNull(args);
+
+        CommandLineArguments arguments = parseArgumentsOrExit(commandLineArgumentParser, args);
+        if (arguments.isDebug()) {
+            enableDebug();
+        }
+        return arguments;
+    }
+
     private CommandLineArguments parseArgumentsOrExit(CommandLineArgumentParser commandLineArgumentParser, String... args) {
         try {
             return commandLineArgumentParser.parse(args);
@@ -68,6 +69,11 @@ public class SchemaSpyConfiguration {
             System.exit(1);
             return null;
         }
+    }
+
+    public void enableDebug() {
+        loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
+        LOGGER.debug("Debug enabled");
     }
 
 }
