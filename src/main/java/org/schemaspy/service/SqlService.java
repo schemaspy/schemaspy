@@ -2,13 +2,12 @@ package org.schemaspy.service;
 
 import org.schemaspy.Config;
 import org.schemaspy.DbDriverLoader;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.app.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ConnectionURLBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -23,7 +22,6 @@ import java.util.*;
 /**
  * Created by rkasa on 2016-12-10.
  */
-@Service
 public class SqlService {
 
     private final CommandLineArguments commandLineArguments;

@@ -18,6 +18,11 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.model.*;
+import org.schemaspy.util.Inflection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -25,11 +30,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
-
-import org.schemaspy.model.*;
-import org.schemaspy.util.Inflection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DbAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

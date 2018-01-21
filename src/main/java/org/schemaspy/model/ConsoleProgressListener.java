@@ -18,11 +18,11 @@
  */
 package org.schemaspy.model;
 
+import org.schemaspy.Config;
+import org.schemaspy.app.cli.CommandLineArguments;
+
 import java.io.File;
 import java.util.Collection;
-
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
 
 /**
  * Implementation of {@link ProgressListener} that sends its output to the console.
