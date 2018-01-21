@@ -1,5 +1,5 @@
-@@IGNORE// dot 2.38 on Linux 4.4.0-98-generic
-@@IGNORE// SchemaSpy rev Unknown
+@@IGNORE // dot 2.38 on Linux 4.4.0-109-generic
+@@IGNORE // SchemaSpy rev Unknown
 digraph "oneDegreeRelationshipsDiagramImplied" {
   graph [
     rankdir="RL"

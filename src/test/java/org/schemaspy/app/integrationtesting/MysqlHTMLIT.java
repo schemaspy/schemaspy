@@ -1,6 +1,7 @@
 package org.schemaspy.app.integrationtesting;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -84,17 +85,19 @@ public class MysqlHTMLIT {
             expectations = pathStream.collect(Collectors.toList());
         }
         assertThat(expectations.size()).isGreaterThan(0);
+        SoftAssertions softAssertions = new SoftAssertions();
         for (Path expect : expectations) {
             List<String> expectLines = Files.readAllLines(expect, StandardCharsets.UTF_8);
             Path actual = Paths.get(target, expectedPath.relativize(expect).toString());
             List<String> actualLines = Files.readAllLines(actual, StandardCharsets.UTF_8);
-            assertThat(actualLines).as("%s doesn't have the expected number of lines: %s", actual.toString(), expectLines.size()).hasSameSizeAs(expectLines);
-            assertThat(actualLines).usingElementComparator((a, e) -> {
+            softAssertions.assertThat(actualLines).as("%s doesn't have the expected number of lines: %s", actual.toString(), expectLines.size()).hasSameSizeAs(expectLines);
+            softAssertions.assertThat(actualLines).usingElementComparator((a, e) -> {
                 if (e.startsWith("@@IGNORE")) {
                     return 0;
                 }
                 return a.compareTo(e);
-            }).containsAll(expectLines);
+            }).as("%s isn't as expected", actual.toString()).containsAll(expectLines);
+            softAssertions.assertAll();
         }
 
     }
