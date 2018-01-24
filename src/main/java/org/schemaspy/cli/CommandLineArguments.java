@@ -55,6 +55,13 @@ public class CommandLineArguments {
     private boolean debug = false;
 
     @Parameter(
+            names = {"-version-info"},
+            help = true,
+            descriptionKey = "version-info"
+    )
+    private boolean showVersionInfo = false;
+
+    @Parameter(
             names = {
                     "-t", "--database-type", "database-type",
                     "schemaspy.t", "schemaspy.database-type"
@@ -155,6 +162,10 @@ public class CommandLineArguments {
 
     public boolean isDebug() {
         return debug;
+    }
+
+    public boolean isShowVersionInfo() {
+        return showVersionInfo;
     }
 
     public String getDatabaseType() {

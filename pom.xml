@@ -34,11 +34,17 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
         <sonar.junit.reportPaths>target/surefire-reports,target/failsafe-reports</sonar.junit.reportPaths>
 
         <spring-boot.version>1.5.9.RELEASE</spring-boot.version>
 
         <java.version>1.8</java.version>
+
+        <maven.buildNumber.timestampFormat>{0,date,yyyy-MM-dd HH:mm:ssX}</maven.buildNumber.timestampFormat>
+        <maven.buildNumber.useLastCommittedRevision>false</maven.buildNumber.useLastCommittedRevision>
+        <maven.buildNumber.shortRevisionLength>7</maven.buildNumber.shortRevisionLength>
+        <maven.buildNumber.revisionOnScmFailure>unknown</maven.buildNumber.revisionOnScmFailure>
     </properties>
     <issueManagement>
         <url>https://github.com/schemaspy/schemaspy/issues</url>
@@ -243,6 +249,15 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <version>1.4</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -251,8 +266,13 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
+                            <Implementation-Title>SchemaSpy</Implementation-Title>
                             <Implementation-Version>${project.version}</Implementation-Version>
-                            <Implementation-Build>${buildNumber}</Implementation-Build>
+                            <Implementation-URL>http://schemaspy.org</Implementation-URL>
+                            <Implementation-Build>${project.version} #${buildNumber} - ${timestamp}</Implementation-Build>
+                            <Built-Branch>${scmBranch}</Built-Branch>
+                            <Built-Revision>${buildNumber}</Built-Revision>
+                            <Built-At>${timestamp}</Built-At>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -282,7 +302,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.4</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -292,12 +311,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <doCheck>true</doCheck>
-                    <format>${project.version}.{0,number} {1,date,yyyy-MM-dd HH:mm:ss}</format>
-                    <items>
-                        <item>buildNumber</item>
-                        <item>timestamp</item>
-                    </items>
+                    <doCheck>false</doCheck>
                 </configuration>
             </plugin>
             <plugin>
@@ -352,6 +366,9 @@
                     <value>true</value>
                 </property>
             </activation>
+            <properties>
+                <maven.buildNumber.doCheck>true</maven.buildNumber.doCheck>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

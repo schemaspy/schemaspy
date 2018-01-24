@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004-2011 John Currier
+ * Copyright (C) 2018 Nils Petzaell
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,32 +20,34 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.util.JarFileFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.jar.Attributes;
-import java.util.jar.Manifest;
+import java.util.jar.JarFile;
 
 /**
  * @author John Currier
+ * @author Nils Petzaell
  */
 public class Revision {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	private static       String rev          = "Unknown";
-	private static final String RESOURCE_NAME = "/META-INF/MANIFEST.MF";
+    private static final JarFileFinder jarFileFinder = new JarFileFinder();
+
+	private static String rev          = "Unknown";
 
 	static {
 		initialize();
 	}
 
 	private static void initialize() {
-		try (InputStream in = Revision.class.getResourceAsStream(RESOURCE_NAME)) {
-			Manifest   manifest = new Manifest(in);
-			Attributes main     = manifest.getMainAttributes();
-			rev = (String) main.getOrDefault("Implementation-Build","Unknown");
-		} catch (Exception ex) {
+		try (JarFile jarFile = jarFileFinder.findJarFileForClass(Revision.class)) {
+			Attributes main     = jarFile.getManifest().getMainAttributes();
+			rev = (String) main.getOrDefault(new Attributes.Name("Implementation-Build"),"Unknown");
+		} catch (IOException ex) {
 			LOGGER.error(ex.getMessage(), ex);
 		}
 	}
