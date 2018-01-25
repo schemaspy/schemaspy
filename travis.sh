@@ -15,7 +15,8 @@ if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
 	echo "Starting analysis by SonarQube..."
 	mvn -P sonar clean verify -e -V \
 		-Dsonar.host.url=$SONAR_HOST_URL \
-		-Dsonar.login=$SONAR_TOKEN
+		-Dsonar.login=$SONAR_TOKEN \
+		-DscmBranch=$TRAVIS_BRANCH
 
 elif [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ -n "${GITHUB_TOKEN-}" ]; then
 	# => This will analyse the PR and display found issues as comments in the PR, but it won't push results to the SonarQube server
@@ -31,10 +32,15 @@ elif [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ -n "${GITHUB_TOKEN-}" ]; then
 		-Dsonar.analysis.mode=preview \
 		-Dsonar.github.oauth=$GITHUB_TOKEN \
 		-Dsonar.github.repository=$TRAVIS_REPO_SLUG \
-		-Dsonar.github.pullRequest=$TRAVIS_PULL_REQUEST
-else
-	echo 'Build feature branch or external pull request'
+		-Dsonar.github.pullRequest=$TRAVIS_PULL_REQUEST \
+		-DscmBranch=$TRAVIS_PULL_REQUEST_BRANCH
 
-    mvn clean -e verify
+elif [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+    echo 'Build external pull request'
+    mvn -DscmBranch=$TRAVIS_PULL_REQUEST_BRANCH clean -e verify
+
+else
+	echo 'Build feature branch'
+    mvn -DscmBranch=$TRAVIS_BRANCH clean -e verify
 fi
 # When neither on master branch nor on a non-external pull request => nothing to do
