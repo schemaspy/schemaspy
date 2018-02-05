@@ -23,7 +23,7 @@ package org.schemaspy.model;
  * defined them.
  */
 public class View extends Table {
-    private String viewSql;
+    private String viewDefinition;
 
     /**
      * @param db
@@ -31,14 +31,14 @@ public class View extends Table {
      * @param schema
      * @param name
      * @param remarks
-     * @param viewSql
+     * @param viewDefinition
      */
     public View(Database db, String catalog, String schema,
-                String name, String remarks, String viewSql) {
+                String name, String remarks, String viewDefinition) {
         super(db, catalog, schema, name, remarks);
 
-        if (viewSql != null && viewSql.trim().length() > 0)
-            this.viewSql = viewSql;
+        if (viewDefinition != null && viewDefinition.trim().length() > 0)
+            this.viewDefinition = viewDefinition;
     }
 
     /**
@@ -50,11 +50,11 @@ public class View extends Table {
     }
 
     @Override
-    public String getViewSql() {
-        return viewSql;
+    public String getViewDefinition() {
+        return viewDefinition;
     }
 
-    public void setViewSql(String viewSql) {
-        this.viewSql = viewSql;
+    public void setViewDefinition(String viewDefinition) {
+        this.viewDefinition = viewDefinition;
     }
 }
