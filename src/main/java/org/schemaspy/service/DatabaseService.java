@@ -49,8 +49,8 @@ public class DatabaseService {
         if (config.isViewsEnabled())
             initViews(config, db, listener, meta);
         
-        initCatalogs(config, db, listener);
-        initSchemas(config, db, listener);
+        initCatalogs(db);
+        initSchemas(db);
 
         initCheckConstraints(config, db, listener);
         initTableIds(config, db);
@@ -68,13 +68,13 @@ public class DatabaseService {
         updateFromXmlMetadata(config, db, db.getSchemaMeta());
     }
     
-   private void initCatalogs(Config config, Database db, ProgressListener listener) throws SQLException {
+   private void initCatalogs(Database db) throws SQLException {
 
             String sql = Config.getInstance().getDbProperties().getProperty("selectCatalogsSql");
 
             if (sql != null && db.getCatalog() != null) {
                 try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                     ResultSet rs = stmt.executeQuery();) {
+                     ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                          db.getCatalog().setComment(rs.getString("catalog_comment"));
                     }
@@ -85,7 +85,7 @@ public class DatabaseService {
             }
     }
 
-    private void initSchemas(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initSchemas(Database db) throws SQLException {
     	  String sql = Config.getInstance().getDbProperties().getProperty("selectSchemasSql");
 
           if (sql != null &&  db.getSchema() != null) {
@@ -458,7 +458,7 @@ public class DatabaseService {
      * E.g. Oracle doesn't have a REMARKS column at all.
      * This method ignores those types of failures, replacing them with null.
      */
-    public String getOptionalString(ResultSet rs, String columnName)
+    private String getOptionalString(ResultSet rs, String columnName)
     {
         try {
             return rs.getString(columnName);
@@ -467,7 +467,7 @@ public class DatabaseService {
         }
     }
 
-    private void initCheckConstraints(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initCheckConstraints(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectCheckConstraintsSql");
         if (sql != null) {
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db,null);
@@ -489,7 +489,7 @@ public class DatabaseService {
         }
     }
 
-    private void initColumnTypes(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initColumnTypes(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectColumnTypesSql");
         if (sql != null) {
 
@@ -570,7 +570,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initTableComments(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initTableComments(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectTableCommentsSql");
         if (sql != null) {
 
@@ -598,7 +598,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initViewComments(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initViewComments(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectViewCommentsSql");
         if (sql != null) {
 
@@ -631,7 +631,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initTableColumnComments(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initTableColumnComments(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectColumnCommentsSql");
         if (sql != null) {
 
@@ -662,7 +662,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initViewColumnComments(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initViewColumnComments(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectViewColumnCommentsSql");
         if (sql != null) {
 
@@ -696,7 +696,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initRoutines(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initRoutines(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectRoutinesSql");
 
         if (sql != null) {
