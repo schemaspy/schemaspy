@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="test" schema="test" type="MySQL - 5.7.18">
+   <tables>
+      <table catalog="test" name="group" numRows="0" remarks="Groups" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="groupId" nullable="false" remarks="" size="10" type="INT">
+            <child catalog="test" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="user"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="16" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="VARCHAR"/>
+         <primaryKey column="groupId" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="groupId"/>
+         </index>
+         <index name="name_unique" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table catalog="test" name="user" numRows="0" remarks="Users of the system" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="userId" nullable="false" remarks="" size="10" type="INT"/>
+         <column autoUpdated="false" digits="0" id="1" name="groupId" nullable="false" remarks="FK to groups omitted, implied relationship" size="10" type="INT">
+            <parent catalog="test" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="group"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="UserName" size="16" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="email" nullable="false" remarks="" size="40" type="VARCHAR"/>
+         <primaryKey column="userId" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="userId"/>
+         </index>
+         <index name="email_unique" unique="true">
+            <column ascending="true" name="email"/>
+         </index>
+      </table>
+   </tables>
+</database>

@@ -394,7 +394,14 @@ public class SchemaAnalyzer {
      * @throws IOException when not possible to copy layout files to outputDir
      */
     private void prepareLayoutFiles(File outputDir) throws IOException {
-        URL url = getClass().getResource("/layout");
+        URL url = null;
+        Enumeration<URL> possibleResources = getClass().getClassLoader().getResources("layout");
+        while (possibleResources.hasMoreElements() && Objects.isNull(url)) {
+            URL possibleResource = possibleResources.nextElement();
+            if (!possibleResource.getPath().contains("test-classes")) {
+                url = possibleResource;
+            }
+        }
 
         IOFileFilter notHtmlFilter = FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter(".html"));
         FileFilter filter = FileFilterUtils.and(notHtmlFilter);
