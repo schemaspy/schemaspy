@@ -103,4 +103,10 @@ SchemaSpy is maintained by [Rafal Kasa](malito:rafalkasa@gmail.com) with SchemaS
 
 SchemaSpy Team would like inform that JetBrains is helping by provided IDE to develop the application. Thanks to its support program for an Open Source projects !
 
+[![alt tag](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/dashboard?id=org.schemaspy%3Aschemaspy)
+
+SchemaSpy project is using SonarCloud for code quality. 
+Thanks to SonarQube Team for free analysis solution for open source projects.
+
+
 
