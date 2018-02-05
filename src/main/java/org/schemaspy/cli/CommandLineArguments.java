@@ -49,6 +49,12 @@ public class CommandLineArguments {
     private boolean dbHelpRequired;
 
     @Parameter(
+            names = {"-debug", "--debug", "debug", "schemaspy.debug"},
+            descriptionKey = "debug"
+    )
+    private boolean debug = false;
+
+    @Parameter(
             names = {
                     "-t", "--database-type", "database-type",
                     "schemaspy.t", "schemaspy.database-type"
@@ -147,6 +153,10 @@ public class CommandLineArguments {
 
     public boolean isDbHelpRequired() {
         return dbHelpRequired;
+    }
+
+    public boolean isDebug() {
+        return debug;
     }
 
     public String getDatabaseType() {

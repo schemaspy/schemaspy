@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004-2011 John Currier
+ * Copyright (C) 2017 Nils Petzaell
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,11 +32,14 @@ import java.util.Properties;
 
 /**
  * @author John Currier
+ * @author Nils Petzaell
  */
 public class ConnectionURLBuilder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final Config config;
     private final Properties dbType;
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * @param config
@@ -55,7 +60,7 @@ public class ConnectionURLBuilder {
         for (DbSpecificOption option : dbConfig.getOptions()) {
             option.setValue(getParam(args, option));
 
-            LOGGER.debug(option.toString());
+            LOGGER.debug("{}",option.toString());
 
             // replace e.g. <host> with myDbHost
             connectionURL = connectionURL.replaceAll("\\<" + option.getName() + "\\>", option.getValue());

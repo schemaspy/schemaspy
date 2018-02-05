@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004-2011 John Currier
+ * Copyright (C) 2017 Nils Petzaell
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,7 +31,6 @@ import org.schemaspy.view.DefaultSqlFormatter;
 import org.schemaspy.view.SqlFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
 
@@ -41,6 +42,7 @@ import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.sql.DatabaseMetaData;
 import java.util.*;
 import java.util.Map.Entry;
@@ -53,6 +55,7 @@ import java.util.regex.PatternSyntaxException;
  * Configuration of a SchemaSpy run
  *
  * @author John Currier
+ * @author Nils Petzaell
  */
 public final class Config {
     private static Config instance;
@@ -93,7 +96,6 @@ public final class Config {
     private String description;
     private PropertiesResolver propertiesResolver = new PropertiesResolver();
     private Properties dbProperties;
-    private String dbPropertiesLoadedFrom;
     private SqlFormatter sqlFormatter;
     private String sqlFormatterClass;
     private Boolean generateHtml;
@@ -258,7 +260,6 @@ public final class Config {
         if (templateDirectory == null) {
             templateDirectory = pullParam("-template");
             if (templateDirectory == null) {
-                // default template dir = resources/layout/
                 templateDirectory = "/layout";
             }
         }
@@ -285,10 +286,8 @@ public final class Config {
     }
 
     /**
-     * @deprecated use {@link CommandLineArguments#getDatabaseName()}
-     * @return
+     * @return Name of database as supplied with -db or set during multi schema analysis
      */
-    @Deprecated
     public String getDb() {
         if (db == null)
             db = pullParam("-db");
@@ -692,7 +691,7 @@ public final class Config {
      * @throws InvalidConfigurationException if unable to load properties
      * @see #setMaxDbThreads(int)
      */
-    public int getMaxDbThreads() throws InvalidConfigurationException {
+    public int getMaxDbThreads() {
         if (maxDbThreads == null) {
             Properties properties = getDbProperties();
 
@@ -1027,7 +1026,7 @@ public final class Config {
      * @throws InvalidConfigurationException if unable to instantiate an instance
      */
     @SuppressWarnings("unchecked")
-    public SqlFormatter getSqlFormatter() throws InvalidConfigurationException {
+    public SqlFormatter getSqlFormatter() {
         if (sqlFormatter == null) {
             if (sqlFormatterClass == null) {
                 sqlFormatterClass = pullParam("-sqlFormatter");
@@ -1338,7 +1337,7 @@ public final class Config {
      * @return
      * @throws InvalidConfigurationException
      */
-    public Properties getDbProperties() throws InvalidConfigurationException {
+    public Properties getDbProperties() {
         if (dbProperties == null) {
             dbProperties = propertiesResolver.getDbProperties(getDbType());
         }
@@ -1353,23 +1352,21 @@ public final class Config {
      * @throws IOException
      * @throws InvalidConfigurationException if db properties are incorrectly formed
      */
-    public Properties determineDbProperties(String type) throws IOException, InvalidConfigurationException {
+    public Properties determineDbProperties(String type) {
         return propertiesResolver.getDbProperties(type);
     }
 
     public List<String> getRemainingParameters() {
         try {
             populate();
-        } catch (IllegalArgumentException exc) {
-            throw new InvalidConfigurationException(exc);
-        } catch (IllegalAccessException exc) {
+        } catch (IllegalArgumentException |
+                 IllegalAccessException |
+                 IntrospectionException exc) {
             throw new InvalidConfigurationException(exc);
         } catch (InvocationTargetException exc) {
             if (exc.getCause() instanceof InvalidConfigurationException)
                 throw (InvalidConfigurationException) exc.getCause();
             throw new InvalidConfigurationException(exc.getCause());
-        } catch (IntrospectionException exc) {
-            throw new InvalidConfigurationException(exc);
         }
 
         return options;
@@ -1414,8 +1411,7 @@ public final class Config {
      * @return
      * @throws MissingRequiredParameterException
      */
-    private String pullParam(String paramId, boolean required, boolean dbTypeSpecific)
-            throws MissingRequiredParameterException {
+    private String pullParam(String paramId, boolean required, boolean dbTypeSpecific) {
         int paramIndex = options.indexOf(paramId);
         if (paramIndex < 0) {
             if (required)
@@ -1500,7 +1496,7 @@ public final class Config {
         File configFile = new File(path);
         String contents;
         try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
-            contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, "UTF-8"));
+            contents = FileCopyUtils.copyToString(new InputStreamReader(fileInputStream, StandardCharsets.UTF_8));
             this.schemaspyProperties.load(new StringReader(contents.replace("\\", "\\\\")));
         } catch (IOException e) {
             LOGGER.info("Configuration file not found");
@@ -1515,7 +1511,7 @@ public final class Config {
      * @throws IllegalArgumentException
      * @throws IntrospectionException
      */
-    private void populate() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, IntrospectionException {
+    private void populate() throws IllegalAccessException, InvocationTargetException, IntrospectionException {
         if (!populating) { // prevent recursion
             populating = true;
 
@@ -1533,10 +1529,7 @@ public final class Config {
 
     public static Set<String> getBuiltInDatabaseTypes(String loadedFromJar) {
         Set<String> databaseTypes = new TreeSet<>();
-        JarInputStream jar = null;
-
-        try {
-            jar = new JarInputStream(new FileInputStream(loadedFromJar));
+        try (JarInputStream jar = new JarInputStream(new FileInputStream(loadedFromJar))){
             JarEntry entry;
 
             while ((entry = jar.getNextJarEntry()) != null) {
@@ -1548,13 +1541,7 @@ public final class Config {
                 }
             }
         } catch (IOException exc) {
-        } finally {
-            if (jar != null) {
-                try {
-                    jar.close();
-                } catch (IOException ignore) {
-                }
-            }
+            LOGGER.error("Failed to read bundled DatabaseTypes", exc);
         }
 
         return databaseTypes;

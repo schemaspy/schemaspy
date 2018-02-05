@@ -56,16 +56,7 @@ public class TableService {
                     addColumn(table, rs);
             } catch (SQLException exc) {
                 if (!table.isLogical()) {
-                    class ColumnInitializationFailure extends SQLException {
-                        private static final long serialVersionUID = 1L;
-
-                        public ColumnInitializationFailure(SQLException failure) {
-                            super("Failed to collect column details for " + (table.isView() ? "view" : "table") + " '" + table.getName() + "' in schema '" + table.getContainer() + "'");
-                            initCause(failure);
-                        }
-                    }
-
-                    throw new ColumnInitializationFailure(exc);
+                    throw new ColumnInitializationFailure(table, exc);
                 }
             }
         }

@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2017 Nils Petzaell
+ */
 package org.schemaspy.db.config;
 
 import org.junit.Test;
@@ -6,6 +9,9 @@ import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Nils Petzaell
+ */
 public class PropertiesFinderTest {
 
     private PropertiesFinder propertiesFinder = new PropertiesFinder();

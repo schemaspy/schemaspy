@@ -28,8 +28,8 @@
       </section>
       <!-- Main content -->
       <section class="content">
-		<div class="row">
-		  <div class="col-md-3 col-sm-6 col-xs-12">
+		  <div class="row">
+			<div class="col-md-2 col-sm-4 col-xs-12">
 			  <div class="info-box">
 				  <span class="info-box-icon bg-aqua"><i class="fa fa-table"></i></span>
 				  <div class="info-box-content">
@@ -39,11 +39,11 @@
 				  <!-- /.info-box-content -->
 			  </div>
 			  <!-- /.info-box -->
-		  </div>
-		  <!-- /.col -->
-		  <div class="col-md-3 col-sm-6 col-xs-12">
+			</div>
+			<!-- /.col -->
+			<div class="col-md-2 col-sm-4 col-xs-12">
 			  <div class="info-box">
-				  <span class="info-box-icon bg-red"><i class="fa fa-table"></i></span>
+				  <span class="info-box-icon bg-teal"><i class="fa fa-table"></i></span>
 				  <div class="info-box-content">
 					  <span class="info-box-text">VIEWS</span>
 					  <span class="info-box-number">{{viewsAmount}}</span>
@@ -51,13 +51,10 @@
 				  <!-- /.info-box-content -->
 			  </div>
 			  <!-- /.info-box -->
-		  </div>
-		  <!-- /.col -->
+			</div>
+			<!-- /.col -->
 
-		  <!-- fix for small devices only -->
-		  <div class="clearfix visible-sm-block"></div>
-
-		  <div class="col-md-3 col-sm-6 col-xs-12">
+			<div class="col-md-2 col-sm-4 col-xs-12">
 			  <div class="info-box">
 				  <span class="info-box-icon bg-green"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></span>
 
@@ -68,9 +65,9 @@
 				  <!-- /.info-box-content -->
 			  </div>
 			  <!-- /.info-box -->
-		  </div>
+			</div>
 		  <!-- /.col -->
-		  <div class="col-md-3 col-sm-6 col-xs-12">
+			<div class="col-md-2 col-sm-4 col-xs-12">
 			  <div class="info-box">
 				  <span class="info-box-icon bg-yellow"><i class="ion ion-key"></i></span>
 
@@ -81,8 +78,34 @@
 				  <!-- /.info-box-content -->
 			  </div>
 			  <!-- /.info-box -->
-		  </div>
-		  <!-- /.col -->
+			</div>
+			<!-- /.col -->
+			<div class="col-md-2 col-sm-4 col-xs-12">
+			  <div class="info-box">
+				  <span class="info-box-icon bg-red-active"><i class="fa fa-question" aria-hidden="true"></i></span>
+
+				  <div class="info-box-content">
+					  <span class="info-box-text">Anomalies</span>
+					  <span class="info-box-number">{{anomaliesAmount}}</span>
+				  </div>
+				  <!-- /.info-box-content -->
+			  </div>
+			  <!-- /.info-box -->
+			</div>
+		  	<!-- /.col -->
+			<div class="col-md-2 col-sm-4 col-xs-12">
+				<div class="info-box">
+					<span class="info-box-icon bg-navy"><i class="fa fa-file-code-o" aria-hidden="true"></i></span>
+
+					<div class="info-box-content">
+						<span class="info-box-text">Routines</span>
+						<span class="info-box-number">{{routinesAmount}}</span>
+					</div>
+					<!-- /.info-box-content -->
+				</div>
+				<!-- /.info-box -->
+			</div>
+			<!-- /.col -->
 		</div>
 		<div class="box box-primary">		
 			<div class="box-header with-border">
@@ -125,6 +148,10 @@
 			  <span class="label label-primary pull-right"><i class="fa fa-database fa-2x"></i></span>
             </div><!-- /.box-header -->
             <div class="box-body">
+			<div class="row">
+				<div id="button_group_one" class="col-md-3 col-sm-6"></div>
+				<div id="button_group_two" class="col-md-2 col-sm-4 pull-right text-right"></div>
+			</div>
             <table id="database_objects" class="table table-bordered table-striped dataTable" role="grid">
 				<thead>
 					<tr>

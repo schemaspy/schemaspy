@@ -4,6 +4,8 @@ import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
@@ -14,6 +16,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
+import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,12 +56,18 @@ public class OracleIT {
 
     private static Database database;
 
-    @ClassRule
+    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+
     public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
             new JdbcContainerRule<>(() -> new OracleContainer())
             .assumeDockerIsPresent()
             .withAssumptions(assumeDriverIsPresent())
             .withInitScript("integrationTesting/dbScripts/oracle.sql");
+
+    @ClassRule
+    public static final TestRule chain = RuleChain
+            .outerRule(jdbcContainerRule)
+            .around(jdbcDriverClassPresentRule);
 
     @Before
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
@@ -113,6 +122,6 @@ public class OracleIT {
     }
 
     private Table getTable(String tableName) {
-        return database.getTables().stream().filter(table -> table.getName().equals(tableName)).findFirst().get();
+        return database.getTablesByName().get(tableName);
     }
 }

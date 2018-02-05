@@ -12,7 +12,6 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
-import org.schemaspy.util.Dot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,6 +56,13 @@ public class OracleSpacesIT {
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitScript("integrationTesting/oracleSpacesIT/dbScripts/spaces_in_table_names.sql");
+
+    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+
+    @ClassRule
+    public static final TestRule chain = RuleChain
+            .outerRule(jdbcContainerRule)
+            .around(jdbcDriverClassPresentRule);
 
     @Before
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {

@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2017 Nils Petzaell
+ */
 package org.schemaspy.db.config;
 
 import java.io.File;
@@ -6,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author Nils Petzaell
+ */
 public class ResolutionInfo {
     private String requested;
     private List<URL> trace = new ArrayList<>();
@@ -21,11 +27,11 @@ public class ResolutionInfo {
     }
 
     public String getTrace() {
-        return trace.stream().map(u -> {
-            return u.getPath()
-                    .replace("file:", "")
-                    .replace(workDir, "");
-        }).collect(
+        return trace.stream().map(u ->
+                u.getPath()
+                        .replace("file:", "")
+                        .replace(workDir, "")
+        ).collect(
                 Collectors.joining(
                         " ->" + System.lineSeparator() + "\t",
                         "Resolving dbType: " + requested + " ->" + System.lineSeparator() + "\t",

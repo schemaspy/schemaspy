@@ -49,8 +49,8 @@ public class DatabaseService {
         if (config.isViewsEnabled())
             initViews(config, db, listener, meta);
         
-        initCatalogs(config, db, listener);
-        initSchemas(config, db, listener);
+        initCatalogs(db);
+        initSchemas(db);
 
         initCheckConstraints(config, db, listener);
         initTableIds(config, db);
@@ -68,13 +68,13 @@ public class DatabaseService {
         updateFromXmlMetadata(config, db, db.getSchemaMeta());
     }
     
-   private void initCatalogs(Config config, Database db, ProgressListener listener) throws SQLException {
+   private void initCatalogs(Database db) throws SQLException {
 
             String sql = Config.getInstance().getDbProperties().getProperty("selectCatalogsSql");
 
             if (sql != null && db.getCatalog() != null) {
                 try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                     ResultSet rs = stmt.executeQuery();) {
+                     ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                          db.getCatalog().setComment(rs.getString("catalog_comment"));
                     }
@@ -85,7 +85,7 @@ public class DatabaseService {
             }
     }
 
-    private void initSchemas(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initSchemas(Database db) throws SQLException {
     	  String sql = Config.getInstance().getDbProperties().getProperty("selectSchemasSql");
 
           if (sql != null &&  db.getSchema() != null) {
@@ -166,12 +166,12 @@ public class DatabaseService {
         for (BasicTableMeta entry : getBasicTableMeta(config, db, listener, metadata, false, types)) {
             if (validator.isValid(entry.getName(), entry.getType())) {
                 View view = new View(db, entry.getCatalog(), entry.getSchema(), entry.getName(),
-                        entry.getRemarks(), entry.getViewSql());
+                        entry.getRemarks(), entry.getViewDefinition());
 
                 tableService.gatheringTableDetails(db, view);
 
-                if (entry.getViewSql() == null) {
-                    view.setViewSql(viewService.fetchViewSql(db, view));
+                if (entry.getViewDefinition() == null) {
+                    view.setViewDefinition(viewService.fetchViewDefinition(db, view));
                 }
 
                 db.getViewsMap().put(view.getName(), view);
@@ -192,7 +192,7 @@ public class DatabaseService {
      */
     private String[] getTypes(Config config, String propName, String defaultValue) {
         String value = config.getDbProperties().getProperty(propName, defaultValue);
-        List<String> types = new ArrayList<String>();
+        List<String> types = new ArrayList<>();
         for (String type : value.split(",")) {
             type = type.trim();
             if (type.length() > 0)
@@ -313,7 +313,7 @@ public class DatabaseService {
      * Multi-threaded implementation of a class that creates tables
      */
     private class ThreadedTableCreator extends TableCreator {
-        private final Set<Thread> threads = new HashSet<Thread>();
+        private final Set<Thread> threads = new HashSet<>();
         private final int maxThreads;
 
         ThreadedTableCreator(int maxThreads) {
@@ -393,7 +393,7 @@ public class DatabaseService {
                                                    String... types) throws SQLException {
         String queryName = forTables ? "selectTablesSql" : "selectViewsSql";
         String sql = config.getDbProperties().getProperty(queryName);
-        List<BasicTableMeta> basics = new ArrayList<BasicTableMeta>();
+        List<BasicTableMeta> basics = new ArrayList<>();
 
 
         if (sql != null) {
@@ -410,11 +410,11 @@ public class DatabaseService {
                     if (cat == null && sch == null)
                         sch = db.getSchema().getName();
                     String remarks = getOptionalString(rs, clazz + "_comment");
-                    String text = forTables ? null : getOptionalString(rs, "view_definition");
+                    String viewDefinition = forTables ? null : getOptionalString(rs, "view_definition");
                     String rows = forTables ? getOptionalString(rs, "table_rows") : null;
                     long numRows = rows == null ? -1 : Long.parseLong(rows);
 
-                    basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, text, numRows));
+                    basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, viewDefinition, numRows));
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
@@ -458,7 +458,7 @@ public class DatabaseService {
      * E.g. Oracle doesn't have a REMARKS column at all.
      * This method ignores those types of failures, replacing them with null.
      */
-    public String getOptionalString(ResultSet rs, String columnName)
+    private String getOptionalString(ResultSet rs, String columnName)
     {
         try {
             return rs.getString(columnName);
@@ -467,7 +467,7 @@ public class DatabaseService {
         }
     }
 
-    private void initCheckConstraints(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initCheckConstraints(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectCheckConstraintsSql");
         if (sql != null) {
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db,null);
@@ -489,7 +489,7 @@ public class DatabaseService {
         }
     }
 
-    private void initColumnTypes(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initColumnTypes(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectColumnTypesSql");
         if (sql != null) {
 
@@ -570,7 +570,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initTableComments(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initTableComments(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectTableCommentsSql");
         if (sql != null) {
 
@@ -598,7 +598,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initViewComments(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initViewComments(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectViewCommentsSql");
         if (sql != null) {
 
@@ -631,7 +631,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initTableColumnComments(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initTableColumnComments(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectColumnCommentsSql");
         if (sql != null) {
 
@@ -662,7 +662,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initViewColumnComments(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initViewColumnComments(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectViewColumnCommentsSql");
         if (sql != null) {
 
@@ -696,7 +696,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initRoutines(Config config, Database db, ProgressListener listener) throws SQLException {
+    private void initRoutines(Config config, Database db, ProgressListener listener) {
         String sql = config.getDbProperties().getProperty("selectRoutinesSql");
 
         if (sql != null) {
