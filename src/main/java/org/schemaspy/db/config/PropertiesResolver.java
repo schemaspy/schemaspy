@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2017 Nils Petzaell
+ */
 package org.schemaspy.db.config;
 
 import org.schemaspy.db.exceptions.RuntimeIOException;
@@ -15,6 +18,9 @@ import java.util.Properties;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * @author Nils Petzaell
+ */
 public class PropertiesResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2017 Nils Petzaell
+ */
 package org.schemaspy.db.config;
 
 import org.junit.BeforeClass;
@@ -14,10 +17,12 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * @author Nils Petzaell
+ */
 public class PropertiesResolverTest {
 
     @Rule
