@@ -109,7 +109,7 @@ public class MysqlHTMLIT {
                 } else if (trimmed.startsWith("// SchemaSpy rev")) {
                     return 0;
                 }
-                return a.compareTo(e);
+                return a.trim().compareTo(trimmed);
             }).as("%s isn't as expected", actual.toString()).containsAll(expectLines);
             softAssertions.assertAll();
         }
