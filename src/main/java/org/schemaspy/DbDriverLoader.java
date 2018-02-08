@@ -27,12 +27,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Rafal Kasa on 2016-08-01.
@@ -99,14 +101,13 @@ public class DbDriverLoader {
      * @param driverClass
      * @param driverPath
      * @return
-     * @throws MalformedURLException
      */
-    protected synchronized Driver getDriver(final String driverClass, final String driverPath) throws MalformedURLException {
+    protected synchronized Driver getDriver(final String driverClass, final String driverPath) {
         Driver driver = driverCache.get(driverClass + "|" + driverPath);
         if (Objects.nonNull(driver)) {
             return driver;
         }
-        Set<URL> classpath = getExistingUrls(driverPath);
+        Set<URI> classpath = getExistingUrls(driverPath);
         if (classpath.isEmpty()) {
             URL url = getClass().getResource(driverPath);
             if (url != null) {
@@ -156,7 +157,7 @@ public class DbDriverLoader {
         return driver;
     }
 
-    private void loadAdditionalJarsForDriver(String driverPath, Set<URL> classpath) throws MalformedURLException {
+    private void loadAdditionalJarsForDriver(String driverPath, Set<URI> classpath) {
         File driverFolder = new File(Paths.get(driverPath).getParent().toString());
         if (driverFolder.exists()) {
             File[] files = driverFolder.listFiles(
@@ -168,7 +169,7 @@ public class DbDriverLoader {
             if (files != null) {
                 for (File file : files) {
                     if (file.isFile()) {
-                        classpath.add(file.toURI().toURL());
+                        classpath.add(file.toURI());
                         LOGGER.info(file.toURI().toString());
                     }
                 }
@@ -182,7 +183,7 @@ public class DbDriverLoader {
      * @param classpath
      * @return
      */
-    private ClassLoader getDriverClassLoader(Set<URL> classpath) {
+    private ClassLoader getDriverClassLoader(Set<URI> classpath) {
         ClassLoader loader;
 
         // if a classpath has been specified then use it to find the driver,
@@ -190,7 +191,14 @@ public class DbDriverLoader {
         // thanks to Bruno Leonardo Gonalves for this implementation that he
         // used to resolve issues when running under Maven
         if (!classpath.isEmpty()) {
-            loader = new URLClassLoader(classpath.toArray(new URL[classpath.size()]));
+            URL[] urls = classpath.stream().map(uri -> {
+                try {
+                    return uri.toURL();
+                } catch (MalformedURLException e) {
+                    return null;
+                }
+            }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(new URL[classpath.size()]);
+            loader = new URLClassLoader(urls);
         } else {
             loader = getClass().getClassLoader();
         }
@@ -224,16 +232,15 @@ public class DbDriverLoader {
      *
      * @param path
      * @return
-     * @throws MalformedURLException
      */
-    private Set<URL> getExistingUrls(String path) throws MalformedURLException {
-        Set<URL> existingUrls = new HashSet<>();
+    private Set<URI> getExistingUrls(String path) {
+        Set<URI> existingUrls = new HashSet<>();
 
         String[] pieces = path.split(File.pathSeparator);
         for (String piece : pieces) {
             File file = new File(piece);
             if (file.exists())
-                existingUrls.add(file.toURI().toURL());
+                existingUrls.add(file.toURI());
         }
 
         return existingUrls;
