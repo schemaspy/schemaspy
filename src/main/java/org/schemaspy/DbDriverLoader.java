@@ -134,11 +134,11 @@ public class DbDriverLoader {
                     sb.append("\t").append(uri.toString()).append(System.lineSeparator());
                 }
             }
-            List<File> missingDriverPathFiles = getMissingFiles(driverPath);
-            if (!missingDriverPathFiles.isEmpty()) {
+            List<String> missingPaths = getMissingPaths(driverPath);
+            if (!missingPaths.isEmpty()) {
                 sb.append("There were missing paths in driverPath:").append(System.lineSeparator());
-                for (File f : missingDriverPathFiles) {
-                    sb.append("\t").append(f.getPath()).append(System.lineSeparator());
+                for (String path : missingPaths) {
+                    sb.append("\t").append(path).append(System.lineSeparator());
                 }
                 sb
                     .append("Use commandline option '-dp' to specify driver location.")
@@ -207,14 +207,13 @@ public class DbDriverLoader {
      * @param path
      * @return
      */
-    private List<File> getMissingFiles(String path) {
-        List<File> missingFiles = new ArrayList<>();
+    private List<String> getMissingPaths(String path) {
+        List<String> missingFiles = new ArrayList<>();
 
         String[] pieces = path.split(File.pathSeparator);
         for (String piece : pieces) {
-            File file = new File(piece);
-            if (!file.exists())
-                missingFiles.add(file);
+            if (!new File(piece).exists())
+                missingFiles.add(piece);
         }
 
         return missingFiles;
