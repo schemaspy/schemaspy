@@ -12,6 +12,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Driver;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,5 +51,14 @@ public class DbDriverLoaderTest {
     DbDriverLoader driverLoader2 = new DbDriverLoader();
     Driver driver2 = driverLoader2.getDriver("org.h2.Driver","");
     assertThat(driver1).isSameAs(driver2);
+  }
+
+  @Test
+  public void driverPathWorks() throws MalformedURLException, SQLException {
+    String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
+    DbDriverLoader driverLoader = new DbDriverLoader();
+    Driver driver = driverLoader.getDriver("dummy.DummyDriver", driverPath);
+    assertThat(driver).isNotNull();
+    assertThat(driver.acceptsURL("dummy")).isTrue();
   }
 }
