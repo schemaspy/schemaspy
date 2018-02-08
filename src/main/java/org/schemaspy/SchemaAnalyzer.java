@@ -421,10 +421,11 @@ public class SchemaAnalyzer {
 
         String driverClass = properties.getProperty("driver");
         String driverPath = properties.getProperty("driverPath");
-        if (driverPath == null)
+        if (Objects.isNull(driverPath))
             driverPath = "";
-        if (config.getDriverPath() != null)
-            driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
+
+        if (Objects.nonNull(config.getDriverPath()))
+            driverPath = config.getDriverPath();
 
         DbDriverLoader driverLoader = new DbDriverLoader();
         return driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);

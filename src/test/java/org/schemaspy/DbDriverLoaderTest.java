@@ -1,22 +1,19 @@
 package org.schemaspy;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.schemaspy.testing.H2MemoryRule;
+
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.schemaspy.testing.H2MemoryRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,5 +41,14 @@ public class DbDriverLoaderTest {
     assertThat(urls).contains(Paths.get(driverPath).toUri().toURL());
     assertThat(urls).contains(Paths.get(driverPath).resolveSibling("dummy.nar").toUri().toURL());
     assertThat(urls).doesNotContain(Paths.get(driverPath).resolveSibling("nar.jar.war.not.included").toUri().toURL());
+  }
+
+  @Test
+  public void driverLoaderCachesDrivers() throws MalformedURLException {
+    DbDriverLoader driverLoader1 = new DbDriverLoader();
+    Driver driver1 = driverLoader1.getDriver("org.h2.Driver","");
+    DbDriverLoader driverLoader2 = new DbDriverLoader();
+    Driver driver2 = driverLoader2.getDriver("org.h2.Driver","");
+    assertThat(driver1).isSameAs(driver2);
   }
 }
