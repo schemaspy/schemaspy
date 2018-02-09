@@ -54,8 +54,6 @@ public class DbDriverLoader {
 
         loadJDBCJars = config.isLoadJDBCJarsEnabled();
 
-        Driver driver = getDriver(driverClass, driverPath);
-
         Properties connectionProperties = config.getConnectionProperties();
         if (config.getUser() != null) {
             connectionProperties.put("user", config.getUser());
@@ -66,12 +64,13 @@ public class DbDriverLoader {
 
         Connection connection;
         try {
+            Driver driver = getDriver(driverClass, driverPath);
             connection = driver.connect(connectionURL, connectionProperties);
             if (connection == null) {
                 throw new ConnectionFailure("Cannot connect to '" + connectionURL +"' with driver '" + driverClass + "'");
             }
         } catch (UnsatisfiedLinkError badPath) {
-            throw new ConnectionFailure("Error with native library occurred while trying to get connection from driver '"+driverClass+"'",badPath);
+            throw new ConnectionFailure("Error with native library occurred while trying to use driver '"+driverClass+"'",badPath);
         } catch (Exception exc) {
             throw new ConnectionFailure("Failed to connect to database URL [" + connectionURL + "]", exc);
         }
