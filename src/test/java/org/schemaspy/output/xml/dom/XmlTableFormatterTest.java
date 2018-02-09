@@ -23,13 +23,15 @@ import static org.mockito.Mockito.when;
 
 public class XmlTableFormatterTest {
 
-    private static final String CHECK_CONSTRAINT_EXPECT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><database>\n" +
-            "   <tables>\n" +
-            "      <table catalog=\"catalog\" name=\"table\" numRows=\"0\" remarks=\"table\" schema=\"schema\" type=\"TABLE\">\n" +
-            "         <checkConstraint constraint=\"check\" name=\"this is a\"/>\n" +
-            "      </table>\n" +
-            "   </tables>\n" +
-            "</database>\n";
+    private static final String NEW_LINE = System.lineSeparator();
+
+    private static final String CHECK_CONSTRAINT_EXPECT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><database>" + NEW_LINE +
+            "   <tables>" + NEW_LINE +
+            "      <table catalog=\"catalog\" name=\"table\" numRows=\"0\" remarks=\"table\" schema=\"schema\" type=\"TABLE\">" + NEW_LINE +
+            "         <checkConstraint constraint=\"check\" name=\"this is a\"/>" + NEW_LINE +
+            "      </table>" + NEW_LINE +
+            "   </tables>" + NEW_LINE +
+            "</database>" + NEW_LINE;
 
     @Test
     public void withCheckConstraint() throws ParserConfigurationException, TransformerException {
