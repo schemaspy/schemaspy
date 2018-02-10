@@ -8,7 +8,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.*;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MysqlRoutines {
+public class MysqlKeyWordTableIT {
 
     @Autowired
     private SqlService sqlService;
@@ -55,28 +56,28 @@ public class MysqlRoutines {
             new JdbcContainerRule<>(() -> new MySQLContainer())
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/mysqlroutines/dbScripts/routines.sql");
+                    .withInitScript("integrationTesting/dbScripts/mysql_keyword.sql");
 
     @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
+    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
         if (database == null) {
             doCreateDatabaseRepresentation();
         }
     }
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    private void doCreateDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
         String[] args = {
                 "-t", "mysql",
                 "-db", "test",
                 "-s", "test",
                 "-cat", "%",
-                "-o", "target/integrationtesting/mysqlroutines",
+                "-o", "target/integrationtesting/mysql_keywords",
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysqlroutines"));
+        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysql_keywords"));
         given(arguments.getDatabaseType()).willReturn("mysql");
         given(arguments.getUser()).willReturn("test");
         given(arguments.getSchema()).willReturn("test");
@@ -90,14 +91,7 @@ public class MysqlRoutines {
     }
 
     @Test
-    public void databaseShouldExist() {
-        assertThat(database).isNotNull();
-        assertThat(database.getName()).isEqualToIgnoringCase("test");
-    }
-
-    @Test
-    public void databaseShouldHaveRoutines() {
-        assertThat(database.getRoutinesMap().get("no_det").isDeterministic()).isFalse();
-        assertThat(database.getRoutinesMap().get("yes_det").isDeterministic()).isTrue();
+    public void hasATableNamedDistinct() {
+        assertThat(database.getTables()).extracting(t -> t.getName()).contains("DISTINCT");
     }
 }

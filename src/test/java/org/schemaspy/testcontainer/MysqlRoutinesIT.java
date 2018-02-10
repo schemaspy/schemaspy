@@ -8,8 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.*;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.DatabaseMetaData;
+import java.sql.Driver;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -32,7 +32,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MysqlKeyWordTable {
+public class MysqlRoutinesIT {
 
     @Autowired
     private SqlService sqlService;
@@ -56,28 +56,28 @@ public class MysqlKeyWordTable {
             new JdbcContainerRule<>(() -> new MySQLContainer())
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/dbScripts/mysql_keyword.sql");
+                    .withInitScript("integrationTesting/mysqlroutines/dbScripts/routines.sql");
 
     @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
+    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
         if (database == null) {
             doCreateDatabaseRepresentation();
         }
     }
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "mysql",
                 "-db", "test",
                 "-s", "test",
                 "-cat", "%",
-                "-o", "target/integrationtesting/mysql_keywords",
+                "-o", "target/integrationtesting/mysqlroutines",
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysql_keywords"));
+        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysqlroutines"));
         given(arguments.getDatabaseType()).willReturn("mysql");
         given(arguments.getUser()).willReturn("test");
         given(arguments.getSchema()).willReturn("test");
@@ -87,11 +87,20 @@ public class MysqlKeyWordTable {
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
         databaseService.gatheringSchemaDetails(config, database, progressListener);
+        Driver driver = jdbcContainerRule.getContainer().getJdbcDriverInstance();
+        System.out.println("" + driver.getMajorVersion() + "." + driver.getMinorVersion());
         this.database = database;
     }
 
     @Test
-    public void hasATableNamedDistinct() {
-        assertThat(database.getTables()).extracting(t -> t.getName()).contains("DISTINCT");
+    public void databaseShouldExist() {
+        assertThat(database).isNotNull();
+        assertThat(database.getName()).isEqualToIgnoringCase("test");
+    }
+
+    @Test
+    public void databaseShouldHaveRoutines() {
+        assertThat(database.getRoutinesMap().get("no_det").isDeterministic()).isFalse();
+        assertThat(database.getRoutinesMap().get("yes_det").isDeterministic()).isTrue();
     }
 }
