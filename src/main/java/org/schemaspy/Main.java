@@ -18,8 +18,10 @@
  */
 package org.schemaspy;
 
+import ch.qos.logback.classic.PatternLayout;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.logging.LogLevelConditionalThrowableProxyConverter;
 import org.schemaspy.model.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
@@ -53,6 +55,7 @@ public class Main implements CommandLineRunner {
     private ApplicationContext context;
 
     public static void main(String... args) throws Exception {
+        LogLevelConditionalThrowableProxyConverter.register();
         SpringApplication.run(Main.class, args);
     }
 
