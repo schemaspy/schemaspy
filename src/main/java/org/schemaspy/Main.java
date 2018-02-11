@@ -18,7 +18,6 @@
  */
 package org.schemaspy;
 
-import ch.qos.logback.classic.PatternLayout;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.logging.LogLevelConditionalThrowableProxyConverter;
@@ -88,15 +87,12 @@ public class Main implements CommandLineRunner {
             LOGGER.warn("Empty schema", noData);
             rc = 2;
         } catch (InvalidConfigurationException badConfig) {
-            LOGGER.info("");
-            if (badConfig.getParamName() != null)
-                LOGGER.warn("Bad parameter specified for {}", badConfig.getParamName());
-            LOGGER.warn("Bad config {}", badConfig.getMessage());
-            if (badConfig.getCause() != null && !badConfig.getMessage().endsWith(badConfig.getMessage()))
-                LOGGER.warn(" caused by {}", badConfig.getCause().getMessage());
-
             LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
-            LOGGER.debug("Invalid configuration detected", badConfig);
+            if (badConfig.getParamName() != null) {
+                LOGGER.error("Bad parameter '{} {}' , {}", badConfig.getParamName(), badConfig.getParamValue(), badConfig.getMessage(), badConfig);
+            } else {
+                LOGGER.error("Bad config {}", badConfig.getMessage(), badConfig);
+            }
         } catch (ProcessExecutionException badLaunch) {
             LOGGER.warn(badLaunch.getMessage(), badLaunch);
         } catch (Exception exc) {
