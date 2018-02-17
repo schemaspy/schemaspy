@@ -68,7 +68,7 @@ Commonly used parameters:
     but the resultant Entity Relationship diagrams generally look better.
 [-imageformat outputImageFormat]
     The format of the image that gets generated. Supported formats are svg and png. Defaults to png. 
-    E.g. `imageformat svg`
+    E.g. ``-imageformat svg``
     
 
 Advanced Usage
