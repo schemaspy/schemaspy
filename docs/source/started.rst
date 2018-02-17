@@ -66,6 +66,10 @@ Commonly used parameters:
     either higher or lower quality images. That is, some might not have the "lower quality" libraries and others might not have the "higher quality" libraries.
     Higher quality output takes longer to generate and results in significantly larger image files (which take longer to download / display),
     but the resultant Entity Relationship diagrams generally look better.
+[-imageformat outputImageFormat]
+    The format of the image that gets generated. Supported formats are svg and png. Defaults to png. 
+    E.g. `imageformat svg`
+    
 
 Advanced Usage
 --------------
