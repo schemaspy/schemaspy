@@ -18,16 +18,15 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ForeignKeyConstraint;
-import org.schemaspy.model.Table;
-import org.schemaspy.util.LineWriter;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ForeignKeyConstraint;
+import org.schemaspy.model.Table;
 
 /**
  * The page that lists all of the constraints in the schema
@@ -58,7 +57,7 @@ public class HtmlConstraintsPage extends HtmlFormatter {
         scopes.put("tables", tables);
         scopes.put("paginationEnabled",database.getConfig().isPaginationEnabled());
 
-        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName(), false);
+        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
         mw.write("constraint.html", "constraints.html", "constraint.js");
     }
 }

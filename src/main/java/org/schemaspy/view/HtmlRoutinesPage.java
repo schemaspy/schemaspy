@@ -20,11 +20,12 @@ package org.schemaspy.view;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.TreeSet;
 
-import org.schemaspy.model.*;
-import org.schemaspy.util.LineWriter;
-import org.schemaspy.util.Markdown;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.Routine;
 
 /**
  * The page that lists all of the routines (stored procedures and functions)
@@ -50,18 +51,18 @@ public class HtmlRoutinesPage extends HtmlFormatter {
         return instance;
     }
 
-    public void write(Database db, File outputDir) throws IOException {
-        Collection<Routine> routines = new TreeSet<Routine>(db.getRoutines());
+    public void write(Database database, File outputDir) throws IOException {
+        Collection<Routine> routines = new TreeSet<Routine>(database.getRoutines());
 
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("routines", routines);
-        scopes.put("paginationEnabled", db.getConfig().isPaginationEnabled());
+        scopes.put("paginationEnabled", database.getConfig().isPaginationEnabled());
 
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
         mw.write("routines.html", "routines.html", "routines.js");
 
         for (Routine routine : routines) {
-            writeRoutineFile(db, routine, outputDir);
+            writeRoutineFile(database, routine, outputDir);
         }
     }
 

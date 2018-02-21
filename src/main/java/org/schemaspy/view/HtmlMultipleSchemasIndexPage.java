@@ -23,17 +23,9 @@ import java.io.IOException;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import org.schemaspy.Config;
-import org.schemaspy.model.Catalog;
-import org.schemaspy.model.Schema;
-import org.schemaspy.util.DiagramUtil;
-import org.schemaspy.util.Dot;
-import org.schemaspy.util.LineWriter;
-import org.schemaspy.util.Markdown;
 
 /**
  * The page that contains links to the various schemas that were analyzed

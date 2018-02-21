@@ -20,14 +20,18 @@ package org.schemaspy.view;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.TreeSet;
 
 import org.schemaspy.DbAnalyzer;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.Markdown;
 
 /**
@@ -68,7 +72,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         tmp = new TreeSet<Table>(sorter);
         tmp.addAll(remotes);
 
-        String databaseName = getDatabaseName(database);
+        //String databaseName = getDatabaseName(database);
 
         List<MustacheTable> mustacheTables = new ArrayList<>();
 
@@ -98,7 +102,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
 
         scopes.put("tables", mustacheTables);
         scopes.put("database", database);
-        scopes.put("databaseName", databaseName);
+        scopes.put("databaseName", getDatabaseName(database));
         scopes.put("description", database.getDescription());
         scopes.put("paginationEnabled",database.getConfig().isPaginationEnabled());
         scopes.put("schema", new MustacheSchema(database.getSchema(), ""));
@@ -119,18 +123,5 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         return anomalies;
     }
 
-    private String getDatabaseName(Database db) {
-        StringBuilder description = new StringBuilder();
 
-        description.append(db.getName());
-        if (db.getSchema() != null) {
-            description.append('.');
-            description.append(db.getSchema().getName());
-        } else if (db.getCatalog() != null) {
-            description.append('.');
-            description.append(db.getCatalog().getName());
-        }
-
-        return description.toString();
-    }
 }

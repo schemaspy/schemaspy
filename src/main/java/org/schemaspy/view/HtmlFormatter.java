@@ -25,6 +25,7 @@ import java.net.URLEncoder;
 
 import com.github.mustachejava.util.HtmlEscaper;
 import org.schemaspy.Config;
+import org.schemaspy.model.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,5 +73,20 @@ public class HtmlFormatter {
             LOGGER.info("Error trying to urlEncode string [{}] with encoding [" + Config.DOT_CHARSET + "]", string);
             return string;
         }
+    }
+    
+    public String getDatabaseName(Database db) {
+        StringBuilder description = new StringBuilder();
+
+        description.append(db.getName());
+        if (db.getSchema() != null) {
+            description.append('.');
+            description.append(db.getSchema().getName());
+        } else if (db.getCatalog() != null) {
+            description.append('.');
+            description.append(db.getCatalog().getName());
+        }
+
+        return description.toString();
     }
 }
