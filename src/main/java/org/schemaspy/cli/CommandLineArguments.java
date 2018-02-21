@@ -74,10 +74,18 @@ public class CommandLineArguments {
 
     @Parameter(
             names = {
+                    "-sso","--single-sign-on",
+                    "schemaspy.sso", "schemaspy.single-sign-on"
+            },
+            descriptionKey = "sso"
+    )
+    private boolean sso = false;
+
+    @Parameter(
+            names = {
                     "-u", "--user", "user",
                     "schemaspy.u", "schemaspy.user"},
-            descriptionKey = "user",
-            required = true
+            descriptionKey = "user"
     )
     private String user;
 
@@ -100,16 +108,16 @@ public class CommandLineArguments {
     )
     private String catalog;
 
-    // TODO Password handling is more complex, see Config class (prompt for password, fallback to Environment variable, multiple schemas, etc.)
-//    @Parameter(
-//            names = {
-//                    "-p", "--password", "password",
-//                    "schemaspy.p", "schemaspy.password"
-//            },
-//            descriptionKey = "password",
-//            password = true
-//    )
-//    private String password;
+    /* TODO Password handling is more complex, see Config class (prompt for password, fallback to Environment variable, multiple schemas, etc.)
+    @Parameter(
+            names = {
+                    "-p", "--password", "password",
+                    "schemaspy.p", "schemaspy.password"
+            },
+            descriptionKey = "password",
+            password = true
+    )
+    private String password; */
 
     @Parameter(
             names = {
@@ -125,8 +133,7 @@ public class CommandLineArguments {
                     "-o", "--outputDirectory", "outputDirectory",
                     "schemaspy.o", "schemaspy.outputDirectory"
             },
-            descriptionKey = "outputDirectory",
-            required = true
+            descriptionKey = "outputDirectory"
     )
     private File outputDirectory;
 
@@ -160,6 +167,10 @@ public class CommandLineArguments {
 
     public String getSchema() {
         return schema;
+    }
+
+    public boolean isSingleSignOn() {
+        return sso;
     }
 
     public String getUser() {

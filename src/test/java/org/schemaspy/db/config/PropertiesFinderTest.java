@@ -5,7 +5,9 @@ package org.schemaspy.db.config;
 
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,12 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PropertiesFinderTest {
 
     private PropertiesFinder propertiesFinder = new PropertiesFinder();
-
-    @Test
-    public void findOnClassPathWithoutExtension() {
-        URL url = propertiesFinder.find("E0");
-        assertThat(url).isNotNull();
-    }
 
     @Test
     public void findOnClassPathWithExtension() {
@@ -45,14 +41,20 @@ public class PropertiesFinderTest {
         assertThat(url).isNotNull();
     }
 
-    @Test
-    public void findByPathHasNoExtension() {
-        URL url = propertiesFinder.find("src/test/resources/dbtypes/D0");
-        assertThat(url).isNotNull();
-    }
-
     @Test(expected = ResourceNotFoundException.class)
     public void noSuchResource() {
         propertiesFinder.find("doesNotExist");
+    }
+
+    @Test
+    public void shouldNotReturnAFolderFromClassPath() throws URISyntaxException {
+        URL url = propertiesFinder.find("folder");
+        assertThat(Paths.get(url.toURI()).toFile().isDirectory()).isFalse();
+    }
+
+    @Test
+    public void shouldNotReturnAFolderFromPath() throws URISyntaxException {
+        URL url = propertiesFinder.find("src/test/resources/org/schemaspy/types/folder");
+        assertThat(Paths.get(url.toURI()).toFile().isDirectory()).isFalse();
     }
 }

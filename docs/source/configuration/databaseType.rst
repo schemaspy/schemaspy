@@ -8,6 +8,8 @@ Selection
 
 On the commandline you specify the databaseType using the option ``-t``.
 The option can be specified with either [name].properties or just [name]
+the .properties will be added if missing. So if you create one, be sure
+to have .properties extension.
 
 Example:
  ``-t mysql``
@@ -15,22 +17,16 @@ or
  ``-t mysql.properties``
 
 The search order is:
-    1. user.dir/ as supplied
-    2. user.dir/ as supplied, suffixed with .properties
-    3. Classpath as supplied
-    4. Classpath as supplied, suffixed with .properties
-    5. Classpath in schemaspy supplied location as supplied
-    6. Classpath in schemaspy supplied location as supplied, suffixed with .properties
+    1. user.dir/
+    2. Classpath
+    3. Classpath in schemaspy supplied location
 
 This actually means that if you supply ``-t my_conf/mydbtype``
 
 It will look for:
-    1. file: $user.dir/my_conf/mydbtype
-    2. file: $user.dir/my_conf/mydbtype.properties
-    3. Classpath: my_conf/mydbtype
-    4. Classpath: my_conf/mydbtype.properties
-    5. Classpath: org/schemaspy/types/my_conf/mydbtype
-    6. Classpath: org/schemaspy/types/my_conf/mydbtype.properties
+    1. file: $user.dir/my_conf/mydbtype.properties
+    2. Classpath: my_conf/mydbtype.properties
+    3. Classpath: org/schemaspy/types/my_conf/mydbtype.properties
 
 Layout
 ------
