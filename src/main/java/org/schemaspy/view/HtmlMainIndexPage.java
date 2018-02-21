@@ -42,6 +42,7 @@ import java.util.*;
  * @author Ismail Simsek
  * @author Daniel Watt
  * @author Nils Petzaell
+ * @author Bharath Kumar Uppala
  */
 public class HtmlMainIndexPage extends HtmlFormatter {
     private static HtmlMainIndexPage instance = new HtmlMainIndexPage();
@@ -76,7 +77,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         tmp = new TreeSet<Table>(sorter);
         tmp.addAll(remotes);
 
-        String databaseName = getDatabaseName(database);
+        //String databaseName = getDatabaseName(database);
 
         List<MustacheTable> mustacheTables = new ArrayList<>();
 
@@ -106,7 +107,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
 
         scopes.put("tables", mustacheTables);
         scopes.put("database", database);
-        scopes.put("databaseName", databaseName);
+        scopes.put("databaseName", getDatabaseName(database));
         scopes.put("description", Config.getInstance().getDescription());
         scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
         scopes.put("schema", new MustacheSchema(database.getSchema(), ""));
@@ -127,18 +128,5 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         return anomalies;
     }
 
-    private String getDatabaseName(Database db) {
-        StringBuilder description = new StringBuilder();
 
-        description.append(db.getName());
-        if (db.getSchema() != null) {
-            description.append('.');
-            description.append(db.getSchema().getName());
-        } else if (db.getCatalog() != null) {
-            description.append('.');
-            description.append(db.getCatalog().getName());
-        }
-
-        return description.toString();
-    }
 }

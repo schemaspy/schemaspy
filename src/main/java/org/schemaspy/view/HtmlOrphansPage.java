@@ -41,6 +41,7 @@ import java.util.*;
  * @author Ismail Simsek
  * @author Wojciech Kasa
  * @author Daniel Watt
+ * @author Bharath Kumar Uppala
  */
 public class HtmlOrphansPage extends HtmlDiagramFormatter {
     private static HtmlOrphansPage instance = new HtmlOrphansPage();
@@ -61,25 +62,25 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
         return instance;
     }
 
-    public boolean write(Database db, List<Table> orphanTables, File diagramDir, File outputDir) throws IOException {
+    public boolean write(Database database, List<Table> orphanTables, File diagramDir, File outputDir) throws IOException {
         Dot dot = getDot();
         if (dot == null)
             return false;
 
         Set<Table> orphansWithImpliedRelationships = new HashSet<Table>();
 
-        Collections.sort(orphanTables, new Comparator() {
+        Collections.sort(orphanTables, new Comparator<Table>() {
             @Override
-            public int compare(Object t1, Object t2) {
-                Integer size1 = ((Table) t1).getColumns().size();
-                Integer size2 = ((Table) t2).getColumns().size();
+            public int compare(Table t1, Table t2) {
+                Integer size1 = t1.getColumns().size();
+                Integer size2 = t2.getColumns().size();
                 int sizeComp = size1.compareTo(size2);
 
                 if (sizeComp != 0) {
                     return sizeComp;
                 } else {
-                    String name1 = ((Table) t1).getName();
-                    String name2 = ((Table) t1).getName();
+                    String name1 = t1.getName();
+                    String name2 = t1.getName();
                     return name1.compareTo(name2);
                 }
             }
@@ -123,7 +124,7 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
             scopes.put("size", size);
             scopes.put("maps", maps);
 
-            MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
+            MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
             mw.write("orphans.html", "orphans.html", "");
 
             return true;

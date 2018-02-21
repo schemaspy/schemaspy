@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
  * @author John Currier
  * @author Rafal Kasa
  * @author Ismail Simsek
+ * @author Bharath Kumar Uppala
  */
 public class HtmlAnomaliesPage extends HtmlFormatter {
     private static HtmlAnomaliesPage instance = new HtmlAnomaliesPage();
@@ -76,7 +77,7 @@ public class HtmlAnomaliesPage extends HtmlFormatter {
         scopes.put("incrementingColumnNames", incrementingColumnNames);
         scopes.put("uniqueNullables", uniqueNullables);
 
-        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName(), false);
+        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
         mw.write("anomalies.html", "anomalies.html", "anomalies.js");
     }
 }

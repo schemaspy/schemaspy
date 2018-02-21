@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
  * @author Thomas Traude
  * @author Daniel Watt
  * @author Nils Petzaell
+ * @author Bharath Kumar Uppala
  */
 public class HtmlConstraintsPage extends HtmlFormatter {
     private static HtmlConstraintsPage instance = new HtmlConstraintsPage();
@@ -68,7 +69,7 @@ public class HtmlConstraintsPage extends HtmlFormatter {
         scopes.put("checkConstraints", collectCheckConstraints(tables));
         scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
 
-        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName(), false);
+        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
         mw.write("constraint.html", "constraints.html", "constraint.js");
     }
 

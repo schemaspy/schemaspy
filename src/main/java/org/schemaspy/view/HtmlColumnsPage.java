@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
  * @author Ismail Simsek
  * @author Thomas Traude
  * @author Nils Petzaell
+ * @author Bharath Kumar Uppala
  */
 public class HtmlColumnsPage extends HtmlFormatter {
     private static HtmlColumnsPage instance = new HtmlColumnsPage();
@@ -76,7 +77,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
         scopes.put("columns", tableColumns);
         scopes.put("paginationEnabled",Config.getInstance().isPaginationEnabled());
 
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), database.getName(), false);
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
         mw.write("column.html", "columns.html", "column.js");
     }
 }
