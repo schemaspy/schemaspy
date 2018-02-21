@@ -38,7 +38,6 @@ import org.schemaspy.util.ResourceWriter;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -56,7 +55,6 @@ import java.util.stream.Collectors;
  * @author John Currier
  * @author Nils Petzaell
  */
-@Component
 public class SchemaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

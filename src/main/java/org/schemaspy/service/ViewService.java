@@ -5,7 +5,6 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.PreparedStatement;
@@ -17,7 +16,6 @@ import java.util.Objects;
 /**
  * Created by rkasa on 2016-12-10.
  */
-@Service
 public class ViewService {
 
     private final SqlService sqlService;
