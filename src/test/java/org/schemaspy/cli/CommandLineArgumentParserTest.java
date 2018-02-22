@@ -113,6 +113,26 @@ public class CommandLineArgumentParserTest {
         assertThat(loggingRule.getLog()).contains("Options:");
     }
 
+    @Test
+    public void onlyHelpSetsHelpRequiredShowsHelp() {
+        String[] args = {
+                "-help"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        assertThat(arguments.isHelpRequired()).isTrue();
+    }
+
+    @Test
+    public void onlyDBHelpSetsDBHelpRequired() {
+        String[] args = {
+                "-dbHelp"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        assertThat(arguments.isDbHelpRequired()).isTrue();
+    }
+
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.
 
     // given only parameter -configFile without value -> error

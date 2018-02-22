@@ -46,8 +46,23 @@ public class CommandLineArgumentParser {
 
         jCommander.parse(localArgs);
 
-        validate(arguments);
+        if (shouldValidate()) {
+            validate(arguments);
+        }
         return arguments;
+    }
+
+    private boolean shouldValidate() {
+        List<ParameterDescription> helpParameters = jCommander.getParameters()
+                .stream()
+                .filter(ParameterDescription::isHelp)
+                .collect(Collectors.toList());
+        for(ParameterDescription parameterDescription: helpParameters) {
+            if (parameterDescription.isAssigned()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void validate(CommandLineArguments arguments) {
