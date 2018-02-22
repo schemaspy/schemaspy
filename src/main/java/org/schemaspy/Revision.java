@@ -21,6 +21,7 @@
 package org.schemaspy;
 
 import org.schemaspy.util.JarFileFinder;
+import org.schemaspy.util.NotRunningFromJarException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,8 @@ public class Revision {
 			rev = (String) main.getOrDefault(new Attributes.Name("Implementation-Build"),"Unknown");
 		} catch (IOException ex) {
 			LOGGER.warn(ex.getMessage(), ex);
+		} catch (NotRunningFromJarException notRunningFromJar) {
+			rev = "NonBuild";
 		}
 	}
 

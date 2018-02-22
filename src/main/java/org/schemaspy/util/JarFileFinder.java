@@ -14,7 +14,11 @@ public class JarFileFinder {
         if (urlConnection instanceof JarURLConnection) {
             return ((JarURLConnection)urlConnection).getJarFile();
         } else {
-            return new JarFile(location.getPath());
+            try {
+                return new JarFile(location.getPath());
+            } catch (IOException e) {
+                throw new NotRunningFromJarException(location.getPath(), e);
+            }
         }
     }
 }

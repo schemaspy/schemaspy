@@ -1,6 +1,7 @@
 package org.schemaspy;
 
 import org.schemaspy.util.JarFileFinder;
+import org.schemaspy.util.NotRunningFromJarException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,7 @@ public class BuildInfo {
     private static final Name BUILD_TIME = new Name("Built-At");
 
     private Attributes attributes;
+    private String defaultValue = UNKNOWN;
 
     public BuildInfo() {
         try (JarFile jarFile = jarFileFinder.findJarFileForClass(this.getClass())){
@@ -34,6 +36,9 @@ public class BuildInfo {
         } catch (IOException e) {
             attributes = new Attributes();
             LOGGER.warn("Failed to load attributes from manifest", e);
+        } catch (NotRunningFromJarException notJar) {
+            attributes = new Attributes();
+            defaultValue = "NonBuild";
         }
     }
 
@@ -62,7 +67,7 @@ public class BuildInfo {
     }
 
     private String get(Name name) {
-        return (String) attributes.getOrDefault(name, UNKNOWN);
+        return (String) attributes.getOrDefault(name, defaultValue);
     }
 
 }

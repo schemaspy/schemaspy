@@ -56,7 +56,6 @@ public class Main implements CommandLineRunner {
     private BuildInfo buildInfo;
 
     public static void main(String... args) {
-        LogLevelConditionalThrowableProxyConverter.register();
         SpringApplication.run(Main.class, args);
     }
 

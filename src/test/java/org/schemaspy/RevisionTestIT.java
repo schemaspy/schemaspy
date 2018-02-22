@@ -14,5 +14,6 @@ public class RevisionTestIT {
     @Test
     public void isNotUnknown() throws IOException {
         assertThat(revision.toString()).isNotEqualToIgnoringCase("unknown");
+        assertThat(revision.toString()).isNotEqualToIgnoringCase("NonBuild");
     }
 }
