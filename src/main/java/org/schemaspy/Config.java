@@ -935,7 +935,9 @@ public final class Config {
             try {
                 tableInclusions = Pattern.compile(strInclusions);
             } catch (PatternSyntaxException badPattern) {
-                throw new InvalidConfigurationException(badPattern).setParamName("-i");
+                throw new InvalidConfigurationException(badPattern)
+                        .setParamName("-i")
+                        .setParamValue(strInclusions);
             }
         }
 
@@ -967,7 +969,9 @@ public final class Config {
             try {
                 tableExclusions = Pattern.compile(strExclusions);
             } catch (PatternSyntaxException badPattern) {
-                throw new InvalidConfigurationException(badPattern).setParamName("-I");
+                throw new InvalidConfigurationException(badPattern)
+                        .setParamName("-I")
+                        .setParamValue(strExclusions);
             }
         }
 
@@ -1046,7 +1050,7 @@ public final class Config {
                 sqlFormatter = clazz.newInstance();
             } catch (Exception exc) {
                 throw new InvalidConfigurationException("Failed to initialize instance of SQL formatter: ", exc)
-                        .setParamName("-sqlFormatter");
+                        .setParamName("-sqlFormatter").setParamValue(sqlFormatterClass);
             }
         }
 
