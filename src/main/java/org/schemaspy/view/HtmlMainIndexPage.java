@@ -72,7 +72,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         tmp = new TreeSet<Table>(sorter);
         tmp.addAll(remotes);
 
-        //String databaseName = getDatabaseName(database);
+        String databaseName = getDatabaseName(database);
 
         List<MustacheTable> mustacheTables = new ArrayList<>();
 
@@ -102,13 +102,13 @@ public class HtmlMainIndexPage extends HtmlFormatter {
 
         scopes.put("tables", mustacheTables);
         scopes.put("database", database);
-        scopes.put("databaseName", getDatabaseName(database));
+        scopes.put("databaseName", databaseName);
         scopes.put("description", database.getDescription());
         scopes.put("paginationEnabled",database.getConfig().isPaginationEnabled());
         scopes.put("schema", new MustacheSchema(database.getSchema(), ""));
         scopes.put("catalog", new MustacheCatalog(database.getCatalog(), ""));
         
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", database.getName(), false);
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", databaseName, false);
         mw.write("main.html", "index.html", "main.js");
     }
 
