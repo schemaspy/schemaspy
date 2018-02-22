@@ -6,12 +6,14 @@ package org.schemaspy.db.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -57,14 +59,38 @@ public class PropertiesFinder implements ResourceFinder {
 
     private URL findClassPath(String resource) {
         URL url = this.getClass().getClassLoader().getResource(resource);
-        try {
-            if (Objects.nonNull(url) && Paths.get(url.toURI()).toFile().isFile()) {
-                return url;
+        if (Objects.nonNull(url)) {
+            try {
+                Path path;
+                if ("jar".equals(url.getProtocol())) {
+                    ensureFileSystemExists(url);
+                    path = fixSpringBootPath(url.toString());
+                } else {
+                    path = Paths.get(url.toURI());
+                }
+                if (Files.isRegularFile(path)) {
+                    return url;
+                }
+            } catch (URISyntaxException e) {
+                LOGGER.debug("Couldn't convert url to uri to file: {}", url, e);
+                return null;
+            } catch (IOException e) {
+                LOGGER.error("Unable to create filesystem for url: {}", url.toString(), e);
             }
-        } catch (URISyntaxException e) {
-            LOGGER.debug("Couldn't convert url to uri to file: {}", url, e);
-            return null;
         }
         return null;
+    }
+
+    private Path fixSpringBootPath(String s) {
+        URI uri = URI.create(s.replace("classes!","classes"));
+        return Paths.get(uri);
+    }
+
+    private void ensureFileSystemExists(URL url) throws URISyntaxException, IOException {
+        try {
+            FileSystems.getFileSystem(url.toURI());
+        } catch (FileSystemNotFoundException notFound) {
+            FileSystems.newFileSystem(url.toURI(), Collections.singletonMap("create","false"));
+        }
     }
 }
