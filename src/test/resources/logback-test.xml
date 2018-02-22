@@ -1,7 +1,9 @@
 <configuration>
+    <conversionRule conversionWord="debugEx"
+                    converterClass="org.schemaspy.logging.LogLevelConditionalThrowableProxyConverter" />
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n%debugEx</pattern>
         </encoder>
     </appender>
 
