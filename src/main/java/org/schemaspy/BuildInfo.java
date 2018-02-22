@@ -33,7 +33,7 @@ public class BuildInfo {
             attributes = jarFile.getManifest().getMainAttributes();
         } catch (IOException e) {
             attributes = new Attributes();
-            LOGGER.error("Failed to load attributes from manifest", e);
+            LOGGER.warn("Failed to load attributes from manifest", e);
         }
     }
 

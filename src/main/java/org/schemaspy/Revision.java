@@ -48,7 +48,7 @@ public class Revision {
 			Attributes main     = jarFile.getManifest().getMainAttributes();
 			rev = (String) main.getOrDefault(new Attributes.Name("Implementation-Build"),"Unknown");
 		} catch (IOException ex) {
-			LOGGER.error(ex.getMessage(), ex);
+			LOGGER.warn(ex.getMessage(), ex);
 		}
 	}
 
