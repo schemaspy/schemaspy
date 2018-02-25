@@ -66,7 +66,7 @@ public class HtmlFormatter {
         try {
             return URLEncoder.encode(string, Config.DOT_CHARSET).replace("+","%20");
         } catch (UnsupportedEncodingException e) {
-            LOGGER.info(String.format("Error trying to urlEncode string [{}] with encoding [%s]", Config.DOT_CHARSET), string);
+        	LOGGER.info("Error trying to urlEncode string [{}] with encoding [{}]", string, Config.DOT_CHARSET);
             return string;
         }
     }
