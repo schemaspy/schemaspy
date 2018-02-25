@@ -33,7 +33,6 @@ public class HtmlFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected final boolean encodeComments = Config.getInstance().isEncodeCommentsEnabled();
-    private   final boolean isMetered = Config.getInstance().isMeterEnabled();
     protected final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
 
     protected HtmlFormatter() {
@@ -49,9 +48,6 @@ public class HtmlFormatter {
         return "";
     }
 
-    protected boolean sourceForgeLogoEnabled() {
-        return Config.getInstance().isLogoEnabled();
-    }
 
 
     /**
@@ -70,7 +66,7 @@ public class HtmlFormatter {
         try {
             return URLEncoder.encode(string, Config.DOT_CHARSET).replace("+","%20");
         } catch (UnsupportedEncodingException e) {
-            LOGGER.info("Error trying to urlEncode string [{}] with encoding [" + Config.DOT_CHARSET + "]", string);
+            LOGGER.info(String.format("Error trying to urlEncode string [{}] with encoding [%s]", Config.DOT_CHARSET), string);
             return string;
         }
     }
