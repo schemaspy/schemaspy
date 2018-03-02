@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004-2011 John Currier
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2017-2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -64,12 +64,15 @@ public class SchemaAnalyzer {
 
     private final CommandLineArguments commandLineArguments;
 
+    private final ProgressListener progressListener;
+
     private final List<OutputProducer> outputProducers = new ArrayList<>();
 
-    public SchemaAnalyzer(SqlService sqlService, DatabaseService databaseService, CommandLineArguments commandLineArguments) {
+    public SchemaAnalyzer(SqlService sqlService, DatabaseService databaseService, CommandLineArguments commandLineArguments, ProgressListener progressListener) {
         this.sqlService = Objects.requireNonNull(sqlService);
         this.databaseService = Objects.requireNonNull(databaseService);
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
+        this.progressListener = Objects.requireNonNull(progressListener);
         addOutputProducer(new XmlProducerUsingDOM());
     }
 
@@ -79,25 +82,19 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze(Config config) throws SQLException, IOException {
-        // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
-        // and not already logging fine details (to keep from obfuscating those)
-
-        boolean render = config.isHtmlGenerationEnabled();
-        ProgressListener progressListener = new ConsoleProgressListener(render, commandLineArguments);
-
         // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
         List<String> schemas = config.getSchemas();
         if (schemas != null || config.isEvaluateAllEnabled()) {
-            return this.analyzeMultipleSchemas(config, progressListener);
+            return this.analyzeMultipleSchemas(config);
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
-            return analyze(schema, config, outputDirectory, progressListener);
+            return analyze(schema, config, outputDirectory);
         }
     }
 
-    public Database analyzeMultipleSchemas(Config config, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyzeMultipleSchemas(Config config) throws SQLException, IOException {
         try {
             // following params will be replaced by something appropriate
             List<String> args = config.asList();
@@ -145,7 +142,7 @@ public class SchemaAnalyzer {
 
                 LOGGER.info("Analyzing {}", schema);
                 File outputDirForSchema = new File(outputDir, schema);
-                db = this.analyze(schema, config, outputDirForSchema, progressListener);
+                db = this.analyze(schema, config, outputDirForSchema);
                 if (db == null) //if any of analysed schema returns null
                     return null;
                 mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
@@ -162,7 +159,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    public Database analyze(String schema, Config config, File outputDir, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyze(String schema, Config config, File outputDir) throws SQLException, IOException {
         try {
             LOGGER.info("Starting schema analysis");
 
@@ -213,7 +210,7 @@ public class SchemaAnalyzer {
             }
 
             if (config.isHtmlGenerationEnabled()) {
-                generateHtmlDoc(config, progressListener, outputDir, db, duration, tables);
+                generateHtmlDoc(config, outputDir, db, duration, tables);
             }
 
             outputProducers.forEach(
@@ -279,7 +276,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    private void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
+    private void generateHtmlDoc(Config config, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
         LineWriter out;
         LOGGER.info("Gathered schema details in {} seconds", duration / 1000);
         LOGGER.info("Writing/graphing summary");
@@ -384,7 +381,7 @@ public class SchemaAnalyzer {
         LOGGER.info("Completed summary in {} seconds", duration / 1000);
         LOGGER.info("Writing/diagramming details");
 
-        generateTables(progressListener, outputDir, db, tables, stats);
+        generateTables(outputDir, db, tables, stats);
         HtmlComponentPage.getInstance().write(db, tables, outputDir);
     }
 
@@ -429,7 +426,7 @@ public class SchemaAnalyzer {
         return driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);
     }
 
-    private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
+    private void generateTables(File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
         HtmlTablePage tableFormatter = HtmlTablePage.getInstance();
         for (Table table : tables) {
             progressListener.graphingDetailsProgressed(table);
