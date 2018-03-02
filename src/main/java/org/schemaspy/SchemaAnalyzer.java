@@ -51,6 +51,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.schemaspy.util.LazyString.lazyString;
+
 /**
  * @author John Currier
  * @author Nils Petzaell
@@ -84,7 +86,7 @@ public class SchemaAnalyzer {
     public Database analyze(Config config) throws SQLException, IOException {
         // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
         List<String> schemas = config.getSchemas();
-        if (schemas != null || config.isEvaluateAllEnabled()) {
+        if (!schemas.isEmpty() || config.isEvaluateAllEnabled()) {
             return this.analyzeMultipleSchemas(config);
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
@@ -101,28 +103,28 @@ public class SchemaAnalyzer {
             args.remove("-schemas");
             args.remove("-schemata");
 
-            List<String> schemas = config.getSchemas();
+            final List<String> schemas = config.getSchemas();
             Database db = null;
             String schemaSpec = config.getSchemaSpec();
             Connection connection = this.getConnection(config);
             DatabaseMetaData meta = connection.getMetaData();
             //-all(evaluteAll) given then get list of the database schemas
-            if (schemas == null || config.isEvaluateAllEnabled()) {
+            if (schemas.isEmpty() || config.isEvaluateAllEnabled()) {
                 if (schemaSpec == null)
                     schemaSpec = ".*";
                 LOGGER.info(
                         "Analyzing schemas that match regular expression '{}'. " +
                         "(use -schemaSpec on command line or in .properties to exclude other schemas)",
                         schemaSpec);
-                schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false);
+                schemas.addAll(DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false));
                 if (schemas.isEmpty())
-                    schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
+                    schemas.addAll(DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true));
                 if (schemas.isEmpty())
                     schemas.add(config.getUser());
             }
-
-            LOGGER.info("Analyzing schemas: " + System.lineSeparator() + "{}",
-                    schemas.stream().collect(Collectors.joining(System.lineSeparator())));
+            LOGGER.info("Analyzing schemas: {}{}",
+                    lazyString(System::lineSeparator),
+                    lazyString(() -> schemas.stream().collect(Collectors.joining(System.lineSeparator()))));
 
             String dbName = config.getDb();
             File outputDir = commandLineArguments.getOutputDirectory();
@@ -445,15 +447,15 @@ public class SchemaAnalyzer {
      */
     private static void dumpNoTablesMessage(String schema, String user, DatabaseMetaData meta, boolean specifiedInclusions) throws SQLException {
         LOGGER.warn("No tables or views were found in schema '{}'.", schema);
-        List<String> schemas;
+        final List<String> schemas = new ArrayList<>();
         try {
-            schemas = DbAnalyzer.getSchemas(meta);
+            schemas.addAll(DbAnalyzer.getSchemas(meta));
         } catch (SQLException | RuntimeException exc) {
             LOGGER.error("The user you specified '{}' might not have rights to read the database metadata.", user, exc);
             return;
         }
 
-        if (Objects.isNull(schemas)) {
+        if (schemas.isEmpty()) {
             LOGGER.error("Failed to retrieve any schemas");
             return;
         } else if (schemas.contains(schema)) {
@@ -473,15 +475,16 @@ public class SchemaAnalyzer {
                     "Also not that schema names are usually case sensitive.",
                     schema, user);
             LOGGER.info(
-                    "Available schemas(Some of these may be user or system schemas):" +
-                    System.lineSeparator() + "{}",
-                    schemas.stream().collect(Collectors.joining(System.lineSeparator())));
-            List<String> populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta);
+                    "Available schemas(Some of these may be user or system schemas):{}{}",
+                    lazyString(System::lineSeparator),
+                    lazyString(() -> schemas.stream().collect(Collectors.joining(System.lineSeparator()))));
+            final List<String> populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta);
             if (populatedSchemas.isEmpty()) {
                 LOGGER.error("Unable to determine if any of the schemas contain tables/views");
             } else {
-                LOGGER.info("Schemas with tables/views visible to '{}':" + System.lineSeparator() + "{}",
-                        populatedSchemas.stream().collect(Collectors.joining(System.lineSeparator())));
+                LOGGER.info("Schemas with tables/views visible to '{}':{}{}",
+                        lazyString(System::lineSeparator),
+                        lazyString(()->populatedSchemas.stream().collect(Collectors.joining(System.lineSeparator()))));
             }
         }
     }
