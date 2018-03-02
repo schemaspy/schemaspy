@@ -110,14 +110,14 @@ public class SchemaMetaIT {
 
         assertThat(database.getTables().size()).isGreaterThan(0);
         assertThat(database.getSchema().getComment()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
-        assertThat(database.getTablesByName().get("ACCOUNT").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
-        assertThat(database.getTablesByName().get("ACCOUNT").getColumn("name").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
+        assertThat(database.getTablesMap().get("ACCOUNT").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
+        assertThat(database.getTablesMap().get("ACCOUNT").getColumn("name").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
 
         assertThat(databaseWithSchemaMeta.getTables().size()).isGreaterThan(0);
         assertThat(databaseWithSchemaMeta.getSchema().getComment()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
-        assertThat(databaseWithSchemaMeta.getTablesByName().get("ACCOUNT").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
-        assertThat(databaseWithSchemaMeta.getTablesByName().get("ACCOUNT").getColumn("name").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
-        assertThat(databaseWithSchemaMeta.getTablesByName().get("ACCOUNT").getColumn("accountId").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
+        assertThat(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
+        assertThat(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumn("name").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
+        assertThat(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumn("accountId").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
     }
 
     @Test
@@ -144,10 +144,10 @@ public class SchemaMetaIT {
         databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, progressListener);
 
         assertThat(database.getTables().size()).isGreaterThan(0);
-        assertThat(database.getTablesByName().get("ACCOUNT").getColumn("accountId").getComments()).isNull();
+        assertThat(database.getTablesMap().get("ACCOUNT").getColumn("accountId").getComments()).isNull();
 
         assertThat(databaseWithSchemaMeta.getTables().size()).isGreaterThan(0);
-        assertThat(databaseWithSchemaMeta.getTablesByName().get("ACCOUNT").getColumn("accountId").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
+        assertThat(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumn("accountId").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
     }
 
     @Test
@@ -167,8 +167,8 @@ public class SchemaMetaIT {
 
         assertThat(database.getTables().size()).isGreaterThan(0);
         assertThat(database.getSchema().getComment()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
-        assertThat(database.getTablesByName().get("ACCOUNT").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
-        assertThat(database.getTablesByName().get("ACCOUNT").getColumn("name").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
+        assertThat(database.getTablesMap().get("ACCOUNT").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
+        assertThat(database.getTablesMap().get("ACCOUNT").getColumn("name").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
     }
 
     @Test
@@ -222,8 +222,8 @@ public class SchemaMetaIT {
         );
         databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, progressListener);
 
-        assertThat(database.getTablesByName().get("ACCOUNT").getNumChildren())
-                .isLessThan(databaseWithSchemaMeta.getTablesByName().get("ACCOUNT").getNumChildren());
+        assertThat(database.getTablesMap().get("ACCOUNT").getNumChildren())
+                .isLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getNumChildren());
     }
 
     @Test
@@ -249,8 +249,8 @@ public class SchemaMetaIT {
         );
         databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, progressListener);
 
-        assertThat(database.getTablesByName().get("ACCOUNT").getColumns().size())
-                .isLessThan(databaseWithSchemaMeta.getTablesByName().get("ACCOUNT").getColumns().size());
+        assertThat(database.getTablesMap().get("ACCOUNT").getColumns().size())
+                .isLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumns().size());
     }
 
     @Test
@@ -279,8 +279,8 @@ public class SchemaMetaIT {
         DbAnalyzer.getImpliedConstraints(database.getTables());
         DbAnalyzer.getImpliedConstraints(databaseWithSchemaMeta.getTables());
 
-        assertThat(database.getTablesByName().get("ACCOUNT").getNumChildren())
-                .isGreaterThan(databaseWithSchemaMeta.getTablesByName().get("ACCOUNT").getNumChildren());
+        assertThat(database.getTablesMap().get("ACCOUNT").getNumChildren())
+                .isGreaterThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getNumChildren());
     }
 
     @Test
@@ -306,8 +306,8 @@ public class SchemaMetaIT {
         );
         databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, progressListener);
 
-        assertThat(database.getTablesByName().get("ACCOUNT").getNumChildren())
-                .isLessThan(databaseWithSchemaMeta.getTablesByName().get("ACCOUNT").getNumChildren());
+        assertThat(database.getTablesMap().get("ACCOUNT").getNumChildren())
+                .isLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getNumChildren());
     }
 
     @Test
@@ -335,13 +335,13 @@ public class SchemaMetaIT {
 
         File withoutSchemaMetaOutput = temporaryFolder.newFolder("withOutSchemaMeta");
         try (LineWriter lineWriter = new LineWriter(new File(withoutSchemaMetaOutput, "company.dot"),"UTF-8")) {
-            DotFormatter.getInstance().writeAllRelationships(database.getTablesByName().get("COMPANY"), false, new WriteStats(database.getTables()), lineWriter, withoutSchemaMetaOutput);
+            DotFormatter.getInstance().writeAllRelationships(database.getTablesMap().get("COMPANY"), false, new WriteStats(database.getTables()), lineWriter, withoutSchemaMetaOutput);
         }
         String dotFileWithoutSchemaMeta = Files.readAllLines(new File(withoutSchemaMetaOutput, "company.dot").toPath()).stream().collect(Collectors.joining());
 
         File withSchemaMetaOutput = temporaryFolder.newFolder("withSchemaMeta");
         try (LineWriter lineWriter = new LineWriter(new File(withSchemaMetaOutput, "company.dot"),"UTF-8")){
-            DotFormatter.getInstance().writeAllRelationships(databaseWithSchemaMeta.getTablesByName().get("COMPANY"), false, new WriteStats(databaseWithSchemaMeta.getTables()), lineWriter, withSchemaMetaOutput);
+            DotFormatter.getInstance().writeAllRelationships(databaseWithSchemaMeta.getTablesMap().get("COMPANY"), false, new WriteStats(databaseWithSchemaMeta.getTables()), lineWriter, withSchemaMetaOutput);
         }
         String dotFileWithSchemaMeta  = Files.readAllLines(new File(withSchemaMetaOutput, "company.dot").toPath()).stream().collect(Collectors.joining());
 

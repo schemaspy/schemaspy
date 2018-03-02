@@ -110,23 +110,23 @@ public class MysqlSpacesNoDotsIT {
 
     @Test
     public void tableShouldHavePKWithAutoIncrement() {
-        assertThat(database.getTablesByName().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("id");
-        assertThat(database.getTablesByName().get("TABLE 1").getColumn("id").isPrimary()).isTrue();
-        assertThat(database.getTablesByName().get("TABLE 1").getColumn("id").isAutoUpdated()).isTrue();
+        assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("id");
+        assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isPrimary()).isTrue();
+        assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isAutoUpdated()).isTrue();
     }
 
     @Test
     public void tableShouldHaveForeignKey() {
-        assertThat(database.getTablesByName().get("TABLE 1").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
+        assertThat(database.getTablesMap().get("TABLE 1").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
     }
 
     @Test
     public void tableShouldHaveUniqueKey() {
-        assertThat(database.getTablesByName().get("TABLE 1").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
+        assertThat(database.getTablesMap().get("TABLE 1").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
     }
 
     @Test
     public void tableShouldHaveColumnWithSpaceInIt() {
-        assertThat(database.getTablesByName().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("link id");
+        assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("link id");
     }
 }

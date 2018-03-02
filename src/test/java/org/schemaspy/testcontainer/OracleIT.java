@@ -129,6 +129,6 @@ public class OracleIT {
     }
 
     private Table getTable(String tableName) {
-        return database.getTablesByName().get(tableName);
+        return database.getTablesMap().get(tableName);
     }
 }

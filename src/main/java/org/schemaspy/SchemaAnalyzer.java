@@ -295,7 +295,7 @@ public class SchemaAnalyzer {
         // note that this is done before 'hasRealRelationships' gets evaluated so
         // we get a relationships ER diagram
         if (config.isRailsEnabled())
-            DbAnalyzer.getRailsConstraints(db.getTablesByName());
+            DbAnalyzer.getRailsConstraints(db.getTablesMap());
 
         File summaryDir = new File(outputDir, "diagrams/summary");
 
