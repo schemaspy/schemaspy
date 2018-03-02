@@ -145,6 +145,15 @@ public class CommandLineArguments {
     )
     private Integer port;
 
+    @Parameter(
+            names = {
+                    "-nohtml", "--nohtml", "nohtml",
+                    "schemaspy.nohtml"
+            },
+            descriptionKey = "nohtml"
+    )
+    private boolean skipHtml = false;
+
     public boolean isHelpRequired() {
         return helpRequired;
     }
@@ -187,5 +196,9 @@ public class CommandLineArguments {
 
     public Integer getPort() {
         return port;
+    }
+
+    public boolean isSkipHtml() {
+        return skipHtml;
     }
 }
