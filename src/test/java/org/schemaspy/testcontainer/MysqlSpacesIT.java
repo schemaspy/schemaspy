@@ -92,7 +92,14 @@ public class MysqlSpacesIT {
         given(arguments.getDatabaseName()).willReturn("TEST 1.0");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
+        Database database = new Database(
+                config,
+                databaseMetaData,
+                arguments.getDatabaseName(),
+                arguments.getCatalog(),
+                arguments.getSchema(),
+                null
+        );
         databaseService.gatheringSchemaDetails(config, database, progressListener);
         this.database = database;
     }

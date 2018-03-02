@@ -50,17 +50,21 @@ public class Database {
     private final String connectTime = new SimpleDateFormat("EEE MMM dd HH:mm z yyyy").format(new Date());
     private Set<String> sqlKeywords;
     private Pattern invalidIdentifierPattern;
-	private final ProgressListener listener;
 
-    public Database(Config config, DatabaseMetaData meta, String name, String catalog, String schema, SchemaMeta schemaMeta,
-    				ProgressListener progressListener) throws SQLException, MissingResourceException {
+    public Database(
+            Config config,
+            DatabaseMetaData meta,
+            String name,
+            String catalog,
+            String schema,
+            SchemaMeta schemaMeta
+    ) throws SQLException, MissingResourceException {
         this.config = config;
         this.meta = meta;
         this.schemaMeta = schemaMeta;
         this.databaseName = name;
         this.catalog = new Catalog(catalog);
         this.schema = new Schema(schema);
-        this.listener = progressListener;
     }
 
     public String getName() {
