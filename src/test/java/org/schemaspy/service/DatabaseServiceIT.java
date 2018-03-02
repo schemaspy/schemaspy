@@ -3,11 +3,9 @@ package org.schemaspy.service;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.H2MemoryRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -37,9 +35,6 @@ public class DatabaseServiceIT {
 
     @Autowired
     private DatabaseService databaseService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     @MockBean
     private CommandLineArguments arguments;
@@ -74,7 +69,7 @@ public class DatabaseServiceIT {
                 schema,
                 null
         );
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        databaseService.gatheringSchemaDetails(config, database);
 
         assertThat(database.getTables()).hasSize(1);
     }

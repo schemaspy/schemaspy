@@ -28,8 +28,8 @@ public class WiringConfiguration {
     }
 
     @Bean
-    public DatabaseService databaseService(TableService tableService, ViewService viewService, SqlService sqlService) {
-        return new DatabaseService(tableService, viewService, sqlService);
+    public DatabaseService databaseService(TableService tableService, ViewService viewService, SqlService sqlService, ProgressListener progressListener) {
+        return new DatabaseService(tableService, viewService, sqlService, progressListener);
     }
 
     @Bean

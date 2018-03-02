@@ -6,7 +6,6 @@ import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.*;
@@ -45,9 +44,6 @@ public class MysqlSpacesIT {
 
     @Autowired
     private DatabaseService databaseService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     @MockBean
     private CommandLineArguments arguments;
@@ -100,7 +96,7 @@ public class MysqlSpacesIT {
                 arguments.getSchema(),
                 null
         );
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        databaseService.gatheringSchemaDetails(config, database);
         this.database = database;
     }
 

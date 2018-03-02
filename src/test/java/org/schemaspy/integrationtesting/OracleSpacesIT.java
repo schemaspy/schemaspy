@@ -7,11 +7,9 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
@@ -41,9 +39,6 @@ public class OracleSpacesIT {
 
     @Autowired
     private DatabaseService databaseService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     @MockBean
     private CommandLineArguments arguments;
@@ -101,7 +96,7 @@ public class OracleSpacesIT {
                 arguments.getSchema(),
                 null
         );
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        databaseService.gatheringSchemaDetails(config, database);
         this.database = database;
     }
 

@@ -28,41 +28,44 @@ public class DatabaseService {
 
     private final SqlService sqlService;
 
+    private final ProgressListener progressListener;
+
     private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public DatabaseService(TableService tableService, ViewService viewService, SqlService sqlService) {
+    public DatabaseService(TableService tableService, ViewService viewService, SqlService sqlService, ProgressListener progressListener) {
         this.tableService = Objects.requireNonNull(tableService);
         this.viewService = Objects.requireNonNull(viewService);
         this.sqlService = Objects.requireNonNull(sqlService);
+        this.progressListener = Objects.requireNonNull(progressListener);
     }
 
-    public void gatheringSchemaDetails(Config config, Database db, ProgressListener listener) throws SQLException {
+    public void gatheringSchemaDetails(Config config, Database db) throws SQLException {
         LOGGER.info("Gathering schema details");
 
-        listener.startedGatheringDetails();
+        progressListener.startedGatheringDetails();
 
         DatabaseMetaData meta = sqlService.getMeta();
 
-        initTables(config, db, listener, meta);
+        initTables(config, db, meta);
         if (config.isViewsEnabled())
-            initViews(config, db, listener, meta);
+            initViews(config, db, meta);
         
         initCatalogs(db);
         initSchemas(db);
 
-        initCheckConstraints(config, db, listener);
+        initCheckConstraints(config, db);
         initTableIds(config, db);
         initIndexIds(config, db);
-        initTableComments(config, db, listener);
-        initTableColumnComments(config, db, listener);
-        initViewComments(config, db, listener);
-        initViewColumnComments(config, db, listener);
-        initColumnTypes(config, db, listener);
-        initRoutines(config, db, listener);
+        initTableComments(config, db);
+        initTableColumnComments(config, db);
+        initViewComments(config, db);
+        initViewColumnComments(config, db);
+        initColumnTypes(config, db);
+        initRoutines(config, db);
 
-        listener.startedConnectingTables();
+        progressListener.startedConnectingTables();
 
-        connectTables(db, listener);
+        connectTables(db);
         updateFromXmlMetadata(config, db, db.getSchemaMeta());
     }
     
@@ -106,14 +109,14 @@ public class DatabaseService {
      * @param metadata
      * @throws SQLException
      */
-    private void initTables(Config config, Database db, ProgressListener listener, final DatabaseMetaData metadata) throws SQLException {
+    private void initTables(Config config, Database db, final DatabaseMetaData metadata) throws SQLException {
         final Pattern include = config.getTableInclusions();
         final Pattern exclude = config.getTableExclusions();
         final int maxThreads = config.getMaxDbThreads();
 
         String[] types = getTypes(config, "tableTypes", "TABLE");
         NameValidator validator = new NameValidator("table", include, exclude, types);
-        List<BasicTableMeta> entries = getBasicTableMeta(config, db, listener, metadata, true, types);
+        List<BasicTableMeta> entries = getBasicTableMeta(config, db, metadata, true, types);
 
         TableCreator creator;
         if (maxThreads == 1) {
@@ -131,7 +134,7 @@ public class DatabaseService {
                 BasicTableMeta entry = entries.remove(0);
 
                 if (validator.isValid(entry.getName(), entry.getType())) {
-                    new TableCreator().create(db, entry, listener);
+                    new TableCreator().create(db, entry);
                     break;
                 }
             }
@@ -140,7 +143,7 @@ public class DatabaseService {
         // kick off the secondary threads to do the creation in parallel
         for (BasicTableMeta entry : entries) {
             if (validator.isValid(entry.getName(), entry.getType())) {
-                creator.create(db, entry, listener);
+                creator.create(db, entry);
             }
         }
 
@@ -154,14 +157,14 @@ public class DatabaseService {
      * @param metadata
      * @throws SQLException
      */
-    private void initViews(Config config, Database db, ProgressListener listener, DatabaseMetaData metadata) throws SQLException {
+    private void initViews(Config config, Database db, DatabaseMetaData metadata) throws SQLException {
         Pattern includeTables = config.getTableInclusions();
         Pattern excludeTables = config.getTableExclusions();
 
         String[] types = getTypes(config, "viewTypes", "VIEW");
         NameValidator validator = new NameValidator("view", includeTables, excludeTables, types);
 
-        for (BasicTableMeta entry : getBasicTableMeta(config, db, listener, metadata, false, types)) {
+        for (BasicTableMeta entry : getBasicTableMeta(config, db, metadata, false, types)) {
             if (validator.isValid(entry.getName(), entry.getType())) {
                 View view = new View(db, entry.getCatalog(), entry.getSchema(), entry.getName(),
                         entry.getRemarks(), entry.getViewDefinition());
@@ -173,7 +176,7 @@ public class DatabaseService {
                 }
 
                 db.getViewsMap().put(view.getName(), view);
-                listener.gatheringDetailsProgressed(view);
+                progressListener.gatheringDetailsProgressed(view);
 
                 LOGGER.debug("Found details of view {}", view.getName());
             }
@@ -252,15 +255,15 @@ public class DatabaseService {
         }
     }
 
-    private void connectTables(Database db, ProgressListener listener) throws SQLException {
+    private void connectTables(Database db) throws SQLException {
         for (Table table : db.getTables()) {
-            listener.connectingTablesProgressed(table);
+            progressListener.connectingTablesProgressed(table);
 
             tableService.connectForeignKeys(db, table, db.getLocals());
         }
 
         for (Table view : db.getViews()) {
-            listener.connectingTablesProgressed(view);
+            progressListener.connectingTablesProgressed(view);
 
             tableService.connectForeignKeys(db, view, db.getLocals());
         }
@@ -273,11 +276,11 @@ public class DatabaseService {
         /**
          * Create a table and put it into <code>tables</code>
          */
-        void create(Database db, BasicTableMeta tableMeta, ProgressListener listener) throws SQLException {
-            createImpl(db, tableMeta, listener);
+        void create(Database db, BasicTableMeta tableMeta) throws SQLException {
+            createImpl(db, tableMeta);
         }
 
-        protected void createImpl(Database db, BasicTableMeta tableMeta, ProgressListener listener) throws SQLException {
+        protected void createImpl(Database db, BasicTableMeta tableMeta) throws SQLException {
             Table table = new Table(db, tableMeta.getCatalog(), tableMeta.getSchema(), tableMeta.getName(), tableMeta.getRemarks());
             tableService.gatheringTableDetails(db, table);
 
@@ -294,7 +297,7 @@ public class DatabaseService {
                 db.getTablesMap().put(table.getName(), table);
             }
 
-            listener.gatheringDetailsProgressed(table);
+            progressListener.gatheringDetailsProgressed(table);
 
             LOGGER.debug("Retrieved details of {}", table.getFullName());
         }
@@ -319,12 +322,12 @@ public class DatabaseService {
         }
 
         @Override
-        void create(Database db, BasicTableMeta tableMeta, ProgressListener listener) {
+        void create(Database db, BasicTableMeta tableMeta) {
             Thread runner = new Thread() {
                 @Override
                 public void run() {
                     try {
-                        createImpl(db, tableMeta, listener);
+                        createImpl(db, tableMeta);
                     } catch (SQLException exc) {
                         LOGGER.error("SQL exception",exc);
                     } finally {
@@ -385,7 +388,6 @@ public class DatabaseService {
      */
     private List<BasicTableMeta> getBasicTableMeta(Config config,
                                                    Database db,
-                                                   ProgressListener listener,
                                                    DatabaseMetaData metadata,
                                                    boolean forTables,
                                                    String... types) throws SQLException {
@@ -416,7 +418,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve " + clazz + " names with custom SQL", sqlException, sql);
+                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve " + clazz + " names with custom SQL", sqlException, sql);
                 if (msg != null) {
                     LOGGER.warn(msg);
                 }
@@ -465,7 +467,7 @@ public class DatabaseService {
         }
     }
 
-    private void initCheckConstraints(Config config, Database db, ProgressListener listener) {
+    private void initCheckConstraints(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectCheckConstraintsSql");
         if (sql != null) {
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db,null);
@@ -479,7 +481,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve check constraints", sqlException, sql);
+                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve check constraints", sqlException, sql);
                 if (msg != null) {
                     LOGGER.warn(msg);
                 }
@@ -487,7 +489,7 @@ public class DatabaseService {
         }
     }
 
-    private void initColumnTypes(Config config, Database db, ProgressListener listener) {
+    private void initColumnTypes(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectColumnTypesSql");
         if (sql != null) {
 
@@ -508,7 +510,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve column type details", sqlException, sql);
+                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve column type details", sqlException, sql);
                 if (msg != null) {
                     LOGGER.warn(msg);
                 }
@@ -568,7 +570,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initTableComments(Config config, Database db, ProgressListener listener) {
+    private void initTableComments(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectTableCommentsSql");
         if (sql != null) {
 
@@ -583,7 +585,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve table/view comments", sqlException, sql);
+                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve table/view comments", sqlException, sql);
                 if (msg != null) {
                     LOGGER.warn(msg);
                 }
@@ -596,7 +598,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initViewComments(Config config, Database db, ProgressListener listener) {
+    private void initViewComments(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectViewCommentsSql");
         if (sql != null) {
 
@@ -614,7 +616,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve table/view comments", sqlException, sql);
+                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve table/view comments", sqlException, sql);
                 if (msg != null) {
                     LOGGER.warn(msg);
                 }
@@ -629,7 +631,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initTableColumnComments(Config config, Database db, ProgressListener listener) {
+    private void initTableColumnComments(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectColumnCommentsSql");
         if (sql != null) {
 
@@ -647,7 +649,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve column comments", sqlException, sql);
+                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve column comments", sqlException, sql);
                 if (msg != null) {
                     LOGGER.warn(msg);
                 }
@@ -660,7 +662,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initViewColumnComments(Config config, Database db, ProgressListener listener) {
+    private void initViewColumnComments(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectViewColumnCommentsSql");
         if (sql != null) {
 
@@ -681,7 +683,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve view column comments", sqlException, sql);
+                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve view column comments", sqlException, sql);
                 if (msg != null) {
                     LOGGER.warn(msg);
                 }
@@ -694,7 +696,7 @@ public class DatabaseService {
      *
      * @throws SQLException
      */
-    private void initRoutines(Config config, Database db, ProgressListener listener) {
+    private void initRoutines(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectRoutinesSql");
 
         if (sql != null) {
@@ -720,7 +722,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve stored procedure/function details", sqlException, sql);
+                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve stored procedure/function details", sqlException, sql);
                 if (msg != null) {
                     LOGGER.warn(msg);
                 }
@@ -750,7 +752,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve stored procedure/function details", sqlException, sql);
+                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve stored procedure/function details", sqlException, sql);
                 if (msg != null) {
                     LOGGER.warn(msg);
                 }
