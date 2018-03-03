@@ -30,7 +30,7 @@ public class DatabaseService {
 
     private final ProgressListener progressListener;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public DatabaseService(TableService tableService, ViewService viewService, SqlService sqlService, ProgressListener progressListener) {
         this.tableService = Objects.requireNonNull(tableService);
@@ -69,7 +69,7 @@ public class DatabaseService {
         updateFromXmlMetadata(config, db, db.getSchemaMeta());
     }
     
-   private void initCatalogs(Database db) throws SQLException {
+    private void initCatalogs(Database db) throws SQLException {
 
             String sql = Config.getInstance().getDbProperties().getProperty("selectCatalogsSql");
 
@@ -80,7 +80,7 @@ public class DatabaseService {
                          db.getCatalog().setComment(rs.getString("catalog_comment"));
                     }
                 } catch (SQLException sqlException) {
-                    LOGGER.error(sql);
+                    LOGGER.error("Failed to initCatalogs with SQL: '{}'",sql, sqlException);
                     throw sqlException;
                 }
             }
@@ -97,7 +97,7 @@ public class DatabaseService {
                        db.getSchema().setComment(rs.getString("schema_comment"));
                   }
               } catch (SQLException sqlException) {
-                  LOGGER.error(sql);
+                  LOGGER.error("Failed to initSchemas with SQL: '{}'",sql, sqlException);
                   throw sqlException;
               }
           }
@@ -222,36 +222,43 @@ public class DatabaseService {
 
             // add the newly defined tables and columns first
             for (TableMeta tableMeta : schemaMeta.getTables()) {
-                Table table;
-
-                if (tableMeta.getRemoteSchema() != null || tableMeta.getRemoteCatalog() != null) {
-                    // will add it if it doesn't already exist
-                    table = tableService.addRemoteTable(db, tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName(), db.getSchema().getName(), true);
-                } else {
-                    table = db.getLocals().get(tableMeta.getName());
-
-                    if (table == null) {
-                        // new table defined only in XML metadata
-                        table = new LogicalTable(db, db.getCatalog().getName(), db.getSchema().getName(), tableMeta.getName(), tableMeta.getComments());
-                        db.getTablesMap().put(table.getName(), table);
-                    }
-                }
-
+                Table table = addOrGetTable(db, tableMeta);
                 table.update(tableMeta);
             }
 
             // then tie the tables together
-            for (TableMeta tableMeta : schemaMeta.getTables()) {
-                Table table;
+            connectSchemaMeta(db, schemaMeta.getTables());
+        }
+    }
 
-                if (tableMeta.getRemoteCatalog() != null || tableMeta.getRemoteSchema() != null) {
-                    table = db.getRemoteTablesMap().get(db.getRemoteTableKey(tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName()));
-                } else {
-                    table = db.getLocals().get(tableMeta.getName());
-                }
+    private Table addOrGetTable(Database database, TableMeta tableMeta) throws SQLException {
+        Table table;
+        if (tableMeta.getRemoteSchema() != null || tableMeta.getRemoteCatalog() != null) {
+            // will add it if it doesn't already exist
+            table = tableService.addRemoteTable(database, tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName(), database.getSchema().getName(), true);
+        } else {
+            table = database.getLocals().get(tableMeta.getName());
 
-                tableService.connect(db, table, tableMeta, db.getLocals());
+            if (table == null) {
+                // new table defined only in XML metadata
+                table = new LogicalTable(database, database.getCatalog().getName(), database.getSchema().getName(), tableMeta.getName(), tableMeta.getComments());
+                database.getTablesMap().put(table.getName(), table);
             }
+        }
+        return table;
+    }
+
+    private void connectSchemaMeta(Database database, List<TableMeta> tableMetas) {
+        for (TableMeta tableMeta : tableMetas) {
+            Table table;
+
+            if (tableMeta.getRemoteCatalog() != null || tableMeta.getRemoteSchema() != null) {
+                table = database.getRemoteTablesMap().get(database.getRemoteTableKey(tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName()));
+            } else {
+                table = database.getLocals().get(tableMeta.getName());
+            }
+
+            tableService.connect(database, table, tableMeta, database.getLocals());
         }
     }
 
@@ -307,6 +314,7 @@ public class DatabaseService {
          * By default this does nothing since this implementation isn't threaded.
          */
         void join() {
+            //NO-OP in single threaded mode
         }
     }
 
@@ -329,11 +337,11 @@ public class DatabaseService {
                     try {
                         createImpl(db, tableMeta);
                     } catch (SQLException exc) {
-                        LOGGER.error("SQL exception",exc);
+                        LOGGER.error("Failed to create Table {}",tableMeta.getName(),exc);
                     } finally {
                         synchronized (threads) {
                             threads.remove(this);
-                            threads.notify();
+                            threads.notifyAll();
                         }
                     }
                 }
@@ -345,6 +353,7 @@ public class DatabaseService {
                     try {
                         threads.wait();
                     } catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
                     }
                 }
 
@@ -373,6 +382,7 @@ public class DatabaseService {
                 try {
                     thread.join();
                 } catch (InterruptedException exc) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -391,44 +401,58 @@ public class DatabaseService {
                                                    DatabaseMetaData metadata,
                                                    boolean forTables,
                                                    String... types) throws SQLException {
+        List<BasicTableMeta> basics = new ArrayList<>();
+        if (getBasicTableMetaFromSQL(config, db, forTables, basics)) {
+            return basics;
+        } else {
+           return getBasicTableMetaFromDatabaseMetaData(db, metadata, forTables, types);
+        }
+    }
+
+    private boolean getBasicTableMetaFromSQL(Config config, Database database, boolean forTables, List<BasicTableMeta> basics) throws SQLException {
         String queryName = forTables ? "selectTablesSql" : "selectViewsSql";
         String sql = config.getDbProperties().getProperty(queryName);
-        List<BasicTableMeta> basics = new ArrayList<>();
-
-
-        if (sql != null) {
-            String clazz = forTables ? "table" : "view";
-
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    String name = rs.getString(clazz + "_name");
-                    String cat = getOptionalString(rs, clazz + "_catalog");
-                    String sch = getOptionalString(rs, clazz + "_schema");
-                    if (cat == null && sch == null)
-                        sch = db.getSchema().getName();
-                    String remarks = getOptionalString(rs, clazz + "_comment");
-                    String viewDefinition = forTables ? null : getOptionalString(rs, "view_definition");
-                    String rows = forTables ? getOptionalString(rs, "table_rows") : null;
-                    long numRows = rows == null ? -1 : Long.parseLong(rows);
-
-                    basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, viewDefinition, numRows));
-                }
-            } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve " + clazz + " names with custom SQL", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
-            }
+        if (Objects.isNull(sql)) {
+            return false;
         }
+        String clazz = forTables ? "table" : "view";
+        try (PreparedStatement stmt = sqlService.prepareStatement(sql, database, null);
+             ResultSet rs = stmt.executeQuery()) {
 
-        if (basics.isEmpty()) {
+            while (rs.next()) {
+                String name = rs.getString(clazz + "_name");
+                String cat = getOptionalString(rs, clazz + "_catalog");
+                String sch = getOptionalString(rs, clazz + "_schema");
+                if (cat == null && sch == null)
+                    sch = database.getSchema().getName();
+                String remarks = getOptionalString(rs, clazz + "_comment");
+                String viewDefinition = forTables ? null : getOptionalString(rs, "view_definition");
+                String rows = forTables ? getOptionalString(rs, "table_rows") : null;
+                long numRows = rows == null ? -1 : Long.parseLong(rows);
+
+                basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, viewDefinition, numRows));
+            }
+        } catch (SQLException sqlException) {
+            LOGGER.warn("Failed to retrieve {} names using SQL: '{}'", clazz, sql, sqlException);
+            return false;
+        }
+        return true;
+    }
+
+    private List<BasicTableMeta> getBasicTableMetaFromDatabaseMetaData(
+            Database database,
+            DatabaseMetaData databaseMetaData,
+            boolean forTables,
+            String...types) throws SQLException {
+        List<BasicTableMeta> basics = new ArrayList<>();
+        try (ResultSet rs = databaseMetaData.getTables(
+                null,
+                database.getSchema().getName(),
+                "%",
+                types)){
             String lastTableName = null;
-            try (ResultSet rs = metadata.getTables(null, db.getSchema().getName(), "%", types)){
-                while (rs.next()) {
+            while (rs.next()) {
+                try {
                     String name = rs.getString("TABLE_NAME");
                     lastTableName = name;
                     String type = rs.getString("TABLE_TYPE");
@@ -437,19 +461,15 @@ public class DatabaseService {
                     String remarks = getOptionalString(rs, "REMARKS");
 
                     basics.add(new BasicTableMeta(cat, schem, name, type, remarks, null, -1));
+                } catch (SQLException sqlex) {
+                    if (forTables) {
+                        LOGGER.error("Failed to retrive table information", sqlex);
+                        throw sqlex;
+                    }
+                    LOGGER.warn("Ignoring view '{}' due to exception", lastTableName, sqlex);
                 }
-            } catch (SQLException exc) {
-                if (forTables)
-                    throw exc;
-
-                System.out.flush();
-                System.err.println();
-                System.err.println("Ignoring view " + lastTableName + " due to exception:");
-                exc.printStackTrace();
-                System.err.println("Continuing analysis.");
             }
         }
-
         return basics;
     }
 
@@ -474,17 +494,13 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(ColumnLabels.TABLE_NAME_LOWER);
                     Table table = db.getLocals().get(tableName);
                     if (table != null)
                         table.addCheckConstraint(rs.getString("constraint_name"), rs.getString("text"));
                 }
             } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve check constraints", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
+                LOGGER.warn("Failed to retrieve check constraints using SQL: '{}'", sql, sqlException);
             }
         }
     }
@@ -497,10 +513,10 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(ColumnLabels.TABLE_NAME_LOWER);
                     Table table = db.getLocals().get(tableName);
                     if (table != null) {
-                        String columnName = rs.getString("column_name");
+                        String columnName = rs.getString(ColumnLabels.COLUMN_NAME_LOWER);
                         TableColumn column = table.getColumn(columnName);
                         if (column != null) {
                             column.setTypeName(rs.getString("column_type"));
@@ -509,11 +525,7 @@ public class DatabaseService {
                     }
                 }
             } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve column type details", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
+                LOGGER.warn("Failed to retrieve column type details using SQL: '{}'", sql, sqlException);
             }
         }
     }
@@ -526,14 +538,13 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(ColumnLabels.TABLE_NAME_LOWER);
                     Table table = db.getLocals().get(tableName);
                     if (table != null)
                         table.setId(rs.getObject("table_id"));
                 }
             } catch (SQLException sqlException) {
-                System.err.println();
-                System.err.println(sql);
+                LOGGER.error("Failed to initTableIds with SQL: '{}'", sql, sqlException);
                 throw sqlException;
             }
         }
@@ -547,7 +558,7 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(ColumnLabels.TABLE_NAME_LOWER);
                     Table table = db.getLocals().get(tableName);
                     if (table != null) {
                         TableIndex index = table.getIndex(rs.getString("index_name"));
@@ -556,8 +567,7 @@ public class DatabaseService {
                     }
                 }
             } catch (SQLException sqlException) {
-                System.err.println();
-                System.err.println(sql);
+                LOGGER.error("Failed to initIndexIds with SQL: '{}'", sql, sqlException);
                 throw sqlException;
             }
         }
@@ -578,17 +588,13 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(ColumnLabels.TABLE_NAME_LOWER);
                     Table table = db.getLocals().get(tableName);
                     if (table != null)
-                        table.setComments(rs.getString("comments"));
+                        table.setComments(rs.getString(ColumnLabels.COMMENTS_LOWER));
                 }
             } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve table/view comments", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
+                LOGGER.warn("Failed to retrieve table comments using SQL: '{}'", sql, sqlException);
             }
         }
     }
@@ -608,18 +614,14 @@ public class DatabaseService {
                 while (rs.next()) {
                     String viewName = rs.getString("view_name");
                     if (viewName == null)
-                        viewName = rs.getString("table_name");
+                        viewName = rs.getString(ColumnLabels.TABLE_NAME_LOWER);
                     Table view = db.getViewsMap().get(viewName);
 
                     if (view != null)
-                        view.setComments(rs.getString("comments"));
+                        view.setComments(rs.getString(ColumnLabels.COMMENTS_LOWER));
                 }
             } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve table/view comments", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
+                LOGGER.warn("Failed to retrieve view comments using SQL: '{}'", sql, sqlException);
             }
         }
     }
@@ -639,20 +641,16 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(ColumnLabels.TABLE_NAME_LOWER);
                     Table table = db.getLocals().get(tableName);
                     if (table != null) {
-                        TableColumn column = table.getColumn(rs.getString("column_name"));
+                        TableColumn column = table.getColumn(rs.getString(ColumnLabels.COLUMN_NAME_LOWER));
                         if (column != null)
-                            column.setComments(rs.getString("comments"));
+                            column.setComments(rs.getString(ColumnLabels.COMMENTS_LOWER));
                     }
                 }
             } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve column comments", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
+                LOGGER.warn("Failed to retrieve table column comments using SQL: '{}'", sql, sqlException);
             }
         }
     }
@@ -672,21 +670,17 @@ public class DatabaseService {
                 while (rs.next()) {
                     String viewName = rs.getString("view_name");
                     if (viewName == null)
-                        viewName = rs.getString("table_name");
+                        viewName = rs.getString(ColumnLabels.TABLE_NAME_LOWER);
                     Table view = db.getViewsMap().get(viewName);
 
                     if (view != null) {
-                        TableColumn column = view.getColumn(rs.getString("column_name"));
+                        TableColumn column = view.getColumn(rs.getString(ColumnLabels.COLUMN_NAME_LOWER));
                         if (column != null)
-                            column.setComments(rs.getString("comments"));
+                            column.setComments(rs.getString(ColumnLabels.COMMENTS_LOWER));
                     }
                 }
             } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve view column comments", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
+                LOGGER.warn("Failed to retrieve view column comments using SQL: '{}'", sql, sqlException);
             }
         }
     }
@@ -721,11 +715,7 @@ public class DatabaseService {
                     db.getRoutinesMap().put(routineName, routine);
                 }
             } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve stored procedure/function details", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
+                LOGGER.warn("Failed to retrieve stored procedure/function details using SQL: '{}'", sql, sqlException);
             }
         }
 
@@ -751,11 +741,7 @@ public class DatabaseService {
 
                 }
             } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = progressListener.recoverableExceptionEncountered("Failed to retrieve stored procedure/function details", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
+                LOGGER.warn("Failed to retrieve stored procedure/function parameter details using SQL: '{}'", sql, sqlException);
             }
         }
     }
