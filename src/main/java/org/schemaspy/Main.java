@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 
 import java.lang.invoke.MethodHandles;
@@ -53,13 +54,15 @@ public class Main implements CommandLineRunner {
     @Autowired
     private ApplicationContext context;
 
-    public static void main(String... args) throws Exception {
-        LogLevelConditionalThrowableProxyConverter.register();
-        SpringApplication.run(Main.class, args);
+    public static void main(String... args) {
+        new SpringApplicationBuilder()
+                .initializers(new LogLevelConditionalThrowableProxyConverter())
+                .sources(Main.class)
+                .run(args);
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (arguments.isHelpRequired()) {
             commandLineArgumentParser.printUsage();
             exitApplication(0);
