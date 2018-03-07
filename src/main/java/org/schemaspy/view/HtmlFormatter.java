@@ -25,6 +25,7 @@ import java.net.URLEncoder;
 
 import com.github.mustachejava.util.HtmlEscaper;
 import org.schemaspy.Config;
+import org.schemaspy.model.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +33,6 @@ public class HtmlFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected final boolean encodeComments = Config.getInstance().isEncodeCommentsEnabled();
-    private   final boolean isMetered = Config.getInstance().isMeterEnabled();
     protected final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
 
     protected HtmlFormatter() {
@@ -48,9 +48,6 @@ public class HtmlFormatter {
         return "";
     }
 
-    protected boolean sourceForgeLogoEnabled() {
-        return Config.getInstance().isLogoEnabled();
-    }
 
 
     /**
@@ -69,8 +66,23 @@ public class HtmlFormatter {
         try {
             return URLEncoder.encode(string, Config.DOT_CHARSET).replace("+","%20");
         } catch (UnsupportedEncodingException e) {
-            LOGGER.info("Error trying to urlEncode string [{}] with encoding [" + Config.DOT_CHARSET + "]", string);
+        	LOGGER.info("Error trying to urlEncode string [{}] with encoding [{}]", string, Config.DOT_CHARSET);
             return string;
         }
+    }
+    
+    public String getDatabaseName(Database db) {
+        StringBuilder description = new StringBuilder();
+
+        description.append(db.getName());
+        if (db.getSchema() != null) {
+            description.append('.');
+            description.append(db.getSchema().getName());
+        } else if (db.getCatalog() != null) {
+            description.append('.');
+            description.append(db.getCatalog().getName());
+        }
+
+        return description.toString();
     }
 }

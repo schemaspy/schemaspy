@@ -20,14 +20,18 @@ package org.schemaspy.view;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.TreeSet;
 
 import org.schemaspy.DbAnalyzer;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.Markdown;
 
 /**
@@ -104,7 +108,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         scopes.put("schema", new MustacheSchema(database.getSchema(), ""));
         scopes.put("catalog", new MustacheCatalog(database.getCatalog(), ""));
         
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", database.getName(), false);
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", databaseName, false);
         mw.write("main.html", "index.html", "main.js");
     }
 
@@ -119,18 +123,5 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         return anomalies;
     }
 
-    private String getDatabaseName(Database db) {
-        StringBuilder description = new StringBuilder();
 
-        description.append(db.getName());
-        if (db.getSchema() != null) {
-            description.append('.');
-            description.append(db.getSchema().getName());
-        } else if (db.getCatalog() != null) {
-            description.append('.');
-            description.append(db.getCatalog().getName());
-        }
-
-        return description.toString();
-    }
 }

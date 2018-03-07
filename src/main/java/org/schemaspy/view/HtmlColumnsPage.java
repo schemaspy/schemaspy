@@ -149,7 +149,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
         scopes.put("columns", tableColumns);
         scopes.put("paginationEnabled",database.getConfig().isPaginationEnabled());
 
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), database.getName(), false);
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
         mw.write("column.html", "columns.html", "column.js");
     }
 
