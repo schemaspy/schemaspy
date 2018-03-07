@@ -18,15 +18,12 @@ LABEL JTDS_VERSION=$JTDS_VERSION
 LABEL GIT_BRANCH=$GIT_BRANCH
 LABEL GIT_REVISION=$GIT_REVISION
 
+ADD docker/open-sans.tar.gz /usr/share/fonts/
+
 RUN adduser java -h / -D && \
     set -x && \
     apk add --no-cache curl unzip graphviz fontconfig && \
-    cd /tmp && \
-    curl https://www.fontsquirrel.com/fonts/download/open-sans -J -O && \
-    unzip open-sans.zip -d /usr/share/fonts && \
     fc-cache -fv && \
-    cd / && \
-    rm -f /tmp/open-sans.zip && \
     mkdir /drivers_inc && \
     cd /drivers_inc && \
     curl -JLO http://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/$MYSQL_VERSION/mysql-connector-java-$MYSQL_VERSION.jar && \
