@@ -52,12 +52,12 @@ public class Main implements CommandLineRunner {
     @Autowired
     private ApplicationContext context;
 
-    public static void main(String... args) throws Exception {
+    public static void main(String... args) {
         SpringApplication.run(Main.class, args);
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (arguments.isHelpRequired()) {
             commandLineArgumentParser.printUsage();
             exitApplication(0);
@@ -85,15 +85,12 @@ public class Main implements CommandLineRunner {
             LOGGER.warn("Empty schema", noData);
             rc = 2;
         } catch (InvalidConfigurationException badConfig) {
-            LOGGER.info("");
-            if (badConfig.getParamName() != null)
-                LOGGER.warn("Bad parameter specified for {}", badConfig.getParamName());
-            LOGGER.warn("Bad config {}", badConfig.getMessage());
-            if (badConfig.getCause() != null && !badConfig.getMessage().endsWith(badConfig.getMessage()))
-                LOGGER.warn(" caused by {}", badConfig.getCause().getMessage());
-
             LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
-            LOGGER.debug("Invalid configuration detected", badConfig);
+            if (badConfig.getParamName() != null) {
+                LOGGER.error("Bad parameter '{} {}' , {}", badConfig.getParamName(), badConfig.getParamValue(), badConfig.getMessage(), badConfig);
+            } else {
+                LOGGER.error("Bad config {}", badConfig.getMessage(), badConfig);
+            }
         } catch (ProcessExecutionException badLaunch) {
             LOGGER.warn(badLaunch.getMessage(), badLaunch);
         } catch (Exception exc) {

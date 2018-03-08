@@ -1,7 +1,7 @@
 SchemaMeta
 ==========
 
-Is a way to modify the processing in and output from SchemaSpy.
+Is a way to modify input that will affect output from SchemaSpy.
 
     * :ref:`schemameta-comment`
     * :ref:`schemameta-add-foreignKey`

@@ -1,10 +1,10 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.ParameterException;
+import org.junit.Rule;
 import org.junit.Test;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
+import org.schemaspy.testing.Logger;
+import org.schemaspy.testing.LoggingRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,6 +15,9 @@ import static org.mockito.Mockito.mock;
 public class CommandLineArgumentParserTest {
 
     private static final PropertyFileDefaultProvider NO_DEFAULT_PROVIDER = null;
+
+    @Rule
+    public LoggingRule loggingRule = new LoggingRule();
 
     @Test
     public void givenNoRequiredParameterProvided_AndNoDefaultProvider_ExpectError() {
@@ -42,16 +45,15 @@ public class CommandLineArgumentParserTest {
      */
     @Test
     public void givenAllRequiredParamsProvided_ExpectToSuccessfullyParseCommandLineArguments() throws Exception {
-        Path myOutputDirecotry = Files.createTempDirectory("myOutputDirecotry");
-
         String[] args = {
-                "-o", myOutputDirecotry.toString(),
-                "-u", "MyUser"};
+                "-o", "aFolder",
+                "-u", "MyUser"
+        };
         CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
 
         CommandLineArguments arguments = parser.parse(args);
 
-        assertThat(arguments.getOutputDirectory()).isEqualTo(myOutputDirecotry.toFile());
+        assertThat(arguments.getOutputDirectory().getPath()).isEqualTo("aFolder");
         assertThat(arguments.getUser()).isEqualTo("MyUser");
     }
 
@@ -67,6 +69,68 @@ public class CommandLineArgumentParserTest {
 
         assertThat(commandLineArguments.getOutputDirectory()).isNotNull();
         assertThat(commandLineArguments.getUser()).isNotNull();
+    }
+
+    @Test
+    public void ssoIsEnabledOnCommandLineUserIsNotRequired() {
+        String[] args = {
+                "-o", "aFolder",
+                "-sso"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+
+        CommandLineArguments arguments = parser.parse(args);
+
+        assertThat(arguments.getOutputDirectory().getPath()).isEqualTo("aFolder");
+        assertThat(arguments.getUser()).isNull();
+    }
+
+    @Test
+    public void ssoIsEnabledInPropertiesFileUserIsNotRequired() {
+        PropertyFileDefaultProvider defaultProvider = mock(PropertyFileDefaultProvider.class);
+        given(defaultProvider.getDefaultValueFor("schemaspy.outputDirectory")).willReturn("mydirectory");
+        given(defaultProvider.getDefaultValueFor("schemaspy.sso")).willReturn(Boolean.TRUE.toString());
+
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(defaultProvider);
+
+        CommandLineArguments commandLineArguments = parser.parse();
+
+        assertThat(commandLineArguments.getOutputDirectory()).isNotNull();
+        assertThat(commandLineArguments.getUser()).isNull();
+    }
+
+    @Test
+    @Logger(CommandLineArgumentParser.class)
+    public void printUsage() {
+        String[] args = {
+                "-o", "aFolder",
+                "-sso"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+
+        CommandLineArguments arguments = parser.parse(args);
+        parser.printUsage();
+        assertThat(loggingRule.getLog()).contains("Options:");
+    }
+
+    @Test
+    public void onlyHelpSetsHelpRequiredShowsHelp() {
+        String[] args = {
+                "-help"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        assertThat(arguments.isHelpRequired()).isTrue();
+    }
+
+    @Test
+    public void onlyDBHelpSetsDBHelpRequired() {
+        String[] args = {
+                "-dbHelp"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        assertThat(arguments.isDbHelpRequired()).isTrue();
     }
 
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.

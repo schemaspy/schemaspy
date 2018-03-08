@@ -1,3 +1,4 @@
 *
+!docker/open-sans.tar.gz
 !docker/entrypoint.sh
 !target/schema*.jar

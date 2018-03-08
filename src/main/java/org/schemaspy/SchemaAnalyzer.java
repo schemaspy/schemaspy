@@ -38,7 +38,6 @@ import org.schemaspy.util.ResourceWriter;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -56,7 +55,6 @@ import java.util.stream.Collectors;
  * @author John Currier
  * @author Nils Petzaell
  */
-@Component
 public class SchemaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -423,10 +421,11 @@ public class SchemaAnalyzer {
 
         String driverClass = properties.getProperty("driver");
         String driverPath = properties.getProperty("driverPath");
-        if (driverPath == null)
+        if (Objects.isNull(driverPath))
             driverPath = "";
-        if (config.getDriverPath() != null)
-            driverPath = config.getDriverPath() + File.pathSeparator + driverPath;
+
+        if (Objects.nonNull(config.getDriverPath()))
+            driverPath = config.getDriverPath();
 
         DbDriverLoader driverLoader = new DbDriverLoader();
         return driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);

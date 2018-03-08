@@ -12,7 +12,6 @@ import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ConnectionURLBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -28,7 +27,6 @@ import java.util.*;
  * @author Rafal Kasa
  * @author Nils Petzaell
  */
-@Service
 public class SqlService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

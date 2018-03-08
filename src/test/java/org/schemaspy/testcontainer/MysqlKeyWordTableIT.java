@@ -32,7 +32,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MysqlKeyWordTable {
+public class MysqlKeyWordTableIT {
 
     @Autowired
     private SqlService sqlService;

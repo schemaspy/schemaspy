@@ -9,12 +9,9 @@ import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.util.Markdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import java.sql.*;
 
 import java.lang.invoke.MethodHandles;
-
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
@@ -23,7 +20,6 @@ import java.util.regex.Pattern;
 /**
  * Created by rkasa on 2016-12-05.
  */
-@Service
 public class TableService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -554,13 +550,20 @@ public class TableService {
         try (ResultSet rs = db.getMetaData().getIndexInfo(table.getCatalog(), table.getSchema(), table.getName(), false, true)){
 
             while (rs.next()) {
-                if (rs.getShort("TYPE") != DatabaseMetaData.tableIndexStatistic)
+                if (isIndexRow(rs))
                     addIndex(table, rs);
             }
         } catch (SQLException exc) {
             if (!table.isLogical())
                 LOGGER.warn("Unable to extract index info for table '{}' in schema '{}': {}", table.getName(), table.getContainer(), exc);
         }
+    }
+
+    //This is to handle a problem with informix and lvarchar Issue 215. It's been reported to IBM.
+    //According to DatabaseMetaData.getIndexInfo() ORDINAL_POSITION is zero when type is tableIndexStatistic.
+    //Problem with informix is that lvarchar is reported back as TYPE = tableIndexOther and ORDINAL_POSITION = 0.
+    private boolean isIndexRow(ResultSet rs) throws SQLException {
+        return rs.getShort("TYPE") != DatabaseMetaData.tableIndexStatistic && rs.getShort("ORDINAL_POSITION") > 0;
     }
 
     /**
