@@ -93,7 +93,13 @@ public class OracleSpacesIT {
         given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
+        Database database = new Database(
+                databaseMetaData,
+                arguments.getDatabaseName(),
+                arguments.getCatalog(),
+                arguments.getSchema(),
+                null
+        );
         databaseService.gatheringSchemaDetails(config, database, progressListener);
         this.database = database;
     }

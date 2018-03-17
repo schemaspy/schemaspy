@@ -22,7 +22,6 @@ import org.testcontainers.containers.MySQLContainer;
 import java.io.File;
 import java.io.IOException;
 import java.sql.DatabaseMetaData;
-import java.sql.Driver;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -84,10 +83,14 @@ public class MysqlRoutinesIT {
         given(arguments.getDatabaseName()).willReturn("test");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
+        Database database = new Database(
+                databaseMetaData,
+                arguments.getDatabaseName(),
+                arguments.getCatalog(),
+                arguments.getSchema(),
+                null
+        );
         databaseService.gatheringSchemaDetails(config, database, progressListener);
-        Driver driver = jdbcContainerRule.getContainer().getJdbcDriverInstance();
-        System.out.println("" + driver.getMajorVersion() + "." + driver.getMinorVersion());
         this.database = database;
     }
 
