@@ -82,7 +82,7 @@ public class SchemaMeta {
         Document doc = parse(metaFile);
 
         NodeList commentsNodes = doc.getElementsByTagName("comments");
-        if (commentsNodes != null && commentsNodes.getLength() > 0)
+        if (commentsNodes != null && commentsNodes.getLength() > 0 && commentsNodes.item(0).hasChildNodes())
             comments = commentsNodes.item(0).getTextContent();
         else
             comments = null;

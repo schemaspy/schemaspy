@@ -209,7 +209,7 @@ public class DatabaseService {
     private void updateFromXmlMetadata(Config config, Database db, SchemaMeta schemaMeta) throws SQLException {
         if (schemaMeta != null) {
             if (Objects.nonNull(schemaMeta.getComments())) {
-                config.setDescription(schemaMeta.getComments());
+                db.getSchema().setComment(schemaMeta.getComments());
             }
 
             // done in three passes:

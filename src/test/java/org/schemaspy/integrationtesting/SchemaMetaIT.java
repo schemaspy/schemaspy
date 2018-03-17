@@ -1,6 +1,9 @@
 package org.schemaspy.integrationtesting;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -123,8 +126,6 @@ public class SchemaMetaIT {
     }
 
     @Test
-    @Ignore
-    //Reported as issue #199
     public void commentsAreReplacedWithReplaceComments() throws Exception {
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/replaceComments.xml","SchemaMetaIT", schema);
         Database database = new Database(null, databaseMetaData, "SchemaMetaIT", catalog, schema, schemaMeta, progressListener);
