@@ -5,10 +5,9 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.*;
+import org.schemaspy.model.Database;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +17,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 
-import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.SQLException;
@@ -39,9 +36,6 @@ public class MysqlRoutinesIT {
 
     @Autowired
     private DatabaseService databaseService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     @MockBean
     private CommandLineArguments arguments;
@@ -85,8 +79,15 @@ public class MysqlRoutinesIT {
         given(arguments.getDatabaseName()).willReturn("test");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        Database database = new Database(
+                config,
+                databaseMetaData,
+                arguments.getDatabaseName(),
+                arguments.getCatalog(),
+                arguments.getSchema(),
+                null
+        );
+        databaseService.gatheringSchemaDetails(config, database);
         Driver driver = jdbcContainerRule.getContainer().getJdbcDriverInstance();
         System.out.println("" + driver.getMajorVersion() + "." + driver.getMinorVersion());
         this.database = database;

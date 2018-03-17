@@ -3,14 +3,11 @@ package org.schemaspy.testcontainer;
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.service.DatabaseService;
@@ -20,12 +17,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MSSQLServerContainer;
-import org.testcontainers.containers.OracleContainer;
-import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.jdbc.ContainerDatabaseDriver;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -47,9 +39,6 @@ public class MSSQLServerIT {
 
     @Autowired
     private DatabaseService databaseService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     @MockBean
     private CommandLineArguments arguments;
@@ -93,8 +82,15 @@ public class MSSQLServerIT {
         given(arguments.getDatabaseName()).willReturn("test");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        Database database = new Database(
+                config,
+                databaseMetaData,
+                arguments.getDatabaseName(),
+                arguments.getCatalog(),
+                arguments.getSchema(),
+                null
+        );
+        databaseService.gatheringSchemaDetails(config, database);
         this.database = database;
     }
 
@@ -119,6 +115,6 @@ public class MSSQLServerIT {
     }
 
     private Table getTable(String tableName) {
-        return database.getTablesByName().get(tableName);
+        return database.getTablesMap().get(tableName);
     }
 }

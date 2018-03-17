@@ -40,7 +40,6 @@ import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.DatabaseMetaData;
@@ -997,10 +996,10 @@ public final class Config {
                     if (name.length() > 0)
                         schemas.add(name);
                 }
-
-                if (schemas.isEmpty())
-                    schemas = null;
             }
+        }
+        if (Objects.isNull(schemas)) {
+            schemas = new ArrayList<>();
         }
 
         return schemas;

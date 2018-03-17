@@ -4,11 +4,9 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.H2MemoryRule;
@@ -41,9 +39,6 @@ public class H2KeywordIT {
     @Autowired
     private DatabaseService databaseService;
 
-    @Mock
-    private ProgressListener progressListener;
-
     @MockBean
     private CommandLineArguments arguments;
 
@@ -75,8 +70,15 @@ public class H2KeywordIT {
         given(arguments.getDatabaseName()).willReturn("h2keyword");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        Database database = new Database(
+                config,
+                databaseMetaData,
+                arguments.getDatabaseName(),
+                arguments.getCatalog(),
+                arguments.getSchema(),
+                null
+        );
+        databaseService.gatheringSchemaDetails(config, database);
         this.database = database;
     }
 

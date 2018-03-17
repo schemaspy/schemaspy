@@ -18,6 +18,11 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.model.*;
+import org.schemaspy.util.Inflection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -25,11 +30,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
-
-import org.schemaspy.model.*;
-import org.schemaspy.util.Inflection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DbAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -321,7 +321,7 @@ public class DbAnalyzer {
      * @param meta DatabaseMetaData
      */
     public static List<String> getSchemas(DatabaseMetaData meta) throws SQLException {
-        List<String> schemas = new ArrayList<String>();
+        List<String> schemas = new ArrayList<>();
 
         ResultSet rs = meta.getSchemas();
         while (rs.next()) {
@@ -372,7 +372,7 @@ public class DbAnalyzer {
             }
         }
 
-        return new ArrayList<String>(schemas);
+        return new ArrayList<>(schemas);
     }
 
     /**

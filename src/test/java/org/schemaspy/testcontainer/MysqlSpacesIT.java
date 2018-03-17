@@ -6,7 +6,6 @@ import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.*;
@@ -45,9 +44,6 @@ public class MysqlSpacesIT {
 
     @Autowired
     private DatabaseService databaseService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     @MockBean
     private CommandLineArguments arguments;
@@ -92,8 +88,15 @@ public class MysqlSpacesIT {
         given(arguments.getDatabaseName()).willReturn("TEST 1.0");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        Database database = new Database(
+                config,
+                databaseMetaData,
+                arguments.getDatabaseName(),
+                arguments.getCatalog(),
+                arguments.getSchema(),
+                null
+        );
+        databaseService.gatheringSchemaDetails(config, database);
         this.database = database;
     }
 
@@ -110,23 +113,23 @@ public class MysqlSpacesIT {
 
     @Test
     public void tableShouldHavePKWithAutoIncrement() {
-        assertThat(database.getTablesByName().get("TABLE 1.0").getColumns()).extracting(TableColumn::getName).contains("id");
-        assertThat(database.getTablesByName().get("TABLE 1.0").getColumn("id").isPrimary()).isTrue();
-        assertThat(database.getTablesByName().get("TABLE 1.0").getColumn("id").isAutoUpdated()).isTrue();
+        assertThat(database.getTablesMap().get("TABLE 1.0").getColumns()).extracting(TableColumn::getName).contains("id");
+        assertThat(database.getTablesMap().get("TABLE 1.0").getColumn("id").isPrimary()).isTrue();
+        assertThat(database.getTablesMap().get("TABLE 1.0").getColumn("id").isAutoUpdated()).isTrue();
     }
 
     @Test
     public void tableShouldHaveForeignKey() {
-        assertThat(database.getTablesByName().get("TABLE 1.0").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
+        assertThat(database.getTablesMap().get("TABLE 1.0").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
     }
 
     @Test
     public void tableShouldHaveUniqueKey() {
-        assertThat(database.getTablesByName().get("TABLE 1.0").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
+        assertThat(database.getTablesMap().get("TABLE 1.0").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
     }
 
     @Test
     public void tableShouldHaveColumnWithSpaceInIt() {
-        assertThat(database.getTablesByName().get("TABLE 1.0").getColumns()).extracting(TableColumn::getName).contains("link id");
+        assertThat(database.getTablesMap().get("TABLE 1.0").getColumns()).extracting(TableColumn::getName).contains("link id");
     }
 }

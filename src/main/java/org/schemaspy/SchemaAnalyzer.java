@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004-2011 John Currier
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2017-2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -51,6 +51,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.schemaspy.util.LazyString.lazyString;
+
 /**
  * @author John Currier
  * @author Nils Petzaell
@@ -64,12 +66,15 @@ public class SchemaAnalyzer {
 
     private final CommandLineArguments commandLineArguments;
 
+    private final ProgressListener progressListener;
+
     private final List<OutputProducer> outputProducers = new ArrayList<>();
 
-    public SchemaAnalyzer(SqlService sqlService, DatabaseService databaseService, CommandLineArguments commandLineArguments) {
+    public SchemaAnalyzer(SqlService sqlService, DatabaseService databaseService, CommandLineArguments commandLineArguments, ProgressListener progressListener) {
         this.sqlService = Objects.requireNonNull(sqlService);
         this.databaseService = Objects.requireNonNull(databaseService);
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
+        this.progressListener = Objects.requireNonNull(progressListener);
         addOutputProducer(new XmlProducerUsingDOM());
     }
 
@@ -79,53 +84,47 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze(Config config) throws SQLException, IOException {
-        // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
-        // and not already logging fine details (to keep from obfuscating those)
-
-        boolean render = config.isHtmlGenerationEnabled();
-        ProgressListener progressListener = new ConsoleProgressListener(render, commandLineArguments);
-
         // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
         List<String> schemas = config.getSchemas();
-        if (schemas != null || config.isEvaluateAllEnabled()) {
-            return this.analyzeMultipleSchemas(config, progressListener);
+        if (!schemas.isEmpty() || config.isEvaluateAllEnabled()) {
+            return this.analyzeMultipleSchemas(config);
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
-            return analyze(schema, config, outputDirectory, progressListener);
+            return analyze(schema, config, outputDirectory);
         }
     }
 
-    public Database analyzeMultipleSchemas(Config config, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyzeMultipleSchemas(Config config) throws SQLException, IOException {
         try {
             // following params will be replaced by something appropriate
             List<String> args = config.asList();
             args.remove("-schemas");
             args.remove("-schemata");
 
-            List<String> schemas = config.getSchemas();
+            final List<String> schemas = config.getSchemas();
             Database db = null;
             String schemaSpec = config.getSchemaSpec();
             Connection connection = this.getConnection(config);
             DatabaseMetaData meta = connection.getMetaData();
             //-all(evaluteAll) given then get list of the database schemas
-            if (schemas == null || config.isEvaluateAllEnabled()) {
+            if (schemas.isEmpty() || config.isEvaluateAllEnabled()) {
                 if (schemaSpec == null)
                     schemaSpec = ".*";
                 LOGGER.info(
                         "Analyzing schemas that match regular expression '{}'. " +
                         "(use -schemaSpec on command line or in .properties to exclude other schemas)",
                         schemaSpec);
-                schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false);
+                schemas.addAll(DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false));
                 if (schemas.isEmpty())
-                    schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
+                    schemas.addAll(DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true));
                 if (schemas.isEmpty())
                     schemas.add(config.getUser());
             }
-
-            LOGGER.info("Analyzing schemas: " + System.lineSeparator() + "{}",
-                    schemas.stream().collect(Collectors.joining(System.lineSeparator())));
+            LOGGER.info("Analyzing schemas: {}{}",
+                    lazyString(System::lineSeparator),
+                    lazyString(() -> schemas.stream().collect(Collectors.joining(System.lineSeparator()))));
 
             String dbName = config.getDb();
             File outputDir = commandLineArguments.getOutputDirectory();
@@ -145,7 +144,7 @@ public class SchemaAnalyzer {
 
                 LOGGER.info("Analyzing {}", schema);
                 File outputDirForSchema = new File(outputDir, schema);
-                db = this.analyze(schema, config, outputDirForSchema, progressListener);
+                db = this.analyze(schema, config, outputDirForSchema);
                 if (db == null) //if any of analysed schema returns null
                     return null;
                 mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
@@ -162,7 +161,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    public Database analyze(String schema, Config config, File outputDir, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyze(String schema, Config config, File outputDir) throws SQLException, IOException {
         try {
             LOGGER.info("Starting schema analysis");
 
@@ -198,8 +197,8 @@ public class SchemaAnalyzer {
             //
             // create our representation of the database
             //
-            Database db = new Database(config, meta, dbName, catalog, schema, schemaMeta, progressListener);
-            databaseService.gatheringSchemaDetails(config, db, progressListener);
+            Database db = new Database(config, meta, dbName, catalog, schema, schemaMeta);
+            databaseService.gatheringSchemaDetails(config, db);
 
             long duration = progressListener.startedGraphingSummaries();
 
@@ -213,7 +212,7 @@ public class SchemaAnalyzer {
             }
 
             if (config.isHtmlGenerationEnabled()) {
-                generateHtmlDoc(config, progressListener, outputDir, db, duration, tables);
+                generateHtmlDoc(config, outputDir, db, duration, tables);
             }
 
             outputProducers.forEach(
@@ -279,7 +278,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    private void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
+    private void generateHtmlDoc(Config config, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
         LineWriter out;
         LOGGER.info("Gathered schema details in {} seconds", duration / 1000);
         LOGGER.info("Writing/graphing summary");
@@ -296,7 +295,7 @@ public class SchemaAnalyzer {
         // note that this is done before 'hasRealRelationships' gets evaluated so
         // we get a relationships ER diagram
         if (config.isRailsEnabled())
-            DbAnalyzer.getRailsConstraints(db.getTablesByName());
+            DbAnalyzer.getRailsConstraints(db.getTablesMap());
 
         File summaryDir = new File(outputDir, "diagrams/summary");
 
@@ -384,7 +383,7 @@ public class SchemaAnalyzer {
         LOGGER.info("Completed summary in {} seconds", duration / 1000);
         LOGGER.info("Writing/diagramming details");
 
-        generateTables(progressListener, outputDir, db, tables, stats);
+        generateTables(outputDir, db, tables, stats);
         HtmlComponentPage.getInstance().write(db, tables, outputDir);
     }
 
@@ -429,7 +428,7 @@ public class SchemaAnalyzer {
         return driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);
     }
 
-    private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
+    private void generateTables(File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
         HtmlTablePage tableFormatter = HtmlTablePage.getInstance();
         for (Table table : tables) {
             progressListener.graphingDetailsProgressed(table);
@@ -448,15 +447,15 @@ public class SchemaAnalyzer {
      */
     private static void dumpNoTablesMessage(String schema, String user, DatabaseMetaData meta, boolean specifiedInclusions) throws SQLException {
         LOGGER.warn("No tables or views were found in schema '{}'.", schema);
-        List<String> schemas;
+        final List<String> schemas = new ArrayList<>();
         try {
-            schemas = DbAnalyzer.getSchemas(meta);
+            schemas.addAll(DbAnalyzer.getSchemas(meta));
         } catch (SQLException | RuntimeException exc) {
             LOGGER.error("The user you specified '{}' might not have rights to read the database metadata.", user, exc);
             return;
         }
 
-        if (Objects.isNull(schemas)) {
+        if (schemas.isEmpty()) {
             LOGGER.error("Failed to retrieve any schemas");
             return;
         } else if (schemas.contains(schema)) {
@@ -476,15 +475,16 @@ public class SchemaAnalyzer {
                     "Also not that schema names are usually case sensitive.",
                     schema, user);
             LOGGER.info(
-                    "Available schemas(Some of these may be user or system schemas):" +
-                    System.lineSeparator() + "{}",
-                    schemas.stream().collect(Collectors.joining(System.lineSeparator())));
-            List<String> populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta);
+                    "Available schemas(Some of these may be user or system schemas):{}{}",
+                    lazyString(System::lineSeparator),
+                    lazyString(() -> schemas.stream().collect(Collectors.joining(System.lineSeparator()))));
+            final List<String> populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta);
             if (populatedSchemas.isEmpty()) {
                 LOGGER.error("Unable to determine if any of the schemas contain tables/views");
             } else {
-                LOGGER.info("Schemas with tables/views visible to '{}':" + System.lineSeparator() + "{}",
-                        populatedSchemas.stream().collect(Collectors.joining(System.lineSeparator())));
+                LOGGER.info("Schemas with tables/views visible to '{}':{}{}",
+                        lazyString(System::lineSeparator),
+                        lazyString(()->populatedSchemas.stream().collect(Collectors.joining(System.lineSeparator()))));
             }
         }
     }

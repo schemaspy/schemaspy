@@ -2,6 +2,8 @@ package org.schemaspy;
 
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.cli.*;
+import org.schemaspy.model.ConsoleProgressListener;
+import org.schemaspy.model.ProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,9 +73,16 @@ public class SchemaSpyConfiguration {
         }
     }
 
-    public void enableDebug() {
+    private void enableDebug() {
         loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
         LOGGER.debug("Debug enabled");
     }
 
+    @Bean
+    public ProgressListener progressListener(CommandLineArguments commandLineArguments) {
+        // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
+        // and not already logging fine details (to keep from obfuscating those)
+        boolean render = !commandLineArguments.isSkipHtml();
+        return new ConsoleProgressListener(render, commandLineArguments);
+    }
 }

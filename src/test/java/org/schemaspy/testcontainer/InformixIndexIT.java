@@ -7,10 +7,12 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.*;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+import org.schemaspy.model.TableIndex;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
@@ -38,9 +40,6 @@ public class InformixIndexIT {
 
     @Autowired
     private DatabaseService databaseService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     @MockBean
     private CommandLineArguments arguments;
@@ -91,8 +90,15 @@ public class InformixIndexIT {
         given(arguments.getDatabaseName()).willReturn("test");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        Database database = new Database(
+                config,
+                databaseMetaData,
+                arguments.getDatabaseName(),
+                arguments.getCatalog(),
+                arguments.getSchema(),
+                null
+        );
+        databaseService.gatheringSchemaDetails(config, database);
         this.database = database;
     }
 
@@ -122,6 +128,6 @@ public class InformixIndexIT {
     }
 
     private Table getTable(String tableName) {
-        return database.getTablesByName().get(tableName);
+        return database.getTablesMap().get(tableName);
     }
 }

@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,27 +39,30 @@ public class Database {
     private final String databaseName ;
     private final Catalog catalog ;
     private final Schema schema;
-    private final Map<String, Table> tables = new CaseInsensitiveMap<Table>();
-    private final Map<String, View> views = new CaseInsensitiveMap<View>();
-    private final Map<String, Table> remoteTables = new CaseInsensitiveMap<Table>(); // key: schema.tableName
+    private final Map<String, Table> tables = new CaseInsensitiveMap<>();
+    private final Map<String, View> views = new CaseInsensitiveMap<>();
+    private final Map<String, Table> remoteTables = new CaseInsensitiveMap<>(); // key: schema.tableName
     private final Map<String, Table> locals = new CombinedMap(tables, views);
-    private final Map<String, Routine> routines = new CaseInsensitiveMap<Routine>();
+    private final Map<String, Routine> routines = new CaseInsensitiveMap<>();
     private final DatabaseMetaData meta;
     private final SchemaMeta schemaMeta;
-    private final String connectTime = new SimpleDateFormat("EEE MMM dd HH:mm z yyyy").format(new Date());
     private Set<String> sqlKeywords;
     private Pattern invalidIdentifierPattern;
-	private final ProgressListener listener;
 
-    public Database(Config config, DatabaseMetaData meta, String name, String catalog, String schema, SchemaMeta schemaMeta,
-    				ProgressListener progressListener) throws SQLException, MissingResourceException {
+    public Database(
+            Config config,
+            DatabaseMetaData meta,
+            String name,
+            String catalog,
+            String schema,
+            SchemaMeta schemaMeta
+    ) {
         this.config = config;
         this.meta = meta;
         this.schemaMeta = schemaMeta;
         this.databaseName = name;
         this.catalog = new Catalog(catalog);
         this.schema = new Schema(schema);
-        this.listener = progressListener;
     }
 
     public String getName() {
@@ -94,15 +96,6 @@ public class Database {
     }
 
     public Map<String, Table> getTablesMap() {
-        return tables;
-    }
-
-    /**
-     * Return a {@link Map} of all {@link Table}s keyed by their name.
-     *
-     * @return
-     */
-    public Map<String, Table> getTablesByName() {
         return tables;
     }
 
@@ -140,10 +133,6 @@ public class Database {
 
     public SchemaMeta getSchemaMeta() {
         return schemaMeta;
-    }
-
-    public String getConnectTime() {
-        return connectTime;
     }
 
     public String getDatabaseProduct() {
@@ -387,7 +376,7 @@ public class Database {
         }
 
         private Map<String, Table> getCombined() {
-            Map<String, Table> all = new CaseInsensitiveMap<Table>(size());
+            Map<String, Table> all = new CaseInsensitiveMap<>(size());
             all.putAll(map1);
             all.putAll(map2);
             return all;
