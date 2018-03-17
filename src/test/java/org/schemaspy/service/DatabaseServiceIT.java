@@ -66,7 +66,7 @@ public class DatabaseServiceIT {
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         String schema = h2MemoryRule.getConnection().getSchema();
         String catalog = h2MemoryRule.getConnection().getCatalog();
-        Database database = new Database(null, databaseMetaData, "DatabaseServiceIT", catalog, schema, null, progressListener);
+        Database database = new Database(databaseMetaData, "DatabaseServiceIT", catalog, schema, null, progressListener);
         databaseService.gatheringSchemaDetails(config, database, progressListener);
 
         assertThat(database.getTables()).hasSize(1);

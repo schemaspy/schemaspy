@@ -18,13 +18,15 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.Config;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.Routine;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-
-import org.schemaspy.model.*;
-import org.schemaspy.util.LineWriter;
-import org.schemaspy.util.Markdown;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.TreeSet;
 
 /**
  * The page that lists all of the routines (stored procedures and functions)
@@ -55,7 +57,7 @@ public class HtmlRoutinesPage extends HtmlFormatter {
 
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("routines", routines);
-        scopes.put("paginationEnabled", db.getConfig().isPaginationEnabled());
+        scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
 
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
         mw.write("routines.html", "routines.html", "routines.js");
