@@ -18,7 +18,6 @@
  */
 package org.schemaspy.model;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.util.CaseInsensitiveMap;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ public class Database {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final Config config;
     private final String databaseName ;
     private final Catalog catalog ;
     private final Schema schema;
@@ -52,9 +50,8 @@ public class Database {
     private Pattern invalidIdentifierPattern;
 	private final ProgressListener listener;
 
-    public Database(Config config, DatabaseMetaData meta, String name, String catalog, String schema, SchemaMeta schemaMeta,
+    public Database(DatabaseMetaData meta, String name, String catalog, String schema, SchemaMeta schemaMeta,
     				ProgressListener progressListener) throws SQLException, MissingResourceException {
-        this.config = config;
         this.meta = meta;
         this.schemaMeta = schemaMeta;
         this.databaseName = name;
@@ -75,19 +72,11 @@ public class Database {
         return schema;
     }
 
-    public Config getConfig()
-    {
-        return config;
-    }
-
     /**
      * Details of the database type that's running under the covers.
      *
      * @return null if a description wasn't specified.
      */
-    public String getDescription() {
-        return config.getDescription();
-    }
 
     public Collection<Table> getTables() {
         return tables.values();

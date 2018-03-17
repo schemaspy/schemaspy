@@ -75,7 +75,7 @@ public class H2SpacesIT {
         given(arguments.getDatabaseName()).willReturn("h2 spaces");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(config, databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
+        Database database = new Database(databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
         databaseService.gatheringSchemaDetails(config, database, progressListener);
         this.database = database;
     }

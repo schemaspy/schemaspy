@@ -27,14 +27,7 @@ import org.schemaspy.model.TableIndex;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * The page that lists all of the columns in the schema,
@@ -147,7 +140,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
 
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("columns", tableColumns);
-        scopes.put("paginationEnabled",database.getConfig().isPaginationEnabled());
+        scopes.put("paginationEnabled",Config.getInstance().isPaginationEnabled());
 
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), database.getName(), false);
         mw.write("column.html", "columns.html", "column.js");

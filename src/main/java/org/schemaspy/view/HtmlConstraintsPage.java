@@ -18,10 +18,10 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
-import org.schemaspy.util.LineWriter;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class HtmlConstraintsPage extends HtmlFormatter {
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("constraints", constraints);
         scopes.put("tables", tables);
-        scopes.put("paginationEnabled",database.getConfig().isPaginationEnabled());
+        scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
 
         MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName(), false);
         mw.write("constraint.html", "constraints.html", "constraint.js");
