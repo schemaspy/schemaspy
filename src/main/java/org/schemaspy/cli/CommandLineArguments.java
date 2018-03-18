@@ -88,6 +88,15 @@ public class CommandLineArguments {
 
     @Parameter(
             names = {
+                    "-nohtml", "--no-html", "nohtml",
+                    "schemaspy.nohtml"
+            },
+            descriptionKey = "nohtml"
+    )
+    private boolean nohtml = false;
+
+    @Parameter(
+            names = {
                     "-t", "--database-type", "database-type",
                     "schemaspy.t", "schemaspy.database-type"
             },
@@ -191,6 +200,14 @@ public class CommandLineArguments {
 
     public boolean isDebug() {
         return debug;
+    }
+
+    public boolean isHtmlDisabled() {
+        return nohtml;
+    }
+
+    public boolean isHtmlEnabled() {
+        return !nohtml;
     }
 
     public String getDatabaseType() {
