@@ -75,7 +75,13 @@ public class H2KeywordIT {
         given(arguments.getDatabaseName()).willReturn("h2keyword");
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(databaseMetaData, arguments.getDatabaseName(), arguments.getCatalog(), arguments.getSchema(), null, progressListener);
+        Database database = new Database(
+                databaseMetaData,
+                arguments.getDatabaseName(),
+                arguments.getCatalog(),
+                arguments.getSchema(),
+                null
+        );
         databaseService.gatheringSchemaDetails(config, database, progressListener);
         this.database = database;
     }
