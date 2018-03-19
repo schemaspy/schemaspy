@@ -61,7 +61,7 @@ public class CommandLineArgumentParserTest {
     public void givenNoRequiredParameterAndDefaultProviderWithRequiredValue_ExpectSuccess() {
         PropertyFileDefaultProvider defaultProvider = mock(PropertyFileDefaultProvider.class);
         given(defaultProvider.getDefaultValueFor("schemaspy.outputDirectory")).willReturn("mydirectory");
-        given(defaultProvider.getDefaultValueFor("schemaspy.user")).willReturn("myuser");
+        given(defaultProvider.getDefaultValueFor("schemaspy.u")).willReturn("myuser");
 
         CommandLineArgumentParser parser = new CommandLineArgumentParser(defaultProvider);
 
@@ -131,6 +131,19 @@ public class CommandLineArgumentParserTest {
         CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
         CommandLineArguments arguments = parser.parse(args);
         assertThat(arguments.isDbHelpRequired()).isTrue();
+    }
+
+    @Test
+    public void unknownOptionsAreAssignedToDbmsCommandLineArguments() {
+        String[] args = {
+                "-o", "aFolder",
+                "-sso",
+                "-notAnOptionKnownOption", "no"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        String unknownOptionValue = arguments.getDbmsCommandLineArguments().getArguments().get("notAnOptionKnownOption");
+        assertThat(unknownOptionValue).isEqualTo("no");
     }
 
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.
