@@ -76,5 +76,23 @@ public class HtmlCommandLineArgumentsTest {
         assertThat(loggingRule.getLog()).contains("falling back to DefaultSqlFormatter");
     }
 
+    @Test
+    public void columnDetailsDefault() {
+        HtmlCommandLineArguments htmlCommandLineArguments = new HtmlCommandLineArguments();
+        new JCommander(htmlCommandLineArguments).parse();
+        assertThat(htmlCommandLineArguments.getColumnDetails())
+                .containsExactly("id", "table", "column", "type", "size", "nulls", "auto", "default");
+
+    }
+
+    @Test
+    public void columnDetailsCustom() {
+        HtmlCommandLineArguments htmlCommandLineArguments = new HtmlCommandLineArguments();
+        new JCommander(htmlCommandLineArguments).parse("-columndetails", "id,table,column,type");
+        assertThat(htmlCommandLineArguments.getColumnDetails().size()).isEqualTo(4);
+        assertThat(htmlCommandLineArguments.getColumnDetails())
+                .containsExactly("id", "table", "column", "type");
+    }
+
 
 }

@@ -10,6 +10,8 @@ import org.schemaspy.view.SqlFormatter;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 @Parameters(resourceBundle = "htmlcommandlinearguments")
 public class HtmlCommandLineArguments {
@@ -48,6 +50,14 @@ public class HtmlCommandLineArguments {
             descriptionKey = "numRows"
     )
     private boolean numRowsDisabled = false;
+    @Parameter(
+            names = {
+                    "-columndetails",
+                    "schemaspy.columndetails"
+            },
+            descriptionKey = "columnDetails"
+    )
+    private List<String> columnDetails = Arrays.asList("id", "table", "column", "type", "size", "nulls", "auto", "default");
     @Parameter(
             names = {
                     "-desc",
@@ -128,6 +138,10 @@ public class HtmlCommandLineArguments {
 
     public boolean numberOfRowsDisabled() {
         return numRowsDisabled;
+    }
+
+    public List<String> getColumnDetails() {
+        return columnDetails;
     }
 
     public String getDescription() {
