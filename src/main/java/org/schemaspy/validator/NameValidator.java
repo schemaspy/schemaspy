@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
-
-
 import java.util.regex.Pattern;
 
 /**
@@ -50,13 +48,6 @@ public class NameValidator {
         // some databases (MySQL) return more than we wanted
         if (!validTypes.contains(type.toUpperCase()))
             return false;
-
-        // Oracle 10g introduced problematic flashback tables
-        // with bizarre illegal names
-        if (name.contains("$")) {
-            LOGGER.debug("Excluding {} {}: embedded $ implies illegal name", clazz, name);
-            return false;
-        }
 
         if (exclude.matcher(name).matches()) {
             LOGGER.debug("Excluding {} {}: matches exclusion pattern \"{}" + '"', clazz, name, exclude);
