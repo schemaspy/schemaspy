@@ -49,6 +49,14 @@ public class DotCommandLineArguments {
             descriptionKey = "renderer"
     )
     private String renderer;
+    @Parameter(
+            names = {
+                    "-maxdet",
+                    "schemaspy.maxdet"
+            },
+            descriptionKey = "maxdet"
+    )
+    private Integer detailsThreshold = 300;
 
     public File getGraphvizDir() {
         return graphvizDir;
@@ -68,5 +76,9 @@ public class DotCommandLineArguments {
 
     public String getRenderer() {
         return renderer;
+    }
+
+    public Integer getDetailsThreshold() {
+        return detailsThreshold;
     }
 }
