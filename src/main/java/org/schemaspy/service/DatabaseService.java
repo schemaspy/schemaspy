@@ -28,6 +28,7 @@ import org.schemaspy.model.*;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.service.helper.BasicTableMeta;
+import org.schemaspy.util.DurationFormatter;
 import org.schemaspy.validator.NameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,9 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -51,6 +55,10 @@ import java.util.regex.Pattern;
  */
 public class DatabaseService {
 
+    private static final long THIRTY_MINUTES = 1000L*60L*30L;
+
+    private final Clock clock;
+
     private final TableService tableService;
 
     private final ViewService viewService;
@@ -59,7 +67,8 @@ public class DatabaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public DatabaseService(TableService tableService, ViewService viewService, SqlService sqlService) {
+    public DatabaseService(Clock clock, TableService tableService, ViewService viewService, SqlService sqlService) {
+        this.clock = Objects.requireNonNull(clock);
         this.tableService = Objects.requireNonNull(tableService);
         this.viewService = Objects.requireNonNull(viewService);
         this.sqlService = Objects.requireNonNull(sqlService);
@@ -283,16 +292,33 @@ public class DatabaseService {
     }
 
     private void connectTables(Database db, ProgressListener listener) throws SQLException {
+        Instant startTables = clock.instant();
+        Duration durationOneTable = null;
         for (Table table : db.getTables()) {
             listener.connectingTablesProgressed(table);
 
             tableService.connectForeignKeys(db, table, db.getLocals());
+            if (Objects.isNull(durationOneTable)) {
+                durationOneTable = Duration.between(startTables, clock.instant());
+                long timeLeft = durationOneTable.toMillis()*(db.getTables().size()-1);
+                if (timeLeft > THIRTY_MINUTES && Config.getInstance().isExportedKeysEnabled()) {
+                    LOGGER.info("Estimated time remaining for connecting tables is {}, most time might be spent in getExportedKeys, you can disable getExportedKeys with `-noexportedkeys`. The implication of this is that you won't get cross schema relationships where table in analysis is FK, and the remote schema isn't analyzed", DurationFormatter.formatMS(timeLeft));
+                }
+            }
         }
-
+        Instant startViews = clock.instant();
+        Duration durationOneView = null;
         for (Table view : db.getViews()) {
             listener.connectingTablesProgressed(view);
 
             tableService.connectForeignKeys(db, view, db.getLocals());
+            if (Objects.isNull(durationOneView)) {
+                durationOneView = Duration.between(startViews, clock.instant());
+                long timeLeft = durationOneView.toMillis()*(db.getViews().size()-1);
+                if (timeLeft > THIRTY_MINUTES && Config.getInstance().isExportedKeysEnabled()) {
+                    LOGGER.info("Estimated time remaining for connecting views is {}, most time might be spent in getExportedKeys, you can disable getExportedKeys with `-noexportedkeys`. The implication of this is that you won't get cross schema relationships where table in analysis is FK, and the remote schema isn't analyzed", DurationFormatter.formatMS(timeLeft));
+                }
+            }
         }
     }
 

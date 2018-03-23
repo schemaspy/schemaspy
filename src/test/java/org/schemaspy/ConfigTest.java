@@ -117,4 +117,16 @@ public class ConfigTest {
         assertThat(dbProps).containsAllEntriesOf(expected);
     }
 
+    @Test
+    public void exportedKeysIsEnabledByDefault() {
+        Config config = new Config();
+        assertThat(config.isExportedKeysEnabled()).isTrue();
+    }
+
+    @Test
+    public void exportedKeysCanBeDisabled() {
+        Config config = new Config("-noexportedkeys");
+        assertThat(config.isExportedKeysEnabled()).isFalse();
+    }
+
 }

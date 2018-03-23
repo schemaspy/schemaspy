@@ -26,11 +26,18 @@ import org.schemaspy.service.ViewService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Clock;
+
 /**
  * @author Nils Petzaell
  */
 @Configuration
 public class WiringConfiguration {
+
+    @Bean
+    public Clock clock() {
+        return Clock.systemDefaultZone();
+    }
 
     @Bean
     public SqlService sqlService() {
@@ -48,8 +55,8 @@ public class WiringConfiguration {
     }
 
     @Bean
-    public DatabaseService databaseService(TableService tableService, ViewService viewService, SqlService sqlService) {
-        return new DatabaseService(tableService, viewService, sqlService);
+    public DatabaseService databaseService(Clock clock, TableService tableService, ViewService viewService, SqlService sqlService) {
+        return new DatabaseService(clock, tableService, viewService, sqlService);
     }
 
     @Bean
