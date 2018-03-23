@@ -38,9 +38,4 @@ public class NameValidatorTest {
     public void typeDoesntMatch() {
         assertThat(nameValidator.isValid("tablename","view")).isFalse();
     }
-
-    @Test
-    public void excludeTablesWithDollarSigns() {
-        assertThat(nameValidator.isValid("table$name","table")).isFalse();
-    }
 }

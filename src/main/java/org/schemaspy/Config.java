@@ -40,7 +40,6 @@ import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.DatabaseMetaData;
@@ -123,7 +122,7 @@ public final class Config {
     public static final String DOT_CHARSET = "UTF-8";
     private static final String ESCAPED_EQUALS = "\\=";
     private static final String DEFAULT_TABLE_INCLUSION = ".*"; // match everything
-    private static final String DEFAULT_TABLE_EXCLUSION = "";   // match nothing
+    private static final String DEFAULT_TABLE_EXCLUSION = ".*\\$.*";
     private static final String DEFAULT_COLUMN_EXCLUSION = "[^.]";  // match nothing
     private static final String DEFAULT_PROPERTIES_FILE = "schemaspy.properties";
     private Properties schemaspyProperties = new Properties();
