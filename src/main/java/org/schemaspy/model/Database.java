@@ -18,7 +18,6 @@
  */
 package org.schemaspy.model;
 
-import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.util.CaseInsensitiveMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,14 +36,12 @@ public class Database {
     private final String databaseName ;
     private final Catalog catalog ;
     private final Schema schema;
-    private final Map<String, Table> tables = new CaseInsensitiveMap<Table>();
-    private final Map<String, View> views = new CaseInsensitiveMap<View>();
-    private final Map<String, Table> remoteTables = new CaseInsensitiveMap<Table>(); // key: schema.tableName
+    private final Map<String, Table> tables = new CaseInsensitiveMap<>();
+    private final Map<String, View> views = new CaseInsensitiveMap<>();
+    private final Map<String, Table> remoteTables = new CaseInsensitiveMap<>(); // key: schema.tableName
     private final Map<String, Table> locals = new CombinedMap(tables, views);
-    private final Map<String, Routine> routines = new CaseInsensitiveMap<Routine>();
+    private final Map<String, Routine> routines = new CaseInsensitiveMap<>();
     private final DatabaseMetaData meta;
-    private final SchemaMeta schemaMeta;
-    private final String connectTime = new SimpleDateFormat("EEE MMM dd HH:mm z yyyy").format(new Date());
     private Set<String> sqlKeywords;
     private Pattern invalidIdentifierPattern;
 
@@ -53,11 +49,9 @@ public class Database {
             DatabaseMetaData meta,
             String name,
             String catalog,
-            String schema,
-            SchemaMeta schemaMeta
-    ) throws SQLException, MissingResourceException {
+            String schema
+    ) {
         this.meta = meta;
-        this.schemaMeta = schemaMeta;
         this.databaseName = name;
         this.catalog = new Catalog(catalog);
         this.schema = new Schema(schema);
@@ -128,14 +122,6 @@ public class Database {
 
     public DatabaseMetaData getMetaData() {
         return meta;
-    }
-
-    public SchemaMeta getSchemaMeta() {
-        return schemaMeta;
-    }
-
-    public String getConnectTime() {
-        return connectTime;
     }
 
     public String getDatabaseProduct() {

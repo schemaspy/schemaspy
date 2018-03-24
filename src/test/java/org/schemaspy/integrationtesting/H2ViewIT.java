@@ -77,10 +77,9 @@ public class H2ViewIT {
                 databaseMetaData,
                 arguments.getDatabaseName(),
                 arguments.getCatalog(),
-                arguments.getSchema(),
-                null
+                arguments.getSchema()
         );
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
         this.database = database;
     }
 
