@@ -33,7 +33,7 @@ public class DbDriverLoaderTest {
   public void testGetConnection() throws IOException {
     DbDriverLoader dbDriverLoader = new DbDriverLoader();
     Config config = new Config("-t", "h2", "-u", "sa");
-    Connection connection = dbDriverLoader.getConnection(config, h2.getConnectionURL(), "org.h2.Driver", "");
+    Connection connection = dbDriverLoader.getConnection(config, h2.getConnectionURL(), toArray("org.h2.Driver"), "");
     assertThat(connection).isNotNull();
   }
 
@@ -53,9 +53,9 @@ public class DbDriverLoaderTest {
   @Test
   public void driverLoaderCachesDrivers() throws MalformedURLException {
     DbDriverLoader driverLoader1 = new DbDriverLoader();
-    Driver driver1 = driverLoader1.getDriver("org.h2.Driver","");
+    Driver driver1 = driverLoader1.getDriver(toArray("org.h2.Driver"),"");
     DbDriverLoader driverLoader2 = new DbDriverLoader();
-    Driver driver2 = driverLoader2.getDriver("org.h2.Driver","");
+    Driver driver2 = driverLoader2.getDriver(toArray("org.h2.Driver"),"");
     assertThat(driver1).isSameAs(driver2);
   }
 
@@ -63,7 +63,7 @@ public class DbDriverLoaderTest {
   public void driverPathWorks() throws MalformedURLException, SQLException {
     String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
     DbDriverLoader driverLoader = new DbDriverLoader();
-    Driver driver = driverLoader.getDriver("dummy.DummyDriver", driverPath);
+    Driver driver = driverLoader.getDriver(toArray("dummy.DummyDriver"), driverPath);
     assertThat(driver).isNotNull();
     assertThat(driver.acceptsURL("dummy")).isTrue();
   }
@@ -72,23 +72,23 @@ public class DbDriverLoaderTest {
   public void connectionIsNullThrowsException() {
     DbDriverLoader driverLoader = new DbDriverLoader();
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", DummyDriver.class.getName(), ""));
+            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray(DummyDriver.class.getName()), ""));
   }
 
   @Test
   public void nativeErrorInDriverCreationThrowsException() {
     DbDriverLoader driverLoader = new DbDriverLoader();
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", DummyDriverUnsatisfiedCtor.class.getName(), ""))
+            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray(DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"), ""))
             .withCauseInstanceOf(UnsatisfiedLinkError.class)
-            .withMessageContaining("Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedCtor'");
+            .withMessageContaining("Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedCtor,dummy.dummy'");
   }
 
   @Test
   public void nativeErrorInConnectThrowsException() {
     DbDriverLoader driverLoader = new DbDriverLoader();
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", DummyDriverUnsatisfiedConnect.class.getName(), ""))
+            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray(DummyDriverUnsatisfiedConnect.class.getName()), ""))
             .withCauseInstanceOf(UnsatisfiedLinkError.class)
             .withMessageContaining("Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedConnect'");
   }
@@ -99,9 +99,29 @@ public class DbDriverLoaderTest {
     String sep = File.separator;
     final String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString() + File.pathSeparator + "missing";
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", "bla.bla.bla", driverPath))
+            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray("bla.bla.bla"), driverPath))
             .withCauseInstanceOf(ConnectionFailure.class)
             .withMessageContaining("src" + sep + "test" + sep + "resources" + sep + "driverFolder" + sep + "dummy.jar"+File.pathSeparator+"missing")
             .withMessageContaining("There were missing paths in driverPath:"+System.lineSeparator()+"\tmissing");
+  }
+
+  private String[] toArray(String...strings) {
+    return strings;
+  }
+
+  @Test
+  public void firstDriverClassMissingSecondExists() {
+    DbDriverLoader driverLoader = new DbDriverLoader();
+    Driver driver = driverLoader.getDriver(toArray("com.no","org.h2.Driver"),"");
+    assertThat(driver).isNotNull();
+    assertThat(driver.getClass().getName()).isEqualTo("org.h2.Driver");
+  }
+
+  @Test
+  public void twoDriversBothExists() {
+    DbDriverLoader driverLoader = new DbDriverLoader();
+    Driver driver = driverLoader.getDriver(toArray("com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"),"");
+    assertThat(driver).isNotNull();
+    assertThat(driver.getClass().getName()).isEqualTo("com.mysql.cj.jdbc.Driver");
   }
 }

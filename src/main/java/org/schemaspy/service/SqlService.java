@@ -9,7 +9,6 @@ import org.schemaspy.Config;
 import org.schemaspy.DbDriverLoader;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.util.ConnectionURLBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,22 +42,8 @@ public class SqlService {
     }
 
     public DatabaseMetaData connect(Config config) throws IOException, SQLException {
-        Properties properties = config.getDbProperties();
-
-        ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
-        if (Objects.isNull(config.getDb()))
-            config.setDb(urlBuilder.build());
-
-        String driverClass = properties.getProperty("driver");
-        String driverPath = properties.getProperty("driverPath");
-        if (Objects.isNull(driverPath))
-            driverPath = "";
-
-        if (Objects.nonNull(config.getDriverPath()))
-            driverPath = config.getDriverPath();
-
         DbDriverLoader driverLoader = new DbDriverLoader();
-        connection = driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);
+        connection = driverLoader.getConnection(config);
 
         meta = connection.getMetaData();
 
