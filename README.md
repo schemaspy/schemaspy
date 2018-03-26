@@ -71,8 +71,8 @@ Are very welcome! And remember, contribution is not only PRs and code, but any h
 ### Build Instructions
 #### Application
 SchemaSpy is built using maven and we utilize the maven wrapper.  
-__Windows__ `mvnw.cmd build`    
-__Linux__ `./mvnw build`  
+__Windows__ `mvnw.cmd package`    
+__Linux__ `./mvnw package`  
 The resulting application can be found in `target`  
 
 ##### Analyzing
