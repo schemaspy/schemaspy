@@ -113,6 +113,7 @@ public final class Config {
     private Boolean lowQuality;
     private Boolean paginationEnabled;
     private String imageFormat;
+    @Deprecated
     private Boolean loadJDBCJarsEnabled = false;
     private String schemaSpec;  // used in conjunction with evaluateAll
     private boolean hasOrphans;
@@ -1131,6 +1132,7 @@ public final class Config {
      *
      * @param enabled
      */
+    @Deprecated
     public void setLoadJDBCJarsEnabled(boolean enabled) {
         loadJDBCJarsEnabled = enabled;
     }
@@ -1139,6 +1141,7 @@ public final class Config {
      * @return
      * @see #setLoadJDBCJarsEnabled(boolean)
      */
+    @Deprecated
     public boolean isLoadJDBCJarsEnabled() {
         String loadJars = pullParam("-loadjars");
         if (loadJars != null && loadJars.equals("true")) {

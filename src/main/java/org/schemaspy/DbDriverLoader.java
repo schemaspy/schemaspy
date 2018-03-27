@@ -52,10 +52,10 @@ import java.util.stream.Stream;
 public class DbDriverLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static Map<String, Driver> driverCache = new HashMap<>();
 
     private boolean loadJDBCJars = false;
 
-    private static Map<String, Driver> driverCache = new HashMap<>();
 
     public Connection getConnection(Config config) throws IOException {
         Properties properties = config.getDbProperties();
@@ -292,10 +292,26 @@ public class DbDriverLoader {
         String[] pieces = path.split(File.pathSeparator);
         for (String piece : pieces) {
             File file = new File(piece);
-            if (file.exists())
+            if (file.exists()) {
                 existingUrls.add(file.toURI());
+                if (file.isDirectory()) {
+                    addDirectoryContent(file, existingUrls);
+                }
+            }
         }
 
         return existingUrls;
+    }
+
+    private void addDirectoryContent(File dir, Set<URI> existingUrls) {
+        File[] files = dir.listFiles();
+        for(File file : files) {
+            if (file.exists()) {
+                existingUrls.add(file.toURI());
+                if (file.isDirectory()) {
+                    addDirectoryContent(file, existingUrls);
+                }
+            }
+        }
     }
 }
