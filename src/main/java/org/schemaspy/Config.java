@@ -31,7 +31,6 @@ import org.schemaspy.db.config.PropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.Dot;
-import org.schemaspy.util.PasswordReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -398,8 +397,14 @@ public final class Config {
         if (password == null)
             password = pullParam("-p");
 
-        if (password == null && isPromptForPasswordEnabled())
-            password = new String(PasswordReader.getInstance().readPassword("Password: "));
+        if (password == null && isPromptForPasswordEnabled()) {
+            Console console = System.console();
+            if (Objects.isNull(console)) {
+                LOGGER.error("No console found for password input");
+            } else {
+                password = new String(console.readPassword("Password: "));
+            }
+        }
 
         if (password == null) {
             password = System.getenv("schemaspy.pw");
