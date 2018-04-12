@@ -46,37 +46,13 @@ public class PropertyFileDefaultProviderTest {
         File propertiesFile = temporaryFolder.newFile("schemaspy.properties");
         try (BufferedWriter bufferedWriter = Files.newBufferedWriter(propertiesFile.toPath(), StandardCharsets.UTF_8)) {
             bufferedWriter.write("schemaspy.user=humbug");
-            bufferedWriter.newLine();
-            bufferedWriter.write("schemaspy.sso");
-            bufferedWriter.newLine();
-            bufferedWriter.write("schemaspy.debug=false");
-            bufferedWriter.newLine();
-            bufferedWriter.write("schemaspy.nohtml");
         }
         propertyFileDefaultProvider = new PropertyFileDefaultProvider(propertiesFile.getAbsolutePath());
     }
 
     @Test
     public void getStringValue() {
-        assertThat(getDefaultValueFor("schemaspy.user")).isEqualTo("humbug");
+        assertThat(propertyFileDefaultProvider.getDefaultValueFor("schemaspy.user")).isEqualTo("humbug");
     }
 
-    @Test
-    public void getSSOWithOutValueShouldBeTrue() {
-        assertThat(getDefaultValueFor("schemaspy.sso")).isEqualTo(Boolean.TRUE.toString());
-    }
-
-    @Test
-    public void getDebugWithValueFalseShouldBeFalse() {
-        assertThat(getDefaultValueFor("schemaspy.debug")).isEqualTo(Boolean.FALSE.toString());
-    }
-
-    @Test
-    public void getNoHTMLWithoutValue() {
-        assertThat(getDefaultValueFor("schemaspy.nohtml")).isEqualTo(Boolean.TRUE.toString());
-    }
-
-    private String getDefaultValueFor(String optionName) {
-        return propertyFileDefaultProvider.getDefaultValueFor(optionName);
-    }
 }
