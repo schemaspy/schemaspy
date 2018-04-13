@@ -427,9 +427,6 @@ public final class Config {
             password = new String(PasswordReader.getInstance().readPassword("Password: "));
 
         if (password == null) {
-            // if -pfp is enabled when analyzing multiple schemas then
-            // we don't want to send the password on the command line,
-            // so see if it was passed in the environment (not ideal, but safer)
             password = System.getenv("schemaspy.pw");
         }
 
