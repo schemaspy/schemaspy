@@ -1,6 +1,7 @@
 /*
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  * Copyright (C) 2011 John Currier
+ * Copyright (C) 2018 Nils Petzaell
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +28,7 @@ import java.sql.SQLException;
  * of columns pointed to by a result set.
  * 
  * @author John Currier
+ * @author Nils Petzaell
  */
 public class ResultSetDumper {
     public static String dump(ResultSet rs) throws SQLException {
