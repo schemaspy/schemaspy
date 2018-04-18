@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2004-2011 John Currier
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2017, 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -27,8 +27,6 @@ import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.PasswordReader;
-import org.schemaspy.view.DefaultSqlFormatter;
-import org.schemaspy.view.SqlFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,8 +95,6 @@ public final class Config {
     private String description;
     private PropertiesResolver propertiesResolver = new PropertiesResolver();
     private Properties dbProperties;
-    private SqlFormatter sqlFormatter;
-    private String sqlFormatterClass;
     private Boolean generateHtml;
     private Boolean includeImpliedConstraints;
     private Boolean logoEnabled;
@@ -1003,57 +999,6 @@ public final class Config {
     }
 
     /**
-     * Set the name of the {@link SqlFormatter SQL formatter} class to use to
-     * format SQL into HTML.<p/>
-     * The implementation of the class must be made available to the class
-     * loader, typically by specifying the path to its jar with <em>-dp</em>
-     * ({@link #setDriverPath(String)}).
-     */
-    public void setSqlFormatter(String formatterClassName) {
-        sqlFormatterClass = formatterClassName;
-        sqlFormatter = null;
-    }
-
-    /**
-     * Set the {@link SqlFormatter SQL formatter} to use to format
-     * SQL into HTML.
-     */
-    public void setSqlFormatter(SqlFormatter sqlFormatter) {
-        this.sqlFormatter = sqlFormatter;
-        if (sqlFormatter != null)
-            sqlFormatterClass = sqlFormatter.getClass().getName();
-    }
-
-    /**
-     * Returns an implementation of {@link SqlFormatter SQL formatter} to use to format
-     * SQL into HTML.  The default implementation is {@link DefaultSqlFormatter}.
-     *
-     * @return
-     * @throws InvalidConfigurationException if unable to instantiate an instance
-     */
-    @SuppressWarnings("unchecked")
-    public SqlFormatter getSqlFormatter() {
-        if (sqlFormatter == null) {
-            if (sqlFormatterClass == null) {
-                sqlFormatterClass = pullParam("-sqlFormatter");
-
-                if (sqlFormatterClass == null)
-                    sqlFormatterClass = DefaultSqlFormatter.class.getName();
-            }
-
-            try {
-                Class<SqlFormatter> clazz = (Class<SqlFormatter>) Class.forName(sqlFormatterClass);
-                sqlFormatter = clazz.newInstance();
-            } catch (Exception exc) {
-                throw new InvalidConfigurationException("Failed to initialize instance of SQL formatter: ", exc)
-                        .setParamName("-sqlFormatter").setParamValue(sqlFormatterClass);
-            }
-        }
-
-        return sqlFormatter;
-    }
-
-    /**
      * Set the details to show on the columns page, where "details" are
      * comma and/or space separated.
      * <p>
@@ -1775,9 +1720,6 @@ public final class Config {
             params.add("-gv");
             params.add(getGraphvizDir().toString());
         }
-
-        params.add("-sqlFormatter");
-        params.add(getSqlFormatter().getClass().getName());
         params.add("-i");
         params.add(getTableInclusions().toString());
         params.add("-I");

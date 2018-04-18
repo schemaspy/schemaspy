@@ -1,6 +1,8 @@
 /*
- * This file is a part of the SchemaSpy project (http://schemaspy.org).
  * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 John Currier
+ * Copyright (C) 2017, 2018 Nils Petzaell
+ *
+ * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,6 +36,7 @@ import java.util.*;
  * The page that contains the details of a specific table or view
  *
  * @author John Currier
+ * @author Nils Petzaell
  */
 public class HtmlTablePage extends HtmlFormatter {
     private static final HtmlTablePage instance = new HtmlTablePage();
@@ -106,7 +109,7 @@ public class HtmlTablePage extends HtmlFormatter {
         Set<Table> references = null;
 
         if (table.isView() && table.getViewDefinition() != null) {
-            DefaultSqlFormatter formatter = new DefaultSqlFormatter();
+            SqlAnalyzer formatter = new SqlAnalyzer();
             references = formatter.getReferencedTables(table.getViewDefinition(), db);
         }
         return references;
