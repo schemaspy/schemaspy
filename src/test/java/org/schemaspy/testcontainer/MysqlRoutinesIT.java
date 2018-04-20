@@ -51,7 +51,7 @@ public class MysqlRoutinesIT {
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MySQLContainer())
+            new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitScript("integrationTesting/mysqlroutines/dbScripts/routines.sql");

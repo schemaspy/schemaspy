@@ -36,7 +36,7 @@ public class MysqlHTMLIT {
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5.7.18"))
+            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5"))
                     .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
                     .withQueryString("?useSSL=false")
                     .withInitScript("integrationTesting/dbScripts/mysql_html_implied_relationship.sql");

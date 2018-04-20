@@ -53,7 +53,7 @@ public class MysqlKeyWordTableIT {
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MySQLContainer())
+            new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitScript("integrationTesting/dbScripts/mysql_keyword.sql");
