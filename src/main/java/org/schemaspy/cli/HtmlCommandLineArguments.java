@@ -4,9 +4,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import org.schemaspy.cli.converters.CharsetConverter;
-import org.schemaspy.cli.converters.SqlFormatterConverter;
-import org.schemaspy.view.DefaultSqlFormatter;
-import org.schemaspy.view.SqlFormatter;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -42,14 +39,6 @@ public class HtmlCommandLineArguments {
             descriptionKey = "encodedComments"
     )
     private boolean encodedCommentsDisabled = false;
-    @Parameter(
-            names = {
-                    "-norows",
-                    "schemaspy.norows"
-            },
-            descriptionKey = "numRows"
-    )
-    private boolean numRowsDisabled = false;
     @Parameter(
             names = {
                     "-columndetails",
@@ -99,16 +88,6 @@ public class HtmlCommandLineArguments {
     )
     private Integer fontSize = 11;
 
-    @Parameter(
-            names = {
-                    "-sqlFormatter",
-                    "schemaspy.sqlformatter"
-            },
-            descriptionKey = "sqlFormatter",
-            converter = SqlFormatterConverter.class
-    )
-    private SqlFormatter sqlFormatter = new DefaultSqlFormatter();
-
     @ParametersDelegate
     private DotCommandLineArguments dotCommandLineArguments = new DotCommandLineArguments();
 
@@ -130,14 +109,6 @@ public class HtmlCommandLineArguments {
 
     public boolean encodedCommentsDisabled() {
         return encodedCommentsDisabled;
-    }
-
-    public boolean numberOfRowsEnabled() {
-        return !numRowsDisabled;
-    }
-
-    public boolean numberOfRowsDisabled() {
-        return numRowsDisabled;
     }
 
     public List<String> getColumnDetails() {
@@ -162,10 +133,6 @@ public class HtmlCommandLineArguments {
 
     public Integer getFontSize() {
         return fontSize;
-    }
-
-    public SqlFormatter getSqlFormatter() {
-        return sqlFormatter;
     }
 
     public DotCommandLineArguments getDotCommandLineArguments() {

@@ -4,10 +4,8 @@ import com.beust.jcommander.JCommander;
 import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.cli.converters.CharsetConverter;
-import org.schemaspy.cli.converters.SqlFormatterConverter;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
-import org.schemaspy.view.DefaultSqlFormatter;
 
 import java.nio.charset.StandardCharsets;
 
@@ -39,41 +37,6 @@ public class HtmlCommandLineArgumentsTest {
         new JCommander(htmlCommandLineArguments).parse("-charset", "UTF-2");
         assertThat(htmlCommandLineArguments.getCharset().name()).isEqualTo(StandardCharsets.UTF_8.name());
         assertThat(loggingRule.getLog()).contains("falling back to UTF-8");
-    }
-
-    @Test
-    public void sqlFormatterDefault() {
-        HtmlCommandLineArguments htmlCommandLineArguments = new HtmlCommandLineArguments();
-        new JCommander(htmlCommandLineArguments).parse();
-        assertThat(
-                htmlCommandLineArguments.getSqlFormatter().getClass().getName()
-        ).isEqualTo(
-                DefaultSqlFormatter.class.getName()
-        );
-    }
-
-    @Test
-    public void sqlFormatterDummyExists() {
-        HtmlCommandLineArguments htmlCommandLineArguments = new HtmlCommandLineArguments();
-        new JCommander(htmlCommandLineArguments).parse("-sqlFormatter", DummySqlFormatter.class.getName());
-        assertThat(
-                htmlCommandLineArguments.getSqlFormatter().getClass().getName()
-        ).isEqualTo(
-                DummySqlFormatter.class.getName()
-        );
-    }
-
-    @Test
-    @Logger(SqlFormatterConverter.class)
-    public void sqlFormatterDoesNotExist() {
-        HtmlCommandLineArguments htmlCommandLineArguments = new HtmlCommandLineArguments();
-        new JCommander(htmlCommandLineArguments).parse("-sqlFormatter", "this.class.does.not.exist");
-        assertThat(
-                htmlCommandLineArguments.getSqlFormatter().getClass().getName()
-        ).isEqualTo(
-                DefaultSqlFormatter.class.getName()
-        );
-        assertThat(loggingRule.getLog()).contains("falling back to DefaultSqlFormatter");
     }
 
     @Test
