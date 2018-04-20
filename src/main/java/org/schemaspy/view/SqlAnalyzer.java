@@ -1,6 +1,6 @@
 /*
- * This file is a part of the SchemaSpy project (http://schemaspy.org).
  * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 John Currier
+ * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,80 +18,21 @@
  */
 package org.schemaspy.view;
 
-import java.sql.DatabaseMetaData;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.CaseInsensitiveMap;
-import org.schemaspy.util.HtmlEncoder;
+
+import java.sql.DatabaseMetaData;
+import java.util.*;
 
 /**
- * Default implementation of {@link SqlFormatter}
  *
  * @author John Currier
  */
-public class DefaultSqlFormatter implements SqlFormatter {
+public class SqlAnalyzer {
     private Set<String> keywords;
     private Map<String, Table> tablesByPossibleNames;
-    private static String TOKENS = " \t\n\r\f()<>|,";
-
-    /**
-     * Return a HTML-formatted representation of the specified SQL.
-     *
-     * @param sql SQL to be formatted
-     * @param db Database
-     * @return HTML-formatted representation of the specified SQL
-     */
-    public String format(String sql, Database db, Set<Table> references) {
-        StringBuilder formatted = new StringBuilder(sql.length() * 2);
-
-        boolean alreadyFormatted = sql.contains("\n") || sql.contains("\r");
-        if (alreadyFormatted)
-        {
-            // apparently already formatted, so dump it as is
-            formatted.append("<div class='viewDefinition preFormatted'>");
-
-            int len = sql.length();
-            for (int i = 0; i < len; i++) {
-                char ch = sql.charAt(i);
-
-                // encode everything except whitespace
-                if (Character.isWhitespace(ch)) {
-                    formatted.append(ch);
-                } else {
-                    formatted.append(HtmlEncoder.encodeToken(ch));
-                }
-            }
-        }
-        else
-        {
-            formatted.append("  <div class='viewDefinition'>");
-            @SuppressWarnings("hiding")
-            Set<String> keywords = getKeywords(db.getMetaData());
-            StringTokenizer tokenizer = new StringTokenizer(sql, TOKENS, true);
-            while (tokenizer.hasMoreTokens()) {
-                String token = tokenizer.nextToken();
-                if (keywords.contains(token.toUpperCase())) {
-                    formatted.append("<b>");
-                    formatted.append(token);
-                    formatted.append("</b>");
-                } else {
-                    formatted.append(HtmlEncoder.encodeToken(token));
-                }
-            }
-        }
-
-        formatted.append("</div>");
-
-        references.addAll(getReferencedTables(sql, db));
-
-        return formatted.toString();
-    }
+    private static final String TOKENS = " \t\n\r\f()<>|,";
 
     /**
      * Returns a {@link Set} of tables/views that are possibly referenced
@@ -137,7 +78,7 @@ public class DefaultSqlFormatter implements SqlFormatter {
      * @param db
      * @return
      */
-    protected Map<String, Table> getTableMap(Database db)
+    private Map<String, Table> getTableMap(Database db)
     {
         if (tablesByPossibleNames == null)
         {
@@ -155,10 +96,9 @@ public class DefaultSqlFormatter implements SqlFormatter {
      * keyed by several possible ways to refer to the table.
      *
      * @param tables
-     * @param dbName
      * @return
      */
-    protected Map<String, Table> getTableMap(Collection<? extends Table> tables) {
+    private Map<String, Table> getTableMap(Collection<? extends Table> tables) {
         Map<String, Table> map = new CaseInsensitiveMap<Table>();
         for (Table t : tables) {
             String name = t.getName();
@@ -184,7 +124,7 @@ public class DefaultSqlFormatter implements SqlFormatter {
      * @param meta
      * @return
      */
-    public Set<String> getKeywords(DatabaseMetaData meta) {
+    private Set<String> getKeywords(DatabaseMetaData meta) {
         if (keywords == null) {
             keywords = new HashSet<String>(Arrays.asList(new String[] {
                 "ABSOLUTE", "ACTION", "ADD", "ALL", "ALLOCATE", "ALTER", "AND",
