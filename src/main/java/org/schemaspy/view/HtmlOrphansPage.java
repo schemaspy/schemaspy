@@ -18,15 +18,18 @@
  */
 package org.schemaspy.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
 import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.LineWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.*;
 
 /**
  * The page that contains the all tables that aren't related to others (orphans)
@@ -34,8 +37,11 @@ import org.schemaspy.util.LineWriter;
  * @author John Currier
  */
 public class HtmlOrphansPage extends HtmlDiagramFormatter {
-    private static HtmlOrphansPage instance = new HtmlOrphansPage();
-    private static int MAX_COLUMNS = 4;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static final HtmlOrphansPage instance = new HtmlOrphansPage();
+    private static final int MAX_COLUMNS = 4;
 
     /**
      * Singleton: Don't allow instantiation
@@ -57,7 +63,7 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
         if (dot == null)
             return false;
 
-        Set<Table> orphansWithImpliedRelationships = new HashSet<Table>();
+        Set<Table> orphansWithImpliedRelationships = new HashSet<>();
 
         Collections.sort(orphanTables, new Comparator() {
             @Override
@@ -84,10 +90,8 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
 
         try {
             StringBuilder maps = new StringBuilder(64 * 1024);
-            int element = 0;
             List<MustacheTable> mustacheTables = new ArrayList<>();
             for (Table table : orphanTables) {
-                element++;
                 String dotBaseFilespec = table.getName();
 
                 File dotFile = new File(diagramDir, dotBaseFilespec + ".1degree.dot");
@@ -102,13 +106,13 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
                 try {
                     maps.append(dot.generateDiagram(dotFile, imgFile));
                 } catch (Dot.DotFailure dotFailure) {
-                    System.err.println(dotFailure);
+                    LOGGER.error("Failed to generate diagram",dotFailure);
                     return false;
                 }
                 mustacheTables.add(new MustacheTable(table, imgFile.getName()));
             }
 
-            HashMap<String, Object> scopes = new HashMap<String, Object>();
+            HashMap<String, Object> scopes = new HashMap<>();
             scopes.put("mustacheTables", mustacheTables);
             int size = 12/MAX_COLUMNS;
             scopes.put("size", size);

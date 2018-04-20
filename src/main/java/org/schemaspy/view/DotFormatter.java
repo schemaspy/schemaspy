@@ -18,17 +18,6 @@
  */
 package org.schemaspy.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import org.schemaspy.Config;
 import org.schemaspy.Revision;
 import org.schemaspy.model.Database;
@@ -38,6 +27,10 @@ import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.LineWriter;
 import org.schemaspy.view.DotNode.DotNodeConfig;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Format table data into .dot format to feed to Graphvis' dot program.
@@ -78,8 +71,8 @@ public class DotFormatter {
      * Returns a set of the implied constraints that could have been included but weren't.
      */
     private Set<ForeignKeyConstraint> writeRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, boolean includeImplied, LineWriter dot, File outputDir) throws IOException {
-        Set<Table> tablesWritten = new HashSet<Table>();
-        Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<ForeignKeyConstraint>();
+        Set<Table> tablesWritten = new HashSet<>();
+        Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
         DotConnectorFinder finder = DotConnectorFinder.getInstance();
 
@@ -88,10 +81,10 @@ public class DotFormatter {
 
         Set<Table> relatedTables = getImmediateRelatives(table, true, includeImplied, skippedImpliedConstraints);
 
-        Set<DotConnector> connectors = new TreeSet<DotConnector>(finder.getRelatedConnectors(table, includeImplied));
+        Set<DotConnector> connectors = new TreeSet<>(finder.getRelatedConnectors(table, includeImplied));
         tablesWritten.add(table);
 
-        Map<Table, DotNode> nodes = new TreeMap<Table, DotNode>();
+        Map<Table, DotNode> nodes = new TreeMap<>();
 
         // write immediate relatives first
         for (Table relatedTable : relatedTables) {
@@ -109,8 +102,8 @@ public class DotFormatter {
                 connector.connectToParentDetails();
         }
 
-        Set<Table> allCousins = new HashSet<Table>();
-        Set<DotConnector> allCousinConnectors = new TreeSet<DotConnector>();
+        Set<Table> allCousins = new HashSet<>();
+        Set<DotConnector> allCousinConnectors = new TreeSet<>();
 
         // next write 'cousins' (2nd degree of separation)
         if (twoDegreesOfSeparation) {
@@ -131,7 +124,7 @@ public class DotFormatter {
 
         // glue together any 'participants' that aren't yet connected
         // note that this is the epitome of nested loops from hell
-        List<Table> participants = new ArrayList<Table>(nodes.keySet());
+        List<Table> participants = new ArrayList<>(nodes.keySet());
         Iterator<Table> iter = participants.iterator();
         while (iter.hasNext()) {
             Table participantA = iter.next();
@@ -186,7 +179,7 @@ public class DotFormatter {
     }
 
     private Set<Table> getImmediateRelatives(Table table, boolean includeExcluded, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
-        Set<TableColumn> relatedColumns = new HashSet<TableColumn>();
+        Set<TableColumn> relatedColumns = new HashSet<>();
 
         for (TableColumn column : table.getColumns()) {
             if (column.isAllExcluded() || (!includeExcluded && column.isExcluded())) {
@@ -218,7 +211,7 @@ public class DotFormatter {
             }
         }
 
-        Set<Table> relatedTables = new HashSet<Table>();
+        Set<Table> relatedTables = new HashSet<>();
         for (TableColumn column : relatedColumns)
             relatedTables.add(column.getTable());
 
@@ -247,7 +240,6 @@ public class DotFormatter {
         dot.writeln("    ranksep=\"0.46\"");
         dot.writeln("    fontname=\"" + Config.getInstance().getFont() + "\"");
         dot.writeln("    fontsize=\"" + fontSize + "\"");
-        //dot.writeln("    dpi=80");
         dot.writeln("    ration=\"compress\"");
         dot.writeln("  ];");
         dot.writeln("  node [");
@@ -290,7 +282,7 @@ public class DotFormatter {
         }
         writeHeader(diagramName, true, dot);
 
-        Map<Table, DotNode> nodes = new TreeMap<Table, DotNode>();
+        Map<Table, DotNode> nodes = new TreeMap<>();
 
         for (Table table : tables) {
             if (!table.isOrphan(includeImplied)) {
@@ -302,7 +294,7 @@ public class DotFormatter {
             nodes.put(table, new DotNode(table, "tables/", outputDir, nodeConfig));
         }
 
-        Set<DotConnector> connectors = new TreeSet<DotConnector>();
+        Set<DotConnector> connectors = new TreeSet<>();
 
         for (DotNode node : nodes.values()) {
             connectors.addAll(finder.getRelatedConnectors(node.getTable(), includeImplied));

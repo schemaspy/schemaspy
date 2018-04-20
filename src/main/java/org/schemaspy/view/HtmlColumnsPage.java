@@ -26,7 +26,6 @@ import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -61,7 +60,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
     public Map<String, ColumnInfo> getColumnInfos()
     {
         // build a collection of all possible column details
-        Map<String, ColumnInfo> avails = new HashMap<String, ColumnInfo>();
+        Map<String, ColumnInfo> avails = new HashMap<>();
         avails.put("id", new ColumnInfo("Id", new ByColumnIdComparator()));
         avails.put("table", new ColumnInfo("Table", new ByTableComparator()));
         avails.put("column", new ColumnInfo("Column", new ByColumnComparator()));
@@ -76,7 +75,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
 
         // now put the ones requested in the order requested
         // LinkedHashMap maintains insertion order
-        Map<String, ColumnInfo> infos = new LinkedHashMap<String, ColumnInfo>();
+        Map<String, ColumnInfo> infos = new LinkedHashMap<>();
 
         for (String detail : Config.getInstance().getColumnDetails()) {
             ColumnInfo info = avails.get(detail);
@@ -118,10 +117,10 @@ public class HtmlColumnsPage extends HtmlFormatter {
         }
     }
 
-    public void write(Database database, Collection<Table> tables, ColumnInfo columnInfo, File outputDir) throws IOException {
-        Set<TableColumn> columns = new TreeSet<TableColumn>(columnInfo.getComparator());
-        Set<TableColumn> primaryColumns = new HashSet<TableColumn>();
-        Set<TableColumn> indexedColumns = new HashSet<TableColumn>();
+    public void write(Database database, Collection<Table> tables, ColumnInfo columnInfo, File outputDir) {
+        Set<TableColumn> columns = new TreeSet<>(columnInfo.getComparator());
+        Set<TableColumn> primaryColumns = new HashSet<>();
+        Set<TableColumn> indexedColumns = new HashSet<>();
 
         Set<MustacheTableColumn> tableColumns = new HashSet<>();
 
@@ -138,7 +137,7 @@ public class HtmlColumnsPage extends HtmlFormatter {
             tableColumns.add(new MustacheTableColumn(column, indexedColumns, getPathToRoot()));
         }
 
-        HashMap<String, Object> scopes = new HashMap<String, Object>();
+        HashMap<String, Object> scopes = new HashMap<>();
         scopes.put("columns", tableColumns);
         scopes.put("paginationEnabled",Config.getInstance().isPaginationEnabled());
 
@@ -258,8 +257,8 @@ public class HtmlColumnsPage extends HtmlFormatter {
 
         @Override
         public int compare(TableColumn column1, TableColumn column2) {
-            Set<String> childTables1 = new TreeSet<String>();
-            Set<String> childTables2 = new TreeSet<String>();
+            Set<String> childTables1 = new TreeSet<>();
+            Set<String> childTables2 = new TreeSet<>();
 
             for (TableColumn column : column1.getChildren()) {
                 if (!column.getParentConstraint(column1).isImplied())
@@ -283,8 +282,8 @@ public class HtmlColumnsPage extends HtmlFormatter {
 
         @Override
         public int compare(TableColumn column1, TableColumn column2) {
-            Set<String> parentTables1 = new TreeSet<String>();
-            Set<String> parentTables2 = new TreeSet<String>();
+            Set<String> parentTables1 = new TreeSet<>();
+            Set<String> parentTables2 = new TreeSet<>();
 
             for (TableColumn column : column1.getParents()) {
                 if (!column.getChildConstraint(column1).isImplied())

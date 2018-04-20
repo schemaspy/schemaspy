@@ -32,13 +32,11 @@ import java.util.regex.Pattern;
  * @author Anthony Eden
  */
 public class Inflection {
-    private static final List<Inflection> plural = new ArrayList<Inflection>();
-    private static final List<Inflection> singular = new ArrayList<Inflection>();
-    private static final List<String> uncountable = new ArrayList<String>();
+    private static final List<Inflection> plural = new ArrayList<>();
+    private static final List<Inflection> singular = new ArrayList<>();
+    private static final List<String> uncountable = new ArrayList<>();
 
     static {
-        // plural is "singular to plural form"
-        // singular is "plural to singular form"
         plural("$", "s");
         plural("s$", "s");
         plural("(ax|test)is$", "$1es");
@@ -51,7 +49,6 @@ public class Inflection {
         plural("(?:([^f])fe|([lr])f)$", "$1$2ves");
         plural("(hive)$", "$1s");
         plural("([^aeiouy]|qu)y$", "$1ies");
-        //plural("([^aeiouy]|qu)ies$", "$1y");
         plural("(x|ch|ss|sh)$", "$1es");
         plural("(matr|vert|ind)ix|ex$", "$1ices");
         plural("([m|l])ouse$", "$1ice");
@@ -83,7 +80,6 @@ public class Inflection {
         singular("(matr)ices$", "$1ix");
         singular("(quiz)zes$", "$1");
 
-        // irregular
         irregular("person", "people");
         irregular("man", "men");
         irregular("child", "children");
@@ -99,8 +95,6 @@ public class Inflection {
         uncountable("fish");
         uncountable("sheep");
 
-        //Collections.reverse(singular);
-        //Collections.reverse(plural);
     }
 
     private final String pattern;
@@ -193,9 +187,7 @@ public class Inflection {
         }
 
         for (Inflection inflection : singular) {
-            //System.out.println(word + " matches " + inflection.pattern + "? (ignore case: " + inflection.ignoreCase + ")");
             if (inflection.match(word)) {
-                //System.out.println("match!");
                 return inflection.replace(word);
             }
         }

@@ -24,7 +24,6 @@ import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -52,8 +51,8 @@ public class HtmlConstraintsPage extends HtmlFormatter {
         return instance;
     }
 
-    public void write(Database database, List<ForeignKeyConstraint> constraints, Collection<Table> tables, File outputDir) throws IOException {
-        HashMap<String, Object> scopes = new HashMap<String, Object>();
+    public void write(Database database, List<ForeignKeyConstraint> constraints, Collection<Table> tables, File outputDir) {
+        HashMap<String, Object> scopes = new HashMap<>();
         scopes.put("constraints", constraints);
         scopes.put("tables", tables);
         scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());

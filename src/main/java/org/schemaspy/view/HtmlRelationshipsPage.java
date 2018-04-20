@@ -18,6 +18,12 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.TableColumn;
+import org.schemaspy.util.DiagramUtil;
+import org.schemaspy.util.Dot;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,18 +31,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.util.DiagramUtil;
-import org.schemaspy.util.Dot;
-
 /**
  * The page that contains the overview entity relationship diagrams.
  *
  * @author John Currier
  */
 public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
+
     private static final HtmlRelationshipsPage instance = new HtmlRelationshipsPage();
 
     /**
@@ -112,7 +113,7 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
 
             DiagramUtil.markFirstAsActive(diagrams);
 
-            HashMap<String, Object> scopes = new HashMap<String, Object>();
+            HashMap<String, Object> scopes = new HashMap<>();
             String graphvizVersion = Dot.getInstance().getSupportedVersions().substring(4);
             scopes.put("graphvizExists", graphvizExists);
             scopes.put("graphvizVersion", graphvizVersion);

@@ -21,7 +21,10 @@ package org.schemaspy.view;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.CaseInsensitiveMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.util.*;
 
@@ -30,6 +33,9 @@ import java.util.*;
  * @author John Currier
  */
 public class SqlAnalyzer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private Set<String> keywords;
     private Map<String, Table> tablesByPossibleNames;
     private static final String TOKENS = " \t\n\r\f()<>|,";
@@ -43,16 +49,16 @@ public class SqlAnalyzer {
      * @return
      */
     public Set<Table> getReferencedTables(String sql, Database db) {
-        Set<Table> referenced = new HashSet<Table>();
+        Set<Table> referenced = new HashSet<>();
 
         Map<String, Table> tables = getTableMap(db);
         @SuppressWarnings("hiding")
-        Set<String> keywords = getKeywords(db.getMetaData());
+        Set<String> sqlKeywords = getKeywords(db.getMetaData());
 
         StringTokenizer tokenizer = new StringTokenizer(sql, TOKENS, true);
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
-            if (!keywords.contains(token.toUpperCase())) {
+            if (!sqlKeywords.contains(token.toUpperCase())) {
                 Table t = tables.get(token);
 
                 if (t == null) {
@@ -82,7 +88,7 @@ public class SqlAnalyzer {
     {
         if (tablesByPossibleNames == null)
         {
-            tablesByPossibleNames = new CaseInsensitiveMap<Table>();
+            tablesByPossibleNames = new CaseInsensitiveMap<>();
 
             tablesByPossibleNames.putAll(getTableMap(db.getTables()));
             tablesByPossibleNames.putAll(getTableMap(db.getViews()));
@@ -99,7 +105,7 @@ public class SqlAnalyzer {
      * @return
      */
     private Map<String, Table> getTableMap(Collection<? extends Table> tables) {
-        Map<String, Table> map = new CaseInsensitiveMap<Table>();
+        Map<String, Table> map = new CaseInsensitiveMap<>();
         for (Table t : tables) {
             String name = t.getName();
             String container = t.getContainer();
@@ -126,7 +132,7 @@ public class SqlAnalyzer {
      */
     private Set<String> getKeywords(DatabaseMetaData meta) {
         if (keywords == null) {
-            keywords = new HashSet<String>(Arrays.asList(new String[] {
+            keywords = new HashSet<>(Arrays.asList(
                 "ABSOLUTE", "ACTION", "ADD", "ALL", "ALLOCATE", "ALTER", "AND",
                 "ANY", "ARE", "AS", "ASC", "ASSERTION", "AT", "AUTHORIZATION", "AVG",
                 "BEGIN", "BETWEEN", "BIT", "BIT_LENGTH", "BOTH", "BY",
@@ -170,10 +176,10 @@ public class SqlAnalyzer {
                 "WHEN", "WHENEVER", "WHERE", "WITH", "WORK", "WRITE",
                 "YEAR",
                 "ZONE"
-            }));
+            ));
 
             try {
-                String keywordsArray[] = new String[] {
+                String[] keywordsArray = new String[] {
                     meta.getSQLKeywords(),
                     meta.getSystemFunctions(),
                     meta.getNumericFunctions(),
@@ -189,7 +195,7 @@ public class SqlAnalyzer {
                 }
             } catch (Exception exc) {
                 // don't totally fail just because we can't extract these details...
-                System.err.println(exc);
+                LOGGER.error("Unable to get keywords from DatabaseMetaData",exc);
             }
         }
 
