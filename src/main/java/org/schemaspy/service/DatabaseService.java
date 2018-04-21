@@ -28,7 +28,7 @@ public class DatabaseService {
 
     private final SqlService sqlService;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public DatabaseService(TableService tableService, ViewService viewService, SqlService sqlService) {
         this.tableService = Objects.requireNonNull(tableService);
@@ -440,11 +440,7 @@ public class DatabaseService {
                 if (forTables)
                     throw exc;
 
-                System.out.flush();
-                System.err.println();
-                System.err.println("Ignoring view " + lastTableName + " due to exception:");
-                exc.printStackTrace();
-                System.err.println("Continuing analysis.");
+                LOGGER.warn("Ignoring view '{}' due to exception, will continue", lastTableName, exc);
             }
         }
 
@@ -530,8 +526,7 @@ public class DatabaseService {
                         table.setId(rs.getObject("table_id"));
                 }
             } catch (SQLException sqlException) {
-                System.err.println();
-                System.err.println(sql);
+                LOGGER.error("Failed to init table ids using SQL '{}'", sql, sqlException);
                 throw sqlException;
             }
         }
@@ -554,8 +549,7 @@ public class DatabaseService {
                     }
                 }
             } catch (SQLException sqlException) {
-                System.err.println();
-                System.err.println(sql);
+                LOGGER.error("Failed to init index ids using SQL '{}'", sql, sqlException);
                 throw sqlException;
             }
         }

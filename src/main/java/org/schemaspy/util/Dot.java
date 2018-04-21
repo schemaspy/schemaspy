@@ -29,12 +29,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Dot {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static Dot instance = new Dot();
     private final GraphvizVersion graphvizVersion;
     private final GraphvizVersion supportedGraphvizVersion = new GraphvizVersion("2.26");
@@ -46,7 +46,6 @@ public class Dot {
     private final Set<String> validatedRenderers = Collections.synchronizedSet(new HashSet<String>());
     private final Set<String> invalidatedRenderers = Collections.synchronizedSet(new HashSet<String>());
 
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String CAIRO_RENDERER = ":cairo";
     private static final String GD_RENDERER = ":gd";
@@ -72,14 +71,14 @@ public class Dot {
                 versionText = matcher.group();
             } else {
                 if (Config.getInstance().isHtmlGenerationEnabled()) {
-                    System.err.println();
+                    //TODO Single logging call
                     LOGGER.warn("Invalid dot configuration detected.  '{}' returned:", getDisplayableCommand(dotCommand));
                     LOGGER.warn("   {}", versionLine);
                 }
             }
         } catch (Exception validDotDoesntExist) {
             if (Config.getInstance().isHtmlGenerationEnabled()) {
-                System.err.println();
+                //TODO single logging call
                 LOGGER.warn("Failed to query Graphviz graphvizVersion information");
                 LOGGER.warn("  with: {}", getDisplayableCommand(dotCommand));
                 LOGGER.warn("  {}", validDotDoesntExist);
@@ -238,7 +237,7 @@ public class Dot {
         }
 
         if (!validatedRenderers.contains(renderer)) {
-            LOGGER.info("Failed to validate {} renderer '{}'.  Reverting to default renderer for {}" + '.', getFormat(), renderer, getFormat());
+            LOGGER.info("Failed to validate '{}' renderer '{}', reverting to default renderer for '{}'", getFormat(), renderer, getFormat());
             invalidatedRenderers.add(renderer);
             return false;
         }
@@ -336,7 +335,7 @@ public class Dot {
     }
 
     private static class ProcessOutputReader extends Thread {
-		private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+		private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
         private final BufferedReader processReader;
         private final String command;
 
@@ -353,7 +352,7 @@ public class Dot {
                 while ((line = processReader.readLine()) != null) {
                     // don't report port id unrecognized or unrecognized port
                     if (!line.contains("unrecognized") && !line.contains("port"))
-                        System.err.println(command + ": " + line);
+                        LOGGER.error("{}: {}", command, line);
                 }
             } catch (IOException ioException) {
                 LOGGER.error("Error reading from process",ioException);

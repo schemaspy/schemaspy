@@ -98,8 +98,7 @@ public class TableService {
             if (forceQuotes) {
                 if (!table.isLogical()) {
                     // don't completely choke just because we couldn't do this....
-                    LOGGER.warn("Failed to determine auto increment status: {}", exc);
-                    LOGGER.warn("SQL: {}", sql.toString());
+                    LOGGER.warn("Failed to determine auto increment status with SQL '{}'", sql, exc);
                 }
             } else {
                 initColumnAutoUpdate(db, table, true);
@@ -171,7 +170,7 @@ public class TableService {
 
         column.setAllExcluded(column.matches(excludeColumns));
         column.setExcluded(column.isAllExcluded() || column.matches(excludeIndirectColumns));
-        LOGGER.trace("Excluding column {}" + '.' + "{}: matches {}:{} {}:{}", column.getTable(), column.getName(), excludeColumns, column.isAllExcluded(), excludeIndirectColumns, column.matches(excludeIndirectColumns));
+        LOGGER.trace("Excluding column {}.{}: matches {}:{} {}:{}", column.getTable(), column.getName(), excludeColumns, column.isAllExcluded(), excludeIndirectColumns, column.matches(excludeIndirectColumns));
 
         return column;
     }
@@ -275,7 +274,7 @@ public class TableService {
                     throw sqlExc;
 
                 // otherwise just report the fact that we tried & couldn't
-                System.err.println("Couldn't resolve foreign keys for remote table " + remoteTable.getFullName() + ": " + sqlExc);
+                LOGGER.error("Couldn't resolve foreign keys for remote table '{}'", remoteTable.getFullName(), sqlExc);
             }
         }
     }
@@ -499,7 +498,7 @@ public class TableService {
                         TableColumn parentColumn = parent.getColumn(fk.getColumnName());
 
                         if (parentColumn == null) {
-                            LOGGER.warn("Undefined column '{}" + '.' + "{}' referenced by '{}" + '.' + "{}' in XML metadata", parent.getName(), fk.getColumnName(), col.getTable(), col);
+                            LOGGER.warn("Undefined column '{}.{}' referenced by '{}.{}' in XML metadata", parent.getName(), fk.getColumnName(), col.getTable(), col);
                         } else {
                             /**
                              * Merely instantiating a foreign key constraint ties it
@@ -515,16 +514,16 @@ public class TableService {
 
                             // they forgot to say it was a primary key
                             if (!parentColumn.isPrimary()) {
-                                LOGGER.warn("Assuming {}" + '.' + "{} is a primary key due to being referenced by {}" + '.' + "{}", parentColumn.getTable(), parentColumn, col.getTable(), col);
+                                LOGGER.warn("Assuming {}.{} is a primary key due to being referenced by {}.{}", parentColumn.getTable(), parentColumn, col.getTable(), col);
                                 parent.setPrimaryColumn(parentColumn);
                             }
                         }
                     } else {
-                        LOGGER.warn("Undefined table '{}' referenced by '{}" + '.' + "{}' in XML metadata", fk.getTableName(), table.getName(), col.getName());
+                        LOGGER.warn("Undefined table '{}' referenced by '{}.{}' in XML metadata", fk.getTableName(), table.getName(), col.getName());
                     }
                 }
             } else {
-                LOGGER.warn("Undefined column '{}" + '.' + "{}' in XML metadata", table.getName(), colMeta.getName());
+                LOGGER.warn("Undefined column '{}.{}' in XML metadata", table.getName(), colMeta.getName());
             }
         }
     }

@@ -21,7 +21,10 @@ package org.schemaspy.view;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.CaseInsensitiveMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.util.*;
 
@@ -30,6 +33,9 @@ import java.util.*;
  * @author John Currier
  */
 public class SqlAnalyzer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private Set<String> keywords;
     private Map<String, Table> tablesByPossibleNames;
     private static final String TOKENS = " \t\n\r\f()<>|,";
@@ -189,7 +195,7 @@ public class SqlAnalyzer {
                 }
             } catch (Exception exc) {
                 // don't totally fail just because we can't extract these details...
-                System.err.println(exc);
+                LOGGER.error("Failed to extract keywords and functions from DatabaseMetaData", exc);
             }
         }
 

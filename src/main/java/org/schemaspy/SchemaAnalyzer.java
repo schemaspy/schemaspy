@@ -157,7 +157,11 @@ public class SchemaAnalyzer {
 
             return db;
         } catch (Config.MissingRequiredParameterException missingParam) {
-            config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
+            if (missingParam.isDbTypeSpecific()) {
+                LOGGER.error("{}, use '-help' to get usage information", missingParam.getMessage());
+            } else {
+                LOGGER.error("{}, use '-dbhelp' to get help on database types", missingParam.getMessage());
+            }
             return null;
         }
     }
@@ -252,7 +256,11 @@ public class SchemaAnalyzer {
 
             return db;
         } catch (Config.MissingRequiredParameterException missingParam) {
-            config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
+            if (missingParam.isDbTypeSpecific()) {
+                LOGGER.error("{}, use '-help' to get usage information", missingParam.getMessage());
+            } else {
+                LOGGER.error("{}, use '-dbhelp' to get help on database types", missingParam.getMessage());
+            }
             return null;
         }
     }

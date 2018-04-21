@@ -26,9 +26,12 @@ import org.schemaspy.util.DiagramUtil;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.LineWriter;
 import org.schemaspy.util.Markdown;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -39,6 +42,9 @@ import java.util.*;
  * @author Nils Petzaell
  */
 public class HtmlTablePage extends HtmlFormatter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static final HtmlTablePage instance = new HtmlTablePage();
 
     /**
@@ -99,7 +105,7 @@ public class HtmlTablePage extends HtmlFormatter {
         scopes.put("diagramExists", DiagramUtil.diagramExists(diagrams));
         scopes.put("indexExists", indexExists(table, indexedColumns));
         scopes.put("definitionExists", definitionExists(table));
-        System.out.println("Table -> "+table.getName());
+        LOGGER.debug("Writing html page for '{}'", table.getName());
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
         mw.write("tables/table.html", Markdown.pagePath(table.getName()), "table.js");
     }

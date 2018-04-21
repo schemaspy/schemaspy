@@ -28,12 +28,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Represents our CSS style sheet (CSS) with accessors for important
@@ -46,6 +41,10 @@ import java.util.StringTokenizer;
 public class StyleSheet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static final String ATTRIBUTE_BACKGROUND = "background";
+    private static final String ATTRIBUTE_BACKGROUND_COLOR = "background-color";
+    private static final String ATTRIBUTE_COLOR = "color";
 
     private static StyleSheet instance;
     private final String css;
@@ -89,23 +88,23 @@ public class StyleSheet {
             } else {
                 Map<String, String> attribs = parseAttributes(token);
                 if (id.equals(".diagram"))
-                    bodyBackgroundColor = attribs.get("background");
+                    bodyBackgroundColor = attribs.get(ATTRIBUTE_BACKGROUND);
                 else if (id.equals("th.diagram"))
-                    tableHeadBackgroundColor = attribs.get("background-color");
+                    tableHeadBackgroundColor = attribs.get(ATTRIBUTE_BACKGROUND_COLOR);
                 else if (id.equals("td.diagram"))
-                    tableBackgroundColor = attribs.get("background-color");
+                    tableBackgroundColor = attribs.get(ATTRIBUTE_BACKGROUND_COLOR);
                 else if (id.equals(".diagram .primarykey"))
-                    primaryKeyBackgroundColor = attribs.get("background");
+                    primaryKeyBackgroundColor = attribs.get(ATTRIBUTE_BACKGROUND);
                 else if (id.equals(".diagram .indexedcolumn"))
-                    indexedColumnBackgroundColor = attribs.get("background");
+                    indexedColumnBackgroundColor = attribs.get(ATTRIBUTE_BACKGROUND);
                 else if (id.equals(".selectedtable"))
-                    selectedTableBackgroundColor = attribs.get("background");
+                    selectedTableBackgroundColor = attribs.get(ATTRIBUTE_BACKGROUND);
                 else if (id.equals(".excludedcolumn"))
-                    excludedColumnBackgroundColor = attribs.get("background");
+                    excludedColumnBackgroundColor = attribs.get(ATTRIBUTE_BACKGROUND);
                 else if (id.equals("a:link"))
-                    linkColor = attribs.get("color");
+                    linkColor = attribs.get(ATTRIBUTE_COLOR);
                 else if (id.equals("a:visited"))
-                    linkVisitedColor = attribs.get("color");
+                    linkVisitedColor = attribs.get(ATTRIBUTE_COLOR);
                 id = null;
             }
         }
@@ -117,7 +116,7 @@ public class StyleSheet {
      * @return the singleton
      * @throws ParseException
      */
-    public static StyleSheet getInstance() throws ParseException {
+    public static StyleSheet getInstance() {
         if (instance == null) {
             String cssFilename = Config.getInstance().getCss();
             String templateDirectory = Config.getInstance().getTemplateDirectory();
@@ -148,7 +147,7 @@ public class StyleSheet {
                 attribs.put(attribute, value);
             }
         } catch (NoSuchElementException badToken) {
-            System.err.println("Failed to extract attributes from '" + data + "'");
+            LOGGER.error("Failed to extract attributes from '{}'", data);
             throw badToken;
         }
 
@@ -167,63 +166,63 @@ public class StyleSheet {
 
     public String getBodyBackground() {
         if (bodyBackgroundColor == null)
-            throw new MissingCssPropertyException(".diagram", "background");
+            throw new MissingCssPropertyException(".diagram", ATTRIBUTE_BACKGROUND);
 
         return bodyBackgroundColor;
     }
 
     public String getTableBackground() {
         if (tableBackgroundColor == null)
-            throw new MissingCssPropertyException("td", "background-color");
+            throw new MissingCssPropertyException("td", ATTRIBUTE_BACKGROUND_COLOR);
 
         return tableBackgroundColor;
     }
 
     public String getTableHeadBackground() {
         if (tableHeadBackgroundColor == null)
-            throw new MissingCssPropertyException("th", "background-color");
+            throw new MissingCssPropertyException("th", ATTRIBUTE_BACKGROUND_COLOR);
 
         return tableHeadBackgroundColor;
     }
 
     public String getPrimaryKeyBackground() {
         if (primaryKeyBackgroundColor == null)
-            throw new MissingCssPropertyException(".diagram .primaryKey", "background");
+            throw new MissingCssPropertyException(".diagram .primaryKey", ATTRIBUTE_BACKGROUND);
 
         return primaryKeyBackgroundColor;
     }
 
     public String getIndexedColumnBackground() {
         if (indexedColumnBackgroundColor == null)
-            throw new MissingCssPropertyException(".diagram .indexedColumn", "background");
+            throw new MissingCssPropertyException(".diagram .indexedColumn", ATTRIBUTE_BACKGROUND);
 
         return indexedColumnBackgroundColor;
     }
 
     public String getSelectedTableBackground() {
         if (selectedTableBackgroundColor == null)
-            throw new MissingCssPropertyException(".selectedTable", "background");
+            throw new MissingCssPropertyException(".selectedTable", ATTRIBUTE_BACKGROUND);
 
         return selectedTableBackgroundColor;
     }
 
     public String getExcludedColumnBackgroundColor() {
         if (excludedColumnBackgroundColor == null)
-            throw new MissingCssPropertyException(".excludedColumn", "background");
+            throw new MissingCssPropertyException(".excludedColumn", ATTRIBUTE_BACKGROUND);
 
         return excludedColumnBackgroundColor;
     }
 
     public String getLinkColor() {
         if (linkColor == null)
-            throw new MissingCssPropertyException("a:link", "color");
+            throw new MissingCssPropertyException("a:link", ATTRIBUTE_COLOR);
 
         return linkColor;
     }
 
     public String getLinkVisitedColor() {
         if (linkVisitedColor == null)
-            throw new MissingCssPropertyException("a:visited", "color");
+            throw new MissingCssPropertyException("a:visited", ATTRIBUTE_COLOR);
 
         return linkVisitedColor;
     }

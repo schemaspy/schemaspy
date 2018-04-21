@@ -20,11 +20,9 @@
  */
 package org.schemaspy;
 
-import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.db.config.PropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.PasswordReader;
 import org.slf4j.Logger;
@@ -1496,59 +1494,6 @@ public final class Config {
         }
 
         return databaseTypes;
-    }
-
-    /**
-     * @deprecated use {@link CommandLineArgumentParser#printUsage()} resp. {@link CommandLineArgumentParser#printDatabaseTypesHelp()}
-     * @param errorMessage
-     * @param detailedDb
-     */
-    @Deprecated
-    protected void dumpUsage(String errorMessage, boolean detailedDb) {
-        if (errorMessage != null) {
-            System.out.flush();
-            System.err.println("*** " + errorMessage + " ***");
-        } else {
-            System.out.println("SchemaSpy generates an HTML representation of a database schema's relationships.");
-        }
-
-        System.err.flush();
-        System.out.println();
-
-        if (!detailedDb) {
-            System.out.println("Usage:");
-            System.out.println(" java -jar " + getLoadedFromJar() + " [options]");
-            System.out.println("   -t databaseType       type of database - defaults to ora");
-            System.out.println("                           use -dbhelp for a list of built-in types");
-            System.out.println("   -u user               connect to the database with this user id");
-            System.out.println("   -s schema             defaults to the specified user");
-            System.out.println("   -p password           defaults to no password");
-            System.out.println("   -o outputDirectory    directory to place the generated output in");
-            System.out.println("   -dp pathToDrivers     optional - looks for JDBC drivers here before looking");
-            System.out.println("                           in driverPath in [databaseType].properties.");
-            System.out.println("Go to http://schemaspy.org for a complete list/description");
-            System.out.println(" of additional parameters.");
-            System.out.println();
-        }
-
-        if (detailedDb) {
-            System.out.println("Built-in database types and their required connection parameters:");
-            for (String type : getBuiltInDatabaseTypes(getLoadedFromJar())) {
-                new DbSpecificConfig(type).dumpUsage();
-            }
-            System.out.println();
-        }
-
-        if (detailedDb) {
-            System.out.println("You can use your own database types by specifying the filespec of a .properties file with -t.");
-            System.out.println("Grab one out of " + getLoadedFromJar() + " and modify it to suit your needs.");
-            System.out.println();
-        }
-
-        System.out.println("Sample usage using the default database type (implied -t ora):");
-        System.out.println(" java -jar schemaSpy.jar -db mydb -s myschema -u devuser -p password -o output");
-        System.out.println();
-        System.out.flush();
     }
 
     /**

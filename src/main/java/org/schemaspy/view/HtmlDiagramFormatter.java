@@ -19,25 +19,27 @@
 package org.schemaspy.view;
 
 import org.schemaspy.util.Dot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
 
 public class HtmlDiagramFormatter extends HtmlFormatter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static boolean printedNoDotWarning = false;
     private static boolean printedInvalidVersionWarning = false;
 
     protected HtmlDiagramFormatter() {
     }
 
-    protected Dot getDot() {
+    protected static Dot getDot() {
         Dot dot = Dot.getInstance();
         if (!dot.exists()) {
             if (!printedNoDotWarning) {
                 printedNoDotWarning = true;
-                System.err.println();
-                System.err.println("Warning: Failed to run dot.");
-                System.err.println("   Download " + dot.getSupportedVersions());
-                System.err.println("   from www.graphviz.org and make sure that dot is either in your path");
-                System.err.println("   or point to where you installed Graphviz with the -gv option.");
-                System.err.println("   Generated pages will not contain a diagramtic view of table relationships.");
+                LOGGER.warn("Failed to run dot, generated pages will not contain relationship diagrams. Make sure dot executable is in your path or specify location using '-gv' on commandline, if graphviz is not installed, download and install version greater than 2.31.");
             }
 
             return null;
@@ -46,10 +48,7 @@ public class HtmlDiagramFormatter extends HtmlFormatter {
         if (!dot.isValid()) {
             if (!printedInvalidVersionWarning) {
                 printedInvalidVersionWarning = true;
-                System.err.println();
-                System.err.println("Warning: Invalid version of Graphviz dot detected (" + dot.getGraphvizVersion() + ").");
-                System.err.println("   SchemaSpy requires " + dot.getSupportedVersions() + ". from www.graphviz.org.");
-                System.err.println("   Generated pages will not contain a diagramatic view of table relationships.");
+                LOGGER.warn("Incompatible version of graphviz detected, download and install graphviz version greater than 2.31");
             }
 
             return null;

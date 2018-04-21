@@ -18,18 +18,21 @@
  */
 package org.schemaspy.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.DiagramUtil;
 import org.schemaspy.util.Dot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The page that contains the overview entity relationship diagrams.
@@ -37,6 +40,9 @@ import org.schemaspy.util.Dot;
  * @author John Currier
  */
 public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static final HtmlRelationshipsPage instance = new HtmlRelationshipsPage();
 
     /**
@@ -86,9 +92,7 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
                 	listener.graphingSummaryProgressed();
                     DiagramUtil.generateDiagram("Large", dot, largeRelationshipsDotFile, largeRelationshipsDiagramFile, diagrams, false, false);
                 } catch (Dot.DotFailure dotFailure) {
-                    System.err.println("dot failed to generate all of the relationships diagrams:");
-                    System.err.println(dotFailure);
-                    System.err.println("...but the relationships page may still be usable.");
+                    LOGGER.error("Failed to generate all of the relationship diagrams, relationships page might still be usable", dotFailure);
                 }
             }
 
@@ -101,14 +105,10 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
                     DiagramUtil.generateDiagram("Large Implied", dot, largeImpliedDotFile, largeImpliedDiagramFile, diagrams, false, true);
                 }
             } catch (Dot.DotFailure dotFailure) {
-                System.err.println("dot failed to generate all of the relationships diagrams:");
-                System.err.println(dotFailure);
-                System.err.println("...but the relationships page may still be usable.");
+                LOGGER.error("Failed to generate all of the relationship diagrams, relationships page might still be usable", dotFailure);
             }
 
         	listener.graphingSummaryProgressed();
-
-            //writeExcludedColumns(excludedColumns, null, html);
 
             DiagramUtil.markFirstAsActive(diagrams);
 
@@ -125,10 +125,10 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
             mw.write("relationships.html", "relationships.html", "relationships.js");
             return true;
         } catch (Dot.DotFailure dotFailure) {
-            System.err.println(dotFailure);
+            LOGGER.error("Error occurred with dot", dotFailure);
             return false;
         } catch (IOException ioExc) {
-            ioExc.printStackTrace();
+            LOGGER.error("IOException occurred with dot or mustache", ioExc);
             return false;
         }
     }
