@@ -146,7 +146,7 @@ public class PasswordReader {
         @Override
         public void run() {
             while (masking) {
-                System.out.print(mask);
+                System.out.print(mask); //NOSONAR
                 try {
                     sleep(100);
                 } catch (InterruptedException iex) {

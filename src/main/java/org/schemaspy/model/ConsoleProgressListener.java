@@ -18,11 +18,11 @@
  */
 package org.schemaspy.model;
 
-import java.io.File;
-import java.util.Collection;
-
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
+
+import java.io.File;
+import java.util.Collection;
 
 /**
  * Implementation of {@link ProgressListener} that sends its output to the console.
@@ -52,7 +52,7 @@ public class ConsoleProgressListener implements ProgressListener {
         long duration = startedAt - startedGatheringAt;
 
         if (render) {
-			System.out.print("Gathering schema details...");
+			System.out.print("Gathering schema details..."); //NOSONAR
 		}
 
         return duration;
@@ -61,7 +61,7 @@ public class ConsoleProgressListener implements ProgressListener {
 	@Override
 	public void gatheringDetailsProgressed(Table table) {
 		if (render) {
-			System.out.print('.');
+			System.out.print('.'); //NOSONAR
 		}
 	}
 
@@ -71,10 +71,10 @@ public class ConsoleProgressListener implements ProgressListener {
         long duration = startedConnectingAt - startedGatheringAt;
 
         if (render) {
-	        System.err.flush();
-	        System.out.flush();
-	        System.out.println("(" + duration / 1000 + "sec)");
-	        System.out.print("Connecting relationships...");
+	        System.err.flush(); //NOSONAR
+	        System.out.flush(); //NOSONAR
+	        System.out.println("(" + duration / 1000 + "sec)"); //NOSONAR
+	        System.out.print("Connecting relationships..."); //NOSONAR
         }
 
         return duration;
@@ -83,7 +83,7 @@ public class ConsoleProgressListener implements ProgressListener {
 	@Override
 	public void connectingTablesProgressed(Table table) {
 		if (render) {
-			System.out.print('.');
+			System.out.print('.'); //NOSONAR
 		}
 	}
 
@@ -93,11 +93,11 @@ public class ConsoleProgressListener implements ProgressListener {
         long duration = startedGraphingSummariesAt - startedConnectingAt;
 
         if (render) {
-	        System.err.flush();
-	        System.out.flush();
-	        System.out.println("(" + duration / 1000 + "sec)");
-	        System.out.print("Writing/graphing summary");
-			System.out.print('.');
+	        System.err.flush(); //NOSONAR
+	        System.out.flush(); //NOSONAR
+	        System.out.println("(" + duration / 1000 + "sec)"); //NOSONAR
+	        System.out.print("Writing/graphing summary"); //NOSONAR
+			System.out.print('.'); //NOSONAR
         }
 
         return duration;
@@ -106,7 +106,7 @@ public class ConsoleProgressListener implements ProgressListener {
 	@Override
 	public void graphingSummaryProgressed() {
 		if (render) {
-			System.out.print('.');
+			System.out.print('.'); //NOSONAR
 		}
 	}
 
@@ -116,10 +116,10 @@ public class ConsoleProgressListener implements ProgressListener {
 		long duration = startedGraphingDetailsAt - startedGraphingSummariesAt;
 
 		if (render) {
-	        System.err.flush();
-	        System.out.flush();
-        	System.out.println("(" + duration / 1000 + "sec)");
-        	System.out.print("Writing/diagramming details");
+	        System.err.flush(); //NOSONAR
+	        System.out.flush(); //NOSONAR
+        	System.out.println("(" + duration / 1000 + "sec)"); //NOSONAR
+        	System.out.print("Writing/diagramming details"); //NOSONAR
 		}
 
 		return duration;
@@ -128,7 +128,7 @@ public class ConsoleProgressListener implements ProgressListener {
 	@Override
 	public void graphingDetailsProgressed(Table table) {
 		if (render) {
-			System.out.print('.');
+			System.out.print('.'); //NOSONAR
 		}
 	}
 
@@ -138,9 +138,9 @@ public class ConsoleProgressListener implements ProgressListener {
 		long duration = finishedAt - startedGraphingDetailsAt;
 
 		if (render) {
-	        System.err.flush();
-	        System.out.flush();
-            System.out.println("(" + duration / 1000 + "sec)");
+	        System.err.flush(); //NOSONAR
+	        System.out.flush(); //NOSONAR
+            System.out.println("(" + duration / 1000 + "sec)"); //NOSONAR
 		}
 
 		return duration;
@@ -152,10 +152,10 @@ public class ConsoleProgressListener implements ProgressListener {
 		long duration = finishedAt - startedAt;
 
 		if (render) {
-	        System.err.flush();
-	        System.out.flush();
-            System.out.println("Wrote relationship details of " + tables.size() + " tables/views to directory '" + commandLineArguments.getOutputDirectory() + "' in " + duration / 1000 + " seconds.");
-            System.out.println("View the results by opening " + new File(commandLineArguments.getOutputDirectory(), "index.html"));
+	        System.err.flush(); //NOSONAR
+	        System.out.flush(); //NOSONAR
+            System.out.println("Wrote relationship details of " + tables.size() + " tables/views to directory '" + commandLineArguments.getOutputDirectory() + "' in " + duration / 1000 + " seconds."); //NOSONAR
+            System.out.println("View the results by opening " + new File(commandLineArguments.getOutputDirectory(), "index.html")); //NOSONAR
 		}
 
 		return duration;
@@ -163,8 +163,8 @@ public class ConsoleProgressListener implements ProgressListener {
 
 	@Override
 	public String recoverableExceptionEncountered(String msg, Exception exc, String sql) {
-        System.out.println();
-        System.out.flush();
+        System.out.println(); //NOSONAR
+        System.out.flush(); //NOSONAR
 
         String text = msg + ": " + exc;
         if (sql != null) {
