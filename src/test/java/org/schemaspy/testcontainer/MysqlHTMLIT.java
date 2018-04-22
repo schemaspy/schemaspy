@@ -114,8 +114,7 @@ public class MysqlHTMLIT {
                 }
                 return a.compareTo(e);
             }).as("%s isn't as expected", actual.toString()).containsAll(expectLines);
-            softAssertions.assertAll();
         }
-
+        softAssertions.assertAll();
     }
 }

@@ -30,5 +30,9 @@
             <column ascending="true" name="email"/>
          </index>
       </table>
+      <table catalog="test" name="userAndGroup" numRows="0" remarks="" type="VIEW" viewSql="select `u`.`name` AS `UserName`,`g`.`name` AS `GroupName` from (`test`.`user` `u` left join `test`.`group` `g` on((`u`.`groupId` = `g`.`groupId`)))">
+         <column autoUpdated="false" digits="0" id="0" name="UserName" nullable="false" remarks="UserName" size="16" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="1" name="GroupName" nullable="true" remarks="" size="16" type="VARCHAR"/>
+      </table>
    </tables>
 </database>
