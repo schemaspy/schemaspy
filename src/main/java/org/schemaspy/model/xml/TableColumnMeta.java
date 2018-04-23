@@ -48,7 +48,7 @@ public class TableColumnMeta {
     private final String comments;
     private final String defaultValue;
     private final boolean isAutoUpdated;
-    private final List<ForeignKeyMeta> foreignKeys = new ArrayList<ForeignKeyMeta>();
+    private final List<ForeignKeyMeta> foreignKeys = new ArrayList<>();
     private final boolean isExcluded;
     private final boolean isAllExcluded;
     private final boolean isImpliedParentsDisabled;

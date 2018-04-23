@@ -21,15 +21,12 @@ package org.schemaspy.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.sql.DatabaseMetaData.importedKeyCascade;
-import static java.sql.DatabaseMetaData.importedKeyNoAction;
-import static java.sql.DatabaseMetaData.importedKeyRestrict;
-import static java.sql.DatabaseMetaData.importedKeySetNull;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static java.sql.DatabaseMetaData.*;
 
 
 
@@ -41,12 +38,12 @@ import java.util.List;
 public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
     private final String name;
     private Table parentTable;
-    private final List<TableColumn> parentColumns = new ArrayList<TableColumn>();
+    private final List<TableColumn> parentColumns = new ArrayList<>();
     private final Table childTable;
-    private final List<TableColumn> childColumns = new ArrayList<TableColumn>();
+    private final List<TableColumn> childColumns = new ArrayList<>();
     private final int deleteRule;
     private final int updateRule;
-    private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Construct a foreign key for the specified child table.
@@ -363,6 +360,9 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
             return true;
         }
         if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
             return false;
         }
         if (this.childTable != ((ForeignKeyConstraint)obj).childTable) {

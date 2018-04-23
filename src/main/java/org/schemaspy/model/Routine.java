@@ -36,7 +36,7 @@ public class Routine implements Comparable<Routine> {
     private final String securityType;
     private final String comment;
     private final String returnType;
-    private final List<RoutineParameter> params = new ArrayList<RoutineParameter>();
+    private final List<RoutineParameter> params = new ArrayList<>();
 
     /**
      * @param name

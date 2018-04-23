@@ -31,7 +31,7 @@ import java.util.StringTokenizer;
  * @version 1.0
  */
 public class GraphvizVersion implements Comparable<GraphvizVersion> {
-    private final List<Integer> segments = new ArrayList<Integer>();
+    private final List<Integer> segments = new ArrayList<>();
     private final String asString;
     private final int hashCode;
 

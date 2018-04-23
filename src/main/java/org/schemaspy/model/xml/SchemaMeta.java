@@ -51,12 +51,12 @@ import java.util.List;
  * @author John Currier
  */
 public class SchemaMeta {
-    private final List<TableMeta> tables = new ArrayList<TableMeta>();
+    private final List<TableMeta> tables = new ArrayList<>();
     private final String comments;
     private final File metaFile;
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public SchemaMeta(String xmlMeta, String dbName, String schema) throws InvalidConfigurationException {
+    public SchemaMeta(String xmlMeta, String dbName, String schema) {
         File meta = new File(xmlMeta);
         if (meta.isDirectory()) {
             String filename = (schema == null ? dbName : schema) + ".meta.xml";
@@ -65,7 +65,7 @@ public class SchemaMeta {
             if (!meta.exists()) {
                 if (Config.getInstance().isOneOfMultipleSchemas()) {
                     // don't force all of the "one of many" schemas to have metafiles
-                    LOGGER.info("Meta directory \"{}\" should contain a file named \"{}" + '\"', xmlMeta, filename);
+                    LOGGER.info("Meta directory '{}' should contain a file named '{}'", xmlMeta, filename);
                     comments = null;
                     metaFile = null;
                     return;
@@ -130,7 +130,7 @@ public class SchemaMeta {
         validator.validate(new DOMSource(document));
     }
 
-    private Document parse(File file) throws InvalidConfigurationException {
+    private Document parse(File file) {
         DocumentBuilder docBuilder;
         Document doc;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

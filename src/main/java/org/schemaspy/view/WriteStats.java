@@ -18,11 +18,12 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
 
 /**
  * Simple ugly hack that provides details of what was written.
@@ -33,7 +34,7 @@ public class WriteStats {
     private final Set<TableColumn> excludedColumns;
 
     public WriteStats(Collection<Table> tables) {
-        excludedColumns = new HashSet<TableColumn>();
+        excludedColumns = new HashSet<>();
 
         for (Table table : tables) {
             for (TableColumn column : table.getColumns()) {

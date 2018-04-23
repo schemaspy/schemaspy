@@ -14,7 +14,7 @@ public class HtmlRoutinePage extends HtmlFormatter {
     }
 
     public void write(Database db, Routine routine, File outputDir) {
-        HashMap<String, Object> scopes = new HashMap<String, Object>();
+        HashMap<String, Object> scopes = new HashMap<>();
         scopes.put("routine", routine);
         scopes.put("parameters",routine.getParameters());
         scopes.put("definitionExists",routine.getDefinition() != null);

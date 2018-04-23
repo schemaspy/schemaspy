@@ -23,7 +23,6 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.Routine;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -52,10 +51,10 @@ public class HtmlRoutinesPage extends HtmlFormatter {
         return instance;
     }
 
-    public void write(Database db, File outputDir) throws IOException {
-        Collection<Routine> routines = new TreeSet<Routine>(db.getRoutines());
+    public void write(Database db, File outputDir) {
+        Collection<Routine> routines = new TreeSet<>(db.getRoutines());
 
-        HashMap<String, Object> scopes = new HashMap<String, Object>();
+        HashMap<String, Object> scopes = new HashMap<>();
         scopes.put("routines", routines);
         scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
 

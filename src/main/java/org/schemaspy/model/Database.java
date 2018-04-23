@@ -38,11 +38,11 @@ public class Database {
     private final String databaseName ;
     private final Catalog catalog ;
     private final Schema schema;
-    private final Map<String, Table> tables = new CaseInsensitiveMap<Table>();
-    private final Map<String, View> views = new CaseInsensitiveMap<View>();
-    private final Map<String, Table> remoteTables = new CaseInsensitiveMap<Table>(); // key: schema.tableName
+    private final Map<String, Table> tables = new CaseInsensitiveMap<>();
+    private final Map<String, View> views = new CaseInsensitiveMap<>();
+    private final Map<String, Table> remoteTables = new CaseInsensitiveMap<>(); // key: schema.tableName
     private final Map<String, Table> locals = new CombinedMap(tables, views);
-    private final Map<String, Routine> routines = new CaseInsensitiveMap<Routine>();
+    private final Map<String, Routine> routines = new CaseInsensitiveMap<>();
     private final DatabaseMetaData meta;
     private final SchemaMeta schemaMeta;
     private final String connectTime = new SimpleDateFormat("EEE MMM dd HH:mm z yyyy").format(new Date());
@@ -55,7 +55,7 @@ public class Database {
             String catalog,
             String schema,
             SchemaMeta schemaMeta
-    ) throws SQLException, MissingResourceException {
+    ) {
         this.meta = meta;
         this.schemaMeta = schemaMeta;
         this.databaseName = name;
@@ -379,7 +379,7 @@ public class Database {
         }
 
         private Map<String, Table> getCombined() {
-            Map<String, Table> all = new CaseInsensitiveMap<Table>(size());
+            Map<String, Table> all = new CaseInsensitiveMap<>(size());
             all.putAll(map1);
             all.putAll(map2);
             return all;

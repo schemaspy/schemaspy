@@ -18,6 +18,11 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.model.*;
+import org.schemaspy.util.Inflection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -26,17 +31,12 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import org.schemaspy.model.*;
-import org.schemaspy.util.Inflection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DbAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	
     public static List<ImpliedForeignKeyConstraint> getImpliedConstraints(Collection<Table> tables) {
-        List<TableColumn> columnsWithoutParents = new ArrayList<TableColumn>();
-        Map<DatabaseObject, Table> keyedTablesByPrimary = new TreeMap<DatabaseObject, Table>();
+        List<TableColumn> columnsWithoutParents = new ArrayList<>();
+        Map<DatabaseObject, Table> keyedTablesByPrimary = new TreeMap<>();
         
         // gather all the primary key columns and columns without parents
         for (Table table : tables) {
@@ -58,7 +58,7 @@ public class DbAnalyzer {
         }
 
         sortColumnsByTable(columnsWithoutParents);
-        List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<ImpliedForeignKeyConstraint>();
+        List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<>();
         
         for (TableColumn childColumn : columnsWithoutParents) {
             DatabaseObject columnWithoutParent = new DatabaseObject(childColumn);
@@ -134,7 +134,7 @@ public class DbAnalyzer {
      * @return List of {@link RailsForeignKeyConstraint}s
      */
     public static List<RailsForeignKeyConstraint> getRailsConstraints(Map<String, Table> tables) {
-        List<RailsForeignKeyConstraint> railsConstraints = new ArrayList<RailsForeignKeyConstraint>(tables.size());
+        List<RailsForeignKeyConstraint> railsConstraints = new ArrayList<>(tables.size());
 
         // iterate thru each column in each table looking for columns that
         // match Rails naming conventions
@@ -166,7 +166,7 @@ public class DbAnalyzer {
      * @return List
      */
     public static List<ForeignKeyConstraint> getForeignKeyConstraints(Collection<Table> tables) {
-        List<ForeignKeyConstraint> constraints = new ArrayList<ForeignKeyConstraint>();
+        List<ForeignKeyConstraint> constraints = new ArrayList<>();
 
         for (Table table : tables) {
             constraints.addAll(table.getForeignKeys());
@@ -176,7 +176,7 @@ public class DbAnalyzer {
     }
 
     public static List<Table> getOrphans(Collection<Table> tables) {
-        List<Table> orphans = new ArrayList<Table>();
+        List<Table> orphans = new ArrayList<>();
 
         for (Table table : tables) {
             if (table.isOrphan(false) && !table.isView()) {
@@ -191,7 +191,7 @@ public class DbAnalyzer {
      * Return a list of <code>Table</code>s that have neither an index nor a primary key.
      */
     public static List<Table> getTablesWithoutIndexes(Collection<Table> tables) {
-        List<Table> withoutIndexes = new ArrayList<Table>();
+        List<Table> withoutIndexes = new ArrayList<>();
 
         for (Table table : tables) {
             if (table.getIndexes().isEmpty() && !table.isView() && !table.isLogical())
@@ -202,10 +202,10 @@ public class DbAnalyzer {
     }
 
     public static List<Table> getTablesWithIncrementingColumnNames(Collection<Table> tables) {
-        List<Table> denormalizedTables = new ArrayList<Table>();
+        List<Table> denormalizedTables = new ArrayList<>();
 
         for (Table table : tables) {
-            Map<String, Long> columnPrefixes = new HashMap<String, Long>();
+            Map<String, Long> columnPrefixes = new HashMap<>();
 
             for (TableColumn column : table.getColumns()) {
                 // search for columns that start with the same prefix
@@ -246,7 +246,7 @@ public class DbAnalyzer {
     }
 
     public static List<Table> getTablesWithOneColumn(Collection<Table> tables) {
-        List<Table> singleColumnTables = new ArrayList<Table>();
+        List<Table> singleColumnTables = new ArrayList<>();
 
         for (Table table : tables) {
             if (table.getColumns().size() == 1)
@@ -281,7 +281,7 @@ public class DbAnalyzer {
      * @return List
      */
     public static List<TableColumn> getDefaultNullStringColumns(Collection<Table> tables) {
-        List<TableColumn> defaultNullStringColumns = new ArrayList<TableColumn>();
+        List<TableColumn> defaultNullStringColumns = new ArrayList<>();
 
         for (Table table : tables) {
             for (TableColumn column : table.getColumns()) {
@@ -304,7 +304,7 @@ public class DbAnalyzer {
      * @param meta DatabaseMetaData
      */
     public static List<String> getCatalogs(DatabaseMetaData meta) throws SQLException {
-        List<String> catalogs = new ArrayList<String>();
+        List<String> catalogs = new ArrayList<>();
 
         ResultSet rs = meta.getCatalogs();
         while (rs.next()) {
@@ -321,7 +321,7 @@ public class DbAnalyzer {
      * @param meta DatabaseMetaData
      */
     public static List<String> getSchemas(DatabaseMetaData meta) throws SQLException {
-        List<String> schemas = new ArrayList<String>();
+        List<String> schemas = new ArrayList<>();
 
         ResultSet rs = meta.getSchemas();
         while (rs.next()) {
@@ -348,7 +348,7 @@ public class DbAnalyzer {
      * @param meta DatabaseMetaData
      */
     public static List<String> getPopulatedSchemas(DatabaseMetaData meta, String schemaSpec, boolean isCatalog) throws SQLException {
-        Set<String> schemas = new TreeSet<String>(); // alpha sorted
+        Set<String> schemas = new TreeSet<>(); // alpha sorted
         Pattern schemaRegex = Pattern.compile(schemaSpec);
 
         for (String schema : (isCatalog ? getCatalogs(meta) : getSchemas(meta))) {
@@ -372,7 +372,7 @@ public class DbAnalyzer {
             }
         }
 
-        return new ArrayList<String>(schemas);
+        return new ArrayList<>(schemas);
     }
 
     /**
