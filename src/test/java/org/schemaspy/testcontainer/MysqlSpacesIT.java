@@ -59,7 +59,7 @@ public class MysqlSpacesIT {
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MySQLContainer())
+            new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitScript("integrationTesting/dbScripts/mysql_spaces.sql")

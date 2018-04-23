@@ -32,7 +32,7 @@ public class MysqlXMLIT {
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>())
+            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5"))
             .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
             .withQueryString("?useSSL=false")
             .withInitScript("integrationTesting/dbScripts/mysqlxmlit.sql");

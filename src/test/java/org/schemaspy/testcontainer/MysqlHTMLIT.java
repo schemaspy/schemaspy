@@ -7,11 +7,13 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.Main;
+import org.schemaspy.testing.IgnoreUsingXPath;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testcontainers.containers.MySQLContainer;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.DifferenceEvaluators;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,7 +38,7 @@ public class MysqlHTMLIT {
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5.7.18"))
+            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5"))
                     .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
                     .withQueryString("?useSSL=false")
                     .withInitScript("integrationTesting/dbScripts/mysql_html_implied_relationship.sql");
@@ -62,6 +64,7 @@ public class MysqlHTMLIT {
     public void verifyXML() {
         Diff d = DiffBuilder.compare(Input.fromURL(expectedXML))
                 .withTest(Input.fromFile("target/mysqlhtml/test.test.xml"))
+                .withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, new IgnoreUsingXPath("/database[1]/@type")))
                 .build();
         assertThat(d.getDifferences()).isEmpty();
     }
@@ -111,8 +114,7 @@ public class MysqlHTMLIT {
                 }
                 return a.compareTo(e);
             }).as("%s isn't as expected", actual.toString()).containsAll(expectLines);
-            softAssertions.assertAll();
         }
-
+        softAssertions.assertAll();
     }
 }

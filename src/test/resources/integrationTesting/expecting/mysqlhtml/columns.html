@@ -107,6 +107,39 @@
 				</thead>
 				<tbody>
 					<tr>
+					 <td>group</td>
+					 <td>Table</td>
+					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
+					 <td>VARCHAR</td>
+					 <td>16</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>userAndGroup</td>
+					 <td>View</td>
+					 <td>UserName</td>
+					 <td>VARCHAR</td>
+					 <td>16</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td><p>UserName</p></td>
+					</tr>
+					<tr>
+					 <td>user</td>
+					 <td>Table</td>
+					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>email</td>
+					 <td>VARCHAR</td>
+					 <td>40</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
 					 <td>user</td>
 					 <td>Table</td>
 					 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
@@ -118,12 +151,12 @@
 					 <td><p>FK to groups omitted, implied relationship</p></td>
 					</tr>
 					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td>description</td>
+					 <td>userAndGroup</td>
+					 <td>View</td>
+					 <td>GroupName</td>
 					 <td>VARCHAR</td>
-					 <td>80</td>
-					 <td title=''></td>
+					 <td>16</td>
+					 <td title='nullable'>√</td>
 					 <td title=''></td>
 					 <td>null</td>
 					 <td></td>
@@ -142,9 +175,9 @@
 					<tr>
 					 <td>group</td>
 					 <td>Table</td>
-					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
+					 <td>description</td>
 					 <td>VARCHAR</td>
-					 <td>16</td>
+					 <td>80</td>
 					 <td title=''></td>
 					 <td title=''></td>
 					 <td>null</td>
@@ -153,18 +186,7 @@
 					<tr>
 					 <td>user</td>
 					 <td>Table</td>
-					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>email</td>
-					 <td>VARCHAR</td>
-					 <td>40</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
+					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>userId</td>
 					 <td>INT</td>
 					 <td>10</td>
 					 <td title=''></td>
@@ -173,9 +195,9 @@
 					 <td></td>
 					</tr>
 					<tr>
-					 <td>user</td>
+					 <td>group</td>
 					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>userId</td>
+					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
 					 <td>INT</td>
 					 <td>10</td>
 					 <td title=''></td>
