@@ -330,6 +330,13 @@
                         <additionalClasspathElement>${basedir}/ext-lib/*</additionalClasspathElement>
                     </additionalClasspathElements>
                     <useManifestOnlyJar>false</useManifestOnlyJar>
+                    <includes>
+                        <include>**/*IT.java</include>
+                        <include>**/*Suite.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/Mysql*IT.java</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
