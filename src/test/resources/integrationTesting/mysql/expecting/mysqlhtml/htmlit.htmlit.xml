@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<database name="test" schema="test" type="MySQL - 5.7.18">
+<database name="htmlit" schema="htmlit" type="MySQL - 5.7.22">
    <tables>
-      <table catalog="test" name="group" numRows="0" remarks="Groups" type="TABLE">
+      <table catalog="htmlit" name="group" numRows="0" remarks="Groups" type="TABLE">
          <column autoUpdated="true" digits="0" id="0" name="groupId" nullable="false" remarks="" size="10" type="INT">
-            <child catalog="test" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="user"/>
+            <child catalog="htmlit" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="user"/>
          </column>
          <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="16" type="VARCHAR"/>
          <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="VARCHAR"/>
@@ -15,10 +15,10 @@
             <column ascending="true" name="name"/>
          </index>
       </table>
-      <table catalog="test" name="user" numRows="0" remarks="Users of the system" type="TABLE">
+      <table catalog="htmlit" name="user" numRows="0" remarks="Users of the system" type="TABLE">
          <column autoUpdated="true" digits="0" id="0" name="userId" nullable="false" remarks="" size="10" type="INT"/>
          <column autoUpdated="false" digits="0" id="1" name="groupId" nullable="false" remarks="FK to groups omitted, implied relationship" size="10" type="INT">
-            <parent catalog="test" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="group"/>
+            <parent catalog="htmlit" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="group"/>
          </column>
          <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="UserName" size="16" type="VARCHAR"/>
          <column autoUpdated="false" digits="0" id="3" name="email" nullable="false" remarks="" size="40" type="VARCHAR"/>
@@ -30,7 +30,7 @@
             <column ascending="true" name="email"/>
          </index>
       </table>
-      <table catalog="test" name="userAndGroup" numRows="0" remarks="" type="VIEW" viewSql="select `u`.`name` AS `UserName`,`g`.`name` AS `GroupName` from (`test`.`user` `u` left join `test`.`group` `g` on((`u`.`groupId` = `g`.`groupId`)))">
+      <table catalog="htmlit" name="userAndGroup" numRows="0" remarks="" type="VIEW" viewSql="select `u`.`name` AS `UserName`,`g`.`name` AS `GroupName` from (`htmlit`.`user` `u` left join `htmlit`.`group` `g` on((`u`.`groupId` = `g`.`groupId`)))">
          <column autoUpdated="false" digits="0" id="0" name="UserName" nullable="false" remarks="UserName" size="16" type="VARCHAR"/>
          <column autoUpdated="false" digits="0" id="1" name="GroupName" nullable="true" remarks="" size="16" type="VARCHAR"/>
       </table>

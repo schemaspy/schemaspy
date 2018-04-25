@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>test Database</title>
+  <title>htmlit Database</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -46,7 +46,7 @@
     <nav class="navbar navbar-static-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="index.html" class="navbar-brand"><b>test</b> Database</a>
+          <a href="index.html" class="navbar-brand"><b>htmlit</b> Database</a>
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
             <i class="fa fa-bars"></i>
           </button>
@@ -77,57 +77,142 @@
   <div class="content-wrapper">
           <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>All Relationships</h1>
+        <h1>Anomalies</h1></br>
+		<div class="callout callout-warning">        
+			<p>Things that might not be 'quite right' about your database and schema</p>
+		</div>		
       </section>
       <!-- Main content -->
       <section class="content">
-				<div class="box box-primary">		
-			<div class="box-header with-border">
-              <i class="fa fa-code-fork"></i>
-              <h3 class="box-title">Diagrams</h3>
-            </div>	
-			<div class="box-body">	
-			<div class="nav-tabs-custom" style="cursor: move;">
-            <!-- Tabs within a box -->
-			<h5>By default only columns that are primary keys, foreign keys or indexes are shown.</h5>
-            <ul class="nav nav-tabs pull-left ui-sortable-handle">
-			  			              <li class="active"><a href="#compactimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact Implied</a></li>			  			 
-			  			              <li class=""><a href="#largeimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large Implied</a></li>			  			 
-            </ul>
-            <div class="tab-content no-padding">            
-				<div class="chart tab-pane active" id="compactimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
-							<div class="alert alert-warning alert-dismissible">
-								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-								<h4><i class="icon fa fa-info-circle"></i> Implied Relationships</h4>
-								<p>No 'real' Foreign Key relationships were detected in the schema.<br>
-								Displayed relationships are implied by a column's name/type/size matching another table's primary key.</p>
-							</div> 
-																											<map id="compactImpliedRelationshipsDiagram" name="compactImpliedRelationshipsDiagram">
-<area shape="rect" id="node1" href="tables/group.html" title="group" alt="" coords="5,35,156,181">
-<area shape="rect" id="node2" href="tables/user.html" title="user" alt="" coords="200,5,319,181">
-</map>
-
-					<a name='diagram'><img id='compactimpliedDegreeImg' src='diagrams/summary/relationships.implied.compact.png' usemap='#compactImpliedRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+	  <div class="row">
+		<div class="col-md-6"> <!-- Implied Relationship -->
+			<div class="box box-success">
+				<div class="box-header with-border">
+				  <h3 class="box-title">Columns whose name and type imply a relationship to another table's primary key</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="implied_constraints" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Child Column</th>					  
+					  <th>Implied Parent Column</th>						  
+					</tr>
+					</thead>
+					<tbody>
+									<tr>
+					 <td><a href='tables/user.html'>user</a>.[groupId]</td>
+					 <td><a href='tables/group.html'>group</a>.[groupId]</td>
+					</tr>				
+													</tbody>
+					</table>				
 				</div>
-				<div class="chart tab-pane " id="largeimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
-							<div class="alert alert-warning alert-dismissible">
-								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-								<h4><i class="icon fa fa-info-circle"></i> Implied Relationships</h4>
-								<p>No 'real' Foreign Key relationships were detected in the schema.<br>
-								Displayed relationships are implied by a column's name/type/size matching another table's primary key.</p>
-							</div> 
-																											<map id="largeImpliedRelationshipsDiagram" name="largeImpliedRelationshipsDiagram">
-<area shape="rect" id="node1" href="tables/group.html" title="group" alt="" coords="5,35,156,187">
-<area shape="rect" id="node2" href="tables/user.html" title="user" alt="" coords="200,5,319,187">
-</map>
-
-					<a name='diagram'><img id='largeimpliedDegreeImg' src='diagrams/summary/relationships.implied.large.png' usemap='#largeImpliedRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+			</div>	
+		</div>	
+		<div class="col-md-6"> <!-- Tables without indexes -->
+			<div class="box box-danger">
+				<div class="box-header with-border">
+				  <h3 class="box-title">Tables without indexes</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="un_indexed_tables" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Table</th>
+					  <th>Rows</th>		
+				  					</tr>
+					</thead>
+					<tbody>
+									<tr><td colspan="3">Anomaly not detected</td></tr>
+									</tbody>
+					</table>				
 				</div>
-			  			</div>
-			</div>
-		  </div><!-- /.box-body -->
+			</div>			
 		</div>
-		      </section>    
+		<div class="col-md-6"> <!-- Tables that contain a single column -->
+			<div class="box box-info">
+				<div class="box-header with-border">
+				  <h3 class="box-title">Tables that contain a single column</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="un_indexed_tables" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Table</th>					  
+					  <th>Column</th>					  
+					</tr>
+					</thead>
+					<tbody>
+									<tr><td colspan="3">Anomaly not detected</td></tr>
+									</tbody>
+					</table>				
+				</div>
+			</div>			
+		</div>
+		<div class="col-md-6"> <!-- Tables with incrementing column names, potentially indicating denormalization -->
+			<div class="box box-danger">
+				<div class="box-header with-border">
+				  <h3 class="box-title">Tables with incrementing column names, potentially indicating denormalization</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="un_indexed_tables" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Table</th>				  
+					</tr>
+					</thead>
+					<tbody>
+									<tr><td colspan="3">Anomaly not detected</td></tr>
+									</tbody>
+					</table>				
+				</div>
+			</div>			
+		</div>	
+		<div class="col-md-6"> <!-- Columns whose default value is the word 'NULL' or 'null', but the SQL NULL value may have been intended -->
+			<div class="box box-primary">
+				<div class="box-header with-border">
+				  <h3 class="box-title" title="Columns whose default value is the word 'NULL' or 'null', but the SQL NULL value may have been intende">Columns whose default value is the word 'NULL' or 'null'</h3>
+				  <div class="box-tools pull-right">
+					<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+					</button>
+					<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+				  </div>
+				</div>	
+				<div class="box-body">
+					<table id="un_indexed_tables" class="table table-bordered table-striped dataTable" role="grid">
+					<thead align='left'>
+					<tr>
+					  <th>Table</th>				  
+					</tr>
+					</thead>
+					<tbody>
+									<tr><td colspan="3">Anomaly not detected</td></tr>
+									</tbody>
+					</table>				
+				</div>
+			</div>			
+		</div>			
+	 </div>
+	 </section>    
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
@@ -174,7 +259,7 @@
 <script src="bower/codemirror/sql.js"></script>
 <!-- AdminLTE App -->
 <script src="bower/admin-lte/dist/js/app.min.js"></script>
-<script src="relationships.js"></script>
+<script src="anomalies.js"></script>
 <script src="schemaSpy.js"></script>
 </body>
 </html>

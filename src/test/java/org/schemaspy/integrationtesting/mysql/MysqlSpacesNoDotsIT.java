@@ -1,4 +1,24 @@
-package org.schemaspy.testcontainer;
+/*
+ * Copyright (c) 2018 Nils Petzaell
+ *
+ * This file is part of SchemaSpy.
+ *
+ *  SchemaSpy is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  SchemaSpy is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+package org.schemaspy.integrationtesting.mysql;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
@@ -8,9 +28,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.model.*;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,11 +74,14 @@ public class MysqlSpacesNoDotsIT {
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/dbScripts/mysql_spaces_no_dots.sql")
-                    .withInitUser("root", "test");
+            new SuiteOrTestJdbcContainerRule<>(
+                    MysqlSuite.jdbcContainerRule,
+                    new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
+                            .assumeDockerIsPresent()
+                            .withAssumptions(assumeDriverIsPresent())
+                            .withInitScript("integrationTesting/mysql/dbScripts/spacesnodotsit.sql")
+                            .withInitUser("root", "test")
+            );
 
     @Before
     public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {

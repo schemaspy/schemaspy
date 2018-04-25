@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>test Database</title>
+  <title>htmlit Database</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -46,7 +46,7 @@
     <nav class="navbar navbar-static-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="index.html" class="navbar-brand"><b>test</b> Database</a>
+          <a href="index.html" class="navbar-brand"><b>htmlit</b> Database</a>
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
             <i class="fa fa-bars"></i>
           </button>
@@ -77,144 +77,34 @@
   <div class="content-wrapper">
           <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>Columns</h1>
+        <h1>Utility Tables</h1>
       </section>
       <!-- Main content -->
       <section class="content">
 		<div class="box box-primary">
 			<div class="box-header with-border">
-			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-              <h3 class="box-title">Columns</h3>
-            </div>	
+              <i class="fa fa-code-fork"></i>
+              <h3 class="box-title">Orphan Tables</h3>
+            </div>			
             <div class="box-body">
-				<div class="row">
-					<div id="button_group_one" class="col-md-3 col-sm-6"></div>
-					<div id="button_group_two" class="col-md-2 col-sm-4 pull-right text-right"></div>
+			<div id="grid" data-columns>
+				<div class="item">
+					<img src='diagrams/orphans/group.1degree.png' usemap='#group' style="max-width:100%;" border='0' alt='' align='top'></img>
 				</div>
-				<table id="column_table" class="table table-bordered table-striped dataTable" role="grid">
-				<thead align='left'>
-					<tr>
-					  <th>Table</th>
-					  <th>Type</th>
-					  <th>Column</th>
-					  <th>Type</th>
-					  <th>Size</th>
-					  <th title='Are nulls allowed?'>Nulls</th>
-					  <th title='Is column automatically updated?'>Auto</th>
-					  <th title='Default value'>Default</th>
-					  <th title='Comments' class="toggle"><span>Comments</span></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
-					 <td>VARCHAR</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>userAndGroup</td>
-					 <td>View</td>
-					 <td>UserName</td>
-					 <td>VARCHAR</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td><p>UserName</p></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>email</td>
-					 <td>VARCHAR</td>
-					 <td>40</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
-					 <td>INT</td>
-					 <td>10</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td><p>FK to groups omitted, implied relationship</p></td>
-					</tr>
-					<tr>
-					 <td>userAndGroup</td>
-					 <td>View</td>
-					 <td>GroupName</td>
-					 <td>VARCHAR</td>
-					 <td>16</td>
-					 <td title='nullable'>√</td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td>name</td>
-					 <td>VARCHAR</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td><p>UserName</p></td>
-					</tr>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td>description</td>
-					 <td>VARCHAR</td>
-					 <td>80</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>userId</td>
-					 <td>INT</td>
-					 <td>10</td>
-					 <td title=''></td>
-					 <td title='Automatically updated by the database'>√</td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
-					 <td>INT</td>
-					 <td>10</td>
-					 <td title=''></td>
-					 <td title='Automatically updated by the database'>√</td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-								</tbody>
-				</table>				
+				<div class="item">
+					<img src='diagrams/orphans/user.1degree.png' usemap='#user' style="max-width:100%;" border='0' alt='' align='top'></img>
+				</div>
 			</div>
-		</div>	
-      </section>
-	  <script>
-          var config = {
-	          pagination: true
-          }
-	  </script>    
+			<map id="group" name="group">
+<area shape="rect" id="node1" href="tables/group.html" title="group" alt="" coords="5,5,156,157">
+</map>
+<map id="user" name="user">
+<area shape="rect" id="node1" href="tables/user.html" title="user" alt="" coords="5,5,124,187">
+</map>
+
+			</div>
+		</div>			
+      </section>    
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
@@ -261,7 +151,7 @@
 <script src="bower/codemirror/sql.js"></script>
 <!-- AdminLTE App -->
 <script src="bower/admin-lte/dist/js/app.min.js"></script>
-<script src="column.js"></script>
+<script src=""></script>
 <script src="schemaSpy.js"></script>
 </body>
 </html>

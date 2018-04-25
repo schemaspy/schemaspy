@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>test Database</title>
+  <title>htmlit Database</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -46,7 +46,7 @@
     <nav class="navbar navbar-static-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="index.html" class="navbar-brand"><b>test</b> Database</a>
+          <a href="index.html" class="navbar-brand"><b>htmlit</b> Database</a>
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
             <i class="fa fa-bars"></i>
           </button>
@@ -77,65 +77,58 @@
   <div class="content-wrapper">
           <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>Constraints</h1>
+        <h1>Routines</h1>
       </section>
+
       <!-- Main content -->
       <section class="content">
 		<div class="box box-primary">
 			<div class="box-header with-border">
-			  <i class="ion ion-key"></i>
-              <h3 class="box-title">0 Foreign Key Constraints</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
+			  <i class="fa fa-file-code-o" aria-hidden="true"></i>
+              <h3 class="box-title">Routines</h3>
             </div>	
             <div class="box-body">
-				<table id="constraint_table" class="table table-bordered table-striped dataTable" role="grid">
+				<div class="row">
+					<div id="button_group_one" class="col-md-3 col-sm-6"></div>
+					<div id="button_group_two" class="col-md-2 col-sm-4 pull-right text-right"></div>
+				</div>
+				<table id="routine_table" class="table table-bordered table-striped dataTable" role="grid">
 				<thead align='left'>
 				<tr>
-				  <th>Constraint Name</th>
-				  <th>Child Column</th>
-				  <th>Parent Column</th>				  
-				  <th>Delete Rule</th>
+				  <th>Name</th>
+				  <th>Type</th>
+				  <th>Language</th>
+				  <th>Deterministic</th>
+				  <th>Return Type</th>
+				  <th title='Comments' class="toggle"><span>Comments</span></th>
 				</tr>
 				</thead>
 				<tbody>
-								</tbody>
-				</table>				
+				<tr>
+					<td><a href="routines/no_det.html">no_det</a></td>
+				 <td>FUNCTION</td>
+				 <td>SQL</td>
+				 <td>false</td>
+				 <td>char(50)</td>
+				 <td></td>
+				</tr>
+				<tr>
+					<td><a href="routines/yes_det.html">yes_det</a></td>
+				 <td>FUNCTION</td>
+				 <td>SQL</td>
+				 <td>true</td>
+				 <td>char(50)</td>
+				 <td></td>
+				</tr>
+				</tbody>
+				</table>
 			</div>
 		</div>	
-		<div class="box box-primary">
-			<div class="box-header with-border">
-              <i class="fa fa-sitemap"></i>
-              <h3 class="box-title">Check Constraints</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>	
-            <div class="box-body">
-				<table id="constraint_table" class="table table-bordered table-striped dataTable" role="grid">
-				<thead align='left'>
-				<tr>
-				  <th>Table</th>
-				  <th>Constraint Name</th>				  
-				  <th>Constraint</th>				  
-				</tr>
-				</thead>
-				<tbody>
-								<tr><td colspan="3">None detected</td></tr>
-								</tbody>
-				</table>				
-			</div>
-		</div>			
       </section>
 	  <script>
-	      var config = {
-		      pagination: true
-	      }
+          var config = {
+	          pagination: true
+          }
 	  </script>    
   </div>
   <!-- /.content-wrapper -->
@@ -183,7 +176,7 @@
 <script src="bower/codemirror/sql.js"></script>
 <!-- AdminLTE App -->
 <script src="bower/admin-lte/dist/js/app.min.js"></script>
-<script src="constraint.js"></script>
+<script src="routines.js"></script>
 <script src="schemaSpy.js"></script>
 </body>
 </html>

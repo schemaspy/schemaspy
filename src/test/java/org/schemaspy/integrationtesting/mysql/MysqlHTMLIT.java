@@ -1,4 +1,24 @@
-package org.schemaspy.testcontainer;
+/*
+ * Copyright (c) 2018 Nils Petzaell
+ *
+ * This file is part of SchemaSpy.
+ *
+ *  SchemaSpy is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  SchemaSpy is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+package org.schemaspy.integrationtesting.mysql;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.assertj.core.api.SoftAssertions;
@@ -7,7 +27,9 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.Main;
+import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.IgnoreUsingXPath;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testcontainers.containers.MySQLContainer;
 import org.xmlunit.builder.DiffBuilder;
@@ -32,24 +54,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class MysqlHTMLIT {
 
-    private static URL expectedXML = MysqlHTMLIT.class.getResource("/integrationTesting/expecting/mysqlhtml/test.test.xml");
-    private static URL expectedDeletionOrder = MysqlHTMLIT.class.getResource("/integrationTesting/expecting/mysqlhtml/deletionOrder.txt");
-    private static URL expectedInsertionOrder = MysqlHTMLIT.class.getResource("/integrationTesting/expecting/mysqlhtml/insertionOrder.txt");
+    private static URL expectedXML = MysqlHTMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml/htmlit.htmlit.xml");
+    private static URL expectedDeletionOrder = MysqlHTMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml/deletionOrder.txt");
+    private static URL expectedInsertionOrder = MysqlHTMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml/insertionOrder.txt");
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5"))
-                    .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
-                    .withQueryString("?useSSL=false")
-                    .withInitScript("integrationTesting/dbScripts/mysql_html_implied_relationship.sql");
+            new SuiteOrTestJdbcContainerRule<>(
+                    MysqlSuite.jdbcContainerRule,
+                    new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5"))
+                        .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
+                        .withQueryString("?useSSL=false")
+                        .withInitScript("integrationTesting/mysql/dbScripts/htmlit.sql")
+                        .withInitUser("root", "test")
+            );
 
     @BeforeClass
     public static void generateHTML() throws Exception {
         MySQLContainer container = jdbcContainerRule.getContainer();
         String[] args = new String[]{
                 "-t", "mysql",
-                "-db", "test",
-                "-s", "test",
+                "-db", "htmlit",
+                "-s", "htmlit",
                 "-host", container.getContainerIpAddress() + ":" + String.valueOf(container.getMappedPort(3306)),
                 "-port", String.valueOf(container.getMappedPort(3306)),
                 "-u", container.getUsername(),
@@ -63,7 +89,7 @@ public class MysqlHTMLIT {
     @Test
     public void verifyXML() {
         Diff d = DiffBuilder.compare(Input.fromURL(expectedXML))
-                .withTest(Input.fromFile("target/mysqlhtml/test.test.xml"))
+                .withTest(Input.fromFile("target/mysqlhtml/htmlit.htmlit.xml"))
                 .withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, new IgnoreUsingXPath("/database[1]/@type")))
                 .build();
         assertThat(d.getDifferences()).isEmpty();
@@ -82,7 +108,7 @@ public class MysqlHTMLIT {
     @Test
     public void producesSameContet() throws IOException {
         String target = "target/mysqlhtml";
-        Path expectedPath = Paths.get("src/test/resources/integrationTesting/expecting/mysqlhtml");
+        Path expectedPath = Paths.get("src/test/resources/integrationTesting/mysql/expecting/mysqlhtml");
         List<Path> expectations;
         try (Stream<Path> pathStream = Files.find(expectedPath, 5, (p, a) -> a.isRegularFile())) {
             expectations = pathStream.filter(p -> {
