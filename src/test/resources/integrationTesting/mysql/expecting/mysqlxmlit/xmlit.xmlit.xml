@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="xmlit" schema="xmlit" type="MySQL - 5.7.22">
+   <tables>
+      <table catalog="xmlit" name="group_resources" numRows="0" remarks="Group access to resource" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="gid" nullable="false" remarks="" size="10" type="INT">
+            <parent catalog="xmlit" column="gid" foreignKey="group_resources_ibfk_1" implied="false" onDeleteCascade="false" table="groups"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="rid" nullable="false" remarks="" size="10" type="INT">
+            <parent catalog="xmlit" column="rid" foreignKey="group_resources_ibfk_2" implied="false" onDeleteCascade="false" table="resources"/>
+         </column>
+         <column autoUpdated="false" defaultValue="n" digits="0" id="2" name="access" nullable="true" remarks="" size="2" type="enum('n', 'r', 'rw')"/>
+         <primaryKey column="gid" sequenceNumberInPK="1"/>
+         <primaryKey column="rid" sequenceNumberInPK="2"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="gid"/>
+            <column ascending="true" name="rid"/>
+         </index>
+         <index name="resource_rid_fk" unique="false">
+            <column ascending="true" name="rid"/>
+         </index>
+      </table>
+      <table catalog="xmlit" name="groups" numRows="0" remarks="Groups" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="gid" nullable="false" remarks="" size="10" type="INT">
+            <child catalog="xmlit" column="gid" foreignKey="group_resources_ibfk_1" implied="false" onDeleteCascade="false" table="group_resources"/>
+            <child catalog="xmlit" column="gid" foreignKey="users_ibfk_1" implied="false" onDeleteCascade="false" table="users"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="16" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="VARCHAR"/>
+         <primaryKey column="gid" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="gid"/>
+         </index>
+         <index name="name_unique" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table catalog="xmlit" name="resources" numRows="0" remarks="Resources" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="rid" nullable="false" remarks="" size="10" type="INT">
+            <child catalog="xmlit" column="rid" foreignKey="group_resources_ibfk_2" implied="false" onDeleteCascade="false" table="group_resources"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="40" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="VARCHAR"/>
+         <primaryKey column="rid" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="rid"/>
+         </index>
+         <index name="name_unique" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table catalog="xmlit" name="userAndGroup" numRows="0" remarks="" type="VIEW" viewSql="select `u`.`name` AS `UserName`,`g`.`name` AS `GroupName` from (`xmlit`.`users` `u` left join `xmlit`.`groups` `g` on((`u`.`gid` = `g`.`gid`)))">
+         <column autoUpdated="false" digits="0" id="0" name="UserName" nullable="false" remarks="UserName" size="16" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="1" name="GroupName" nullable="true" remarks="" size="16" type="VARCHAR"/>
+      </table>
+      <table catalog="xmlit" name="users" numRows="0" remarks="Users of the system" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="uid" nullable="false" remarks="" size="10" type="INT"/>
+         <column autoUpdated="false" digits="0" id="1" name="gid" nullable="false" remarks="" size="10" type="INT">
+            <parent catalog="xmlit" column="gid" foreignKey="users_ibfk_1" implied="false" onDeleteCascade="false" table="groups"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="UserName" size="16" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="email" nullable="false" remarks="" size="40" type="VARCHAR"/>
+         <primaryKey column="gid" sequenceNumberInPK="1"/>
+         <primaryKey column="uid" sequenceNumberInPK="2"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="uid"/>
+            <column ascending="true" name="gid"/>
+         </index>
+         <index name="email_unique" unique="true">
+            <column ascending="true" name="email"/>
+         </index>
+         <index name="groups_gid_fk" unique="false">
+            <column ascending="true" name="gid"/>
+         </index>
+      </table>
+   </tables>
+</database>
