@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,12 +20,14 @@
  */
 package org.schemaspy.util;
 
+import junit.framework.TestCase;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import junit.framework.TestCase;
 
 /**
  * @author John Currier
+ * @author Rafal Kasa
  */
 public class GraphvizVersionTest extends TestCase {
     private final GraphvizVersion twoNineOne = new GraphvizVersion("2.9.1");

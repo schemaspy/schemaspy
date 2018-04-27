@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004 - 2010 John Currier
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,20 +20,15 @@
  */
 package org.schemaspy.util;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * BufferedWriter that adds a <code>writeln()</code> method
  * to output a <i>lineDelimited</i> line of text without
  * cluttering up code.
+ *
+ * @author John Currier
+ * @author Daniel Watt
  */
 public class LineWriter extends BufferedWriter {
     private final Writer out;

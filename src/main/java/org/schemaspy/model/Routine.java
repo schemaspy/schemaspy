@@ -1,6 +1,8 @@
 /*
- * This file is a part of the SchemaSpy project (http://schemaspy.org).
  * Copyright (C) 2011 John Currier
+ * Copyright (C) 2017 Mårten Bohlin
+ *
+ * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +27,7 @@ import java.util.List;
  * Metadata about a stored procedure or function
  *
  * @author John Currier
+ * @author Mårten Bohlin
  */
 public class Routine implements Comparable<Routine> {
     private final String name;

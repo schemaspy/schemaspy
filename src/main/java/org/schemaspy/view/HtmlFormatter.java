@@ -1,6 +1,9 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2017 Rafal Kasa
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,16 +21,22 @@
  */
 package org.schemaspy.view;
 
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.invoke.MethodHandles;
-import java.net.URLEncoder;
-
 import com.github.mustachejava.util.HtmlEscaper;
 import org.schemaspy.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
+import java.net.URLEncoder;
+
+/**
+ * @author John Currier
+ * @author Rafal Kasa
+ * @author Thomas Traude
+ * @author Daniel Watt
+ */
 public class HtmlFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

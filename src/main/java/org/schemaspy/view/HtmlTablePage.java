@@ -1,6 +1,9 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 John Currier
- * Copyright (C) 2017, 2018 Nils Petzaell
+ * Copyright (C) 2004 - 2011, 2014 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2016 Ismail Simsek
+ * Copyright (C) 2017 Wojciech Kasa
+ * Copyright (C) 2017 Daniel Watt
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -36,6 +39,10 @@ import java.util.*;
  * The page that contains the details of a specific table or view
  *
  * @author John Currier
+ * @author Rafal Kasa
+ * @author Ismail Simsek
+ * @author Wojciech Kasa
+ * @author Daniel Watt
  * @author Nils Petzaell
  */
 public class HtmlTablePage extends HtmlFormatter {

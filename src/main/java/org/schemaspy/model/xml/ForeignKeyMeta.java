@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,6 +33,7 @@ import java.lang.invoke.MethodHandles;
  * instead of from the database.
  *
  * @author John Currier
+ * @author Daniel Watt
  */
 public class ForeignKeyMeta {
     private final String tableName;

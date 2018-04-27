@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2004-2011 John Currier
- * Copyright (C) 2018 Nils Petzaell
+ * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2017, 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -31,6 +32,7 @@ import java.util.*;
  * to insert or delete them from a database.
  *
  * @author John Currier
+ * @author Daniel Watt
  * @author Nils Petzaell
  */
 public class TableOrderer {

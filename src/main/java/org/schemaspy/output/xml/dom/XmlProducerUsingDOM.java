@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2004-2011 John Currier
- * Copyright (C) 2018 Nils Petzaell
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2017 Wojciech Kasa
+ * Copyright (C) 2017 - 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -18,7 +19,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package org.schemaspy.output.xml.dom;
 
 import org.schemaspy.model.Database;
@@ -52,6 +52,7 @@ import java.util.Objects;
 
 /**
  * @author John Currier
+ * @author Wojciech Kasa
  * @author Nils Petzaell
  */
 public class XmlProducerUsingDOM implements XmlProducer {

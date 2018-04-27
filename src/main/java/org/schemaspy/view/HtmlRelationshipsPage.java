@@ -1,6 +1,9 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2016 Ismail Simsek
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,6 +21,12 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.TableColumn;
+import org.schemaspy.util.DiagramUtil;
+import org.schemaspy.util.Dot;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,16 +34,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.util.DiagramUtil;
-import org.schemaspy.util.Dot;
-
 /**
  * The page that contains the overview entity relationship diagrams.
  *
  * @author John Currier
+ * @author Rafal Kasa
+ * @author Ismail Simsek
  */
 public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
     private static final HtmlRelationshipsPage instance = new HtmlRelationshipsPage();

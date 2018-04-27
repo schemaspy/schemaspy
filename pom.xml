@@ -46,8 +46,8 @@
     </issueManagement>
     <licenses>
         <license>
-            <name>MIT License</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <name>LGPL-3.0-or-later</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -61,6 +61,11 @@
             <id>rafalkasa</id>
             <name>Rafal Kasa</name>
             <email>rafalkasa@gmail.com</email>
+        </developer>
+        <developer>
+            <id>npetzall</id>
+            <name>Nils Petzaell</name>
+            <email>nils.petzall@gmail.com</email>
         </developer>
     </developers>
     <dependencyManagement>

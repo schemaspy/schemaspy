@@ -1,6 +1,11 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2016 Ismail Simsek
+ * Copyright (C) 2017 Wojciech Kasa
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,20 +23,24 @@
  */
 package org.schemaspy.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
 import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.LineWriter;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
 /**
  * The page that contains the all tables that aren't related to others (orphans)
  *
  * @author John Currier
+ * @author Rafal Kasa
+ * @author Ismail Simsek
+ * @author Wojciech Kasa
+ * @author Daniel Watt
  */
 public class HtmlOrphansPage extends HtmlDiagramFormatter {
     private static HtmlOrphansPage instance = new HtmlOrphansPage();

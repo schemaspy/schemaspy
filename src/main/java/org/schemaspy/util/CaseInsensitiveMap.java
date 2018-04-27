@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004 - 2010 John Currier
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +21,6 @@
 package org.schemaspy.util;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -28,6 +29,7 @@ import java.util.Map;
  * will return the same object as <code>get("MYTABLENAME")</code>.
  *
  * @author John Currier
+ * @author Daniel Watt
  */
 public class CaseInsensitiveMap<V> extends HashMap<String, V>
 {

@@ -8,7 +8,7 @@
     "globals",
     "yui"
   ],
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "dependencies": {
     "admin-lte": "2.3.11",
     "font-awesome": "~4.7.0",

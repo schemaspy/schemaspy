@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004 - 2010 John Currier
+ * Copyright (C) 2018 Nils Petzaell
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +26,7 @@ import java.util.Objects;
  * Base class to indicate that there was problem with how SchemaSpy was configured / used.
  *
  * @author John Currier
+ * @author Nils Petzaell
  */
 public class InvalidConfigurationException extends RuntimeException {
     private static final long serialVersionUID = 1L;

@@ -1,6 +1,9 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2017 Thomas Traude
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,12 +31,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Represents our CSS style sheet (CSS) with accessors for important
@@ -42,6 +40,8 @@ import java.util.StringTokenizer;
  * also determines the colors used in the generated ER diagrams.
  *
  * @author John Currier
+ * @author Thomas Traude
+ * @author Daniel Watt
  */
 public class StyleSheet {
 

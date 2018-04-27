@@ -1,6 +1,9 @@
 /*
+ * Copyright (C) 2004 - 2011, 2014 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2016 Ismail Simsek
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,6 +21,12 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.DbAnalyzer;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ForeignKeyConstraint;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -26,17 +35,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.schemaspy.DbAnalyzer;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ForeignKeyConstraint;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-
 /**
  * This page lists all of the 'things that might not be quite right'
  * about the schema.
  *
  * @author John Currier
+ * @author Rafal Kasa
+ * @author Ismail Simsek
  */
 public class HtmlAnomaliesPage extends HtmlFormatter {
     private static HtmlAnomaliesPage instance = new HtmlAnomaliesPage();

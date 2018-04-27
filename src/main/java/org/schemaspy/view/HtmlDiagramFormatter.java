@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004 - 2010 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,6 +22,10 @@ package org.schemaspy.view;
 
 import org.schemaspy.util.Dot;
 
+/**
+ * @author John Currier
+ * @author Rafal Kasa
+ */
 public class HtmlDiagramFormatter extends HtmlFormatter {
     private static boolean printedNoDotWarning = false;
     private static boolean printedInvalidVersionWarning = false;

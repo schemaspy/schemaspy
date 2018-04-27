@@ -108,5 +108,9 @@ SchemaSpy Team would like inform that JetBrains is helping by provided IDE to de
 SchemaSpy project is using SonarCloud for code quality. 
 Thanks to SonarQube Team for free analysis solution for open source projects.
 
+## License
+SchemaSpy is distributed under LGPL version 3 or later, see COPYING.LESSER(LGPL) and COPYING(GPL).   
+LGPLv3 is additional permissions on top of GPLv3.
+
 
 

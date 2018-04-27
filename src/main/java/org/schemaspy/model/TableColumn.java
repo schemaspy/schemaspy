@@ -1,6 +1,10 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2017 Thomas Traude
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,14 +25,15 @@ package org.schemaspy.model;
 import org.schemaspy.model.xml.TableColumnMeta;
 
 import java.sql.DatabaseMetaData;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * @author John Currier
+ * @author Rafal Kasa
+ * @author Thomas Traude
+ * @author Daniel Watt
+ */
 public class TableColumn {
     private final Table table;
     private String name;

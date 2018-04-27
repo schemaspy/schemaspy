@@ -1,6 +1,12 @@
 /*
+ * Copyright (C) 2004 - 2011, 2014 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2016, 2017 Ismail Simsek
+ * Copyright (C) 2017 Wojciech Kasa
+ * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2017 Mårten Bohlin
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,6 +24,11 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.model.*;
+import org.schemaspy.util.Inflection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -26,11 +37,14 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import org.schemaspy.model.*;
-import org.schemaspy.util.Inflection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * @author John Currier
+ * @author Rafal Kasa
+ * @author Ismail Simsek
+ * @author Wojciech Kasa
+ * @author Daniel Watt
+ * @author Mårten Bohlin
+ */
 public class DbAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	

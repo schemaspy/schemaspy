@@ -1,6 +1,8 @@
 /*
- * This file is a part of the SchemaSpy project (http://schemaspy.org).
  * Copyright (C) 2011 John Currier
+ * Copyright (C) 2017 Daniel Watt
+ *
+ * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,6 +35,8 @@ import java.util.TreeSet;
  * in the schema.
  *
  * @author John Currier
+ * @author Daniel Watt
+ * @author Nils Petzaell
  */
 public class HtmlRoutinesPage extends HtmlFormatter {
     private static HtmlRoutinesPage instance = new HtmlRoutinesPage();
