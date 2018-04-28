@@ -77,68 +77,28 @@
   <div class="content-wrapper">
           <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>Constraints</h1>
+        <h1>Utility Tables</h1>
       </section>
       <!-- Main content -->
       <section class="content">
 		<div class="box box-primary">
 			<div class="box-header with-border">
-			  <i class="ion ion-key"></i>
-              <h3 class="box-title">0 Foreign Key Constraints</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>	
+              <i class="fa fa-code-fork"></i>
+              <h3 class="box-title">Orphan Tables</h3>
+            </div>			
             <div class="box-body">
-				<table id="constraint_table" class="table table-bordered table-striped dataTable" role="grid">
-				<thead align='left'>
-				<tr>
-				  <th>Constraint Name</th>
-				  <th>Child Column</th>
-				  <th>Parent Column</th>				  
-				  <th>Delete Rule</th>
-				</tr>
-				</thead>
-				<tbody>
-								</tbody>
-				</table>				
+			<div id="grid" data-columns>
+				<div class="item">
+					<img src='diagrams/orphans/user.1degree.png' usemap='#user' style="max-width:100%;" border='0' alt='' align='top'></img>
+				</div>
 			</div>
-		</div>	
-		<div class="box box-primary">
-			<div class="box-header with-border">
-              <i class="fa fa-sitemap"></i>
-              <h3 class="box-title">Check Constraints</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>	
-            <div class="box-body">
-				<table id="constraint_table" class="table table-bordered table-striped dataTable" role="grid">
-				<thead align='left'>
-					<tr>
-				  		<th>Table</th>
-				  		<th>Constraint Name</th>
-				  		<th>Constraint</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-				  		<td colspan="3">None detected</td>
-					</tr>
-				</tbody>
-				</table>				
+			<map id="user" name="user">
+<area shape="rect" id="node1" href="tables/user.html" title="user" alt="" coords="5,5,124,187">
+</map>
+
 			</div>
 		</div>			
-      </section>
-	  <script>
-	      var config = {
-		      pagination: true
-	      }
-	  </script>    
+      </section>    
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
@@ -185,7 +145,7 @@
 <script src="bower/codemirror/sql.js"></script>
 <!-- AdminLTE App -->
 <script src="bower/admin-lte/dist/js/app.min.js"></script>
-<script src="constraint.js"></script>
+<script src=""></script>
 <script src="schemaSpy.js"></script>
 </body>
 </html>

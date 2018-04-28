@@ -1,0 +1,4 @@
+group
+resources
+user
+group_resources

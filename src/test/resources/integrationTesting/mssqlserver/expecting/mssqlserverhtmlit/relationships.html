@@ -77,68 +77,69 @@
   <div class="content-wrapper">
           <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>Constraints</h1>
+        <h1>All Relationships</h1>
       </section>
       <!-- Main content -->
       <section class="content">
-		<div class="box box-primary">
+				<div class="box box-primary">		
 			<div class="box-header with-border">
-			  <i class="ion ion-key"></i>
-              <h3 class="box-title">0 Foreign Key Constraints</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
+              <i class="fa fa-code-fork"></i>
+              <h3 class="box-title">Diagrams</h3>
             </div>	
-            <div class="box-body">
-				<table id="constraint_table" class="table table-bordered table-striped dataTable" role="grid">
-				<thead align='left'>
-				<tr>
-				  <th>Constraint Name</th>
-				  <th>Child Column</th>
-				  <th>Parent Column</th>				  
-				  <th>Delete Rule</th>
-				</tr>
-				</thead>
-				<tbody>
-								</tbody>
-				</table>				
+			<div class="box-body">	
+			<div class="nav-tabs-custom" style="cursor: move;">
+            <!-- Tabs within a box -->
+			<h5>By default only columns that are primary keys, foreign keys or indexes are shown.</h5>
+            <ul class="nav nav-tabs pull-left ui-sortable-handle">
+			  			              <li class="active"><a href="#compactDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact</a></li>			  			 
+			  			              <li class=""><a href="#largeDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large</a></li>			  			 
+			  			              <li class=""><a href="#compactimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact Implied</a></li>			  			 
+			  			              <li class=""><a href="#largeimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large Implied</a></li>			  			 
+            </ul>
+            <div class="tab-content no-padding">            
+				<div class="chart tab-pane active" id="compactDegreeImg-chart" style="position: relative; overflow-x:auto;">
+																					<map id="compactRelationshipsDiagram" name="compactRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/group.html" title="group" alt="" coords="5,5,156,152">
+<area shape="rect" id="node2" href="tables/group_resources.html" title="group_resources" alt="" coords="200,73,401,220">
+<area shape="rect" id="node3" href="tables/resources.html" title="resources" alt="" coords="5,169,156,316">
+</map>
+
+					<a name='diagram'><img id='compactDegreeImg' src='diagrams/summary/relationships.real.compact.png' usemap='#compactRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="largeDegreeImg-chart" style="position: relative; overflow-x:auto;">
+																					<map id="largeRelationshipsDiagram" name="largeRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/group.html" title="group" alt="" coords="5,5,156,157">
+<area shape="rect" id="node2" href="tables/group_resources.html" title="group_resources" alt="" coords="200,76,401,228">
+<area shape="rect" id="node3" href="tables/resources.html" title="resources" alt="" coords="5,175,156,327">
+</map>
+
+					<a name='diagram'><img id='largeDegreeImg' src='diagrams/summary/relationships.real.large.png' usemap='#largeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="compactimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+																											<map id="compactImpliedRelationshipsDiagram" name="compactImpliedRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/group.html" title="group" alt="" coords="5,49,156,196">
+<area shape="rect" id="node2" href="tables/group_resources.html" title="group_resources" alt="" coords="200,199,401,345">
+<area shape="rect" id="node3" href="tables/resources.html" title="resources" alt="" coords="5,228,156,375">
+<area shape="rect" id="node4" href="tables/user.html" title="user" alt="" coords="241,5,360,181">
+</map>
+
+					<a name='diagram'><img id='compactimpliedDegreeImg' src='diagrams/summary/relationships.implied.compact.png' usemap='#compactImpliedRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+				<div class="chart tab-pane " id="largeimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+																											<map id="largeImpliedRelationshipsDiagram" name="largeImpliedRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/group.html" title="group" alt="" coords="5,49,156,201">
+<area shape="rect" id="node2" href="tables/group_resources.html" title="group_resources" alt="" coords="200,204,401,356">
+<area shape="rect" id="node3" href="tables/resources.html" title="resources" alt="" coords="5,233,156,385">
+<area shape="rect" id="node4" href="tables/user.html" title="user" alt="" coords="241,5,360,187">
+</map>
+
+					<a name='diagram'><img id='largeimpliedDegreeImg' src='diagrams/summary/relationships.implied.large.png' usemap='#largeImpliedRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
+				</div>
+			  			</div>
 			</div>
-		</div>	
-		<div class="box box-primary">
-			<div class="box-header with-border">
-              <i class="fa fa-sitemap"></i>
-              <h3 class="box-title">Check Constraints</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>	
-            <div class="box-body">
-				<table id="constraint_table" class="table table-bordered table-striped dataTable" role="grid">
-				<thead align='left'>
-					<tr>
-				  		<th>Table</th>
-				  		<th>Constraint Name</th>
-				  		<th>Constraint</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-				  		<td colspan="3">None detected</td>
-					</tr>
-				</tbody>
-				</table>				
-			</div>
-		</div>			
-      </section>
-	  <script>
-	      var config = {
-		      pagination: true
-	      }
-	  </script>    
+		  </div><!-- /.box-body -->
+		</div>
+		      </section>    
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
@@ -185,7 +186,7 @@
 <script src="bower/codemirror/sql.js"></script>
 <!-- AdminLTE App -->
 <script src="bower/admin-lte/dist/js/app.min.js"></script>
-<script src="constraint.js"></script>
+<script src="relationships.js"></script>
 <script src="schemaSpy.js"></script>
 </body>
 </html>
