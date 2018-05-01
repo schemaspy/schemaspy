@@ -52,6 +52,9 @@ public class Main implements CommandLineRunner {
     @Autowired
     private ApplicationContext context;
 
+    @Autowired
+    private BuildInfo buildInfo;
+
     public static void main(String... args) {
         SpringApplication.run(Main.class, args);
     }
@@ -66,6 +69,16 @@ public class Main implements CommandLineRunner {
 
         if (arguments.isDbHelpRequired()) {
             commandLineArgumentParser.printDatabaseTypesHelp();
+            exitApplication(0);
+            return;
+        }
+
+        if (arguments.isShowVersionInfo()) {
+            LOGGER.info("Version: " + buildInfo.getVersion());
+            LOGGER.info("Branch: " + buildInfo.getBranch());
+            LOGGER.info("Revision: " + buildInfo.getRevision());
+            LOGGER.info("JDK: " + buildInfo.getJDK());
+            LOGGER.info("Build time: " + buildInfo.getBuildTime());
             exitApplication(0);
             return;
         }

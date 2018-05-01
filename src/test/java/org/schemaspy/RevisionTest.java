@@ -9,7 +9,7 @@ public class RevisionTest {
     @Test
     public void revisionDefaultsToUnknown() {
         Revision revision = new Revision();
-        assertThat(revision.toString()).isEqualTo("Unknown");
+        assertThat(revision.toString()).isEqualTo("NonBuild");
     }
 
 }
