@@ -46,6 +46,8 @@ public class CommandLineArgumentParser {
 
         jCommander.parse(localArgs);
 
+        arguments.getDbmsCommandLineArguments().setArguments(jCommander.getUnknownOptions());
+
         if (shouldValidate()) {
             validate(arguments);
         }
@@ -123,7 +125,7 @@ public class CommandLineArgumentParser {
         builder.append(System.lineSeparator());
         builder.append(" java -jar schemaSpy.jar -db mydb -s myschema -u devuser -p password -o output");
         builder.append(System.lineSeparator());
-        builder.append(System.lineSeparator());
+        builder.append("Some databaseTypes requires additional arguments they are supplied using '-[key] [value]'");
 
         LOGGER.info("{}", builder);
     }
