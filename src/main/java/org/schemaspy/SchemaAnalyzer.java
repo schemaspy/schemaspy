@@ -213,7 +213,7 @@ public class SchemaAnalyzer {
             }
 
             if (config.isHtmlGenerationEnabled()) {
-                generateHtmlDoc(config, progressListener, outputDir, db, duration, tables);
+                generateHtmlDoc(config, commandLineArguments, progressListener, outputDir, db, duration, tables);
             }
 
             outputProducers.forEach(
@@ -279,7 +279,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    private void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
+    private void generateHtmlDoc(Config config, CommandLineArguments commandLineArguments, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
         LineWriter out;
         LOGGER.info("Gathered schema details in {} seconds", duration / 1000);
         LOGGER.info("Writing/graphing summary");
@@ -304,7 +304,7 @@ public class SchemaAnalyzer {
         String dotBaseFilespec = "relationships";
         out = new LineWriter(new File(summaryDir, dotBaseFilespec + ".real.compact.dot"), Config.DOT_CHARSET);
         WriteStats stats = new WriteStats(tables);
-        DotFormatter.getInstance().writeRealRelationships(db, tables, true, showDetailedTables, stats, out, outputDir);
+        DotFormatter.getInstance().writeRealRelationships(db, tables, true, showDetailedTables, stats, out, outputDir, commandLineArguments.isRenderDotInJvm());
         boolean hasRealRelationships = stats.getNumTablesWritten() > 0 || stats.getNumViewsWritten() > 0;
         out.close();
 
@@ -312,7 +312,7 @@ public class SchemaAnalyzer {
             // real relationships exist so generate the 'big' form of the relationships .dot file
             progressListener.graphingSummaryProgressed();
             out = new LineWriter(new File(summaryDir, dotBaseFilespec + ".real.large.dot"), Config.DOT_CHARSET);
-            DotFormatter.getInstance().writeRealRelationships(db, tables, false, showDetailedTables, stats, out, outputDir);
+            DotFormatter.getInstance().writeRealRelationships(db, tables, false, showDetailedTables, stats, out, outputDir, commandLineArguments.isRenderDotInJvm());
             out.close();
         }
 
@@ -332,14 +332,14 @@ public class SchemaAnalyzer {
 
         File impliedDotFile = new File(summaryDir, dotBaseFilespec + ".implied.compact.dot");
         out = new LineWriter(impliedDotFile, Config.DOT_CHARSET);
-        boolean hasImplied = DotFormatter.getInstance().writeAllRelationships(db, tables, true, showDetailedTables, stats, out, outputDir);
+        boolean hasImplied = DotFormatter.getInstance().writeAllRelationships(db, tables, true, showDetailedTables, stats, out, outputDir, commandLineArguments.isRenderDotInJvm());
 
         Set<TableColumn> excludedColumns = stats.getExcludedColumns();
         out.close();
         if (hasImplied) {
             impliedDotFile = new File(summaryDir, dotBaseFilespec + ".implied.large.dot");
             out = new LineWriter(impliedDotFile, Config.DOT_CHARSET);
-            DotFormatter.getInstance().writeAllRelationships(db, tables, false, showDetailedTables, stats, out, outputDir);
+            DotFormatter.getInstance().writeAllRelationships(db, tables, false, showDetailedTables, stats, out, outputDir, commandLineArguments.isRenderDotInJvm());
             out.close();
         } else {
             Files.deleteIfExists(impliedDotFile.toPath());

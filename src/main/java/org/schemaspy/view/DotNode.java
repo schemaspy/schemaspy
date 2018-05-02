@@ -200,8 +200,10 @@ public class DotNode {
         }
 
         buf.append("    </TABLE>>" + lineSeparator);
-        if (!table.isRemote() || Config.getInstance().isOneOfMultipleSchemas())
+        if (!table.isRemote() || Config.getInstance().isOneOfMultipleSchemas()){
             buf.append("    URL=\"" + path + HtmlFormatter.urlEncodeLink(tableName) + ".html\"" + lineSeparator);
+            buf.append("    target=\"_top\"" + lineSeparator);
+        }
         buf.append("    tooltip=\"" + HtmlFormatter.escapeHtml(fqTableName) + "\"" + lineSeparator);
         buf.append("  ];");
 

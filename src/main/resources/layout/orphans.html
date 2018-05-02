@@ -13,7 +13,7 @@
 			<div id="grid" data-columns>
 				{{#mustacheTables}}
 				<div class="item">
-					<img src='diagrams/orphans/{{diagramName}}' usemap='#{{table.name}}' style="max-width:100%;" border='0' alt='' align='top'></img>
+					<a name='diagram'><{{#isEmbed}}embed{{/isEmbed}}{{^isEmbed}}img{{/isEmbed}} id='{{id}}' src='diagrams/orphans/{{diagramName}}' usemap='#{{table.name}}' class='diagram' border='0' alt='' align='left'></a>
 				</div>
 				{{/mustacheTables}}
 			</div>

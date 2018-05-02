@@ -98,7 +98,7 @@ public class DotFormatter {
             if (!tablesWritten.add(relatedTable))
                 continue; // already written
 
-            nodes.put(relatedTable, new DotNode(relatedTable, "", outputDir, new DotNodeConfig(false, false)));
+            nodes.put(relatedTable, new DotNode(relatedTable, "../tables/", outputDir, new DotNodeConfig(false, false)));
             connectors.addAll(finder.getRelatedConnectors(relatedTable, table, true, includeImplied));
         }
 
@@ -160,7 +160,7 @@ public class DotFormatter {
         }
 
         // include the table itself
-        nodes.put(table, new DotNode(table, "", outputDir));
+        nodes.put(table, new DotNode(table, "../tables/", outputDir));
 
         connectors.addAll(allCousinConnectors);
         for (DotConnector connector : connectors) {
@@ -260,18 +260,18 @@ public class DotFormatter {
         dot.writeln("  ];");
 }
 
-    public void writeRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, LineWriter dot, File outputDir) throws IOException {
-        writeRelationships(db, tables, compact, showColumns, false, stats, dot, outputDir);
+    public void writeRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, LineWriter dot, File outputDir, boolean isRenderDotInJvm) throws IOException {
+        writeRelationships(db, tables, compact, showColumns, false, stats, dot, outputDir, isRenderDotInJvm);
     }
 
     /**
      * Returns <code>true</code> if it wrote any implied relationships
      */
-    public boolean writeAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, LineWriter dot, File outputDir) throws IOException {
-        return writeRelationships(db, tables, compact, showColumns, true, stats, dot, outputDir);
+    public boolean writeAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, LineWriter dot, File outputDir, boolean isRenderDotInJvm) throws IOException {
+        return writeRelationships(db, tables, compact, showColumns, true, stats, dot, outputDir, isRenderDotInJvm);
     }
 
-    private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, LineWriter dot, File outputDir) throws IOException {
+    private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, LineWriter dot, File outputDir, boolean isRenderDotInJvm) throws IOException {
         DotConnectorFinder finder = DotConnectorFinder.getInstance();
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
         boolean wroteImplied = false;
@@ -292,14 +292,16 @@ public class DotFormatter {
 
         Map<Table, DotNode> nodes = new TreeMap<Table, DotNode>();
 
+        String tablesPath = (isRenderDotInJvm ? "../../" : "") + "tables/";
+
         for (Table table : tables) {
             if (!table.isOrphan(includeImplied)) {
-                nodes.put(table, new DotNode(table, "tables/", outputDir, nodeConfig));
+                nodes.put(table, new DotNode(table, tablesPath, outputDir, nodeConfig));
             }
         }
 
         for (Table table : db.getRemoteTables()) {
-            nodes.put(table, new DotNode(table, "tables/", outputDir, nodeConfig));
+            nodes.put(table, new DotNode(table, tablesPath, outputDir, nodeConfig));
         }
 
         Set<DotConnector> connectors = new TreeSet<DotConnector>();
