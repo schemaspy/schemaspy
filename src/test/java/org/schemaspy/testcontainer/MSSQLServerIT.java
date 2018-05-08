@@ -121,7 +121,7 @@ public class MSSQLServerIT {
     public void databaseShouldBePopulatedWithTableTestAndHaveColumnNameWithComment() {
         Table table = getTable("TestTable");
         TableColumn column = table.getColumn("Description");
-        assertThat(column.getComments()).isEqualToIgnoringCase("This is column description");
+        assertThat(column.getComments()).isEqualToIgnoringCase("This is a column description");
     }
 
     private Table getTable(String tableName) {
