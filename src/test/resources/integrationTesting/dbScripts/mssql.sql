@@ -11,7 +11,14 @@ CREATE TABLE TestTable
 
 EXEC sys.sp_addextendedproperty
     @name=N'MS_Description',
-    @value=N'This is column description' ,
+    @value=N'This is a table description' ,
+    @level0type=N'SCHEMA',@level0name=N'dbo',
+    @level1type=N'TABLE',@level1name=N'TestTable',
+    @level2type=null,@level2name=null
+
+EXEC sys.sp_addextendedproperty
+    @name=N'MS_Description',
+    @value=N'This is a column description' ,
     @level0type=N'SCHEMA',@level0name=N'dbo',
     @level1type=N'TABLE',@level1name=N'TestTable',
     @level2type=N'COLUMN',@level2name=N'Description'

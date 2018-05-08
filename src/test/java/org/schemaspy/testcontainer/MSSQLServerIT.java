@@ -105,6 +105,12 @@ public class MSSQLServerIT {
     }
 
     @Test
+    public void databaseShouldBePopulatedWithTableTestWithComment() {
+        Table table = getTable("TestTable");
+        assertThat(table.getComments()).isEqualToIgnoringCase("This is a table description");
+    }
+
+    @Test
     public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
         Table table = getTable("TestTable");
         TableColumn column = table.getColumn("Description");
