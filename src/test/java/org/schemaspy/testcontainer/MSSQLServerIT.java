@@ -30,8 +30,6 @@ import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +48,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -77,15 +74,20 @@ public class MSSQLServerIT {
     @MockBean
     private CommandLineRunner commandLineRunner;
 
-    private static Database abcdbo;
-    private static Database abca;
-    private static Database abcb;
-    private static Database abcc;
+    private static Database abc_dbo;
+    private static Database abc_a;
+    private static Database abc_b;
+    private static Database abc_c;
 
-    private static Database defdbo;
-    private static Database defd;
-    private static Database defe;
-    private static Database deff;
+    private static Database abc_test_dbo;
+    private static Database abc_test_a;
+    private static Database abc_test_b;
+    private static Database abc_test_c;
+
+    private static Database def_dbo;
+    private static Database def_d;
+    private static Database def_e;
+    private static Database def_f;
 
     @ClassRule
     public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
@@ -96,30 +98,43 @@ public class MSSQLServerIT {
 
     @Before
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (abcdbo == null) {
-            abcdbo = createDatabaseRepresentation("abc", "dbo");
+        if (abc_dbo == null) {
+            abc_dbo = createDatabaseRepresentation("abc", "dbo");
         }
-        if (abca == null) {
-            abca = createDatabaseRepresentation("abc", "a");
+        if (abc_a == null) {
+            abc_a = createDatabaseRepresentation("abc", "a");
         }
-        if (abcb == null) {
-            abcb = createDatabaseRepresentation("abc", "b");
+        if (abc_b == null) {
+            abc_b = createDatabaseRepresentation("abc", "b");
         }
-        if (abcc == null) {
-            abcc = createDatabaseRepresentation("abc", "c");
+        if (abc_c == null) {
+            abc_c = createDatabaseRepresentation("abc", "c");
         }
 
-        if (defdbo == null) {
-            defdbo = createDatabaseRepresentation("def", "dbo");
+        if (abc_test_dbo == null) {
+            abc_test_dbo = createDatabaseRepresentation("abc_test", "dbo");
         }
-        if (defd == null) {
-            defd = createDatabaseRepresentation("def", "d");
+        if (abc_test_a == null) {
+            abc_test_a = createDatabaseRepresentation("abc_test", "a");
         }
-        if (defe == null) {
-            defe = createDatabaseRepresentation("def", "e");
+        if (abc_test_b == null) {
+            abc_test_b = createDatabaseRepresentation("abc_test", "b");
         }
-        if (deff == null) {
-            deff = createDatabaseRepresentation("def", "f");
+        if (abc_test_c == null) {
+            abc_test_c = createDatabaseRepresentation("abc_test", "c");
+        }
+
+        if (def_dbo == null) {
+            def_dbo = createDatabaseRepresentation("def", "dbo");
+        }
+        if (def_d == null) {
+            def_d = createDatabaseRepresentation("def", "d");
+        }
+        if (def_e == null) {
+            def_e = createDatabaseRepresentation("def", "e");
+        }
+        if (def_f == null) {
+            def_f = createDatabaseRepresentation("def", "f");
         }
     }
 
@@ -156,60 +171,80 @@ public class MSSQLServerIT {
     @Test
     public void validateCatalogComments() {
         SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(abcdbo.getCatalog().getComment()).isEqualTo("ABC comment");
-        softAssertions.assertThat(abca.getCatalog().getComment()).isEqualTo("ABC comment");
-        softAssertions.assertThat(abcb.getCatalog().getComment()).isEqualTo("ABC comment");
-        softAssertions.assertThat(abcc.getCatalog().getComment()).isEqualTo("ABC comment");
+        softAssertions.assertThat(abc_dbo.getCatalog().getComment()).isEqualTo("ABC comment");
+        softAssertions.assertThat(abc_a.getCatalog().getComment()).isEqualTo("ABC comment");
+        softAssertions.assertThat(abc_b.getCatalog().getComment()).isEqualTo("ABC comment");
+        softAssertions.assertThat(abc_c.getCatalog().getComment()).isEqualTo("ABC comment");
 
-        softAssertions.assertThat(defdbo.getCatalog().getComment()).isEqualTo("DEF comment");
-        softAssertions.assertThat(defd.getCatalog().getComment()).isEqualTo("DEF comment");
-        softAssertions.assertThat(defe.getCatalog().getComment()).isEqualTo("DEF comment");
-        softAssertions.assertThat(deff.getCatalog().getComment()).isEqualTo("DEF comment");
+        softAssertions.assertThat(abc_test_dbo.getCatalog().getComment()).isEqualTo("ABC_TEST comment");
+        softAssertions.assertThat(abc_test_a.getCatalog().getComment()).isEqualTo("ABC_TEST comment");
+        softAssertions.assertThat(abc_test_b.getCatalog().getComment()).isEqualTo("ABC_TEST comment");
+        softAssertions.assertThat(abc_test_c.getCatalog().getComment()).isEqualTo("ABC_TEST comment");
+
+        softAssertions.assertThat(def_dbo.getCatalog().getComment()).isEqualTo("DEF comment");
+        softAssertions.assertThat(def_d.getCatalog().getComment()).isEqualTo("DEF comment");
+        softAssertions.assertThat(def_e.getCatalog().getComment()).isEqualTo("DEF comment");
+        softAssertions.assertThat(def_f.getCatalog().getComment()).isEqualTo("DEF comment");
         softAssertions.assertAll();
     }
 
     @Test
     public void validateSchemaComments() {
         SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(abcdbo.getSchema().getComment()).isEqualTo("ABC Schema dbo comment");
-        softAssertions.assertThat(abca.getSchema().getComment()).isEqualTo("ABC Schema A comment");
-        softAssertions.assertThat(abcb.getSchema().getComment()).isEqualTo("ABC Schema B comment");
-        softAssertions.assertThat(abcc.getSchema().getComment()).isEqualTo("ABC Schema C comment");
+        softAssertions.assertThat(abc_dbo.getSchema().getComment()).isEqualTo("ABC Schema dbo comment");
+        softAssertions.assertThat(abc_a.getSchema().getComment()).isEqualTo("ABC Schema A comment");
+        softAssertions.assertThat(abc_b.getSchema().getComment()).isEqualTo("ABC Schema B comment");
+        softAssertions.assertThat(abc_c.getSchema().getComment()).isEqualTo("ABC Schema C comment");
 
-        softAssertions.assertThat(defdbo.getSchema().getComment()).isEqualTo("DEF Schema dbo comment");
-        softAssertions.assertThat(defd.getSchema().getComment()).isEqualTo("DEF Schema D comment");
-        softAssertions.assertThat(defe.getSchema().getComment()).isEqualTo("DEF Schema E comment");
-        softAssertions.assertThat(deff.getSchema().getComment()).isEqualTo("DEF Schema F comment");
+        softAssertions.assertThat(abc_test_dbo.getSchema().getComment()).isEqualTo("ABC_TEST Schema dbo comment");
+        softAssertions.assertThat(abc_test_a.getSchema().getComment()).isEqualTo("ABC_TEST Schema A comment");
+        softAssertions.assertThat(abc_test_b.getSchema().getComment()).isEqualTo("ABC_TEST Schema B comment");
+        softAssertions.assertThat(abc_test_c.getSchema().getComment()).isEqualTo("ABC_TEST Schema C comment");
+
+        softAssertions.assertThat(def_dbo.getSchema().getComment()).isEqualTo("DEF Schema dbo comment");
+        softAssertions.assertThat(def_d.getSchema().getComment()).isEqualTo("DEF Schema D comment");
+        softAssertions.assertThat(def_e.getSchema().getComment()).isEqualTo("DEF Schema E comment");
+        softAssertions.assertThat(def_f.getSchema().getComment()).isEqualTo("DEF Schema F comment");
         softAssertions.assertAll();
     }
 
     @Test
     public void validateTableComments() {
         SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(abcdbo.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema dbo ATable comment");
-        softAssertions.assertThat(abca.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema A ATable comment");
-        softAssertions.assertThat(abcb.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema B ATable comment");
-        softAssertions.assertThat(abcc.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema C ATable comment");
+        softAssertions.assertThat(abc_dbo.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema dbo ATable comment");
+        softAssertions.assertThat(abc_a.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema A ATable comment");
+        softAssertions.assertThat(abc_b.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema B ATable comment");
+        softAssertions.assertThat(abc_c.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema C ATable comment");
 
-        softAssertions.assertThat(defdbo.getTablesMap().get("ATable").getComments()).isEqualTo("DEF Schema dbo ATable comment");
-        softAssertions.assertThat(defd.getTablesMap().get("ATable").getComments()).isEqualTo("DEF Schema D ATable comment");
-        softAssertions.assertThat(defe.getTablesMap().get("ATable").getComments()).isEqualTo("DEF Schema E ATable comment");
-        softAssertions.assertThat(deff.getTablesMap().get("ATable").getComments()).isEqualTo("DEF Schema F ATable comment");
+        softAssertions.assertThat(abc_test_dbo.getTablesMap().get("ATable").getComments()).isEqualTo("ABC_TEST Schema dbo ATable comment");
+        softAssertions.assertThat(abc_test_a.getTablesMap().get("ATable").getComments()).isEqualTo("ABC_TEST Schema A ATable comment");
+        softAssertions.assertThat(abc_test_b.getTablesMap().get("ATable").getComments()).isEqualTo("ABC_TEST Schema B ATable comment");
+        softAssertions.assertThat(abc_test_c.getTablesMap().get("ATable").getComments()).isEqualTo("ABC_TEST Schema C ATable comment");
+
+        softAssertions.assertThat(def_dbo.getTablesMap().get("ATable").getComments()).isEqualTo("DEF Schema dbo ATable comment");
+        softAssertions.assertThat(def_d.getTablesMap().get("ATable").getComments()).isEqualTo("DEF Schema D ATable comment");
+        softAssertions.assertThat(def_e.getTablesMap().get("ATable").getComments()).isEqualTo("DEF Schema E ATable comment");
+        softAssertions.assertThat(def_f.getTablesMap().get("ATable").getComments()).isEqualTo("DEF Schema F ATable comment");
         softAssertions.assertAll();
     }
 
     @Test
     public void validateColumnComments() {
         SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(abcdbo.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema dbo ATable Column comment");
-        softAssertions.assertThat(abca.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema A ATable Column comment");
-        softAssertions.assertThat(abcb.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema B ATable Column comment");
-        softAssertions.assertThat(abcc.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema C ATable Column comment");
+        softAssertions.assertThat(abc_dbo.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema dbo ATable Column comment");
+        softAssertions.assertThat(abc_a.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema A ATable Column comment");
+        softAssertions.assertThat(abc_b.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema B ATable Column comment");
+        softAssertions.assertThat(abc_c.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema C ATable Column comment");
 
-        softAssertions.assertThat(defdbo.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("DEF Schema dbo ATable Column comment");
-        softAssertions.assertThat(defd.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("DEF Schema D ATable Column comment");
-        softAssertions.assertThat(defe.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("DEF Schema E ATable Column comment");
-        softAssertions.assertThat(deff.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("DEF Schema F ATable Column comment");
+        softAssertions.assertThat(abc_test_dbo.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC_TEST Schema dbo ATable Column comment");
+        softAssertions.assertThat(abc_test_a.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC_TEST Schema A ATable Column comment");
+        softAssertions.assertThat(abc_test_b.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC_TEST Schema B ATable Column comment");
+        softAssertions.assertThat(abc_test_c.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC_TEST Schema C ATable Column comment");
+
+        softAssertions.assertThat(def_dbo.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("DEF Schema dbo ATable Column comment");
+        softAssertions.assertThat(def_d.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("DEF Schema D ATable Column comment");
+        softAssertions.assertThat(def_e.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("DEF Schema E ATable Column comment");
+        softAssertions.assertThat(def_f.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("DEF Schema F ATable Column comment");
         softAssertions.assertAll();
     }
 
