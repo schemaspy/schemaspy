@@ -152,6 +152,26 @@ public class CommandLineArgumentParserTest {
         assertThat(arguments.isDbHelpRequired()).isTrue();
     }
 
+    @Test
+    public void printLicenseFlagWorks() {
+        String[] args = {
+                "--license"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        assertThat(arguments.isPrintLicense()).isTrue();
+    }
+
+    @Test
+    @Logger(CommandLineArgumentParser.class)
+    public void canPrintLicense() {
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        parser.printLicense();
+        String log = loggingRule.getLog();
+        assertThat(log).contains("GNU GENERAL PUBLIC LICENSE");
+        assertThat(log).contains("GNU LESSER GENERAL PUBLIC LICENSE");
+    }
+
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.
 
     // given only parameter -configFile without value -> error

@@ -27,8 +27,14 @@ import org.schemaspy.Config;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,7 +116,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private List<String> computeRequiredFields(CommandLineArguments arguments) {
+    private static List<String> computeRequiredFields(CommandLineArguments arguments) {
         List<String> computedRequiredFields = new ArrayList<>(Arrays.asList(requiredFields));
         if (!arguments.isSingleSignOn()) {
             computedRequiredFields.add("user");
@@ -118,7 +124,7 @@ public class CommandLineArgumentParser {
         return computedRequiredFields;
     }
 
-    private boolean valueIsMissing(ParameterDescription parameterDescription) {
+    private static boolean valueIsMissing(ParameterDescription parameterDescription) {
         Object value = parameterDescription.getParameterized().get(parameterDescription.getObject());
         if (value instanceof String) {
             return ((String)value).isEmpty();
@@ -164,5 +170,20 @@ public class CommandLineArgumentParser {
         }
         LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
         LOGGER.info("Grab one out of {} and modify it to suit your needs.", schemaspyJarFileName);
+    }
+
+    public void printLicense() {
+        Resource gpl = new ClassPathResource("COPYING");
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gpl.getInputStream(), StandardCharsets.UTF_8))) {
+            bufferedReader.lines().forEachOrdered(LOGGER::info);
+        } catch (IOException e) {
+            LOGGER.error("Failed to read COPYING (GPL)", e);
+        }
+        Resource lgpl = new ClassPathResource("COPYING.LESSER");
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(lgpl.getInputStream(), StandardCharsets.UTF_8))) {
+            bufferedReader.lines().forEachOrdered(LOGGER::info);
+        } catch (IOException e) {
+            LOGGER.error("Failed to read COPYING.LESSER (LGPL)", e);
+        }
     }
 }

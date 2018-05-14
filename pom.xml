@@ -247,6 +247,13 @@
                 </includes>
                 <filtering>true</filtering>
             </resource>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <includes>
+                    <include>COPYING</include>
+                    <include>COPYING.LESSER</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
             <plugin>

@@ -82,11 +82,13 @@ public class LoggingRule implements TestRule {
         patternLayoutEncoder.start();
         outputStreamAppender.start();
         logger.addAppender(outputStreamAppender);
+        logger.setAdditive(false);
     }
 
     private void after() {
         outputStreamAppender.stop();
         patternLayoutEncoder.stop();
         logger.detachAppender(outputStreamAppender);
+        logger.setAdditive(true);
     }
 }

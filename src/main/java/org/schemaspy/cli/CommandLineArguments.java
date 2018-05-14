@@ -71,6 +71,16 @@ public class CommandLineArguments {
     private boolean dbHelpRequired;
 
     @Parameter(
+            names = {
+                    "-l","--license"
+            },
+            help = true,
+            descriptionKey = "license",
+            order = 3
+    )
+    private boolean printLicense;
+
+    @Parameter(
             names = {"-debug", "--debug", "debug", "schemaspy.debug"},
             descriptionKey = "debug"
     )
@@ -173,6 +183,10 @@ public class CommandLineArguments {
 
     public boolean isDbHelpRequired() {
         return dbHelpRequired;
+    }
+
+    public boolean isPrintLicense() {
+        return printLicense;
     }
 
     public boolean isDebug() {

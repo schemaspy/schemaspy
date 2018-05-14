@@ -86,6 +86,12 @@ public class Main implements CommandLineRunner {
             return;
         }
 
+        if (arguments.isPrintLicense()) {
+            commandLineArgumentParser.printLicense();
+            exitApplication(0);
+            return;
+        }
+
         runAnalyzer(args);
     }
 
