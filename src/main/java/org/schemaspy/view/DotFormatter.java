@@ -84,7 +84,7 @@ public class DotFormatter {
         DotConnectorFinder finder = DotConnectorFinder.getInstance();
 
         String diagramName = (twoDegreesOfSeparation ? "twoDegreesRelationshipsDiagram" : "oneDegreeRelationshipsDiagram") + (includeImplied ? "Implied" : "");
-        writeHeader(diagramName, true, dot);
+        writeHeader(diagramName, true, dot, outputDir);
 
         Set<Table> relatedTables = getImmediateRelatives(table, true, includeImplied, skippedImpliedConstraints);
 
@@ -227,11 +227,12 @@ public class DotFormatter {
         return relatedTables;
     }
 
-    private void writeHeader(String diagramName, boolean showLabel, LineWriter dot) throws IOException {
+    private void writeHeader(String diagramName, boolean showLabel, LineWriter dot, File outputDir) throws IOException {
         dot.writeln("// dot " + Dot.getInstance().getGraphvizVersion() + " on " + System.getProperty("os.name") + " " + System.getProperty("os.version"));
         dot.writeln("// SchemaSpy rev " + new Revision());
         dot.writeln("digraph \"" + diagramName + "\" {");
         dot.writeln("  graph [");
+        dot.writeln("    stylesheet=\"" + outputDir + "\\graphviz.css\"");
         boolean rankdirbug = Config.getInstance().isRankDirBugEnabled();
         if (!rankdirbug)
             dot.writeln("    rankdir=\"RL\"");
@@ -288,7 +289,7 @@ public class DotFormatter {
             else
                 diagramName = "largeRelationshipsDiagram";
         }
-        writeHeader(diagramName, true, dot);
+        writeHeader(diagramName, true, dot, outputDir);
 
         Map<Table, DotNode> nodes = new TreeMap<Table, DotNode>();
 
@@ -339,7 +340,7 @@ public class DotFormatter {
     }
 
     public void writeOrphan(Table table, LineWriter dot, File outputDir) throws IOException {
-        writeHeader(table.getName(), false, dot);
+        writeHeader(table.getName(), false, dot, outputDir);
         dot.writeln(new DotNode(table, true, "tables/", outputDir).toString());
         dot.writeln("}");
     }

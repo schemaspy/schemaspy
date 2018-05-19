@@ -1,0 +1,7 @@
+svg g.node {
+  cursor: pointer;
+}
+
+svg .node {
+  cursor: pointer;
+}
