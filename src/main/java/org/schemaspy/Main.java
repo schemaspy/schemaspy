@@ -123,7 +123,8 @@ public class Main implements CommandLineRunner {
     }
 
     private void exitApplication(int returnCode) {
-        SpringApplication.exit(context, () -> returnCode);
+        int computedReturnCode = SpringApplication.exit(context, () -> returnCode);
+        System.exit(computedReturnCode);
     }
 
 }
