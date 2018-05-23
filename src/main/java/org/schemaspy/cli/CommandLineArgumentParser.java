@@ -51,13 +51,17 @@ public class CommandLineArgumentParser {
 
     private final JCommander jCommander;
 
+    private final CommandLineArguments arguments;
+
     private final PropertyFileDefaultProvider defaultProvider;
 
     private static final String[] requiredFields = {"outputDirectory"};
 
-    public CommandLineArgumentParser(PropertyFileDefaultProvider defaultProvider) {
+    public CommandLineArgumentParser(CommandLineArguments arguments, PropertyFileDefaultProvider defaultProvider) {
         this.defaultProvider = defaultProvider;
+        this.arguments = arguments;
         jCommander = createJCommander();
+        jCommander.addObject(arguments);
     }
 
     private JCommander createJCommander() {
@@ -70,9 +74,6 @@ public class CommandLineArgumentParser {
     }
 
     public CommandLineArguments parse(String... localArgs) {
-        CommandLineArguments arguments = new CommandLineArguments();
-        jCommander.addObject(arguments);
-
         jCommander.parse(localArgs);
 
         if (shouldValidate()) {
