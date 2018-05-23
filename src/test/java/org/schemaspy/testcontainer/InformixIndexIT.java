@@ -27,32 +27,31 @@ import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.*;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.InformixContainer;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 /**
  * @author Nils Petzaell
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext
 public class InformixIndexIT {
     @Autowired
     private SqlService sqlService;
@@ -63,11 +62,8 @@ public class InformixIndexIT {
     @Mock
     private ProgressListener progressListener;
 
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
+    @Autowired
+    private CommandLineArgumentParser commandLineArgumentParser;
 
     private static Database database;
 
@@ -104,12 +100,7 @@ public class InformixIndexIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getJdbcPort().toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/informix"));
-        given(arguments.getDatabaseType()).willReturn("informix");
-        given(arguments.getUser()).willReturn(jdbcContainerRule.getContainer().getUsername());
-        given(arguments.getSchema()).willReturn("informix");
-        given(arguments.getCatalog()).willReturn("test");
-        given(arguments.getDatabaseName()).willReturn("test");
+        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         Database database = new Database(

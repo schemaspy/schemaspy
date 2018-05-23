@@ -19,15 +19,18 @@
 package org.schemaspy.testcontainer;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
-import org.schemaspy.Main;
+import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.schemaspy.testing.IgnoreUsingXPath;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testcontainers.containers.InformixContainer;
 import org.xmlunit.builder.DiffBuilder;
@@ -40,6 +43,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,6 +52,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nils Petzaell
  */
 @RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
+@DirtiesContext
 public class InformixIndexXMLIT {
 
     private static URL expectedXML = InformixIndexXMLIT.class.getResource("/integrationTesting/informixIndexXMLIT/expecting/test.informix.xml");
@@ -67,22 +73,30 @@ public class InformixIndexXMLIT {
             .outerRule(jdbcContainerRule)
             .around(jdbcDriverClassPresentRule);
 
-    @BeforeClass
-    public static void createXML() throws Exception {
-        String[] args = {
-                "-t", "informix",
-                "-db", "test",
-                "-s", "informix",
-                "-cat", "test",
-                "-server", "dev",
-                "-o", "target/informix_xml",
-                "-u", jdbcContainerRule.getContainer().getUsername(),
-                "-p", jdbcContainerRule.getContainer().getPassword(),
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getJdbcPort().toString(),
-                "-nohtml"
-        };
-        Main.main(args);
+    @Autowired
+    private SchemaSpyRunner schemaSpyRunner;
+
+    private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
+
+    @Before
+    public void createXML() throws Exception {
+        if (shouldRun.get()) {
+            String[] args = {
+                    "-t", "informix",
+                    "-db", "test",
+                    "-s", "informix",
+                    "-cat", "test",
+                    "-server", "dev",
+                    "-o", "target/informix_xml",
+                    "-u", jdbcContainerRule.getContainer().getUsername(),
+                    "-p", jdbcContainerRule.getContainer().getPassword(),
+                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
+                    "-port", jdbcContainerRule.getContainer().getJdbcPort().toString(),
+                    "-nohtml"
+            };
+            schemaSpyRunner.run(args);
+            shouldRun.set(false);
+        }
     }
 
     @Test

@@ -20,15 +20,18 @@ package org.schemaspy.integrationtesting.mysql;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.schemaspy.Main;
+import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.IgnoreUsingXPath;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
@@ -43,6 +46,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,7 +56,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@DirtiesContext
 public class MysqlHTMLIT {
 
     private static URL expectedXML = MysqlHTMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml/htmlit.htmlit.xml");
@@ -70,21 +76,28 @@ public class MysqlHTMLIT {
                         .withInitUser("root", "test")
             );
 
-    @BeforeClass
-    public static void generateHTML() throws Exception {
-        MySQLContainer container = jdbcContainerRule.getContainer();
-        String[] args = new String[]{
-                "-t", "mysql",
-                "-db", "htmlit",
-                "-s", "htmlit",
-                "-host", container.getContainerIpAddress() + ":" + String.valueOf(container.getMappedPort(3306)),
-                "-port", String.valueOf(container.getMappedPort(3306)),
-                "-u", container.getUsername(),
-                "-p", container.getPassword(),
-                "-o", "target/mysqlhtml",
-                "-connprops", "useSSL\\=false"
-        };
-        Main.main(args);
+    @Autowired
+    private SchemaSpyRunner schemaSpyRunner;
+
+    private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
+
+    @Before
+    public synchronized void generateHTML() throws Exception {
+        if (shouldRun.get()) {
+            String[] args = new String[]{
+                    "-t", "mysql",
+                    "-db", "htmlit",
+                    "-s", "htmlit",
+                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
+                    "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
+                    "-u", jdbcContainerRule.getContainer().getUsername(),
+                    "-p", jdbcContainerRule.getContainer().getPassword(),
+                    "-o", "target/mysqlhtml",
+                    "-connprops", "useSSL\\=false"
+            };
+            schemaSpyRunner.run(args);
+            shouldRun.set(false);
+        }
     }
 
     @Test

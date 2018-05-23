@@ -19,14 +19,17 @@
 package org.schemaspy.integrationtesting.mysql;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.schemaspy.Main;
+import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.IgnoreUsingXPath;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testcontainers.containers.MySQLContainer;
 import org.xmlunit.builder.DiffBuilder;
@@ -39,6 +42,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +51,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nils Petzaell
  */
 @RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
+@DirtiesContext
 public class MysqlXMLIT {
 
     private static URL expectedXML = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/xmlit.xmlit.xml");
@@ -64,22 +70,30 @@ public class MysqlXMLIT {
                             .withInitUser("root", "test")
             );
 
-    @BeforeClass
-    public static void generateXML() throws Exception {
-        MySQLContainer container = jdbcContainerRule.getContainer();
-        String[] args = new String[] {
-                "-t", "mysql",
-                "-db", "xmlit",
-                "-s", "xmlit",
-                "-host", container.getContainerIpAddress() + ":" + String.valueOf(container.getMappedPort(3306)),
-                "-port", String.valueOf(container.getMappedPort(3306)),
-                "-u", container.getUsername(),
-                "-p", container.getPassword(),
-                "-nohtml",
-                "-o", "target/mysqlxmlit",
-                "-connprops","useSSL\\=false"
-        };
-        Main.main(args);
+    @Autowired
+    private SchemaSpyRunner schemaSpyRunner;
+
+    private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
+
+    @Before
+    public void generateXML() throws Exception {
+        if (shouldRun.get()) {
+            MySQLContainer container = jdbcContainerRule.getContainer();
+            String[] args = new String[]{
+                    "-t", "mysql",
+                    "-db", "xmlit",
+                    "-s", "xmlit",
+                    "-host", container.getContainerIpAddress() + ":" + String.valueOf(container.getMappedPort(3306)),
+                    "-port", String.valueOf(container.getMappedPort(3306)),
+                    "-u", container.getUsername(),
+                    "-p", container.getPassword(),
+                    "-nohtml",
+                    "-o", "target/mysqlxmlit",
+                    "-connprops", "useSSL\\=false"
+            };
+            schemaSpyRunner.run(args);
+            shouldRun.set(false);
+        }
     }
 
     @Test
