@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004 - 2011, 2014 John Currier
+ * Copyright (C) 2017 Thomas Traude
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,16 +20,17 @@
  */
 package org.schemaspy.model;
 
-import java.io.File;
-import java.util.Collection;
-
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
+
+import java.io.File;
+import java.util.Collection;
 
 /**
  * Implementation of {@link ProgressListener} that sends its output to the console.
  *
  * @author John Currier
+ * @author Thomas Traude
  */
 public class ConsoleProgressListener implements ProgressListener {
 	private final CommandLineArguments commandLineArguments;

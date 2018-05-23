@@ -1,6 +1,11 @@
 /*
  * Copyright (C) 2004-2011 John Currier
+ * Copyright (C) 2016, 2017 Rafal Kasa
+ * Copyright (C) 2016 Ismail Simsek
+ * Copyright (C) 2017 Wojciech Kasa
+ * Copyright (C) 2017 Thomas Traude
  * Copyright (C) 2017, 2018 Nils Petzaell
+ * Copyright (C) 2017 Daniel Watt
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -54,7 +59,12 @@ import java.util.stream.Stream;
  * Configuration of a SchemaSpy run
  *
  * @author John Currier
+ * @author Rafal Kasa
+ * @author Ismail Simsek
+ * @author Wojciech Kasa
+ * @author Thomas Traude
  * @author Nils Petzaell
+ * @author Daniel Watt
  */
 public final class Config {
     private static Config instance;

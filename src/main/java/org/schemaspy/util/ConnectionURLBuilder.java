@@ -1,6 +1,8 @@
 /*
  * Copyright (C) 2004-2011 John Currier
+ * Copyright (C) 2017 Thomas Traude
  * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2017 Daniel Watt
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -29,10 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-
 /**
  * @author John Currier
+ * @author Thomas Traude
  * @author Nils Petzaell
+ * @author Daniel Watt
  */
 public class ConnectionURLBuilder {
 

@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2017 Thomas Traude
+ * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2018 Nils Petzaell
+ *
+ * This file is part of SchemaSpy.
+ *
+ * SchemaSpy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * SchemaSpy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.schemaspy.cli;
 
 import com.beust.jcommander.JCommander;
@@ -7,14 +27,23 @@ import org.schemaspy.Config;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 /**
  * This class uses {@link JCommander} to parse the SchemaSpy command line arguments represented by {@link CommandLineArguments}.
+ *
+ * @author Thomas Traude
+ * @author Daniel Watt
+ * @author Nils Petzaell
  */
 public class CommandLineArgumentParser {
 
@@ -87,7 +116,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private List<String> computeRequiredFields(CommandLineArguments arguments) {
+    private static List<String> computeRequiredFields(CommandLineArguments arguments) {
         List<String> computedRequiredFields = new ArrayList<>(Arrays.asList(requiredFields));
         if (!arguments.isSingleSignOn()) {
             computedRequiredFields.add("user");
@@ -95,7 +124,7 @@ public class CommandLineArgumentParser {
         return computedRequiredFields;
     }
 
-    private boolean valueIsMissing(ParameterDescription parameterDescription) {
+    private static boolean valueIsMissing(ParameterDescription parameterDescription) {
         Object value = parameterDescription.getParameterized().get(parameterDescription.getObject());
         if (value instanceof String) {
             return ((String)value).isEmpty();
@@ -141,5 +170,20 @@ public class CommandLineArgumentParser {
         }
         LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
         LOGGER.info("Grab one out of {} and modify it to suit your needs.", schemaspyJarFileName);
+    }
+
+    public void printLicense() {
+        Resource gpl = new ClassPathResource("COPYING");
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gpl.getInputStream(), StandardCharsets.UTF_8))) {
+            bufferedReader.lines().forEachOrdered(LOGGER::info);
+        } catch (IOException e) {
+            LOGGER.error("Failed to read COPYING (GPL)", e);
+        }
+        Resource lgpl = new ClassPathResource("COPYING.LESSER");
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(lgpl.getInputStream(), StandardCharsets.UTF_8))) {
+            bufferedReader.lines().forEachOrdered(LOGGER::info);
+        } catch (IOException e) {
+            LOGGER.error("Failed to read COPYING.LESSER (LGPL)", e);
+        }
     }
 }

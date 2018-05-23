@@ -1,6 +1,8 @@
 /*
- * This file is a part of the SchemaSpy project (http://schemaspy.org).
  * Copyright (C) 2011 John Currier
+ * Copyright (C) 2017 Thomas Traude
+ *
+ * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +25,7 @@ package org.schemaspy.model;
  * that doesn't really exist in the current database.
  *
  * @author John Currier
+ * @author Thomas Traude
  */
 public class LogicalTable extends Table {
     public LogicalTable(Database db, String catalog, String schema, String name, String comments) {

@@ -1,6 +1,7 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,14 +19,17 @@
  */
 package org.schemaspy.view;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Simple ugly hack that provides details of what was written.
+ *
+ * @author John Currier
  */
 public class WriteStats {
     private int numTables;

@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2004-2010 John Currier
+ * Copyright (C) 2017 Wojciech Kasa
+ * Copyright (C) 2017 Thomas Traude
  * Copyright (C) 2017 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
@@ -34,6 +36,8 @@ import java.util.StringTokenizer;
  * Configuration of a specific type of database (as specified by -t)
  *
  * @author John Currier
+ * @author Wojciech Kasa
+ * @author Thomas Traude
  * @author Nils Petzaell
  */
 public class DbSpecificConfig {

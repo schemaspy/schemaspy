@@ -1,6 +1,10 @@
 /*
+ * Copyright (C) 2004 - 2010 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2016 Ismail Simsek
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,6 +37,11 @@ import java.util.List;
  * The page that lists all of the constraints in the schema
  *
  * @author John Currier
+ * @author Rafal Kasa
+ * @author Ismail Simsek
+ * @author Thomas Traude
+ * @author Daniel Watt
+ * @author Nils Petzaell
  */
 public class HtmlConstraintsPage extends HtmlFormatter {
     private static HtmlConstraintsPage instance = new HtmlConstraintsPage();

@@ -1,6 +1,9 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2016, 2017 Ismail Simsek
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,22 +26,16 @@ import java.io.IOException;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import org.schemaspy.Config;
-import org.schemaspy.model.Catalog;
-import org.schemaspy.model.Schema;
-import org.schemaspy.util.DiagramUtil;
-import org.schemaspy.util.Dot;
-import org.schemaspy.util.LineWriter;
-import org.schemaspy.util.Markdown;
 
 /**
  * The page that contains links to the various schemas that were analyzed
  *
  * @author John Currier
+ * @author Rafal Kasa
+ * @author Ismail Simsek
  */
 public class HtmlMultipleSchemasIndexPage extends HtmlFormatter {
     private static HtmlMultipleSchemasIndexPage instance = new HtmlMultipleSchemasIndexPage();

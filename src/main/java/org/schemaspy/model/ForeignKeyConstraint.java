@@ -1,6 +1,10 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2017 Wojciech Kasa
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,22 +25,22 @@ package org.schemaspy.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.sql.DatabaseMetaData.importedKeyCascade;
-import static java.sql.DatabaseMetaData.importedKeyNoAction;
-import static java.sql.DatabaseMetaData.importedKeyRestrict;
-import static java.sql.DatabaseMetaData.importedKeySetNull;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+import static java.sql.DatabaseMetaData.*;
 
 /**
  * Represents a <a href='http://en.wikipedia.org/wiki/Foreign_key'>
  * Foreign Key Constraint</a> that "ties" a child table to a parent table
  * via foreign and primary keys.
+ *
+ * @author John Currier
+ * @author Rafal Kasa
+ * @author Wojciech Kasa
+ * @author Daniel Watt
  */
 public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
     private final String name;

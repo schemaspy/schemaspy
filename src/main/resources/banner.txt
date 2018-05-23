@@ -8,3 +8,6 @@
                                               ${application.version}
 
 SchemaSpy generates an HTML representation of a database schema's relationships.
+SchemaSpy comes with ABSOLUTELY NO WARRANTY.
+SchemaSpy is free software and can be redistributed under the conditions of LGPL version 3 or later.
+http://www.gnu.org/licenses/

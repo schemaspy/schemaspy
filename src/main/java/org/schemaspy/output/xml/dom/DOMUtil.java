@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2004-2010 John Currier
- * Copyright (C) 2018 Nils Petzaell
+ * Copyright (C) 2004 - 2010 John Currier
+ * Copyright (C) 2017 - Wojciech Kasa
+ * Copyright (C) 2017 - 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -24,6 +25,7 @@ import org.w3c.dom.Node;
 
 /**
  * @author John Currier
+ * @author Wojciech Kasa
  * @author Nils Petzaell
  */
 public class DOMUtil {

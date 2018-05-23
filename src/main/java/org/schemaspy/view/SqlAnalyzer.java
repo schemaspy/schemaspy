@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 John Currier
+ * Copyright (C) 2004 - 2010 John Currier
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
  * SchemaSpy is free software; you can redistribute it and/or
@@ -28,6 +30,8 @@ import java.util.*;
 /**
  *
  * @author John Currier
+ * @author Daniel Watt
+ * @author Nils Petzaell
  */
 public class SqlAnalyzer {
     private Set<String> keywords;

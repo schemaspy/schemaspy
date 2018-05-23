@@ -1,7 +1,8 @@
 /*
- * This file is a part of the SchemaSpy project (http://schemaspy.org).
  * Copyright (C) 2011 John Currier
- * Copyright (C) 2018 Nils Petzaell
+ * Copyright (C) 2017 Nils Petzaell
+ *
+ * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

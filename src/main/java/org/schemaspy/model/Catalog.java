@@ -1,6 +1,9 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2017 Ismail Simsek
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,6 +23,11 @@ package org.schemaspy.model;
 
 import java.util.Objects;
 
+/**
+ * @author John Currier
+ * @author Ismail Simsek
+ * @author Daniel Watt
+ */
 public final class Catalog implements Comparable<Catalog>{
     private final String name;
     private String comment;

@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2017 Thomas Traude
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,14 +20,12 @@
  */
 package org.schemaspy.model;
 
-
-
-
 /**
  * A table that's outside of the default schema but is referenced
  * by or references a table in the default schema.
  *
  * @author John Currier
+ * @author Thomas Traude
  */
 public class RemoteTable extends Table {
 

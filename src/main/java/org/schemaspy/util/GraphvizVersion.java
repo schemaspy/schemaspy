@@ -1,6 +1,8 @@
 /*
+ * Copyright (C) 2004 - 2010 John Currier
+ * Copyright (C) 2017 Daniel Watt
+ *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 John Currier
  *
  * SchemaSpy is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,6 +30,7 @@ import java.util.StringTokenizer;
  * e.g. version 2.1.4 should be less than version 2.1.10.
  *
  * @author John Currier
+ * @author Daniel Watt
  * @version 1.0
  */
 public class GraphvizVersion implements Comparable<GraphvizVersion> {
