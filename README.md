@@ -94,8 +94,12 @@ The resulting documentation can be found in `docs/build/html`
 
 ## Maintained
 
-SchemaSpy is maintained by [Rafal Kasa](malito:rafalkasa@gmail.com) with SchemaSpy community support please contact with me if you have some question or proposition.
-* https://github.com/rafalkasa
+SchemaSpy is maintained by:
+* [Rafał Kasa](https://github.com/rafalkasa) 
+* [Nils Petzäll](https://github.com/npetzall)
+
+with SchemaSpy community support please contact with us if you have some question or proposition.
+
 
 ## Team Tools
 
