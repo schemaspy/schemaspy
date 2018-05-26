@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -41,6 +43,7 @@ public class DbSpecificConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private static final Pattern OPTION_PATTER = Pattern.compile("<([a-zA-Z0-9.\\-_]+)>");
     private static final String DUMP_FORMAT = "   -%s   \t\t%s";
 
     private String description;
@@ -57,22 +60,20 @@ public class DbSpecificConfig {
      * @param properties
      */
     private void loadOptions(Properties properties) {
-        boolean inParam = false;
+        Set<String> optionsFound = findOptions(properties.getProperty("connectionSpec"));
+        optionsFound.stream().forEachOrdered(optionName -> {
+            String desc = properties.getProperty(optionName);
+            options.add(new DbSpecificOption(optionName, desc));
+        });
+    }
 
-        StringTokenizer tokenizer = new StringTokenizer(properties.getProperty("connectionSpec"), "<>", true);
-        while (tokenizer.hasMoreTokens()) {
-            String token = tokenizer.nextToken();
-            if ("<".equals(token)) {
-                inParam = true;
-            } else if (">".equals(token)) {
-                inParam = false;
-            } else {
-                if (inParam) {
-                    String desc = properties.getProperty(token);
-                    options.add(new DbSpecificOption(token, desc));
-                }
-            }
+    private static Set<String> findOptions(String connectionSpec) {
+        Set<String> optionsFound = new LinkedHashSet<>();
+        Matcher matcher = OPTION_PATTER.matcher(connectionSpec);
+        while(matcher.find()) {
+            optionsFound.add(matcher.group(1));
         }
+        return optionsFound;
     }
 
     /**
