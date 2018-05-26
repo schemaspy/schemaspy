@@ -117,7 +117,7 @@ public class ConnectionURLBuilder {
     private String getHostOptionalPort() {
         String hostOptionalPort = config.getHost();
         if (hostOptionalPort == null) {
-            return null;
+            throw new Config.MissingRequiredParameterException("host", "host of database, may contain port", true);
         }
         String hostPortSeparator = dbType.getProperty("hostPortSeparator", ":");
         Integer port = config.getPort();

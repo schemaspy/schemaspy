@@ -43,6 +43,8 @@ import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.DatabaseMetaData;
@@ -1197,8 +1199,17 @@ public final class Config {
      * @return
      */
     public static String getLoadedFromJar() {
-        String classpath = System.getProperty("java.class.path");
-        return new StringTokenizer(classpath, File.pathSeparator).nextToken();
+        String loadedFrom = Config.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        if (loadedFrom.contains("!/BOOT-INF")) {
+            try {
+                loadedFrom = new URL(loadedFrom).getFile();
+                loadedFrom = loadedFrom.substring(0, loadedFrom.indexOf("!"));
+            } catch (MalformedURLException e) {
+                String classpath = System.getProperty("java.class.path");
+                return new StringTokenizer(classpath, File.pathSeparator).nextToken();
+            }
+        }
+        return loadedFrom;
     }
 
     /**
@@ -1542,10 +1553,8 @@ public final class Config {
         }
 
         if (detailedDb) {
-            System.out.println("Built-in database types and their required connection parameters:");
-            for (String type : getBuiltInDatabaseTypes(getLoadedFromJar())) {
-                new DbSpecificConfig(type).dumpUsage();
-            }
+            System.out.println("Missing required connection parameters for '" + getDbType() + "':");
+            new DbSpecificConfig(getDbType()).dumpUsage();
             System.out.println();
         }
 
