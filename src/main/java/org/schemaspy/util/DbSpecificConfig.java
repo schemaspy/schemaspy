@@ -22,7 +22,6 @@
  */
 package org.schemaspy.util;
 
-import org.schemaspy.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,18 +45,6 @@ public class DbSpecificConfig {
 
     private String description;
     private final List<DbSpecificOption> options = new ArrayList<>();
-    private final Config config = new Config();
-
-    /**
-     * Construct an instance with configuration options of the specified database type
-     *
-     * @param dbType
-     */
-    public DbSpecificConfig(String dbType) {
-        Properties props = config.determineDbProperties(dbType);
-        description = props.getProperty("description");
-        loadOptions(props);
-    }
 
     public DbSpecificConfig(Properties props) {
         description = props.getProperty("description");
@@ -96,15 +83,6 @@ public class DbSpecificConfig {
      */
     public List<DbSpecificOption> getOptions() {
         return options;
-    }
-
-    /**
-     * Return the generic configuration associated with this DbSpecificCofig
-     *
-     * @return
-     */
-    public Config getConfig() {
-        return config;
     }
 
     /**

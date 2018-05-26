@@ -24,6 +24,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.Config;
+import org.schemaspy.db.config.PropertiesResolver;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,8 @@ import java.util.stream.Collectors;
 public class CommandLineArgumentParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static final PropertiesResolver propertiesResolver = new PropertiesResolver();
 
     private final JCommander jCommander;
 
@@ -167,7 +170,7 @@ public class CommandLineArgumentParser {
 
         LOGGER.info("Built-in database types and their required connection parameters:");
         for (String type : Config.getBuiltInDatabaseTypes(schemaspyJarFileName)) {
-            new DbSpecificConfig(type).dumpUsage();
+            new DbSpecificConfig(propertiesResolver.getDbProperties(type)).dumpUsage();
         }
         LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
         LOGGER.info("Grab one out of {} and modify it to suit your needs.", schemaspyJarFileName);
