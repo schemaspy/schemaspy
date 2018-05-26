@@ -26,10 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Configuration of a specific type of database (as specified by -t)
@@ -42,6 +40,8 @@ import java.util.StringTokenizer;
 public class DbSpecificConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static final String DUMP_FORMAT = "   -%s   \t\t%s";
 
     private String description;
     private final List<DbSpecificOption> options = new ArrayList<>();
@@ -90,16 +90,22 @@ public class DbSpecificConfig {
      */
     public void dumpUsage() {
         LOGGER.info(description);
-        getOptions().stream().map(option ->
-                        "   -" +
-                        option.getName() +
-                        " " +
-                        (
-                                option.getDescription() != null ?
-                                "  \t\t" + option.getDescription() :
-                                ""
-                        )
-                ).forEach(LOGGER::info);
+        getOptions().stream().flatMap(option -> {
+            if ("hostOptionalPort".equals(option.getName())) {
+                return Stream.of(
+                        String.format(DUMP_FORMAT, "host", "host of database, may contain port"),
+                        String.format(DUMP_FORMAT, "port", "optional port if not default")
+                );
+            } else {
+                return Stream.of(
+                        String.format(DUMP_FORMAT, option.getName(), getDescription(option))
+                );
+            }
+        }).forEach(LOGGER::info);
+    }
+
+    private static String getDescription(DbSpecificOption option) {
+        return Objects.isNull(option.getDescription()) ? "" : option.getDescription();
     }
 
     /**
