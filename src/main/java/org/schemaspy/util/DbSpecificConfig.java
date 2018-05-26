@@ -44,7 +44,6 @@ public class DbSpecificConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final String type;
     private String description;
     private final List<DbSpecificOption> options = new ArrayList<>();
     private final Config config = new Config();
@@ -55,14 +54,12 @@ public class DbSpecificConfig {
      * @param dbType
      */
     public DbSpecificConfig(String dbType) {
-        type = dbType;
         Properties props = config.determineDbProperties(dbType);
         description = props.getProperty("description");
         loadOptions(props);
     }
 
-    public DbSpecificConfig(String dbType, Properties props) {
-        type = dbType;
+    public DbSpecificConfig(Properties props) {
         description = props.getProperty("description");
         loadOptions(props);
     }
