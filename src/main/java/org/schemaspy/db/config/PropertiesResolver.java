@@ -60,7 +60,7 @@ public class PropertiesResolver {
             Properties props = fromURL(url);
             processIncludes(props, resolutionInfo);
             processExtends(props, resolutionInfo);
-            LOGGER.info(resolutionInfo.getTrace());
+            LOGGER.debug(resolutionInfo.getTrace());
             return props;
         } catch (ResourceNotFoundException rnfe) {
             throw new InvalidConfigurationException("Unable to resolve databaseType: " + dbType, rnfe)
