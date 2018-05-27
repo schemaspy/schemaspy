@@ -21,6 +21,7 @@ package org.schemaspy.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
 
 import java.io.File;
 
@@ -177,6 +178,9 @@ public class CommandLineArguments {
     )
     private Integer port;
 
+    @ParametersDelegate
+    private HtmlCommandLineArguments htmlCommandLineArguments = new HtmlCommandLineArguments();
+
     public boolean isHelpRequired() {
         return helpRequired;
     }
@@ -223,5 +227,9 @@ public class CommandLineArguments {
 
     public Integer getPort() {
         return port;
+    }
+
+    public HtmlCommandLineArguments getHtmlCommandLineArguments() {
+        return htmlCommandLineArguments;
     }
 }
