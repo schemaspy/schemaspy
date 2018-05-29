@@ -57,7 +57,7 @@ public class DatabaseService {
 
     private final SqlService sqlService;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public DatabaseService(TableService tableService, ViewService viewService, SqlService sqlService) {
         this.tableService = Objects.requireNonNull(tableService);
@@ -95,7 +95,7 @@ public class DatabaseService {
         updateFromXmlMetadata(config, db, db.getSchemaMeta());
     }
     
-   private void initCatalogs(Database db) throws SQLException {
+    private void initCatalogs(Database db) throws SQLException {
 
             String sql = Config.getInstance().getDbProperties().getProperty("selectCatalogsSql");
 
@@ -142,7 +142,7 @@ public class DatabaseService {
 
         String[] types = getTypes(config, "tableTypes", "TABLE");
         NameValidator validator = new NameValidator("table", include, exclude, types);
-        List<BasicTableMeta> entries = getBasicTableMeta(config, db, listener, metadata, true, types);
+        List<BasicTableMeta> entries = getBasicTableMeta(config, db, metadata, true, types);
 
         TableCreator creator;
         if (maxThreads == 1) {
@@ -190,7 +190,7 @@ public class DatabaseService {
         String[] types = getTypes(config, "viewTypes", "VIEW");
         NameValidator validator = new NameValidator("view", includeTables, excludeTables, types);
 
-        for (BasicTableMeta entry : getBasicTableMeta(config, db, listener, metadata, false, types)) {
+        for (BasicTableMeta entry : getBasicTableMeta(config, db, metadata, false, types)) {
             if (validator.isValid(entry.getName(), entry.getType())) {
                 View view = new View(db, entry.getCatalog(), entry.getSchema(), entry.getName(),
                         entry.getRemarks(), entry.getViewDefinition());
@@ -414,28 +414,30 @@ public class DatabaseService {
      */
     private List<BasicTableMeta> getBasicTableMeta(Config config,
                                                    Database db,
-                                                   ProgressListener listener,
                                                    DatabaseMetaData metadata,
                                                    boolean forTables,
                                                    String... types) throws SQLException {
+        List<BasicTableMeta> basics = getBasicTableMetaFromSql(config, db, forTables);
+        if (Objects.isNull(basics)) {
+            basics = getBasicTableMetaFromDatabaseMetaData(metadata, db, forTables, types);
+        }
+        return basics;
+    }
+    private List<BasicTableMeta> getBasicTableMetaFromSql(Config config, Database database, boolean forTables) {
         String queryName = forTables ? "selectTablesSql" : "selectViewsSql";
         String sql = config.getDbProperties().getProperty(queryName);
-        List<BasicTableMeta> basics = new ArrayList<>();
-
 
         if (sql != null) {
             String clazz = forTables ? "table" : "view";
-
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
+            try (PreparedStatement stmt = sqlService.prepareStatement(sql, database, null);
                  ResultSet rs = stmt.executeQuery()) {
-
+                List<BasicTableMeta> basics = new ArrayList<>();
                 while (rs.next()) {
                     String name = rs.getString(clazz + "_name");
                     String cat = getOptionalString(rs, clazz + "_catalog");
                     String sch = getOptionalString(rs, clazz + "_schema");
                     if (cat == null && sch == null)
-                        sch = db.getSchema().getName();
+                        sch = database.getSchema().getName();
                     String remarks = getOptionalString(rs, clazz + "_comment");
                     String viewDefinition = forTables ? null : getOptionalString(rs, "view_definition");
                     String rows = forTables ? getOptionalString(rs, "table_rows") : null;
@@ -443,40 +445,33 @@ public class DatabaseService {
 
                     basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, viewDefinition, numRows));
                 }
+                return basics;
             } catch (SQLException sqlException) {
-                // don't die just because this failed
-                String msg = listener.recoverableExceptionEncountered("Failed to retrieve " + clazz + " names with custom SQL", sqlException, sql);
-                if (msg != null) {
-                    LOGGER.warn(msg);
-                }
+                LOGGER.warn("Failed to retrieve '{}' names with custom SQL '{}", clazz, sql, sqlException);
             }
         }
+        return null;
+    }
 
-        if (basics.isEmpty()) {
-            String lastTableName = null;
-            try (ResultSet rs = metadata.getTables(null, db.getSchema().getName(), "%", types)){
-                while (rs.next()) {
-                    String name = rs.getString("TABLE_NAME");
-                    lastTableName = name;
-                    String type = rs.getString("TABLE_TYPE");
-                    String cat = rs.getString("TABLE_CAT");
-                    String schem = rs.getString("TABLE_SCHEM");
-                    String remarks = getOptionalString(rs, "REMARKS");
+    private List<BasicTableMeta> getBasicTableMetaFromDatabaseMetaData(DatabaseMetaData databaseMetaData, Database database, boolean forTables, String... types) throws SQLException {
+        List<BasicTableMeta> basics = new ArrayList<>();
+        String lastTableName = null;
+        try (ResultSet rs = databaseMetaData.getTables(null, database.getSchema().getName(), "%", types)){
+            while (rs.next()) {
+                String name = rs.getString("TABLE_NAME");
+                lastTableName = name;
+                String type = rs.getString("TABLE_TYPE");
+                String cat = rs.getString("TABLE_CAT");
+                String schem = rs.getString("TABLE_SCHEM");
+                String remarks = getOptionalString(rs, "REMARKS");
 
-                    basics.add(new BasicTableMeta(cat, schem, name, type, remarks, null, -1));
-                }
-            } catch (SQLException exc) {
-                if (forTables)
-                    throw exc;
-
-                System.out.flush();
-                System.err.println();
-                System.err.println("Ignoring view " + lastTableName + " due to exception:");
-                exc.printStackTrace();
-                System.err.println("Continuing analysis.");
+                basics.add(new BasicTableMeta(cat, schem, name, type, remarks, null, -1));
             }
+        } catch (SQLException exc) {
+            if (forTables)
+                throw exc;
+            LOGGER.warn("Ignoring view '{}' due to exception", lastTableName, exc);
         }
-
         return basics;
     }
 
