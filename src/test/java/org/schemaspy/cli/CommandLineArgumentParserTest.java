@@ -40,7 +40,7 @@ public class CommandLineArgumentParserTest {
 
     @Test
     public void givenNoRequiredParameterProvided_AndNoDefaultProvider_ExpectError() {
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), NO_DEFAULT_PROVIDER);
 
         assertThatThrownBy(parser::parse)
                 .isInstanceOf(ParameterException.class)
@@ -52,7 +52,7 @@ public class CommandLineArgumentParserTest {
         PropertyFileDefaultProvider defaultProvider = mock(PropertyFileDefaultProvider.class);
         given(defaultProvider.getDefaultValueFor(any())).willReturn(null);
 
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(defaultProvider);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), defaultProvider);
 
         assertThatThrownBy(parser::parse)
                 .isInstanceOf(ParameterException.class)
@@ -68,7 +68,7 @@ public class CommandLineArgumentParserTest {
                 "-o", "aFolder",
                 "-u", "MyUser"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), NO_DEFAULT_PROVIDER);
 
         CommandLineArguments arguments = parser.parse(args);
 
@@ -82,7 +82,7 @@ public class CommandLineArgumentParserTest {
         given(defaultProvider.getDefaultValueFor("schemaspy.outputDirectory")).willReturn("mydirectory");
         given(defaultProvider.getDefaultValueFor("schemaspy.user")).willReturn("myuser");
 
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(defaultProvider);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), defaultProvider);
 
         CommandLineArguments commandLineArguments = parser.parse();
 
@@ -96,7 +96,7 @@ public class CommandLineArgumentParserTest {
                 "-o", "aFolder",
                 "-sso"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), NO_DEFAULT_PROVIDER);
 
         CommandLineArguments arguments = parser.parse(args);
 
@@ -110,7 +110,7 @@ public class CommandLineArgumentParserTest {
         given(defaultProvider.getDefaultValueFor("schemaspy.outputDirectory")).willReturn("mydirectory");
         given(defaultProvider.getDefaultValueFor("schemaspy.sso")).willReturn(Boolean.TRUE.toString());
 
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(defaultProvider);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), defaultProvider);
 
         CommandLineArguments commandLineArguments = parser.parse();
 
@@ -125,7 +125,7 @@ public class CommandLineArgumentParserTest {
                 "-o", "aFolder",
                 "-sso"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), NO_DEFAULT_PROVIDER);
 
         CommandLineArguments arguments = parser.parse(args);
         parser.printUsage();
@@ -137,7 +137,7 @@ public class CommandLineArgumentParserTest {
         String[] args = {
                 "-help"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), NO_DEFAULT_PROVIDER);
         CommandLineArguments arguments = parser.parse(args);
         assertThat(arguments.isHelpRequired()).isTrue();
     }
@@ -147,7 +147,7 @@ public class CommandLineArgumentParserTest {
         String[] args = {
                 "-dbHelp"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), NO_DEFAULT_PROVIDER);
         CommandLineArguments arguments = parser.parse(args);
         assertThat(arguments.isDbHelpRequired()).isTrue();
     }
@@ -157,7 +157,7 @@ public class CommandLineArgumentParserTest {
         String[] args = {
                 "--license"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), NO_DEFAULT_PROVIDER);
         CommandLineArguments arguments = parser.parse(args);
         assertThat(arguments.isPrintLicense()).isTrue();
     }
@@ -165,7 +165,7 @@ public class CommandLineArgumentParserTest {
     @Test
     @Logger(CommandLineArgumentParser.class)
     public void canPrintLicense() {
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), NO_DEFAULT_PROVIDER);
         parser.printLicense();
         String log = loggingRule.getLog();
         assertThat(log).contains("GNU GENERAL PUBLIC LICENSE");

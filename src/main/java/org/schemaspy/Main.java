@@ -25,22 +25,10 @@
  */
 package org.schemaspy;
 
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.ConnectionFailure;
-import org.schemaspy.model.EmptySchemaException;
-import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.model.ProcessExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.schemaspy.cli.SchemaSpyRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-
-import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * @author John Currier
@@ -52,78 +40,14 @@ import java.util.Arrays;
  * @author Nils Petzaell
  */
 @SpringBootApplication
-public class Main implements CommandLineRunner {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    @Autowired
-    private SchemaAnalyzer analyzer;
-
-    @Autowired
-    private CommandLineArguments arguments;
-
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
-    @Autowired
-    private ApplicationContext context;
+public class Main {
 
     public static void main(String... args) {
-        SpringApplication.run(Main.class, args);
-    }
-
-    @Override
-    public void run(String... args) {
-        if (arguments.isHelpRequired()) {
-            commandLineArgumentParser.printUsage();
-            exitApplication(0);
-            return;
-        }
-
-        if (arguments.isDbHelpRequired()) {
-            commandLineArgumentParser.printDatabaseTypesHelp();
-            exitApplication(0);
-            return;
-        }
-
-        if (arguments.isPrintLicense()) {
-            commandLineArgumentParser.printLicense();
-            exitApplication(0);
-            return;
-        }
-
-        runAnalyzer(args);
-    }
-
-    private void runAnalyzer(String... args) {
-        int rc = 1;
-
-        try {
-            rc = analyzer.analyze(new Config(args)) == null ? 1 : 0;
-        } catch (ConnectionFailure couldntConnect) {
-            LOGGER.warn("Connection Failure", couldntConnect);
-            rc = 3;
-        } catch (EmptySchemaException noData) {
-            LOGGER.warn("Empty schema", noData);
-            rc = 2;
-        } catch (InvalidConfigurationException badConfig) {
-            LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
-            if (badConfig.getParamName() != null) {
-                LOGGER.error("Bad parameter '{} {}' , {}", badConfig.getParamName(), badConfig.getParamValue(), badConfig.getMessage(), badConfig);
-            } else {
-                LOGGER.error("Bad config {}", badConfig.getMessage(), badConfig);
-            }
-        } catch (ProcessExecutionException badLaunch) {
-            LOGGER.warn(badLaunch.getMessage(), badLaunch);
-        } catch (Exception exc) {
-            LOGGER.error(exc.getMessage(), exc);
-        }
-
-        exitApplication(rc);
-    }
-
-    private void exitApplication(int returnCode) {
-        SpringApplication.exit(context, () -> returnCode);
+        ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
+        SchemaSpyRunner schemaSpyRunner = context.getBean(SchemaSpyRunner.class);
+        schemaSpyRunner.run(args);
+        int exitCode = SpringApplication.exit(context, () -> 0);
+        System.exit(exitCode);
     }
 
 }

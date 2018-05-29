@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
@@ -34,14 +35,12 @@ import org.schemaspy.model.TableColumn;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MSSQLServerContainer;
 
 import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.DatabaseMetaData;
@@ -49,7 +48,6 @@ import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 /**
  * @author Rafal Kasa
@@ -57,6 +55,7 @@ import static org.mockito.BDDMockito.given;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext
 public class MSSQLServerIT {
 
     @Autowired
@@ -68,11 +67,8 @@ public class MSSQLServerIT {
     @Mock
     private ProgressListener progressListener;
 
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
+    @Autowired
+    private CommandLineArgumentParser commandLineArgumentParser;
 
     private static Database database;
 
@@ -102,12 +98,7 @@ public class MSSQLServerIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(1433).toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mssql"));
-        given(arguments.getDatabaseType()).willReturn("mssql08");
-        given(arguments.getUser()).willReturn("sa");
-        given(arguments.getSchema()).willReturn("dbo");
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn("test");
+        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(config);
         Database database = new Database(
