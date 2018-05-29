@@ -128,6 +128,12 @@ public class MSSQLServerIT {
     }
 
     @Test
+    public void databaseShouldBePopulatedWithTableTestWithComment() {
+        Table table = getTable("TestTable");
+        assertThat(table.getComments()).isEqualToIgnoringCase("This is a table description");
+    }
+
+    @Test
     public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
         Table table = getTable("TestTable");
         TableColumn column = table.getColumn("Description");
@@ -138,7 +144,7 @@ public class MSSQLServerIT {
     public void databaseShouldBePopulatedWithTableTestAndHaveColumnNameWithComment() {
         Table table = getTable("TestTable");
         TableColumn column = table.getColumn("Description");
-        assertThat(column.getComments()).isEqualToIgnoringCase("This is column description");
+        assertThat(column.getComments()).isEqualToIgnoringCase("This is a column description");
     }
 
     private Table getTable(String tableName) {
