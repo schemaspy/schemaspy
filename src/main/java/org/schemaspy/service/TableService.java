@@ -353,13 +353,12 @@ public class TableService {
             Table parentTable = tables.get(pkTableName);
 
             String parentContainer = pkSchema != null ? pkSchema : pkCatalog != null ? pkCatalog : db.getName();
-            String childContainer = table.getSchema() != null ? table.getSchema() : table.getCatalog() != null ? table.getCatalog() : db.getName();
 
             // if named table doesn't exist in this schema
             // or exists here but really referencing same named table in another schema
-            if (parentTable == null || !childContainer.equals(parentContainer)) {
+            if (parentTable == null || !table.getContainer().equals(parentContainer)) {
                 LOGGER.debug("Adding remote table {}", Table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName));
-                parentTable = addRemoteTable(db, pkCatalog, pkSchema, pkTableName, childContainer, false);
+                parentTable = addRemoteTable(db, pkCatalog, pkSchema, pkTableName, table.getContainer(), false);
             }
 
             if (parentTable != null) {
