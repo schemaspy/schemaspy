@@ -23,14 +23,14 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.Dot;
-import org.schemaspy.util.LineWriter;
+import org.schemaspy.util.Writers;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 /**
@@ -102,7 +102,7 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
                 File dotFile = new File(diagramDir, dotBaseFilespec + ".1degree.dot");
                 File imgFile = new File(diagramDir, dotBaseFilespec + ".1degree." + dot.getFormat());
 
-                try (LineWriter dotOut = new LineWriter(dotFile, Config.DOT_CHARSET)) {
+                try (PrintWriter dotOut = Writers.newPrintWriter(dotFile)) {
                     DotFormatter.getInstance().writeOrphan(table, dotOut, outputDir);
                 } catch (IOException e) {
                     throw new IOException(e);

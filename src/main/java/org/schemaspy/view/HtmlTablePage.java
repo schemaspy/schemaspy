@@ -27,11 +27,12 @@ import org.schemaspy.Config;
 import org.schemaspy.model.*;
 import org.schemaspy.util.DiagramUtil;
 import org.schemaspy.util.Dot;
-import org.schemaspy.util.LineWriter;
 import org.schemaspy.util.Markdown;
+import org.schemaspy.util.Writers;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -166,12 +167,12 @@ public class HtmlTablePage extends HtmlFormatter {
             Set<ForeignKeyConstraint> impliedConstraints;
 
             DotFormatter formatter = DotFormatter.getInstance();
-            LineWriter dotOut = new LineWriter(oneDegreeDotFile, Config.DOT_CHARSET);
+            PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile);
             WriteStats oneStats = new WriteStats(stats);
             formatter.writeRealRelationships(table, false, oneStats, dotOut, outputDir);
             dotOut.close();
 
-            dotOut = new LineWriter(twoDegreesDotFile, Config.DOT_CHARSET);
+            dotOut = Writers.newPrintWriter(twoDegreesDotFile);
             WriteStats twoStats = new WriteStats(stats);
             impliedConstraints = formatter.writeRealRelationships(table, true, twoStats, dotOut, outputDir);
             dotOut.close();
@@ -181,11 +182,11 @@ public class HtmlTablePage extends HtmlFormatter {
             }
 
             if (!impliedConstraints.isEmpty()) {
-                dotOut = new LineWriter(oneImpliedDotFile, Config.DOT_CHARSET);
+                dotOut = Writers.newPrintWriter(oneImpliedDotFile);
                 formatter.writeAllRelationships(table, false, stats, dotOut, outputDir);
                 dotOut.close();
 
-                dotOut = new LineWriter(twoImpliedDotFile, Config.DOT_CHARSET);
+                dotOut = Writers.newPrintWriter(twoImpliedDotFile);
                 formatter.writeAllRelationships(table, true, stats, dotOut, outputDir);
                 dotOut.close();
                 return true;

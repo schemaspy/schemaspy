@@ -35,7 +35,6 @@ import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.H2MemoryRule;
-import org.schemaspy.util.LineWriter;
 import org.schemaspy.view.DotFormatter;
 import org.schemaspy.view.WriteStats;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +45,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.SQLException;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -322,19 +321,15 @@ public class SchemaMetaIT {
         );
         databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
-        File withoutSchemaMetaOutput = temporaryFolder.newFolder("withOutSchemaMeta");
-        try (LineWriter lineWriter = new LineWriter(new File(withoutSchemaMetaOutput, "company.dot"),"UTF-8")) {
-            DotFormatter.getInstance().writeAllRelationships(database.getTablesMap().get("COMPANY"), false, new WriteStats(database.getTables()), lineWriter, withoutSchemaMetaOutput);
+        StringWriter withoutSchemaMetaOutput = new StringWriter();
+        try (PrintWriter printWriter = new PrintWriter(withoutSchemaMetaOutput)) {
+            DotFormatter.getInstance().writeAllRelationships(database.getTablesMap().get("COMPANY"), false, new WriteStats(database.getTables()), printWriter, temporaryFolder.newFolder("withoutSchemaMeta"));
         }
-        String dotFileWithoutSchemaMeta = Files.readAllLines(new File(withoutSchemaMetaOutput, "company.dot").toPath()).stream().collect(Collectors.joining());
-
-        File withSchemaMetaOutput = temporaryFolder.newFolder("withSchemaMeta");
-        try (LineWriter lineWriter = new LineWriter(new File(withSchemaMetaOutput, "company.dot"),"UTF-8")){
-            DotFormatter.getInstance().writeAllRelationships(databaseWithSchemaMeta.getTablesMap().get("COMPANY"), false, new WriteStats(databaseWithSchemaMeta.getTables()), lineWriter, withSchemaMetaOutput);
+        StringWriter withSchemaMetaOutput = new StringWriter();
+        try (PrintWriter printWriter = new PrintWriter(withSchemaMetaOutput)){
+            DotFormatter.getInstance().writeAllRelationships(databaseWithSchemaMeta.getTablesMap().get("COMPANY"), false, new WriteStats(databaseWithSchemaMeta.getTables()), printWriter, temporaryFolder.newFolder("withSchemaMeta"));
         }
-        String dotFileWithSchemaMeta  = Files.readAllLines(new File(withSchemaMetaOutput, "company.dot").toPath()).stream().collect(Collectors.joining());
-
-        assertThat(dotFileWithoutSchemaMeta).contains("\"COUNTRY\":\"COUNTRYID\"");
-        assertThat(dotFileWithSchemaMeta).doesNotContain("\"COUNTRY\":\"COUNTRYID\"");
+        assertThat(withoutSchemaMetaOutput.toString()).contains("\"COUNTRY\":\"COUNTRYID\"");
+        assertThat(withSchemaMetaOutput.toString()).doesNotContain("\"COUNTRY\":\"COUNTRYID\"");
     }
 }
