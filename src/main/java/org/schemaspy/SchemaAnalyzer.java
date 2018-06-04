@@ -378,9 +378,7 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        for (HtmlColumnsPage.ColumnInfo columnInfo : HtmlColumnsPage.getInstance().getColumnInfos().values()) {
-            HtmlColumnsPage.getInstance().write(db, tables, columnInfo, outputDir);
-        }
+        HtmlColumnsPage.getInstance().write(db, tables, outputDir);
 
         progressListener.graphingSummaryProgressed();
 

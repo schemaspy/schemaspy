@@ -118,7 +118,6 @@ public final class Config {
     private boolean hasOrphans;
     private boolean hasRoutines;
     private boolean populating;
-    private List<String> columnDetails;
     public static final String DOT_CHARSET = "UTF-8";
     private static final String ESCAPED_EQUALS = "\\=";
     private static final String DEFAULT_TABLE_INCLUSION = ".*"; // match everything
@@ -921,59 +920,6 @@ public final class Config {
         }
 
         return schemas;
-    }
-
-    /**
-     * Set the details to show on the columns page, where "details" are
-     * comma and/or space separated.
-     * <p>
-     * Valid values:
-     * <ul>
-     * <li>id</li>
-     * <li>table</li>
-     * <li>column</li>
-     * <li>type</li>
-     * <li>size</li>
-     * <li>nulls</li>
-     * <li>auto</li>
-     * <li>default</li>
-     * <li>children</li>
-     * <li>parents</li>
-     * </ul>
-     * <p>
-     * The default details are <code>"table column type size nulls auto default"</code>.
-     * Note that "column" is the initially displayed detail and must be included.
-     *
-     * @param columnDetails
-     */
-    public void setColumnDetails(String columnDetails) {
-        this.columnDetails = new ArrayList<>();
-        if (columnDetails == null || columnDetails.length() == 0) {
-            // not specified, so use defaults
-            columnDetails = "id table column type size nulls auto default";
-        }
-
-        for (String detail : columnDetails.split("[\\s,'\"]")) {
-            if (detail.length() > 0) {
-                this.columnDetails.add(detail.toLowerCase());
-            }
-        }
-
-        if (!this.columnDetails.contains("column"))
-            throw new InvalidConfigurationException("'column' is a required column detail");
-    }
-
-    public void setColumnDetails(List<String> columnDetails) {
-        String details = columnDetails == null ? "[]" : columnDetails.toString();
-        setColumnDetails(details.substring(1, details.length() - 1));
-    }
-
-    public List<String> getColumnDetails() {
-        if (columnDetails == null) {
-            setColumnDetails(pullParam("-columndetails"));
-        }
-
-        return columnDetails;
     }
 
     public void setEvaluateAllEnabled(boolean enabled) {
