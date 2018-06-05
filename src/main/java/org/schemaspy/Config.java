@@ -109,7 +109,6 @@ public final class Config {
     private Boolean includeImpliedConstraints;
     private Boolean logoEnabled;
     private Boolean rankDirBugEnabled;
-    private Boolean encodeCommentsEnabled;
     private Boolean numRowsEnabled;
     private Boolean viewsEnabled;
     private Boolean railsEnabled;
@@ -761,23 +760,6 @@ public final class Config {
             railsEnabled = options.remove("-rails");
 
         return railsEnabled;
-    }
-
-    /**
-     * Allow Html In Comments - encode them unless otherwise specified
-     */
-    public void setEncodeCommentsEnabled(boolean enabled) {
-        encodeCommentsEnabled = enabled;
-    }
-
-    /**
-     * @see #setEncodeCommentsEnabled(boolean)
-     */
-    public boolean isEncodeCommentsEnabled() {
-        if (encodeCommentsEnabled == null)
-            encodeCommentsEnabled = !options.remove("-ahic");
-
-        return encodeCommentsEnabled;
     }
 
     /**
@@ -1584,8 +1566,6 @@ public final class Config {
             }
         }
 
-        if (isEncodeCommentsEnabled())
-            params.add("-ahic");
         if (isEvaluateAllEnabled())
             params.add("-all");
         if (!isHtmlGenerationEnabled())
