@@ -86,7 +86,6 @@ public final class Config {
     private String db;
     private String host;
     private Integer port;
-    private String server;
     private String meta;
     private String templateDirectory;
     private Pattern tableInclusions;
@@ -340,18 +339,6 @@ public final class Config {
 
     private boolean hasText(String string) {
         return Objects.nonNull(string) && !string.trim().isEmpty();
-    }
-
-    public void setServer(String server) {
-        this.server = server;
-    }
-
-    public String getServer() {
-        if (server == null) {
-            server = pullParam("-server");
-        }
-
-        return server;
     }
 
     public void setUser(String user) {
@@ -1663,11 +1650,6 @@ public final class Config {
         if (getPort() != null) {
             params.add("-port");
             params.add(getPort().toString());
-        }
-        value = getServer();
-        if (value != null) {
-            params.add("-server");
-            params.add(value);
         }
         value = getMeta();
         if (value != null) {
