@@ -98,7 +98,6 @@ public final class Config {
     private Integer maxDetailedTables;
     private String driverPath;
     private String css;
-    private String charset;
     private String font;
     private Integer fontSize;
     private String description;
@@ -616,27 +615,6 @@ public final class Config {
         }
 
         return fontSize;
-    }
-
-    /**
-     * The character set to use within HTML pages (defaults to <code>"ISO-8859-1"</code>).
-     *
-     * @param charset
-     */
-    public void setCharset(String charset) {
-        this.charset = charset;
-    }
-
-    /**
-     * @see #setCharset(String)
-     */
-    public String getCharset() {
-        if (charset == null) {
-            charset = pullParam("-charset");
-            if (charset == null)
-                charset = "ISO-8859-1";
-        }
-        return charset;
     }
 
     /**
@@ -1583,8 +1561,6 @@ public final class Config {
         }
         params.add("-css");
         params.add(getCss());
-        params.add("-charset");
-        params.add(getCharset());
         params.add("-font");
         params.add(getFont());
         params.add("-fontsize");
