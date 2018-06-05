@@ -105,7 +105,6 @@ public final class Config {
     private Properties dbProperties;
     private Boolean generateHtml;
     private Boolean includeImpliedConstraints;
-    private Boolean logoEnabled;
     private Boolean rankDirBugEnabled;
     private Boolean numRowsEnabled;
     private Boolean viewsEnabled;
@@ -673,13 +672,6 @@ public final class Config {
         }
 
         return maxDbThreads;
-    }
-
-    public boolean isLogoEnabled() {
-        if (logoEnabled == null)
-            logoEnabled = !options.remove("-nologo");
-
-        return logoEnabled;
     }
 
     /**
@@ -1537,8 +1529,6 @@ public final class Config {
             params.add("-nohtml");
         if (!isImpliedConstraintsEnabled())
             params.add("-noimplied");
-        if (!isLogoEnabled())
-            params.add("-nologo");
         if (!isNumRowsEnabled())
             params.add("-norows");
         if (!isViewsEnabled())

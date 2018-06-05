@@ -55,11 +55,6 @@ public class HtmlFormatter {
         return "";
     }
 
-    protected boolean sourceForgeLogoEnabled() {
-        return Config.getInstance().isLogoEnabled();
-    }
-
-
     /**
      * HTML escape the specified string
      *
