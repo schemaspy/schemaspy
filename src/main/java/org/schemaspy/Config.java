@@ -47,7 +47,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.DatabaseMetaData;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.jar.JarEntry;
@@ -82,7 +81,6 @@ public final class Config {
     private boolean oneOfMultipleSchemas;
     private String user;
     private Boolean singleSignOn;
-    private Boolean noSchema;
     private String password;
     private Boolean promptForPassword;
     private String db;
@@ -316,20 +314,6 @@ public final class Config {
         if (schema == null)
             schema = pullParam("-s");
         return schema;
-    }
-
-    /**
-     * Some databases types (e.g. older versions of Informix) don't really
-     * have the concept of a schema but still return true from
-     * {@link DatabaseMetaData#supportsSchemasInTableDefinitions()}.
-     * This option lets you ignore that and treat all the tables
-     * as if they were in one flat namespace.
-     */
-    public boolean isSchemaDisabled() {
-        if (noSchema == null)
-            noSchema = options.remove("-noschema");
-
-        return noSchema;
     }
 
     public void setHost(String host) {
@@ -1641,8 +1625,6 @@ public final class Config {
             params.add("-rails");
         if (isSingleSignOn())
             params.add("-sso");
-        if (isSchemaDisabled())
-            params.add("-noschema");
 
         String value = getDriverPath();
         if (value != null) {
