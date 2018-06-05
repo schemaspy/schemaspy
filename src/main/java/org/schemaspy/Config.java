@@ -112,7 +112,6 @@ public final class Config {
     private Boolean encodeCommentsEnabled;
     private Boolean numRowsEnabled;
     private Boolean viewsEnabled;
-    private Boolean meterEnabled;
     private Boolean railsEnabled;
     private Boolean evaluateAll;
     private Boolean highQuality;
@@ -824,20 +823,6 @@ public final class Config {
             viewsEnabled = !options.remove("-noviews");
 
         return viewsEnabled;
-    }
-
-    /**
-     * Returns <code>true</code> if metering should be embedded in
-     * the generated pages.<p/>
-     * Defaults to <code>false</code> (disabled).
-     *
-     * @return
-     */
-    public boolean isMeterEnabled() {
-        if (meterEnabled == null)
-            meterEnabled = options.remove("-meter");
-
-        return meterEnabled;
     }
 
     /**
@@ -1609,8 +1594,6 @@ public final class Config {
             params.add("-noimplied");
         if (!isLogoEnabled())
             params.add("-nologo");
-        if (isMeterEnabled())
-            params.add("-meter");
         if (!isNumRowsEnabled())
             params.add("-norows");
         if (!isViewsEnabled())
