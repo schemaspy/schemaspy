@@ -55,7 +55,7 @@ If you need more info about how to use or install SchemaSpy please read the last
 
 To verify fixes and new features you can download our latest build.
 
-[schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-rc2.jar)
+[schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.0.0-SNAPSHOT.jar)
 
 ## Docker  
 
