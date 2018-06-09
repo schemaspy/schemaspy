@@ -99,15 +99,6 @@ public class Database {
         return tables;
     }
 
-    /**
-     * Return a {@link Map} of all {@link Table}s keyed by their name.
-     *
-     * @return
-     */
-    public Map<String, Table> getTablesByName() {
-        return tables;
-    }
-
     public Map<String, Table> getLocals() {
         return locals;
     }
@@ -325,8 +316,7 @@ public class Database {
         private final Map<String, ? extends Table> map1;
         private final Map<String, ? extends Table> map2;
 
-        public CombinedMap(Map<String, ? extends Table> map1, Map<String, ? extends Table> map2)
-        {
+        public CombinedMap(Map<String, ? extends Table> map1, Map<String, ? extends Table> map2)  {
             this.map1 = map1;
             this.map2 = map2;
         }
@@ -389,7 +379,7 @@ public class Database {
         }
 
         private Map<String, Table> getCombined() {
-            Map<String, Table> all = new CaseInsensitiveMap<Table>(size());
+            Map<String, Table> all = new CaseInsensitiveMap<>(size());
             all.putAll(map1);
             all.putAll(map2);
             return all;
