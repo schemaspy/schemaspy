@@ -29,8 +29,11 @@ import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ResourceFinder;
 import org.schemaspy.util.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -46,6 +49,8 @@ import java.util.Map;
  * @author Nils Petzaell
  */
 public class MustacheWriter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final ResourceFinder resourceFinder = new ResourceFinder();
 
@@ -100,7 +105,7 @@ public class MustacheWriter {
             Files.write(destinationFile.toPath(), content.toString().getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             //TODO: Wouldn't we want an exception thrown here?
-            e.printStackTrace();
+            LOGGER.error("Failed to write file '{}'", destination, e);
         }
     }
 
