@@ -77,67 +77,209 @@
   <div class="content-wrapper">
           <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>Constraints</h1>
+        <h1>Columns</h1>
       </section>
       <!-- Main content -->
       <section class="content">
 		<div class="box box-primary">
 			<div class="box-header with-border">
-			  <i class="ion ion-key"></i>
-              <h3 class="box-title">0 Foreign Key Constraints</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
+			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+              <h3 class="box-title">Columns</h3>
             </div>	
             <div class="box-body">
-				<table id="constraint_table" class="table table-bordered table-striped dataTable" role="grid">
+				<div class="row">
+					<div id="button_group_one" class="col-md-3 col-sm-6"></div>
+					<div id="button_group_two" class="col-md-2 col-sm-4 pull-right text-right"></div>
+				</div>
+				<table id="column_table" class="table table-bordered table-striped dataTable" role="grid">
 				<thead align='left'>
-				<tr>
-				  <th>Constraint Name</th>
-				  <th>Child Column</th>
-				  <th>Parent Column</th>				  
-				  <th>Delete Rule</th>
-				</tr>
+					<tr>
+					  <th>Table</th>
+					  <th>Type</th>
+					  <th>Column</th>
+					  <th>Type</th>
+					  <th>Size</th>
+					  <th title='Are nulls allowed?'>Nulls</th>
+					  <th title='Is column automatically updated?'>Auto</th>
+					  <th title='Default value'>Default</th>
+					  <th title='Comments' class="toggle"><span>Comments</span></th>
+					</tr>
 				</thead>
 				<tbody>
+					<tr>
+					 <td>user</td>
+					 <td>Table</td>
+					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>userId</td>
+					 <td>int identity</td>
+					 <td>4</td>
+					 <td title=''></td>
+					 <td title='Automatically updated by the database'>√</td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>group_resources</td>
+					 <td>Table</td>
+					 <td>access</td>
+					 <td>varchar</td>
+					 <td>2</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>(&#39;n&#39;)</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>user</td>
+					 <td>Table</td>
+					 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
+					 <td>int</td>
+					 <td>4</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>group_resources</td>
+					 <td>Table</td>
+					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>gid</td>
+					 <td>int</td>
+					 <td>4</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>group</td>
+					 <td>Table</td>
+					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
+					 <td>varchar</td>
+					 <td>16</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>user</td>
+					 <td>Table</td>
+					 <td>name</td>
+					 <td>varchar</td>
+					 <td>16</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>resources</td>
+					 <td>Table</td>
+					 <td>description</td>
+					 <td>varchar</td>
+					 <td>80</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>userAndGroup</td>
+					 <td>View</td>
+					 <td>UserName</td>
+					 <td>varchar</td>
+					 <td>16</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>group</td>
+					 <td>Table</td>
+					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
+					 <td>int identity</td>
+					 <td>4</td>
+					 <td title=''></td>
+					 <td title='Automatically updated by the database'>√</td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>resources</td>
+					 <td>Table</td>
+					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>rid</td>
+					 <td>int</td>
+					 <td>4</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>resources</td>
+					 <td>Table</td>
+					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
+					 <td>varchar</td>
+					 <td>40</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>group</td>
+					 <td>Table</td>
+					 <td>description</td>
+					 <td>varchar</td>
+					 <td>80</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>group_resources</td>
+					 <td>Table</td>
+					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>rid</td>
+					 <td>int</td>
+					 <td>4</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>user</td>
+					 <td>Table</td>
+					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>email</td>
+					 <td>varchar</td>
+					 <td>40</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
+					<tr>
+					 <td>userAndGroup</td>
+					 <td>View</td>
+					 <td>GroupName</td>
+					 <td>varchar</td>
+					 <td>16</td>
+					 <td title=''></td>
+					 <td title=''></td>
+					 <td>null</td>
+					 <td></td>
+					</tr>
 								</tbody>
 				</table>				
 			</div>
 		</div>	
-		<div class="box box-primary">
-			<div class="box-header with-border">
-              <i class="fa fa-sitemap"></i>
-              <h3 class="box-title">Check Constraints</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>	
-            <div class="box-body">
-				<table id="constraint_table" class="table table-bordered table-striped dataTable" role="grid">
-				<thead align='left'>
-					<tr>
-				  		<th>Table</th>
-				  		<th>Constraint Name</th>
-				  		<th>Constraint</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-				  		<td colspan="3">None detected</td>
-					</tr>
-				</tbody>
-				</table>				
-			</div>
-		</div>			
       </section>
 	  <script>
-	      var config = {
-		      pagination: true
-	      }
+          var config = {
+	          pagination: true
+          }
 	  </script>    
   </div>
   <!-- /.content-wrapper -->
@@ -185,7 +327,7 @@
 <script src="bower/codemirror/sql.js"></script>
 <!-- AdminLTE App -->
 <script src="bower/admin-lte/dist/js/app.min.js"></script>
-<script src="constraint.js"></script>
+<script src="column.js"></script>
 <script src="schemaSpy.js"></script>
 </body>
 </html>

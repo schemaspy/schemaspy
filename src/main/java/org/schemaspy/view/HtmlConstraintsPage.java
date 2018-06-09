@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The page that lists all of the constraints in the schema
@@ -64,10 +65,23 @@ public class HtmlConstraintsPage extends HtmlFormatter {
     public void write(Database database, List<ForeignKeyConstraint> constraints, Collection<Table> tables, File outputDir) throws IOException {
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("constraints", constraints);
-        scopes.put("tables", tables);
+        scopes.put("checkConstraints", collectCheckConstraints(tables));
         scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
 
         MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName(), false);
         mw.write("constraint.html", "constraints.html", "constraint.js");
+    }
+
+    private static List<MustacheCheckConstraint> collectCheckConstraints(Collection<Table> tables) {
+        return tables.stream()
+                .filter(table -> table.getCheckConstraints().size() > 0)
+                .flatMap(table -> table.getCheckConstraints().entrySet()
+                        .stream()
+                        .map(entry -> new MustacheCheckConstraint(
+                                table.getName(),
+                                entry.getKey(),
+                                entry.getValue())
+                        )
+                ).collect(Collectors.toList());
     }
 }

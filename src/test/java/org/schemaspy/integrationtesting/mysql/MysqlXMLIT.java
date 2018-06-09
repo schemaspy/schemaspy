@@ -25,17 +25,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.integrationtesting.MysqlSuite;
-import org.schemaspy.testing.IgnoreUsingXPath;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.schemaspy.testing.XmlOutputDiff;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testcontainers.containers.MySQLContainer;
-import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
-import org.xmlunit.diff.DifferenceEvaluators;
 
 import java.io.IOException;
 import java.net.URL;
@@ -98,10 +96,10 @@ public class MysqlXMLIT {
 
     @Test
     public void verifyXML() {
-        Diff d = DiffBuilder.compare(Input.fromURL(expectedXML))
-                .withTest(Input.fromFile("target/mysqlxmlit/xmlit.xmlit.xml"))
-                .withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, new IgnoreUsingXPath("/database[1]/@type")))
-                .build();
+        Diff d = XmlOutputDiff.diffXmlOutput(
+                Input.fromFile("target/mysqlxmlit/xmlit.xmlit.xml"),
+                Input.fromURL(expectedXML)
+                );
         assertThat(d.getDifferences()).isEmpty();
     }
 

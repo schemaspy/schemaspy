@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="htmlit" schema="htmlit" type="Microsoft SQL Server - 14.00.3015">
+   <tables>
+      <table catalog="htmlit" name="group" numRows="0" remarks="" schema="htmlit" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="groupId" nullable="false" remarks="" size="4" type="int identity">
+            <child catalog="htmlit" column="gid" foreignKey="FK__group_resou__gid__4222D4EF" implied="false" onDeleteCascade="false" schema="htmlit" table="group_resources"/>
+            <child catalog="htmlit" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="htmlit" table="user"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="16" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="varchar"/>
+         <primaryKey column="groupId" sequenceNumberInPK="1"/>
+         <index name="PK__group__88C1034DA3695B41" unique="true">
+            <column ascending="true" name="groupId"/>
+         </index>
+         <index name="UQ__group__72E12F1BD087561F" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table catalog="htmlit" name="group_resources" numRows="0" remarks="" schema="htmlit" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="gid" nullable="false" remarks="" size="4" type="int">
+            <parent catalog="htmlit" column="groupId" foreignKey="FK__group_resou__gid__4222D4EF" implied="false" onDeleteCascade="false" schema="htmlit" table="group"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="rid" nullable="false" remarks="" size="4" type="int">
+            <parent catalog="htmlit" column="rid" foreignKey="FK__group_resou__rid__4316F928" implied="false" onDeleteCascade="false" schema="htmlit" table="resources"/>
+         </column>
+         <column autoUpdated="false" defaultValue="('n')" digits="0" id="2" name="access" nullable="false" remarks="" size="2" type="varchar"/>
+         <primaryKey column="gid" sequenceNumberInPK="1"/>
+         <primaryKey column="rid" sequenceNumberInPK="2"/>
+         <index name="PK__group_re__40F370262C7C63E6" unique="true">
+            <column ascending="true" name="gid"/>
+            <column ascending="true" name="rid"/>
+         </index>
+         <checkConstraint constraint="([access]='rw' OR [access]='r' OR [access]='n')" name="CK__group_res__acces__403A8C7D"/>
+      </table>
+      <table catalog="htmlit" name="resources" numRows="0" remarks="" schema="htmlit" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="rid" nullable="false" remarks="" size="4" type="int">
+            <child catalog="htmlit" column="rid" foreignKey="FK__group_resou__rid__4316F928" implied="false" onDeleteCascade="false" schema="htmlit" table="group_resources"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="40" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="varchar"/>
+         <primaryKey column="rid" sequenceNumberInPK="1"/>
+         <index name="PK__resource__C2B7EDE86A60C1CA" unique="true">
+            <column ascending="true" name="rid"/>
+         </index>
+         <index name="UQ__resource__72E12F1BAB48A4FF" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table catalog="htmlit" name="user" numRows="0" remarks="" schema="htmlit" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="userId" nullable="false" remarks="" size="4" type="int identity"/>
+         <column autoUpdated="false" digits="0" id="1" name="groupId" nullable="false" remarks="" size="4" type="int">
+            <parent catalog="htmlit" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="htmlit" table="group"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="" size="16" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="3" name="email" nullable="false" remarks="" size="40" type="varchar"/>
+         <primaryKey column="userId" sequenceNumberInPK="1"/>
+         <index name="PK__user__CB9A1CFFD9CF0D7E" unique="true">
+            <column ascending="true" name="userId"/>
+         </index>
+         <index name="UQ__user__AB6E616478A4F744" unique="true">
+            <column ascending="true" name="email"/>
+         </index>
+      </table>
+      <table catalog="htmlit" name="userAndGroup" numRows="0" remarks="" schema="htmlit" type="VIEW" viewSql="CREATE VIEW htmlit.userAndGroup AS SELECT u.name AS UserName, g.name AS GroupName FROM [htmlit].[user] u JOIN [htmlit].[group] g ON u.groupId = g.groupId">
+         <column autoUpdated="false" digits="0" id="0" name="UserName" nullable="false" remarks="" size="16" type="varchar"/>
+         <column autoUpdated="false" digits="0" id="1" name="GroupName" nullable="false" remarks="" size="16" type="varchar"/>
+      </table>
+   </tables>
+</database>

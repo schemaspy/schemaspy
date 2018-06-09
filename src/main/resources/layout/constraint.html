@@ -70,25 +70,25 @@
             <div class="box-body">
 				<table id="constraint_table" class="table table-bordered table-striped dataTable" role="grid">
 				<thead align='left'>
-				<tr>
-				  <th>Table</th>
-				  <th>Constraint Name</th>				  
-				  <th>Constraint</th>				  
-				</tr>
+					<tr>
+				  		<th>Table</th>
+				  		<th>Constraint Name</th>
+				  		<th>Constraint</th>
+					</tr>
 				</thead>
 				<tbody>
-				{{#tables}}
-				{{#checkConstraints.keySet}}
-				<tr>
-				 <td><a href='tables/{{table.name}}.html'>{{table.name}}</a></td>
-				 <td>{{name}}</td>
-				 <td>{{checkConstraints.keySet}}</td>
-				</tr>
-				{{/checkConstraints.keySet}}
-				{{/tables}}				
-				{{^checkConstraints.keySet}}
-				<tr><td colspan="3">None detected</td></tr>
-				{{/checkConstraints.keySet}}				
+					{{#checkConstraints}}
+					<tr>
+				  		<td><a href='tables/{{tableName}}.html'>{{tableName}}</a></td>
+				  		<td>{{name}}</td>
+				  		<td>{{definition}}</td>
+					</tr>
+					{{/checkConstraints}}
+					{{^checkConstraints}}
+					<tr>
+				  		<td colspan="3">None detected</td>
+					</tr>
+					{{/checkConstraints}}
 				</tbody>
 				</table>				
 			</div>
