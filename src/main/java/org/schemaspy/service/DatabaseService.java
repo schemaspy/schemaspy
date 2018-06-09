@@ -65,7 +65,7 @@ public class DatabaseService {
         this.sqlService = Objects.requireNonNull(sqlService);
     }
 
-    public void gatheringSchemaDetails(Config config, Database db, ProgressListener listener) throws SQLException {
+    public void gatheringSchemaDetails(Config config, Database db, SchemaMeta schemaMeta, ProgressListener listener) throws SQLException {
         LOGGER.info("Gathering schema details");
 
         listener.startedGatheringDetails();
@@ -92,7 +92,7 @@ public class DatabaseService {
         listener.startedConnectingTables();
 
         connectTables(db, listener);
-        updateFromXmlMetadata(config, db, db.getSchemaMeta());
+        updateFromXmlMetadata(config, db, schemaMeta);
     }
     
     private void initCatalogs(Database db) throws SQLException {

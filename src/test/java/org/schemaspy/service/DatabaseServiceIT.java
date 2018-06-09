@@ -93,10 +93,9 @@ public class DatabaseServiceIT {
                 databaseMetaData,
                 "DatabaseServiceIT",
                 catalog,
-                schema,
-                null
+                schema
         );
-        databaseService.gatheringSchemaDetails(config, database, progressListener);
+        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
 
         assertThat(database.getTables()).hasSize(1);
     }
