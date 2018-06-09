@@ -40,8 +40,6 @@ import java.net.URLEncoder;
 public class HtmlFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    protected final boolean encodeComments = Config.getInstance().isEncodeCommentsEnabled();
-    private   final boolean isMetered = Config.getInstance().isMeterEnabled();
     protected final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
 
     protected HtmlFormatter() {
@@ -56,11 +54,6 @@ public class HtmlFormatter {
     protected String getPathToRoot() {
         return "";
     }
-
-    protected boolean sourceForgeLogoEnabled() {
-        return Config.getInstance().isLogoEnabled();
-    }
-
 
     /**
      * HTML escape the specified string

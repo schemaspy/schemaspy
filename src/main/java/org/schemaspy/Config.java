@@ -47,7 +47,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.DatabaseMetaData;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.jar.JarEntry;
@@ -82,13 +81,11 @@ public final class Config {
     private boolean oneOfMultipleSchemas;
     private String user;
     private Boolean singleSignOn;
-    private Boolean noSchema;
     private String password;
     private Boolean promptForPassword;
     private String db;
     private String host;
     private Integer port;
-    private String server;
     private String meta;
     private String templateDirectory;
     private Pattern tableInclusions;
@@ -101,7 +98,6 @@ public final class Config {
     private Integer maxDetailedTables;
     private String driverPath;
     private String css;
-    private String charset;
     private String font;
     private Integer fontSize;
     private String description;
@@ -109,12 +105,9 @@ public final class Config {
     private Properties dbProperties;
     private Boolean generateHtml;
     private Boolean includeImpliedConstraints;
-    private Boolean logoEnabled;
     private Boolean rankDirBugEnabled;
-    private Boolean encodeCommentsEnabled;
     private Boolean numRowsEnabled;
     private Boolean viewsEnabled;
-    private Boolean meterEnabled;
     private Boolean railsEnabled;
     private Boolean evaluateAll;
     private Boolean highQuality;
@@ -318,20 +311,6 @@ public final class Config {
         return schema;
     }
 
-    /**
-     * Some databases types (e.g. older versions of Informix) don't really
-     * have the concept of a schema but still return true from
-     * {@link DatabaseMetaData#supportsSchemasInTableDefinitions()}.
-     * This option lets you ignore that and treat all the tables
-     * as if they were in one flat namespace.
-     */
-    public boolean isSchemaDisabled() {
-        if (noSchema == null)
-            noSchema = options.remove("-noschema");
-
-        return noSchema;
-    }
-
     public void setHost(String host) {
         this.host = host;
     }
@@ -358,18 +337,6 @@ public final class Config {
 
     private boolean hasText(String string) {
         return Objects.nonNull(string) && !string.trim().isEmpty();
-    }
-
-    public void setServer(String server) {
-        this.server = server;
-    }
-
-    public String getServer() {
-        if (server == null) {
-            server = pullParam("-server");
-        }
-
-        return server;
     }
 
     public void setUser(String user) {
@@ -650,27 +617,6 @@ public final class Config {
     }
 
     /**
-     * The character set to use within HTML pages (defaults to <code>"ISO-8859-1"</code>).
-     *
-     * @param charset
-     */
-    public void setCharset(String charset) {
-        this.charset = charset;
-    }
-
-    /**
-     * @see #setCharset(String)
-     */
-    public String getCharset() {
-        if (charset == null) {
-            charset = pullParam("-charset");
-            if (charset == null)
-                charset = "ISO-8859-1";
-        }
-        return charset;
-    }
-
-    /**
      * Description of schema that gets display on main pages.
      *
      * @param description
@@ -728,13 +674,6 @@ public final class Config {
         return maxDbThreads;
     }
 
-    public boolean isLogoEnabled() {
-        if (logoEnabled == null)
-            logoEnabled = !options.remove("-nologo");
-
-        return logoEnabled;
-    }
-
     /**
      * Don't use this unless absolutely necessary as it screws up the layout
      *
@@ -781,23 +720,6 @@ public final class Config {
     }
 
     /**
-     * Allow Html In Comments - encode them unless otherwise specified
-     */
-    public void setEncodeCommentsEnabled(boolean enabled) {
-        encodeCommentsEnabled = enabled;
-    }
-
-    /**
-     * @see #setEncodeCommentsEnabled(boolean)
-     */
-    public boolean isEncodeCommentsEnabled() {
-        if (encodeCommentsEnabled == null)
-            encodeCommentsEnabled = !options.remove("-ahic");
-
-        return encodeCommentsEnabled;
-    }
-
-    /**
      * If enabled we'll attempt to query/render the number of rows that
      * each table contains.<p/>
      * <p>
@@ -840,20 +762,6 @@ public final class Config {
             viewsEnabled = !options.remove("-noviews");
 
         return viewsEnabled;
-    }
-
-    /**
-     * Returns <code>true</code> if metering should be embedded in
-     * the generated pages.<p/>
-     * Defaults to <code>false</code> (disabled).
-     *
-     * @return
-     */
-    public boolean isMeterEnabled() {
-        if (meterEnabled == null)
-            meterEnabled = options.remove("-meter");
-
-        return meterEnabled;
     }
 
     /**
@@ -1615,18 +1523,12 @@ public final class Config {
             }
         }
 
-        if (isEncodeCommentsEnabled())
-            params.add("-ahic");
         if (isEvaluateAllEnabled())
             params.add("-all");
         if (!isHtmlGenerationEnabled())
             params.add("-nohtml");
         if (!isImpliedConstraintsEnabled())
             params.add("-noimplied");
-        if (!isLogoEnabled())
-            params.add("-nologo");
-        if (isMeterEnabled())
-            params.add("-meter");
         if (!isNumRowsEnabled())
             params.add("-norows");
         if (!isViewsEnabled())
@@ -1641,8 +1543,6 @@ public final class Config {
             params.add("-rails");
         if (isSingleSignOn())
             params.add("-sso");
-        if (isSchemaDisabled())
-            params.add("-noschema");
 
         String value = getDriverPath();
         if (value != null) {
@@ -1651,8 +1551,6 @@ public final class Config {
         }
         params.add("-css");
         params.add(getCss());
-        params.add("-charset");
-        params.add(getCharset());
         params.add("-font");
         params.add(getFont());
         params.add("-fontsize");
@@ -1718,11 +1616,6 @@ public final class Config {
         if (getPort() != null) {
             params.add("-port");
             params.add(getPort().toString());
-        }
-        value = getServer();
-        if (value != null) {
-            params.add("-server");
-            params.add(value);
         }
         value = getMeta();
         if (value != null) {
