@@ -36,7 +36,6 @@ import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
-import org.schemaspy.util.ConnectionURLBuilder;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.LineWriter;
 import org.schemaspy.util.ResourceWriter;
@@ -420,23 +419,8 @@ public class SchemaAnalyzer {
     }
 
     private Connection getConnection(Config config) throws IOException {
-
-        Properties properties = config.getDbProperties();
-
-        ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
-        if (config.getDb() == null)
-            config.setDb(urlBuilder.build());
-
-        String driverClass = properties.getProperty("driver");
-        String driverPath = properties.getProperty("driverPath");
-        if (Objects.isNull(driverPath))
-            driverPath = "";
-
-        if (Objects.nonNull(config.getDriverPath()))
-            driverPath = config.getDriverPath();
-
         DbDriverLoader driverLoader = new DbDriverLoader();
-        return driverLoader.getConnection(config, urlBuilder.build(), driverClass, driverPath);
+        return driverLoader.getConnection(config);
     }
 
     private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
