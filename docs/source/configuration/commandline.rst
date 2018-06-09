@@ -29,8 +29,6 @@ Connecting
     Hostname/ip to connect to, if required by databaseType.
 [-port portNumber]
     Port that dbms listens to, if required by databaseType.
-[-server server]
-    Name of server, if required by databaseType.
 [-u user]
     Valid database user id with read access. A user id is required unless -sso is specified.
 [-p password]
@@ -63,8 +61,6 @@ Processing
     Try to analyze all schemas in database, schemas can be excluded with ``-schemSpec`` which as defaults set by databaseType
 [-schemaspec schemaRegEx]
     Schemas to analyze, default to all, might be specified by databaseType.
-[-noschema]
-    Unimplemented/not used.
 [-dbthreads number]
     Specify how many threads/connections should be used when reading data from database, defaults to 15 or
     as specified by databaseType
@@ -100,16 +96,8 @@ Html report related
     Limit for when tables should be shown with details.
 [-css fileName]
     Use a custom stylesheet. Bundled stylesheet can be extracted from jar(using zip capable tool), path '/layout/schemaSpy.css'
-[-charset characterSetName]
-    Unimplemented/not used.
 [-desc description]
     Add a description to the index page.
-[-nologo]
-    Unimplemented/not used.
-[-ahic]
-    Unimplemented/not used.
-[-meter]
-    Unimplemented/not used.
 [-columndetails stringColumnDetails]
     Unimplemented/not used.
 
