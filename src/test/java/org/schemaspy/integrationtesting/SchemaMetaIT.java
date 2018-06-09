@@ -29,6 +29,7 @@ import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
+import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.service.DatabaseService;
@@ -46,7 +47,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 
@@ -85,7 +85,7 @@ public class SchemaMetaIT {
     private CommandLineRunner commandLineRunner;
 
     private Config config;
-    private DatabaseMetaData databaseMetaData;
+    private DbmsMeta dbmsMeta;
     private String schema;
     private String catalog;
 
@@ -104,7 +104,8 @@ public class SchemaMetaIT {
         given(arguments.getSchema()).willReturn("SCHEMAMETAIT");
         given(arguments.getDatabaseName()).willReturn("SchemaMetaIT");
         config = new Config(args);
-        databaseMetaData = sqlService.connect(config);
+        sqlService.connect(config);
+        dbmsMeta = sqlService.getDbmsMeta();
         schema = h2MemoryRule.getConnection().getSchema();
         catalog = h2MemoryRule.getConnection().getCatalog();
     }
@@ -112,7 +113,7 @@ public class SchemaMetaIT {
     @Test
     public void commentsNullTableComment() throws Exception {
         Database database = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "DatabaseServiceIT",
                 catalog,
                 schema
@@ -121,7 +122,7 @@ public class SchemaMetaIT {
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/nullTableComment.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -143,7 +144,7 @@ public class SchemaMetaIT {
     @Test
     public void commentsNoTableComment() throws SQLException {
         Database database = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "DatabaseServiceIT",
                 catalog,
                 schema
@@ -152,7 +153,7 @@ public class SchemaMetaIT {
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/noTableComment.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -170,7 +171,7 @@ public class SchemaMetaIT {
     public void commentsAreReplacedWithReplaceComments() throws Exception {
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/replaceComments.xml","SchemaMetaIT", schema);
         Database database = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -186,7 +187,7 @@ public class SchemaMetaIT {
     @Test
     public void remoteTable() throws Exception {
         Database database = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -195,7 +196,7 @@ public class SchemaMetaIT {
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -210,7 +211,7 @@ public class SchemaMetaIT {
     @Test
     public void remoteTableAndRelationShip() throws Exception {
         Database database = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -219,7 +220,7 @@ public class SchemaMetaIT {
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -233,7 +234,7 @@ public class SchemaMetaIT {
     @Test
     public void addColumn() throws Exception {
         Database database = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -242,7 +243,7 @@ public class SchemaMetaIT {
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addColumn.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -256,7 +257,7 @@ public class SchemaMetaIT {
     @Test
     public void disableImpliedOnAgentAccountId() throws Exception {
         Database database = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -265,7 +266,7 @@ public class SchemaMetaIT {
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableImpliedOnAgent.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -282,7 +283,7 @@ public class SchemaMetaIT {
     @Test
     public void addFKInsteadOfImplied() throws Exception {
         Database database = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -291,7 +292,7 @@ public class SchemaMetaIT {
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addFKInsteadOfImplied.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -305,7 +306,7 @@ public class SchemaMetaIT {
     @Test
     public void disableDiagramAssociations() throws Exception {
         Database database = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema
@@ -314,7 +315,7 @@ public class SchemaMetaIT {
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableDiagramAssociations.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
-                databaseMetaData,
+                dbmsMeta,
                 "SchemaMetaIT",
                 catalog,
                 schema

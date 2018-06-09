@@ -35,7 +35,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
-import java.sql.DatabaseMetaData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -86,11 +85,11 @@ public class DatabaseServiceIT {
         given(arguments.getDatabaseName()).willReturn("DatabaseServiceIT");
 
         Config config = new Config(args);
-        DatabaseMetaData databaseMetaData = sqlService.connect(config);
+        sqlService.connect(config);
         String schema = h2MemoryRule.getConnection().getSchema();
         String catalog = h2MemoryRule.getConnection().getCatalog();
         Database database = new Database(
-                databaseMetaData,
+                sqlService.getDbmsMeta(),
                 "DatabaseServiceIT",
                 catalog,
                 schema
