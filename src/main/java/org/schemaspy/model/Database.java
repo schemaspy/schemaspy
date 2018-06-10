@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,6 +59,7 @@ public class Database {
     private final DatabaseMetaData meta;
     private Set<String> sqlKeywords;
     private Pattern invalidIdentifierPattern;
+    private final ZonedDateTime connectTime = ZonedDateTime.now().now();
 
     public Database(
             DatabaseMetaData meta,
@@ -143,6 +146,14 @@ public class Database {
         } catch (SQLException exc) {
             return "";
         }
+    }
+
+    /**
+     * Used in Mustache template
+     * @return creation time of model
+     */
+    public String getConnectTime() {
+        return connectTime.format(DateTimeFormatter.ofPattern("EEE MMM dd HH:mm z yyyy"));
     }
 
     /**
