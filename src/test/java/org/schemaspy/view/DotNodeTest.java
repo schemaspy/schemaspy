@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -19,23 +19,32 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.LogicalTable;
+import org.schemaspy.model.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
- * @author Daniel Watt
+ * @author Nils Petzaell
  */
-public class HtmlFormatterTest {
+public class DotNodeTest {
 
     @Test
     public void escapeHtml() {
-        assertThat(HtmlFormatter.escapeHtml("string")).isEqualTo("string");
-        assertThat(HtmlFormatter.escapeHtml("string with spaces")).isEqualTo("string with spaces");
+        Database database = mock(Database.class);
+        Table table = new LogicalTable(database, "catalog", "schema", "<table>", "comment");
+        DotNode dotNode = new DotNode(table,"", "output");
+        System.out.println(dotNode.toString());
+        assertThat(dotNode.toString()).contains("tooltip=\"&lt;table&gt;");
     }
 
     @Test
     public void urlEncodeLink() {
-        assertThat(HtmlFormatter.urlEncodeLink("string")).isEqualTo("string");
-        assertThat(HtmlFormatter.urlEncodeLink("string with spaces")).isEqualTo("string%20with%20spaces");
+        Database database = mock(Database.class);
+        Table table = new LogicalTable(database, "catalog", "schema", "a table", "comment");
+        DotNode dotNode = new DotNode(table,"", "output");
+        assertThat(dotNode.toString()).contains("URL=\"a%20table.html\"");
     }
 }

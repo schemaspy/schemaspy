@@ -21,24 +21,16 @@
  */
 package org.schemaspy.view;
 
-import com.github.mustachejava.util.HtmlEscaper;
 import org.schemaspy.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.invoke.MethodHandles;
-import java.net.URLEncoder;
 
 /**
  * @author John Currier
  * @author Rafal Kasa
  * @author Thomas Traude
  * @author Daniel Watt
+ * @author Nils Petzaell
  */
 public class HtmlFormatter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     protected final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
 
@@ -53,26 +45,5 @@ public class HtmlFormatter {
      */
     protected String getPathToRoot() {
         return "";
-    }
-
-    /**
-     * HTML escape the specified string
-     *
-     * @param string
-     * @return
-     */
-    static String escapeHtml(String string) {
-        StringWriter writer = new StringWriter();
-        HtmlEscaper.escape(string, writer);
-        return writer.toString();
-    }
-
-    static String urlEncodeLink(String string) {
-        try {
-            return URLEncoder.encode(string, Config.DOT_CHARSET).replace("+","%20");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.info("Error trying to urlEncode string [{}] with encoding [" + Config.DOT_CHARSET + "]", string);
-            return string;
-        }
     }
 }

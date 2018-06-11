@@ -22,14 +22,22 @@
  */
 package org.schemaspy.view;
 
+import com.github.mustachejava.util.HtmlEscaper;
 import org.schemaspy.Config;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.List;
@@ -41,8 +49,12 @@ import java.util.Set;
  * @author Wojciech Kasa
  * @author Thomas Traude
  * @author Daniel Watt
+ * @author Nils Petzaell
  */
 public class DotNode {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final Table table;
     private final DotNodeConfig config;
     private final String path;
@@ -211,8 +223,8 @@ public class DotNode {
 
         buf.append("    </TABLE>>" + lineSeparator);
         if (!table.isRemote() || Config.getInstance().isOneOfMultipleSchemas())
-            buf.append("    URL=\"" + path + HtmlFormatter.urlEncodeLink(tableName) + ".html\"" + lineSeparator);
-        buf.append("    tooltip=\"" + HtmlFormatter.escapeHtml(fqTableName) + "\"" + lineSeparator);
+            buf.append("    URL=\"" + path + urlEncodeLink(tableName) + ".html\"" + lineSeparator);
+        buf.append("    tooltip=\"" + escapeHtml(fqTableName) + "\"" + lineSeparator);
         buf.append("  ];");
 
         return buf.toString();
@@ -235,6 +247,28 @@ public class DotNode {
         int fontSize = Config.getInstance().getFontSize() + 1;
         Font font = new Font(Config.getInstance().getFont(), Font.BOLD, fontSize);
         return (int) (font.getStringBounds(text, frc).getWidth());
+    }
+
+    /**
+     * HTML escape the specified string
+     *
+     * @param string
+     * @return
+     */
+    private static String escapeHtml(String string) {
+        StringWriter writer = new StringWriter();
+        //TODO Try to replace usage of HtmlEscaper so that the "dot-lang" doesn't have dependency on mustache
+        HtmlEscaper.escape(string, writer);
+        return writer.toString();
+    }
+
+    private static String urlEncodeLink(String string) {
+        try {
+            return URLEncoder.encode(string, StandardCharsets.UTF_8.name()).replace("+","%20");
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Error trying to urlEncode string [{}] with encoding [{}]", string, StandardCharsets.UTF_8.name(), e);
+            return string;
+        }
     }
 
     public static class DotNodeConfig {
