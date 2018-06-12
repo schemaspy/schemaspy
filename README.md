@@ -61,6 +61,25 @@ To verify fixes and new features you can download our latest build.
 
 We publish snapshot and release to [hub.docker.io](https://hub.docker.com/r/schemaspy/schemaspy/)
 
+## FAQ
+
+### General
+
+#### Schema or Catalog name can't be null
+This means that Schema or Catalog information could not be extracted from connection.  
+I this case you need to add options `-s [schemaName]` or `-cat [catalogName]`   
+In most cases for catalog you can use `-cat %`  
+In mysql you can use same as `-db`  
+
+### OSX
+
+#### Graphviz
+There have been lots of issue with graphviz and OSX  
+So install using brew `brew install graphviz --with-librsvg --with-pango`
+Depending on OSX version  
+*Older than High Sierra*, add `-renderer :quartz` to the commandline  
+*High Sierra or newer*, add `-renderer :cairo` to the commandline  
+
 ## Bugs and Issues
 
 Have a bug or an issue with SchemaSpy? [Open a new issue](https://github.com/schemaspy/schemaspy/issues) here on GitHub.
