@@ -120,8 +120,9 @@ public class DbDriverLoaderTest {
     String sep = File.separator;
     final String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString() + File.pathSeparator + "missing";
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray("bla.bla.bla"), driverPath))
+            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray("bla.bla.bla", "no.no.no"), driverPath))
             .withCauseInstanceOf(ConnectionFailure.class)
+            .withMessageContaining("'bla.bla.bla, no.no.no'")
             .withMessageContaining("src" + sep + "test" + sep + "resources" + sep + "driverFolder" + sep + "dummy.jar"+File.pathSeparator+"missing")
             .withMessageContaining("There were missing paths in driverPath:"+System.lineSeparator()+"\tmissing");
   }

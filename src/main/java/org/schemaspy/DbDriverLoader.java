@@ -181,7 +181,7 @@ public class DbDriverLoader {
     private String createMessage(String []driverClass, String driverPath, Set<URI> classpath) {
         StringBuilder sb = new StringBuilder()
                 .append("Failed to create any of '")
-                .append(driverClass)
+                .append(Arrays.stream(driverClass).collect(Collectors.joining(", ")))
                 .append("' driver from driverPath '")
                 .append(driverPath)
                 .append("' with sibling jars ")
@@ -190,7 +190,7 @@ public class DbDriverLoader {
                 .append(System.lineSeparator())
                 .append("Resulting in classpath:");
         if (classpath.isEmpty()) {
-            sb.append("empty").append(System.lineSeparator());
+            sb.append(" empty").append(System.lineSeparator());
         } else {
             sb.append(System.lineSeparator());
             for (URI uri : classpath) {
