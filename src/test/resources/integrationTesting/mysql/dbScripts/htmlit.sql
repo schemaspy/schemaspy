@@ -22,8 +22,8 @@ CREATE FUNCTION `htmlit`.no_det (s CHAR(20))
 RETURNS CHAR(50) NOT DETERMINISTIC
 RETURN CONCAT('Hello, ',s,'!');
 
-CREATE FUNCTION `htmlit`.yes_det (s CHAR(20))
-RETURNS CHAR(50) DETERMINISTIC
+CREATE DEFINER = 'test'@'%' FUNCTION `htmlit`.yes_det (s CHAR(20))
+RETURNS CHAR(50) DETERMINISTIC COMMENT 'is deterministic'
 RETURN CONCAT('Hello, ',s,'!');
 
 GRANT SELECT, EXECUTE, SHOW VIEW on `htmlit`.* to test@`%`;
