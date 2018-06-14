@@ -1,7 +1,7 @@
       <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>{{routine.name}}</h1></br>
-		{{#comments}}
+        <h1>{{routineName}}</h1></br>
+		{{#routineComment}}
 		<div class="box box-primary">
             <div class="box-header with-border">
               <i class="fa fa-file-text-o"></i>
@@ -14,11 +14,11 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body clearfix">
-				<p>{{{comments}}}</p>              
+				<p>{{{routineComment}}}</p>
             </div>
             <!-- /.box-body -->
 		</div>
-		{{/comments}}		
+		{{/routineComment}}
       </section>
       <!-- Main content -->
       <section class="content">
@@ -42,19 +42,19 @@
 				</tr>
 				</thead>
 				<tbody>
-				{{#parameters}}
+				{{#routineParameters}}
 				<tr>
 				 <td>{{name}}</td>
 				 <td>{{type}}</td>
 				 <td>{{mode}}</td>
 				</tr>
-				{{/parameters}}
+				{{/routineParameters}}
 				</tbody>
 				</table>
 			</div>
 		</div>
 
-		{{#definitionExists}}
+		{{#routineDefinition}}
 		<div class="box box-primary">		
 			<div class="box-header with-border">
 			  <i class="fa fa-file-code-o"></i>
@@ -68,8 +68,8 @@
 			  </div>
 			</div>
 			<div class="box-body">
-				<textarea id="sql-script-codemirror" name="sql-script-codemirror" rows="" style="display: none;">{{routine.definition}}</textarea>
+				<textarea id="sql-script-codemirror" name="sql-script-codemirror" rows="" style="display: none;">{{routineDefinition}}</textarea>
 			</div>
 		</div>		
-		{{/definitionExists}}	
+		{{/routineDefinition}}
       </section>
