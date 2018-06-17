@@ -7,6 +7,7 @@
    installation
    started
    configuration
+   faq
 
 
 Indices and tables
