@@ -1,3 +1,5 @@
+.. _schemameta:
+
 SchemaMeta
 ==========
 
@@ -22,6 +24,7 @@ Add comments/remarks
 The xsd currently allows both comments and remarks. However remarks has been deprecated.
 
 So adding a comment will either add, if missing from database, or replace if comments/remarks exist.
+Supports markdown, example see :ref:`usage_advanced_markdown_metadata`
 
 .. code-block:: xml
     :linenos:

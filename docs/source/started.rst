@@ -1,3 +1,11 @@
+.. |markdown_link| raw:: html
+
+   <a href="https://daringfireball.net/projects/markdown/" target="_blank">markdown</a>
+
+.. |br| raw:: html
+
+   <br />
+
 Get Started
 ===========
 
@@ -37,12 +45,12 @@ You can easily run SchemaSpy from the command line:
 
     java -jar schemaspy.jar -t dbType -dp C:/sqljdbc4-3.0.jar -db dbName -host server -port 1433 [-s schema] -u user [-p password] -o outputDir
 
-Parameters priority:
+Parameters priority
 ~~~~~~~~~~~~~~~~~~~~
 
 It is important to notice, that command-line parameters **override** those configured in schemaspy.properties file. 
 
-Commonly used parameters:
+Commonly used parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 [-t databaseType]
@@ -137,7 +145,33 @@ Now we are going to connect to mysql thru unix socket, put on your helmets
     -socket [pathToSocket] \
     -o [outputDir]
 
-| Replace values accordingly.
-| Yes, you need to specify ``-db``, ``-host``, ``-port``
-| Yes, the socketFactory could have been written directly into the properties-file, this is just an example, mysql-socket exists as a db-type exactly like this.
-| And since you might want to use another unix socket library this doesn't close any doors.
+   Replace values accordingly. |br|
+   Yes, you need to specify ``-db``, ``-host``, ``-port`` |br|
+   Yes, the socketFactory could have been written directly into the properties-file, this is just an example, mysql-socket exists as a db-type exactly like this. |br|
+   And since you might want to use another unix socket library this doesn't close any doors. |br|
+
+.. _usage_advanced_markdown_metadata:
+
+Add markdown comments using additional metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Schemaspy supports markdown in comments |markdown_link| |br|
+Not all dbms supports comments or long enough comments or comments might just be missing. |br|
+
+Schemaspy also supports supplying additional metadata :ref:`schemameta` |br|
+More precise the ability to add/replace comments. :ref:`schemameta-comment`
+
+.. code-block:: xml
+    :linenos:
+    :emphasize-lines: 4,5
+
+    <schemaMeta xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemaspy.org/xsd/6/schemameta.xsd" >
+        <comments>Database comment</comments>
+        <tables>
+            <table name="ACCOUNT" comments="I've added comment that links using markdown to markdown documentation [markdown](https://daringfireball.net/projects/markdown/)">
+                <column name="accountId" comments="And now the schemaspy avatar ![avatar](https://avatars3.githubusercontent.com/u/20635098?s=20&v=4 "SchemaSpy")"/>
+            </table>
+        </tables>
+    </schemaMeta>
+
+Now just run with ``-meta [path-to-above-xml]``
