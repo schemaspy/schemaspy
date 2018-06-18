@@ -1,3 +1,5 @@
+.. _commandline:
+
 Command-Line Arguments
 ======================
 
@@ -39,7 +41,7 @@ Connecting
     Prompt for password, if you don't want to have password in command history.
 [-connprops filePathOrKeyValue]
     Either a properties-file with additional properties or a key/value list, pairs separated by ``;``
-    and key and value separated by ``\\=`` example ``-connprops key1\\=value1;key2\\=value2``
+    and key and value separated by ``\\=`` example ``-connprops key1\\=value1;key2\\=value2`` see also :ref:`started_connection_props`.
     ConnectionProperties will always be populated with -u and -p if they exist.
 [-dp pathToDrivers]
     Looks for drivers here before looking in driverPath in [databaseType].properties.
