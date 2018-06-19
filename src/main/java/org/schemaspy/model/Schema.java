@@ -26,20 +26,22 @@ import java.util.Objects;
 /**
  * @author John Currier
  * @author Ismail Simsek
- * @author Dnaiel Watt
+ * @author Daniel Watt
+ * @author Nils Petzaell
  */
 public final class Schema implements Comparable<Schema>{
-	public final String name;
-	public String comment =null;
+	private final String name;
+	private String comment =null;
     
+	public Schema(String name) {
+		this(name,null);
+	}
+
 	public Schema(String name, String comment) {
 		this.name = Objects.requireNonNull(name);
 		this.comment = comment;
 	}
-	public Schema(String name) {
-		this(name,null);
-	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -47,24 +49,30 @@ public final class Schema implements Comparable<Schema>{
 	public String getComment() {
 		return comment;
 	}
+
 	public void setComment(String comment) {
 		this.comment = comment;
-	}	
+	}
+
     public int compareTo(Schema i) {
     	return this.getName().compareTo(i.getName());
     }
+
     public String toString() {
         return name;
     }
 
-	@Override public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Schema schema = (Schema) o;
-		return Objects.equals(name, schema.name);
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Schema) {
+			return ((Schema)o).getName().equals(name);
+		} else {
+			return false;
+		}
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 		return name.hashCode();
 	}
 }
