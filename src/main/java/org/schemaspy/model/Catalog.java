@@ -27,6 +27,7 @@ import java.util.Objects;
  * @author John Currier
  * @author Ismail Simsek
  * @author Daniel Watt
+ * @author Nils Petzaell
  */
 public final class Catalog implements Comparable<Catalog>{
     private final String name;
@@ -34,7 +35,6 @@ public final class Catalog implements Comparable<Catalog>{
 
 	public Catalog(String name) {
 		this(name,null);
-
 	}
 	
 	public Catalog(String name, String comment) {
@@ -49,24 +49,30 @@ public final class Catalog implements Comparable<Catalog>{
 	public String getComment() {
 		return comment;
 	}
+
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
+
     public int compareTo(Catalog i) {
     	return this.getName().compareTo(i.getName());
     }
+
     public String toString() {
         return name;
     }
 
-	@Override public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Catalog catalog = (Catalog) o;
-		return Objects.equals(name, catalog.name);
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Catalog) {
+			return ((Catalog)o).getName().equals(name);
+		} else {
+			return false;
+		}
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 		return name.hashCode();
 	}
 }
