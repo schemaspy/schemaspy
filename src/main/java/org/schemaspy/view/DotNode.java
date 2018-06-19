@@ -30,7 +30,6 @@ import org.schemaspy.model.TableIndex;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
-import java.io.File;
 import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.List;
@@ -60,14 +59,14 @@ public class DotNode {
      * @param table Table
      * @param path  String
      */
-    public DotNode(Table table, String path, File outputDir) {
+    public DotNode(Table table, String path, String outputDir) {
         this(table, path, outputDir, new DotNodeConfig(true, true));
     }
 
-    public DotNode(Table table, String path, File outputDir, DotNodeConfig config) {
+    public DotNode(Table table, String path, String outputDir, DotNodeConfig config) {
         this.table = table;
         this.path = path + (table.isRemote() ? ("../../" + table.getContainer() + "/tables/") : "");
-        this.outputDir = outputDir.toString();
+        this.outputDir = outputDir;
         this.config = config;
     }
 
@@ -79,7 +78,7 @@ public class DotNode {
      * @param showColumns boolean
      * @param path        String
      */
-    public DotNode(Table table, boolean showColumns, String path, File outputDir) {
+    public DotNode(Table table, boolean showColumns, String path, String outputDir) {
         this(table, path, outputDir, showColumns ? new DotNodeConfig(true, false) : new DotNodeConfig());
     }
 
@@ -230,13 +229,12 @@ public class DotNode {
         return maxWidth;
     }
 
-    private int getTextWidth(String text) {
+    private static int getTextWidth(String text) {
         AffineTransform affinetransform = new AffineTransform();
         FontRenderContext frc = new FontRenderContext(affinetransform, true, true);
         int fontSize = Config.getInstance().getFontSize() + 1;
         Font font = new Font(Config.getInstance().getFont(), Font.BOLD, fontSize);
-        int fontWidth = (int) (font.getStringBounds(text, frc).getWidth());
-        return fontWidth;
+        return (int) (font.getStringBounds(text, frc).getWidth());
     }
 
     public static class DotNodeConfig {

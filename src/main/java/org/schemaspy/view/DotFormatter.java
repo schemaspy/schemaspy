@@ -94,7 +94,7 @@ public class DotFormatter {
             if (!tablesWritten.add(relatedTable))
                 continue; // already written
 
-            nodes.put(relatedTable, new DotNode(relatedTable, "", outputDir, new DotNodeConfig(false, false)));
+            nodes.put(relatedTable, new DotNode(relatedTable, "", outputDir.toString(), new DotNodeConfig(false, false)));
             connectors.addAll(finder.getRelatedConnectors(relatedTable, table, true, includeImplied));
         }
 
@@ -118,7 +118,7 @@ public class DotFormatter {
                         continue; // already written
 
                     allCousinConnectors.addAll(finder.getRelatedConnectors(cousin, relatedTable, false, includeImplied));
-                    nodes.put(cousin, new DotNode(cousin, false, "", outputDir));
+                    nodes.put(cousin, new DotNode(cousin, false, "", outputDir.toString()));
                 }
 
                 allCousins.addAll(cousins);
@@ -156,7 +156,7 @@ public class DotFormatter {
         }
 
         // include the table itself
-        nodes.put(table, new DotNode(table, "", outputDir));
+        nodes.put(table, new DotNode(table, "", outputDir.toString()));
 
         connectors.addAll(allCousinConnectors);
         for (DotConnector connector : connectors) {
@@ -290,12 +290,12 @@ public class DotFormatter {
 
         for (Table table : tables) {
             if (!table.isOrphan(includeImplied)) {
-                nodes.put(table, new DotNode(table, "tables/", outputDir, nodeConfig));
+                nodes.put(table, new DotNode(table, "tables/", outputDir.toString(), nodeConfig));
             }
         }
 
         for (Table table : db.getRemoteTables()) {
-            nodes.put(table, new DotNode(table, "tables/", outputDir, nodeConfig));
+            nodes.put(table, new DotNode(table, "tables/", outputDir.toString(), nodeConfig));
         }
 
         Set<DotConnector> connectors = new TreeSet<DotConnector>();
@@ -334,7 +334,7 @@ public class DotFormatter {
 
     public void writeOrphan(Table table, LineWriter dot, File outputDir) throws IOException {
         writeHeader(table.getName(), false, dot);
-        dot.writeln(new DotNode(table, true, "tables/", outputDir).toString());
+        dot.writeln(new DotNode(table, true, "tables/", outputDir.toString()).toString());
         dot.writeln("}");
     }
 }
