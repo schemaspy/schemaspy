@@ -77,10 +77,13 @@ Commonly used parameters
 [-imageformat outputImageFormat]
     The format of the image that gets generated. Supported formats are svg and png. Defaults to png. 
     E.g. ``-imageformat svg``
-    
+
+For a comprehensive listing see :ref:`commandline`
 
 Advanced Usage
 --------------
+
+.. _started_connection_props:
 
 Supply Connection-properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -93,7 +96,9 @@ This can be omited by addind connection property ``useSSL=false``
 To add this connection property add following to commandline:
 ``-connprops useSSL\\=false``
 
-``-connprops`` can also take a properties file as argument but when escaping the = with double \ it will use ut as "useSSL=false"
+``-connprops`` can also take a properties file as argument but when escaping the = with double ``\`` it will use it as "useSSL=false"
+If key or value contains ``/`` it needs to be escaped with a single ``\``. Multiple pairs can be separated by ``;``
+
 
 Create your own DB type
 ~~~~~~~~~~~~~~~~~~~~~~~
