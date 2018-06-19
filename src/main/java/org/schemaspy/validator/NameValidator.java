@@ -43,7 +43,7 @@ public class NameValidator {
     private final Pattern exclude;
     private final Set<String> validTypes;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * @param clazz table or view
@@ -56,8 +56,7 @@ public class NameValidator {
         this.include = include;
         this.exclude = exclude;
         this.validTypes = new HashSet<>();
-        for (String type : validTypes)
-        {
+        for (String type : validTypes) {
             this.validTypes.add(type.toUpperCase());
         }
     }
@@ -75,15 +74,15 @@ public class NameValidator {
             return false;
 
         if (exclude.matcher(name).matches()) {
-            LOGGER.debug("Excluding {} {}: matches exclusion pattern \"{}" + '"', clazz, name, exclude);
+            LOGGER.debug("Excluding {} {}: matches exclusion pattern '{}'", clazz, name, exclude);
             return false;
         }
 
         boolean valid = include.matcher(name).matches();
         if (valid) {
-            LOGGER.debug("Including {} {}: matches inclusion pattern \"{}" + '"', clazz, name, include);
+            LOGGER.debug("Including {} {}: matches inclusion pattern '{}'", clazz, name, include);
         } else {
-            LOGGER.debug("Excluding {} {}: doesn't match inclusion pattern \"{}" + '"', clazz, name, include);
+            LOGGER.debug("Excluding {} {}: doesn't match inclusion pattern '{}'", clazz, name, include);
         }
         return valid;
     }
