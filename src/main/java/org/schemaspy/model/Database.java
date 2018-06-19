@@ -59,7 +59,7 @@ public class Database {
     private final DatabaseMetaData meta;
     private Set<String> sqlKeywords;
     private Pattern invalidIdentifierPattern;
-    private final ZonedDateTime connectTime = ZonedDateTime.now().now();
+    private final ZonedDateTime connectTime = ZonedDateTime.now();
 
     public Database(
             DatabaseMetaData meta,
