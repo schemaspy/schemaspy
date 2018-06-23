@@ -45,6 +45,7 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
     private static final int EXIT_CODE_GENERIC_ERROR = 1;
     private static final int EXIT_CODE_EMPTY_SCHEMA = 2;
     private static final int EXIT_CODE_CONNECTION_ERROR = 3;
+    private static final int EXIT_CODE_CONFIG_ERROR = 4;
 
     @Autowired
     private SchemaAnalyzer analyzer;
@@ -101,11 +102,12 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
             LOGGER.warn("Empty schema", noData);
             exitCode = EXIT_CODE_EMPTY_SCHEMA;
         } catch (InvalidConfigurationException badConfig) {
+            exitCode = EXIT_CODE_CONFIG_ERROR;
             LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
             if (badConfig.getParamName() != null) {
-                LOGGER.error("Bad parameter '{} {}' , {}", badConfig.getParamName(), badConfig.getParamValue(), badConfig.getMessage(), badConfig);
+                LOGGER.error("Bad parameter: '{} = {}' , {}", badConfig.getParamName(), badConfig.getParamValue(), badConfig.getMessage(), badConfig);
             } else {
-                LOGGER.error("Bad config {}", badConfig.getMessage(), badConfig);
+                LOGGER.error("Bad config: {}", badConfig.getMessage(), badConfig);
             }
         } catch (ProcessExecutionException badLaunch) {
             LOGGER.warn(badLaunch.getMessage(), badLaunch);
