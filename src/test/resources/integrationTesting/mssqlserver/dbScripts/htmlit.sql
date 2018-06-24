@@ -31,7 +31,7 @@ CREATE TABLE [htmlit].[resources] (
 CREATE TABLE [htmlit].[group_resources] (
   gid int NOT NULL,
   rid int NOT NULL,
-  access VARCHAR(2) NOT NULL CHECK (access IN('n','r','rw')) DEFAULT 'n',
+  access VARCHAR(2) NOT NULL DEFAULT 'n' CONSTRAINT CK_access_value CHECK (access IN('n','r','rw')),
   CONSTRAINT PK_gid_rid PRIMARY KEY (gid, rid),
   CONSTRAINT FK_gid FOREIGN KEY (gid) REFERENCES htmlit.[group](groupId),
   CONSTRAINT FK_rid FOREIGN KEY (rid) REFERENCES htmlit.resources(rid)
