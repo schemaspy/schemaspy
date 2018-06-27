@@ -201,11 +201,13 @@ public class XmlTableFormatter {
         int index = 1;
 
         for (TableColumn primaryKeyColumn : table.getPrimaryColumns()) {
-            Node primaryKeyNode = document.createElement("primaryKey");
-            tableNode.appendChild(primaryKeyNode);
+            if(null != primaryKeyColumn) {
+                Node primaryKeyNode = document.createElement("primaryKey");
+                tableNode.appendChild(primaryKeyNode);
 
-            DOMUtil.appendAttribute(primaryKeyNode, COLUMN, primaryKeyColumn.getName());
-            DOMUtil.appendAttribute(primaryKeyNode, "sequenceNumberInPK", String.valueOf(index++));
+                DOMUtil.appendAttribute(primaryKeyNode, COLUMN, primaryKeyColumn.getName());
+                DOMUtil.appendAttribute(primaryKeyNode, "sequenceNumberInPK", String.valueOf(index++));
+            }
         }
     }
 

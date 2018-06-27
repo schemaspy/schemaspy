@@ -57,10 +57,12 @@ public class DbAnalyzer {
             List<TableColumn> tablePrimaries = table.getPrimaryColumns();
             if (tablePrimaries.size() == 1 || tablePrimaries.stream().anyMatch(t -> t.getName().equals("LanguageId"))) { // can't match up multiples...yet...
             	TableColumn tableColumn = tablePrimaries.get(0);
-                DatabaseObject primary = new DatabaseObject(tableColumn);
-                if (tableColumn.allowsImpliedChildren()) {
-                    // new primary key name/type 
-                    keyedTablesByPrimary.put(primary, table);
+            	if (null !=  tableColumn) {
+                    DatabaseObject primary = new DatabaseObject(tableColumn);
+                    if (tableColumn.allowsImpliedChildren()) {
+                        // new primary key name/type
+                        keyedTablesByPrimary.put(primary, table);
+                    }
                 }
             }
 
