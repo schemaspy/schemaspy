@@ -334,7 +334,8 @@ public class DotFormatter {
 
     public void writeOrphan(Table table, LineWriter dot, File outputDir) throws IOException {
         writeHeader(table.getName(), false, dot);
-        dot.writeln(new DotNode(table, true, "tables/", outputDir.toString()).toString());
+        DotNodeConfig nodeConfig = new DotNodeConfig(true, true);
+        dot.writeln(new DotNode(table, "tables/", outputDir.toString(), nodeConfig).toString());
         dot.writeln("}");
     }
 }
