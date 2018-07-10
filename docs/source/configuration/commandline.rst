@@ -1,3 +1,7 @@
+.. |br| raw:: html
+
+   <br />
+
 .. _commandline:
 
 Command-Line Arguments

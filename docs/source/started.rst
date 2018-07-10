@@ -9,8 +9,6 @@
 Get Started
 ===========
 
-Welcome to SchemaSpy. We will do the best to simplify documentation process of your database.
-
 Configuration
 -------------
 
