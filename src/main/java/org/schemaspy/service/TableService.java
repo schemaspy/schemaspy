@@ -681,7 +681,21 @@ public class TableService {
 
         String columnName = rs.getString("COLUMN_NAME");
 
-        table.setPrimaryColumn(table.getColumn(columnName));
+        TableColumn tableColumn = table.getColumn(columnName);
+        if (Objects.nonNull(tableColumn)) {
+            table.setPrimaryColumn(tableColumn);
+        } else {
+            LOGGER.error(
+                    "Found PrimaryKey index '{}' with column '{}.{}.{}.{}'" +
+                    ", but was unable to find column in table '{}'",
+                    pkName,
+                    rs.getString("TABLE_CAT"),
+                    rs.getString("TABLE_SCHEM"),
+                    rs.getString("TABLE_NAME"),
+                    columnName,
+                    table.getFullName()
+            );
+        }
     }
 
     private static void markDownRegistryPage(Table table) {
