@@ -26,6 +26,7 @@
 * Database type (e.g. MySQL):
 * Database driver version (is you use a special one):
 * Your DDL (sample how to reproduce the issue):
+<!--- Remember to remove sensitive information like user/password --->
 * Full command including arguments how you run SchemaSpy:
 
 ## Your Environment
