@@ -23,10 +23,10 @@
 ## Context
 <!--- How has this issue affected you? What are you trying to accomplish? -->
 <!--- Providing context helps us come up with a solution that is most useful in the real world -->
+<!--- Remember to remove sensitive information like user/password -->
 * Database type (e.g. MySQL):
 * Database driver version (is you use a special one):
 * Your DDL (sample how to reproduce the issue):
-<!--- Remember to remove sensitive information like user/password --->
 * Full command including arguments how you run SchemaSpy:
 
 ## Your Environment
