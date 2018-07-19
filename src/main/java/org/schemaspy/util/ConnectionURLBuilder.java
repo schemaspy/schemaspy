@@ -59,7 +59,7 @@ public class ConnectionURLBuilder {
         args.addAll(remaining);
 
         String connectionURL = dbType.getProperty("connectionSpec");
-        DbSpecificConfig dbConfig = new DbSpecificConfig(config.getDbType(), config.getDbProperties());
+        DbSpecificConfig dbConfig = new DbSpecificConfig(config.getDbProperties());
         for (DbSpecificOption option : dbConfig.getOptions()) {
             option.setValue(getParam(args, option));
 

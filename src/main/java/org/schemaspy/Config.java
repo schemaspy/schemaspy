@@ -1413,7 +1413,7 @@ public final class Config {
 
         if (detailedDb) {
             System.out.println("Missing required connection parameters for '" + getDbType() + "':");
-            new DbSpecificConfig(getDbType()).dumpUsage();
+            new DbSpecificConfig(getDbProperties()).dumpUsage();
             System.out.println();
         }
 

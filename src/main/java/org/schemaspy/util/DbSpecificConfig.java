@@ -22,15 +22,14 @@
  */
 package org.schemaspy.util;
 
-import org.schemaspy.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * Configuration of a specific type of database (as specified by -t)
@@ -44,25 +43,13 @@ public class DbSpecificConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final String type;
+    private static final Pattern OPTION_PATTER = Pattern.compile("<([a-zA-Z0-9.\\-_]+)>");
+    private static final String DUMP_FORMAT = "   -%s   \t\t%s";
+
     private String description;
     private final List<DbSpecificOption> options = new ArrayList<>();
-    private final Config config = new Config();
 
-    /**
-     * Construct an instance with configuration options of the specified database type
-     *
-     * @param dbType
-     */
-    public DbSpecificConfig(String dbType) {
-        type = dbType;
-        Properties props = config.determineDbProperties(dbType);
-        description = props.getProperty("description");
-        loadOptions(props);
-    }
-
-    public DbSpecificConfig(String dbType, Properties props) {
-        type = dbType;
+    public DbSpecificConfig(Properties props) {
         description = props.getProperty("description");
         loadOptions(props);
     }
@@ -73,22 +60,20 @@ public class DbSpecificConfig {
      * @param properties
      */
     private void loadOptions(Properties properties) {
-        boolean inParam = false;
+        Set<String> optionsFound = findOptions(properties.getProperty("connectionSpec"));
+        optionsFound.stream().forEachOrdered(optionName -> {
+            String desc = properties.getProperty(optionName);
+            options.add(new DbSpecificOption(optionName, desc));
+        });
+    }
 
-        StringTokenizer tokenizer = new StringTokenizer(properties.getProperty("connectionSpec"), "<>", true);
-        while (tokenizer.hasMoreTokens()) {
-            String token = tokenizer.nextToken();
-            if ("<".equals(token)) {
-                inParam = true;
-            } else if (">".equals(token)) {
-                inParam = false;
-            } else {
-                if (inParam) {
-                    String desc = properties.getProperty(token);
-                    options.add(new DbSpecificOption(token, desc));
-                }
-            }
+    private static Set<String> findOptions(String connectionSpec) {
+        Set<String> optionsFound = new LinkedHashSet<>();
+        Matcher matcher = OPTION_PATTER.matcher(connectionSpec);
+        while(matcher.find()) {
+            optionsFound.add(matcher.group(1));
         }
+        return optionsFound;
     }
 
     /**
@@ -102,29 +87,26 @@ public class DbSpecificConfig {
     }
 
     /**
-     * Return the generic configuration associated with this DbSpecificCofig
-     *
-     * @return
-     */
-    public Config getConfig() {
-        return config;
-    }
-
-    /**
      * Dump usage details associated with the associated type of database
      */
     public void dumpUsage() {
         LOGGER.info(description);
-        getOptions().stream().map(option ->
-                        "   -" +
-                        option.getName() +
-                        " " +
-                        (
-                                option.getDescription() != null ?
-                                "  \t\t" + option.getDescription() :
-                                ""
-                        )
-                ).forEach(LOGGER::info);
+        getOptions().stream().flatMap(option -> {
+            if ("hostOptionalPort".equals(option.getName())) {
+                return Stream.of(
+                        String.format(DUMP_FORMAT, "host", "host of database, may contain port"),
+                        String.format(DUMP_FORMAT, "port", "optional port if not default")
+                );
+            } else {
+                return Stream.of(
+                        String.format(DUMP_FORMAT, option.getName(), getDescription(option))
+                );
+            }
+        }).forEach(LOGGER::info);
+    }
+
+    private static String getDescription(DbSpecificOption option) {
+        return Objects.isNull(option.getDescription()) ? "" : option.getDescription();
     }
 
     /**
