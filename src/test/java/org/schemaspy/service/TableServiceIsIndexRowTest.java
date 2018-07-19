@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Nils Petzaell
  */
-public class TableServiceTest {
+public class TableServiceIsIndexRowTest {
 
     private SqlService sqlService = mock(SqlService.class);
     private CommandLineArguments commandLineArguments = mock(CommandLineArguments.class);
@@ -46,10 +46,10 @@ public class TableServiceTest {
         Method m = null;
         try {
             m = TableService.class.getDeclaredMethod("isIndexRow", ResultSet.class);
+            m.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
-        m.setAccessible(true);
         Method finalM = m;
         isIndexRowMethod = () -> finalM;
         return m;

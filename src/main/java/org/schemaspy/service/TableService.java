@@ -95,7 +95,7 @@ public class TableService {
      * @param forceQuotes
      * @throws SQLException
      */
-    private void initColumnAutoUpdate(Database db, Table table, boolean forceQuotes) throws SQLException {
+    private static void initColumnAutoUpdate(Database db, Table table, boolean forceQuotes) throws SQLException {
 
         if (table.isView() || table.isRemote())
             return;
@@ -130,7 +130,7 @@ public class TableService {
                 if (!table.isLogical()) {
                     // don't completely choke just because we couldn't do this....
                     LOGGER.warn("Failed to determine auto increment status: {}", exc);
-                    LOGGER.warn("SQL: {}", sql.toString());
+                    LOGGER.warn("SQL: {}", sql);
                 }
             } else {
                 initColumnAutoUpdate(db, table, true);
@@ -138,7 +138,7 @@ public class TableService {
         }
     }
 
-    private TableColumn getColumn(Table table, String columnName) {
+    private static TableColumn getColumn(Table table, String columnName) {
         TableColumn column = table.getColumn(columnName);
         if (Objects.isNull(column)) {
             if (columnName.startsWith(table.getName())) {
@@ -166,7 +166,7 @@ public class TableService {
         }
     }
 
-    private TableColumn initColumn(Table table, ResultSet rs) throws SQLException {
+    private static TableColumn initColumn(Table table, ResultSet rs) throws SQLException {
         TableColumn column = new TableColumn(table);
         // names and types are typically reused *many* times in a database,
         // so keep a single instance of each distinct one
@@ -202,7 +202,7 @@ public class TableService {
 
         column.setAllExcluded(column.matches(excludeColumns));
         column.setExcluded(column.isAllExcluded() || column.matches(excludeIndirectColumns));
-        LOGGER.trace("Excluding column {}" + '.' + "{}: matches {}:{} {}:{}", column.getTable(), column.getName(), excludeColumns, column.isAllExcluded(), excludeIndirectColumns, column.matches(excludeIndirectColumns));
+        LOGGER.trace("Excluding column {}.{}: matches {}:{} {}:{}", column.getTable(), column.getName(), excludeColumns, column.isAllExcluded(), excludeIndirectColumns, column.matches(excludeIndirectColumns));
 
         return column;
     }
@@ -306,7 +306,7 @@ public class TableService {
                     throw sqlExc;
 
                 // otherwise just report the fact that we tried & couldn't
-                System.err.println("Couldn't resolve foreign keys for remote table " + remoteTable.getFullName() + ": " + sqlExc);
+                LOGGER.warn("Couldn't resolve foreign keys for remote table '{}'", remoteTable.getFullName(), sqlExc);
             }
         }
     }
@@ -334,7 +334,7 @@ public class TableService {
         Pattern exclude = Config.getInstance().getTableExclusions();
 
         if (!include.matcher(pkTableName).matches() || exclude.matcher(pkTableName).matches()) {
-            LOGGER.debug("Ignoring {} referenced by FK {}", table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName), fkName);
+            LOGGER.debug("Ignoring {} referenced by FK {}", Table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName), fkName);
             return;
         }
 
@@ -359,7 +359,7 @@ public class TableService {
             // if named table doesn't exist in this schema
             // or exists here but really referencing same named table in another schema
             if (parentTable == null || !baseContainer.equals(parentContainer)) {
-                LOGGER.debug("Adding remote table {}", table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName));
+                LOGGER.debug("Adding remote table {}", Table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName));
                 parentTable = addRemoteTable(db, pkCatalog, pkSchema, pkTableName, baseContainer, false);
             }
 
@@ -392,7 +392,7 @@ public class TableService {
         } else
             sql.append(db.getQuotedIdentifier(table.getName()));
 
-        LOGGER.trace(sql.toString());
+        LOGGER.trace("Fetch number of rows using sql: '{}'",sql);
         try (PreparedStatement stmt = sqlService.prepareStatement(sql.toString());
              ResultSet rs = stmt.executeQuery()) {
 
@@ -408,7 +408,7 @@ public class TableService {
         }
     }
 
-    private String getSchemaOrCatalog(Database db, Table table, boolean forceQuotes) throws SQLException {
+    private static String getSchemaOrCatalog(Database db, Table table, boolean forceQuotes) throws SQLException {
         String schemaOrCatalog = null;
         if (table.getSchema() != null) {
             schemaOrCatalog = table.getSchema();
@@ -452,6 +452,7 @@ public class TableService {
             } catch (SQLException sqlException) {
                 // don't die just because this failed
                 originalFailure = sqlException;
+                LOGGER.debug("Failed to fetch number of rows for '{}' using custom query: '{}'", table.getFullName(), sql, sqlException);
             }
         }
 
@@ -460,17 +461,16 @@ public class TableService {
             // '*' should work best for the majority of cases
             return fetchNumRows(db, table, "count(*)", false);
         } catch (SQLException try2Exception) {
+            LOGGER.debug("Failed to fetch number of rows for '{}' using built-in query with 'count(*)'", table.getFullName(), try2Exception);
             try {
                 // except nested tables...try using '1' instead
                 return fetchNumRows(db, table, "count(1)", false);
             } catch (SQLException try3Exception) {
                 if (!table.isLogical()) {
-                    LOGGER.warn("Unable to extract the number of rows for table {}, using '-1'", table.getName());
                     if (originalFailure != null)
-                        LOGGER.warn(originalFailure.toString());
-                    LOGGER.warn(try2Exception.toString());
-                    if (!String.valueOf(try2Exception.toString()).equals(try3Exception.toString()))
-                        LOGGER.warn(try3Exception.toString());
+                        LOGGER.warn("Failed to fetch number of rows for '{}' using custom query: '{}'", table.getFullName(), sql, originalFailure);
+                    LOGGER.warn("Failed to fetch number of rows for '{}' using built-in query with 'count(*)'", table.getFullName(), try2Exception);
+                    LOGGER.warn("Failed to fetch number of rows for '{}' using built-in query with 'count(1)'", table.getFullName(), try3Exception);
                 }
                 return -1;
             }
@@ -521,6 +521,7 @@ public class TableService {
                             parent = addRemoteTable(db, fk.getRemoteCatalog(), fk.getRemoteSchema(), fk.getTableName(), table.getContainer(), true);
                         } catch (SQLException exc) {
                             parent = null;
+                            LOGGER.debug("Failed to addRemoteTable '{}.{}.{}'", fk.getRemoteCatalog(), fk.getRemoteSchema(), fk.getTableName(), exc);
                         }
                     } else {
                         parent = tables.get(fk.getTableName());
@@ -530,11 +531,15 @@ public class TableService {
                         TableColumn parentColumn = parent.getColumn(fk.getColumnName());
 
                         if (parentColumn == null) {
-                            LOGGER.warn("Undefined column '{}" + '.' + "{}' referenced by '{}" + '.' + "{}' in XML metadata", parent.getName(), fk.getColumnName(), col.getTable(), col);
+                            LOGGER.warn("Undefined column '{}.{}' referenced by '{}.{}' in XML metadata", parent.getName(), fk.getColumnName(), col.getTable(), col);
                         } else {
                             /**
                              * Merely instantiating a foreign key constraint ties it
                              * into its parent and child columns (& therefore their tables)
+                             */
+                            /* TODO: This sort of code suggest that too much is happening in the constructor.
+                             * Should either be a factory or constructed by a method of the holding object.
+                             * Or opertations preformed in the constructor should be exposed.
                              */
                             @SuppressWarnings("unused")
                             ForeignKeyConstraint unused = new ForeignKeyConstraint(parentColumn, col) {
@@ -546,16 +551,16 @@ public class TableService {
 
                             // they forgot to say it was a primary key
                             if (!parentColumn.isPrimary()) {
-                                LOGGER.warn("Assuming {}" + '.' + "{} is a primary key due to being referenced by {}" + '.' + "{}", parentColumn.getTable(), parentColumn, col.getTable(), col);
+                                LOGGER.warn("Assuming '{}.{}' is a primary key due to being referenced by '{}.{}'", parentColumn.getTable(), parentColumn, col.getTable(), col);
                                 parent.setPrimaryColumn(parentColumn);
                             }
                         }
                     } else {
-                        LOGGER.warn("Undefined table '{}' referenced by '{}" + '.' + "{}' in XML metadata", fk.getTableName(), table.getName(), col.getName());
+                        LOGGER.warn("Undefined table '{}' referenced by '{}.{}' in XML metadata", fk.getTableName(), table.getName(), col.getName());
                     }
                 }
             } else {
-                LOGGER.warn("Undefined column '{}" + '.' + "{}' in XML metadata", table.getName(), colMeta.getName());
+                LOGGER.warn("Undefined column '{}.{}' in XML metadata", table.getName(), colMeta.getName());
             }
         }
     }
@@ -593,7 +598,7 @@ public class TableService {
     //This is to handle a problem with informix and lvarchar Issue 215. It's been reported to IBM.
     //According to DatabaseMetaData.getIndexInfo() ORDINAL_POSITION is zero when type is tableIndexStatistic.
     //Problem with informix is that lvarchar is reported back as TYPE = tableIndexOther and ORDINAL_POSITION = 0.
-    private boolean isIndexRow(ResultSet rs) throws SQLException {
+    private static boolean isIndexRow(ResultSet rs) throws SQLException {
         return rs.getShort("TYPE") != DatabaseMetaData.tableIndexStatistic && rs.getShort("ORDINAL_POSITION") > 0;
     }
 
@@ -615,8 +620,7 @@ public class TableService {
                     addIndex(table, rs);
             }
         } catch (SQLException sqlException) {
-            LOGGER.warn("Failed to query index information with SQL: {}", selectIndexesSql);
-            LOGGER.warn(sqlException.toString());
+            LOGGER.warn("Failed to query index information with SQL: {}", selectIndexesSql, sqlException);
             return false;
         }
 
@@ -627,7 +631,7 @@ public class TableService {
      * @param rs
      * @throws SQLException
      */
-    private void addIndex(Table table, ResultSet rs) throws SQLException {
+    private static void addIndex(Table table, ResultSet rs) throws SQLException {
         String indexName = rs.getString("INDEX_NAME");
 
         if (indexName == null)
@@ -648,12 +652,12 @@ public class TableService {
      *
      * @throws SQLException
      */
-    private void initPrimaryKeys(Database db, Table table) throws SQLException {
+    private static void initPrimaryKeys(Database db, Table table) throws SQLException {
 
         LOGGER.debug("Querying primary keys for {}", table.getFullName());
         try (ResultSet rs = db.getMetaData().getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName())){
             while (rs.next())
-                setPrimaryColumn(table, rs);
+                addPrimaryKeyColumn(table, rs);
         } catch (SQLException exc) {
             if (!table.isLogical()) {
                 throw exc;
@@ -665,7 +669,7 @@ public class TableService {
      * @param rs
      * @throws SQLException
      */
-    private void setPrimaryColumn(Table table, ResultSet rs) throws SQLException {
+    private static void addPrimaryKeyColumn(Table table, ResultSet rs) throws SQLException {
         String pkName = rs.getString("PK_NAME");
         if (pkName == null)
             return;
@@ -677,10 +681,24 @@ public class TableService {
 
         String columnName = rs.getString("COLUMN_NAME");
 
-        table.setPrimaryColumn(table.getColumn(columnName));
+        TableColumn tableColumn = table.getColumn(columnName);
+        if (Objects.nonNull(tableColumn)) {
+            table.setPrimaryColumn(tableColumn);
+        } else {
+            LOGGER.error(
+                    "Found PrimaryKey index '{}' with column '{}.{}.{}.{}'" +
+                    ", but was unable to find column in table '{}'",
+                    pkName,
+                    rs.getString("TABLE_CAT"),
+                    rs.getString("TABLE_SCHEM"),
+                    rs.getString("TABLE_NAME"),
+                    columnName,
+                    table.getFullName()
+            );
+        }
     }
 
-    private void markDownRegistryPage(Table table) {
+    private static void markDownRegistryPage(Table table) {
         String tablePath = "tables/" + table.getName() + ".html";
         Markdown.registryPage(table.getName(), tablePath);
     }
