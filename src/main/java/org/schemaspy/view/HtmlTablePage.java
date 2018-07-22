@@ -44,6 +44,7 @@ import java.util.*;
  * @author Wojciech Kasa
  * @author Daniel Watt
  * @author Nils Petzaell
+ * @author Bharath Kumar Uppala
  */
 public class HtmlTablePage extends HtmlFormatter {
     private static final HtmlTablePage instance = new HtmlTablePage();
@@ -70,7 +71,7 @@ public class HtmlTablePage extends HtmlFormatter {
         return stats;
     }
 
-    public void writeMainTable(Database db, Table table, File outputDir, WriteStats stats) throws IOException {
+    public void writeMainTable(Database database, Table table, File outputDir, WriteStats stats) throws IOException {
         Set<TableColumn> primaries = new HashSet<>(table.getPrimaryColumns());
         Set<TableColumn> indexes = new HashSet<>();
         Set<MustacheTableColumn> tableColumns = new LinkedHashSet<>();
@@ -101,13 +102,13 @@ public class HtmlTablePage extends HtmlFormatter {
 
         scopes.put("diagrams", diagrams);
         scopes.put("sqlCode", sqlCode(table));
-        scopes.put("references", sqlReferences(table, db));
+        scopes.put("references", sqlReferences(table, database));
 
         scopes.put("diagramExists", DiagramUtil.diagramExists(diagrams));
         scopes.put("indexExists", indexExists(table, indexedColumns));
         scopes.put("definitionExists", definitionExists(table));
         System.out.println("Table -> "+table.getName());
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
         mw.write("tables/table.html", Markdown.pagePath(table.getName()), "table.js");
     }
 

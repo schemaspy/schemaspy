@@ -26,6 +26,7 @@ import java.util.HashMap;
 
 /**
  * @author Daniel Watt
+ * @author Bharath Kumar Uppala
  */
 public class HtmlRoutinePage extends HtmlFormatter {
     private static HtmlRoutinePage instance = new HtmlRoutinePage();
@@ -34,13 +35,13 @@ public class HtmlRoutinePage extends HtmlFormatter {
         return instance;
     }
 
-    public void write(Database db, Routine routine, File outputDir) {
+    public void write(Database database, Routine routine, File outputDir) {
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("routine", routine);
         scopes.put("parameters",routine.getParameters());
         scopes.put("definitionExists",routine.getDefinition() != null);
 
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
         mw.write("routines/routine.html", "routines/" + routine.getName() + ".html", "routine.js");
     }
 

@@ -40,6 +40,7 @@ import java.util.Set;
  * @author John Currier
  * @author Rafal Kasa
  * @author Ismail Simsek
+ * @author Bharath Kumar Uppala
  */
 public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
     private static final HtmlRelationshipsPage instance = new HtmlRelationshipsPage();
@@ -59,7 +60,7 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
         return instance;
     }
 
-    public boolean write(Database db, File diagramDir, String dotBaseFilespec, boolean hasRealRelationships, boolean hasImpliedRelationships,
+    public boolean write(Database database, File diagramDir, String dotBaseFilespec, boolean hasRealRelationships, boolean hasImpliedRelationships,
     					Set<TableColumn> excludedColumns, ProgressListener listener, File outputDir) {
 
         try {
@@ -126,7 +127,7 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
             scopes.put("anyRelationships", anyRelationships(hasRealRelationships, hasImpliedRelationships));
             scopes.put("diagrams", diagrams);
 
-            MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
+            MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), getDatabaseName(database), false);
             mw.write("relationships.html", "relationships.html", "relationships.js");
             return true;
         } catch (Dot.DotFailure dotFailure) {

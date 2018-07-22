@@ -22,6 +22,7 @@
 package org.schemaspy.view;
 
 import org.schemaspy.Config;
+import org.schemaspy.model.Database;
 
 /**
  * @author John Currier
@@ -29,6 +30,7 @@ import org.schemaspy.Config;
  * @author Thomas Traude
  * @author Daniel Watt
  * @author Nils Petzaell
+ * @author Bharath Kumar Uppala
  */
 public class HtmlFormatter {
 
@@ -45,5 +47,20 @@ public class HtmlFormatter {
      */
     protected String getPathToRoot() {
         return "";
+    }
+
+    public String getDatabaseName(Database db) {
+        StringBuilder description = new StringBuilder();
+
+        description.append(db.getName());
+        if (db.getSchema() != null) {
+            description.append('.');
+            description.append(db.getSchema().getName());
+        } else if (db.getCatalog() != null) {
+            description.append('.');
+            description.append(db.getCatalog().getName());
+        }
+
+        return description.toString();
     }
 }

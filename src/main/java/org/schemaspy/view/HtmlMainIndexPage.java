@@ -42,6 +42,7 @@ import java.util.*;
  * @author Ismail Simsek
  * @author Daniel Watt
  * @author Nils Petzaell
+ * @author Bharath Kumar Uppala
  */
 public class HtmlMainIndexPage extends HtmlFormatter {
     private static HtmlMainIndexPage instance = new HtmlMainIndexPage();
@@ -112,7 +113,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         scopes.put("schema", new MustacheSchema(database.getSchema(), ""));
         scopes.put("catalog", new MustacheCatalog(database.getCatalog(), ""));
         
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", database.getName(), false);
+        MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", databaseName, false);
         mw.write("main.html", "index.html", "main.js");
     }
 
@@ -127,18 +128,5 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         return anomalies;
     }
 
-    private String getDatabaseName(Database db) {
-        StringBuilder description = new StringBuilder();
 
-        description.append(db.getName());
-        if (db.getSchema() != null) {
-            description.append('.');
-            description.append(db.getSchema().getName());
-        } else if (db.getCatalog() != null) {
-            description.append('.');
-            description.append(db.getCatalog().getName());
-        }
-
-        return description.toString();
-    }
 }
