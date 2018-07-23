@@ -24,7 +24,6 @@
 package org.schemaspy.service;
 
 import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.*;
 import org.schemaspy.model.xml.ForeignKeyMeta;
 import org.schemaspy.model.xml.TableColumnMeta;
@@ -57,18 +56,15 @@ public class TableService {
 
     private final SqlService sqlService;
 
-    private final CommandLineArguments commandLineArguments;
-
-    public TableService(SqlService sqlService, CommandLineArguments commandLineArguments) {
+    public TableService(SqlService sqlService) {
         this.sqlService = Objects.requireNonNull(sqlService);
-        this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
     }
 
     public void gatheringTableDetails(Database db, Table table) throws SQLException {
         markDownRegistryPage(table);
         initColumns(db, table);
         initIndexes(db, table);
-        initPrimaryKeys(db, table);
+        initPrimaryKeys(table);
     }
 
     /**
@@ -104,7 +100,7 @@ public class TableService {
         // so we can ask if the columns are auto updated
         // Ugh!!!  Should have been in DatabaseMetaData instead!!!
         StringBuilder sql = new StringBuilder("select * from ");
-        sql.append(getSchemaOrCatalog(db, table, forceQuotes));
+        sql.append(getSchemaOrCatalog(table, forceQuotes));
 
         if (forceQuotes) {
             sql.append(sqlService.quoteIdentifier(table.getName()));
@@ -349,7 +345,6 @@ public class TableService {
         if (childColumn != null) {
             foreignKey.addChildColumn(childColumn);
 
-            Config config = Config.getInstance();
             Table parentTable = tables.get(pkTableName);
 
             String parentContainer = pkSchema != null ? pkSchema : pkCatalog != null ? pkCatalog : db.getName();
@@ -383,7 +378,7 @@ public class TableService {
         StringBuilder sql = new StringBuilder("select ");
         sql.append(clause);
         sql.append(" from ");
-        sql.append(getSchemaOrCatalog(db, table, forceQuotes));
+        sql.append(getSchemaOrCatalog(table, forceQuotes));
 
         if (forceQuotes) {
             sql.append(sqlService.quoteIdentifier(table.getName()));
@@ -406,7 +401,7 @@ public class TableService {
         }
     }
 
-    private String getSchemaOrCatalog(Database db, Table table, boolean forceQuotes) throws SQLException {
+    private String getSchemaOrCatalog(Table table, boolean forceQuotes) throws SQLException {
         String schemaOrCatalog = null;
         if (table.getSchema() != null) {
             schemaOrCatalog = table.getSchema();
@@ -650,7 +645,7 @@ public class TableService {
      *
      * @throws SQLException
      */
-    private void initPrimaryKeys(Database db, Table table) throws SQLException {
+    private void initPrimaryKeys(Table table) throws SQLException {
 
         LOGGER.debug("Querying primary keys for {}", table.getFullName());
         try (ResultSet rs = sqlService.getDatabaseMetaData().getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName())){

@@ -19,7 +19,6 @@
 package org.schemaspy.service;
 
 import org.junit.Test;
-import org.schemaspy.cli.CommandLineArguments;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,9 +37,8 @@ import static org.mockito.Mockito.when;
 public class TableServiceIsIndexRowTest {
 
     private SqlService sqlService = mock(SqlService.class);
-    private CommandLineArguments commandLineArguments = mock(CommandLineArguments.class);
 
-    private TableService tableService = new TableService(sqlService,commandLineArguments);
+    private TableService tableService = new TableService(sqlService);
 
     private Supplier<Method> isIndexRowMethod = () -> {
         Method m = null;

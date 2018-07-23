@@ -38,8 +38,8 @@ public class WiringConfiguration {
     }
 
     @Bean
-    public TableService tableService(SqlService sqlService, CommandLineArguments commandLineArguments) {
-        return new TableService(sqlService, commandLineArguments);
+    public TableService tableService(SqlService sqlService) {
+        return new TableService(sqlService);
     }
 
     @Bean
