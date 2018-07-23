@@ -181,23 +181,24 @@ public class SchemaAnalyzer {
 
             String catalog = commandLineArguments.getCatalog();
 
-            DatabaseMetaData meta = sqlService.connect(config);
+            DatabaseMetaData databaseMetaData = sqlService.connect(config);
+            DbmsMeta dbmsMeta = sqlService.getDbmsMeta();
 
-            LOGGER.debug("supportsSchemasInTableDefinitions: {}", meta.supportsSchemasInTableDefinitions());
-            LOGGER.debug("supportsCatalogsInTableDefinitions: {}", meta.supportsCatalogsInTableDefinitions());
+            LOGGER.debug("supportsSchemasInTableDefinitions: {}", databaseMetaData.supportsSchemasInTableDefinitions());
+            LOGGER.debug("supportsCatalogsInTableDefinitions: {}", databaseMetaData.supportsCatalogsInTableDefinitions());
 
             // set default Catalog and Schema of the connection
             if (schema == null)
-                schema = meta.getConnection().getSchema();
+                schema = databaseMetaData.getConnection().getSchema();
             if (catalog == null)
-                catalog = meta.getConnection().getCatalog();
+                catalog = databaseMetaData.getConnection().getCatalog();
 
             SchemaMeta schemaMeta = config.getMeta() == null ? null : new SchemaMeta(config.getMeta(), dbName, schema);
             if (config.isHtmlGenerationEnabled()) {
                 FileUtils.forceMkdir(new File(outputDir, "tables"));
                 FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
-                LOGGER.info("Connected to {} - {}", meta.getDatabaseProductName(), meta.getDatabaseProductVersion());
+                LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
 
                 if (schemaMeta != null && schemaMeta.getFile() != null) {
                     LOGGER.info("Using additional metadata from {}", schemaMeta.getFile());
@@ -207,7 +208,7 @@ public class SchemaAnalyzer {
             //
             // create our representation of the database
             //
-            Database db = new Database(meta, dbName, catalog, schema);
+            Database db = new Database(dbmsMeta, dbName, catalog, schema);
             databaseService.gatheringSchemaDetails(config, db, schemaMeta, progressListener);
 
             long duration = progressListener.startedGraphingSummaries();
@@ -216,7 +217,7 @@ public class SchemaAnalyzer {
             tables.addAll(db.getViews());
 
             if (tables.isEmpty()) {
-                dumpNoTablesMessage(schema, config.getUser(), meta, config.getTableInclusions() != null);
+                dumpNoTablesMessage(schema, config.getUser(), databaseMetaData, config.getTableInclusions() != null);
                 if (!config.isOneOfMultipleSchemas()) // don't bail if we're doing the whole enchilada
                     throw new EmptySchemaException();
             }
@@ -305,7 +306,7 @@ public class SchemaAnalyzer {
         // note that this is done before 'hasRealRelationships' gets evaluated so
         // we get a relationships ER diagram
         if (config.isRailsEnabled())
-            DbAnalyzer.getRailsConstraints(db.getTablesByName());
+            DbAnalyzer.getRailsConstraints(db.getTablesMap());
 
         File summaryDir = new File(outputDir, "diagrams/summary");
 
@@ -421,12 +422,12 @@ public class SchemaAnalyzer {
     }
 
     private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
-        HtmlTablePage tableFormatter = HtmlTablePage.getInstance();
+        HtmlTablePage htmlTablePage = new HtmlTablePage(db);
         for (Table table : tables) {
             progressListener.graphingDetailsProgressed(table);
-            LOGGER.debug("Writing details of {}", table.getName());
+            LOGGER.debug("Writing details for {}", table.getName());
 
-            tableFormatter.write(db, table, outputDir, stats);
+            htmlTablePage.write(db, table, outputDir, stats);
         }
     }
 

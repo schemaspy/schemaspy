@@ -46,31 +46,14 @@ import java.util.*;
  * @author Nils Petzaell
  */
 public class HtmlTablePage extends HtmlFormatter {
-    private static final HtmlTablePage instance = new HtmlTablePage();
 
-    /**
-     * Singleton: Don't allow instantiation
-     */
-    private HtmlTablePage() {
+    private SqlAnalyzer sqlAnalyzer;
+
+    public HtmlTablePage(Database database) {
+        sqlAnalyzer = new SqlAnalyzer(database.getDbmsMeta().getAllKeywords(), database.getTables(), database.getViews());
     }
 
-    /**
-     * Singleton accessor
-     *
-     * @return the singleton instance
-     */
-    public static HtmlTablePage getInstance() {
-        return instance;
-    }
-
-    public WriteStats write(Database db, Table table, File outputDir, WriteStats stats) throws IOException {
-
-        writeMainTable(db, table, outputDir, stats);
-
-        return stats;
-    }
-
-    public void writeMainTable(Database db, Table table, File outputDir, WriteStats stats) throws IOException {
+    public void write(Database db, Table table, File outputDir, WriteStats stats) throws IOException {
         Set<TableColumn> primaries = new HashSet<>(table.getPrimaryColumns());
         Set<TableColumn> indexes = new HashSet<>();
         Set<MustacheTableColumn> tableColumns = new LinkedHashSet<>();
@@ -101,28 +84,26 @@ public class HtmlTablePage extends HtmlFormatter {
 
         scopes.put("diagrams", diagrams);
         scopes.put("sqlCode", sqlCode(table));
-        scopes.put("references", sqlReferences(table, db));
+        scopes.put("references", sqlReferences(table));
 
         scopes.put("diagramExists", DiagramUtil.diagramExists(diagrams));
         scopes.put("indexExists", indexExists(table, indexedColumns));
         scopes.put("definitionExists", definitionExists(table));
-        System.out.println("Table -> "+table.getName());
         MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
         mw.write("tables/table.html", Markdown.pagePath(table.getName()), "table.js");
     }
 
 
-    private Set<Table> sqlReferences(Table table, Database db) {
+    private Set<Table> sqlReferences(Table table) {
         Set<Table> references = null;
 
         if (table.isView() && table.getViewDefinition() != null) {
-            SqlAnalyzer formatter = new SqlAnalyzer();
-            references = formatter.getReferencedTables(table.getViewDefinition(), db);
+            references = sqlAnalyzer.getReferencedTables(table.getViewDefinition());
         }
         return references;
     }
 
-    private String sqlCode(Table table) {
+    private static String sqlCode(Table table) {
         return table.getViewDefinition() != null ? table.getViewDefinition().trim() : "";
     }
 
@@ -134,7 +115,7 @@ public class HtmlTablePage extends HtmlFormatter {
         return exists;
     }
 
-    private Object definitionExists(Table table) {
+    private static Object definitionExists(Table table) {
         Object exists = null;
         if (table.isView() && table.getViewDefinition() != null) {
             exists = new Object();

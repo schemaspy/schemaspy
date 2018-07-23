@@ -78,7 +78,7 @@ public class TableService {
 
 
         synchronized (Table.class) {
-            try (ResultSet rs = db.getMetaData().getColumns(table.getCatalog(), table.getSchema(), table.getName(), "%")) {
+            try (ResultSet rs = sqlService.getDatabaseMetaData().getColumns(table.getCatalog(), table.getSchema(), table.getName(), "%")) {
                 while (rs.next())
                     addColumn(table, rs);
             } catch (SQLException exc) {
@@ -95,7 +95,7 @@ public class TableService {
      * @param forceQuotes
      * @throws SQLException
      */
-    private static void initColumnAutoUpdate(Database db, Table table, boolean forceQuotes) throws SQLException {
+    private void initColumnAutoUpdate(Database db, Table table, boolean forceQuotes) throws SQLException {
 
         if (table.isView() || table.isRemote())
             return;
@@ -107,13 +107,13 @@ public class TableService {
         sql.append(getSchemaOrCatalog(db, table, forceQuotes));
 
         if (forceQuotes) {
-            sql.append(db.quoteIdentifier(table.getName()));
+            sql.append(sqlService.quoteIdentifier(table.getName()));
         } else
-            sql.append(db.getQuotedIdentifier(table.getName()));
+            sql.append(sqlService.getQuotedIdentifier(table.getName()));
 
         sql.append(" where 0 = 1");
 
-        try (PreparedStatement stmt = db.getMetaData().getConnection().prepareStatement(sql.toString());
+        try (PreparedStatement stmt = sqlService.getDatabaseMetaData().getConnection().prepareStatement(sql.toString());
              ResultSet rs = stmt.executeQuery()) {
 
             ResultSetMetaData rsMeta = rs.getMetaData();
@@ -218,7 +218,7 @@ public class TableService {
         LOGGER.trace("Connecting foreign keys to {}", table.getFullName());
 
 
-        try (ResultSet rs = db.getMetaData().getImportedKeys(table.getCatalog(), table.getSchema(), table.getName())) {
+        try (ResultSet rs = sqlService.getDatabaseMetaData().getImportedKeys(table.getCatalog(), table.getSchema(), table.getName())) {
             // get our foreign keys that reference other tables' primary keys
             ArrayList<ForeignKey> importedKeys = new ArrayList<>();
 
@@ -248,7 +248,7 @@ public class TableService {
         // point to our primary keys (not necessary in the normal case
         // as we infer this from the opposite direction)
         if (table.getSchema() != null || table.getCatalog() != null) {
-            try (ResultSet rs = db.getMetaData().getExportedKeys(table.getCatalog(), table.getSchema(), table.getName())) {
+            try (ResultSet rs = sqlService.getDatabaseMetaData().getExportedKeys(table.getCatalog(), table.getSchema(), table.getName())) {
                 // get the foreign keys that reference our primary keys
                 // note that this can take an insane amount of time on Oracle (i.e. 30 secs per call)
 
@@ -283,7 +283,7 @@ public class TableService {
     private void connectForeignKeysRemoteTable(Database db, RemoteTable remoteTable, Map<String, Table> tables) throws SQLException {
         LOGGER.trace("Connecting foreign keys to {}", remoteTable.getFullName());
 
-        try (ResultSet rs = db.getMetaData().getImportedKeys(remoteTable.getCatalog(), remoteTable.getSchema(), remoteTable.getName())){
+        try (ResultSet rs = sqlService.getDatabaseMetaData().getImportedKeys(remoteTable.getCatalog(), remoteTable.getSchema(), remoteTable.getName())){
             // get remote table's FKs that reference PKs in our schema
 
             while (rs.next()) {
@@ -388,9 +388,9 @@ public class TableService {
         sql.append(getSchemaOrCatalog(db, table, forceQuotes));
 
         if (forceQuotes) {
-            sql.append(db.quoteIdentifier(table.getName()));
+            sql.append(sqlService.quoteIdentifier(table.getName()));
         } else
-            sql.append(db.getQuotedIdentifier(table.getName()));
+            sql.append(sqlService.getQuotedIdentifier(table.getName()));
 
         LOGGER.trace("Fetch number of rows using sql: '{}'",sql);
         try (PreparedStatement stmt = sqlService.prepareStatement(sql.toString());
@@ -408,7 +408,7 @@ public class TableService {
         }
     }
 
-    private static String getSchemaOrCatalog(Database db, Table table, boolean forceQuotes) throws SQLException {
+    private String getSchemaOrCatalog(Database db, Table table, boolean forceQuotes) throws SQLException {
         String schemaOrCatalog = null;
         if (table.getSchema() != null) {
             schemaOrCatalog = table.getSchema();
@@ -419,9 +419,9 @@ public class TableService {
             return "";
         }
         if (forceQuotes) {
-            return db.quoteIdentifier(schemaOrCatalog) + ".";
+            return sqlService.quoteIdentifier(schemaOrCatalog) + ".";
         } else {
-            return db.getQuotedIdentifier(schemaOrCatalog) + ".";
+            return sqlService.getQuotedIdentifier(schemaOrCatalog) + ".";
         }
     }
 
@@ -583,7 +583,7 @@ public class TableService {
         // couldn't, so try the old fashioned approach
 
 
-        try (ResultSet rs = db.getMetaData().getIndexInfo(table.getCatalog(), table.getSchema(), table.getName(), false, true)){
+        try (ResultSet rs = sqlService.getDatabaseMetaData().getIndexInfo(table.getCatalog(), table.getSchema(), table.getName(), false, true)){
 
             while (rs.next()) {
                 if (isIndexRow(rs))
@@ -652,10 +652,10 @@ public class TableService {
      *
      * @throws SQLException
      */
-    private static void initPrimaryKeys(Database db, Table table) throws SQLException {
+    private void initPrimaryKeys(Database db, Table table) throws SQLException {
 
         LOGGER.debug("Querying primary keys for {}", table.getFullName());
-        try (ResultSet rs = db.getMetaData().getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName())){
+        try (ResultSet rs = sqlService.getDatabaseMetaData().getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName())){
             while (rs.next())
                 addPrimaryKeyColumn(table, rs);
         } catch (SQLException exc) {

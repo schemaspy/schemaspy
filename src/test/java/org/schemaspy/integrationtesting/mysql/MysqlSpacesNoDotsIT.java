@@ -41,7 +41,6 @@ import org.testcontainers.containers.MySQLContainer;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -101,9 +100,9 @@ public class MysqlSpacesNoDotsIT {
         };
         CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
-        DatabaseMetaData databaseMetaData = sqlService.connect(config);
+        sqlService.connect(config);
         Database database = new Database(
-                databaseMetaData,
+                sqlService.getDbmsMeta(),
                 arguments.getDatabaseName(),
                 arguments.getCatalog(),
                 arguments.getSchema()
@@ -125,23 +124,23 @@ public class MysqlSpacesNoDotsIT {
 
     @Test
     public void tableShouldHavePKWithAutoIncrement() {
-        assertThat(database.getTablesByName().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("id");
-        assertThat(database.getTablesByName().get("TABLE 1").getColumn("id").isPrimary()).isTrue();
-        assertThat(database.getTablesByName().get("TABLE 1").getColumn("id").isAutoUpdated()).isTrue();
+        assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("id");
+        assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isPrimary()).isTrue();
+        assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isAutoUpdated()).isTrue();
     }
 
     @Test
     public void tableShouldHaveForeignKey() {
-        assertThat(database.getTablesByName().get("TABLE 1").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
+        assertThat(database.getTablesMap().get("TABLE 1").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
     }
 
     @Test
     public void tableShouldHaveUniqueKey() {
-        assertThat(database.getTablesByName().get("TABLE 1").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
+        assertThat(database.getTablesMap().get("TABLE 1").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
     }
 
     @Test
     public void tableShouldHaveColumnWithSpaceInIt() {
-        assertThat(database.getTablesByName().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("link id");
+        assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("link id");
     }
 }

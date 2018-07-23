@@ -44,7 +44,6 @@ import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -113,9 +112,9 @@ public class OracleSpacesIT {
         given(arguments.getCatalog()).willReturn("%");
         given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
         Config config = new Config(args);
-        DatabaseMetaData databaseMetaData = sqlService.connect(config);
+        sqlService.connect(config);
         Database database = new Database(
-                databaseMetaData,
+                sqlService.getDbmsMeta(),
                 arguments.getDatabaseName(),
                 arguments.getCatalog(),
                 arguments.getSchema()

@@ -70,7 +70,7 @@ public class DatabaseService {
 
         listener.startedGatheringDetails();
 
-        DatabaseMetaData meta = sqlService.getMeta();
+        DatabaseMetaData meta = sqlService.getDatabaseMetaData();
 
         initTables(config, db, listener, meta);
         if (config.isViewsEnabled())

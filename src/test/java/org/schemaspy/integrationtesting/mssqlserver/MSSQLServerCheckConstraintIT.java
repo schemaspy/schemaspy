@@ -103,9 +103,9 @@ public class MSSQLServerCheckConstraintIT {
         given(arguments.getCatalog()).willReturn("CheckConstraint");
         given(arguments.getDatabaseName()).willReturn("CheckConstraint");
         Config config = new Config(args);
-        DatabaseMetaData databaseMetaData = sqlService.connect(config);
+        sqlService.connect(config);
         Database database = new Database(
-                databaseMetaData,
+                sqlService.getDbmsMeta(),
                 arguments.getDatabaseName(),
                 arguments.getCatalog(),
                 arguments.getSchema()

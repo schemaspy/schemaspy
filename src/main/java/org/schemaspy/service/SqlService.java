@@ -26,6 +26,7 @@ package org.schemaspy.service;
 import org.schemaspy.Config;
 import org.schemaspy.DbDriverLoader;
 import org.schemaspy.model.Database;
+import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by rkasa on 2016-12-10.
@@ -52,28 +55,59 @@ public class SqlService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private DbmsService dbmsService = new DbmsService();
+
     private Connection connection;
-    private DatabaseMetaData meta;
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public DatabaseMetaData getMeta() {
-        return meta;
-    }
+    private DatabaseMetaData databaseMetaData;
+    private DbmsMeta dbmsMeta;
+    private Pattern invalidIdentifierPattern;
+    private Set<String> allKeywords;
 
     public DatabaseMetaData connect(Config config) throws IOException, SQLException {
         DbDriverLoader driverLoader = new DbDriverLoader();
         connection = driverLoader.getConnection(config);
 
-        meta = connection.getMetaData();
+        databaseMetaData = connection.getMetaData();
+        dbmsMeta = dbmsService.fetchDbmsMeta(databaseMetaData);
+        invalidIdentifierPattern = createInvalidIdentifierPattern(databaseMetaData);
+        allKeywords = dbmsMeta.getAllKeywords();
 
         if (config.isEvaluateAllEnabled()) {
             return null;    // no database to return
         }
 
-        return meta;
+        return databaseMetaData;
+    }
+
+
+    /**
+     * Return a <code>Pattern</code> whose matcher will return <code>true</code>
+     * when run against an identifier that contains a character that is not
+     * acceptable by the database without being quoted.
+     */
+    private static Pattern createInvalidIdentifierPattern(DatabaseMetaData databaseMetaData) throws SQLException {
+        StringBuilder validChars = new StringBuilder("a-zA-Z0-9_");
+        String reservedRegexChars = "-&^";
+        String extraValidChars = databaseMetaData.getExtraNameCharacters();
+        for (int i = 0; i < extraValidChars.length(); ++i) {
+            char ch = extraValidChars.charAt(i);
+            if (reservedRegexChars.indexOf(ch) >= 0)
+                validChars.append("" + "\\");
+            validChars.append(ch);
+        }
+        return Pattern.compile("[^" + validChars + "]");
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public DatabaseMetaData getDatabaseMetaData() {
+        return databaseMetaData;
+    }
+
+    public DbmsMeta getDbmsMeta() {
+        return dbmsMeta;
     }
 
     /**
@@ -117,7 +151,7 @@ public class SqlService {
      * @return List of Strings
      * @see #prepareStatement(String, Database, String)
      */
-    private List<String> getSqlParams(StringBuilder sql, String dbName, String catalog, String schema, String tableName) {
+    private static List<String> getSqlParams(StringBuilder sql, String dbName, String catalog, String schema, String tableName) {
         Map<String, String> namedParams = new HashMap<>();
         if (Objects.isNull(schema)) {
             schema = dbName; // some 'schema-less' db's treat the db name like a schema (unusual case)
@@ -151,5 +185,32 @@ public class SqlService {
 
     public PreparedStatement prepareStatement(String sqlQuery) throws SQLException {
         return connection.prepareStatement(sqlQuery);
+    }
+
+    /**
+     * Return <code>id</code> quoted if required, otherwise return <code>id</code>
+     *
+     * @param id
+     * @return
+     * @throws SQLException
+     */
+    public String getQuotedIdentifier(String id) throws SQLException {
+        // look for any character that isn't valid (then matcher.find() returns true)
+        Matcher matcher = invalidIdentifierPattern.matcher(id);
+
+        boolean quotesRequired = matcher.find() || allKeywords.contains(id);
+
+        if (quotesRequired) {
+            // name contains something that must be quoted
+            return quoteIdentifier(id);
+        }
+
+        // no quoting necessary
+        return id;
+    }
+
+    public String quoteIdentifier(String id) throws SQLException {
+        String quote = dbmsMeta.getIdentifierQuoteString();
+        return quote + id + quote;
     }
 }

@@ -38,7 +38,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,9 +92,9 @@ public class H2ViewIT {
         given(arguments.getSchema()).willReturn(h2MemoryRule.getConnection().getSchema());
         given(arguments.getDatabaseName()).willReturn("h2view");
         Config config = new Config(args);
-        DatabaseMetaData databaseMetaData = sqlService.connect(config);
+        sqlService.connect(config);
         Database database = new Database(
-                databaseMetaData,
+                sqlService.getDbmsMeta(),
                 arguments.getDatabaseName(),
                 arguments.getCatalog(),
                 arguments.getSchema()
