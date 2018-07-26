@@ -20,7 +20,6 @@ package org.schemaspy.service;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.testing.Logger;
@@ -44,9 +43,8 @@ public class TableServiceAddPrimaryKeyColumnTest {
     public LoggingRule loggingRule = new LoggingRule();
 
     private SqlService sqlService = mock(SqlService.class);
-    private CommandLineArguments commandLineArguments = mock(CommandLineArguments.class);
 
-    private TableService tableService = new TableService(sqlService,commandLineArguments);
+    private TableService tableService = new TableService(sqlService);
 
     private Supplier<Method> addPrimaryKeyColumnMethod = () -> {
         Method m = null;
