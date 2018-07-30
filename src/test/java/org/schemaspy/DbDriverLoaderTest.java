@@ -146,4 +146,53 @@ public class DbDriverLoaderTest {
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("com.mysql.cj.jdbc.Driver");
   }
+
+  @Test
+  public void willAddDirAndContentIfDpIsADirAndNotAFile() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    URI driverFolder = Paths.get("src","test", "resources", "driverFolder").toUri();
+    URI dummyJarURI = Paths.get("src","test", "resources", "driverFolder","dummy.jar").toUri();
+    URI dummyNarURI = Paths.get("src","test", "resources", "driverFolder","dummy.nar").toUri();
+    URI narJarWarNotIncludedURI = Paths.get("src","test", "resources", "driverFolder","nar.jar.war.not.included").toUri();
+    DbDriverLoader dbDriverLoader = new DbDriverLoader();
+    String dp = Paths.get("src","test", "resources", "driverFolder").toString();
+
+    Method method = DbDriverLoader.class.getDeclaredMethod("getExistingUrls", String.class);
+    method.setAccessible(true);
+
+    Set<URI> uris = (Set<URI>) method.invoke(dbDriverLoader, dp);
+    assertThat(uris.size()).isEqualTo(4);
+    assertThat(uris).contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
+  }
+
+  @Test
+  public void willOnlyAddFileIfFileIsSpecified() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    URI dummyJarURI = Paths.get("src","test", "resources", "driverFolder","dummy.jar").toUri();
+    DbDriverLoader dbDriverLoader = new DbDriverLoader();
+    String dp = Paths.get("src","test", "resources", "driverFolder", "dummy.jar").toString();
+
+    Method method = DbDriverLoader.class.getDeclaredMethod("getExistingUrls", String.class);
+    method.setAccessible(true);
+
+    Set<URI> uris = (Set<URI>) method.invoke(dbDriverLoader, dp);
+    assertThat(uris.size()).isEqualTo(1);
+    assertThat(uris).contains(dummyJarURI);
+  }
+
+  @Test
+  public void willAddDirAndContentIfDpSecondArgIsADirAndNotAFile() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    URI driverFolder = Paths.get("src","test", "resources", "driverFolder").toUri();
+    URI dummyJarURI = Paths.get("src","test", "resources", "driverFolder","dummy.jar").toUri();
+    URI dummyNarURI = Paths.get("src","test", "resources", "driverFolder","dummy.nar").toUri();
+    URI narJarWarNotIncludedURI = Paths.get("src","test", "resources", "driverFolder","nar.jar.war.not.included").toUri();
+    DbDriverLoader dbDriverLoader = new DbDriverLoader();
+    String dpFile = Paths.get("src","test", "resources", "driverFolder", "dummy.jar").toString();
+    String dpDir = Paths.get("src","test", "resources", "driverFolder").toString();
+
+    Method method = DbDriverLoader.class.getDeclaredMethod("getExistingUrls", String.class);
+    method.setAccessible(true);
+
+    Set<URI> uris = (Set<URI>) method.invoke(dbDriverLoader, dpFile + File.pathSeparator + dpDir);
+    assertThat(uris.size()).isEqualTo(4);
+    assertThat(uris).contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
+  }
 }

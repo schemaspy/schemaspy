@@ -69,6 +69,8 @@ Commonly used parameters
 [-dp pathToDrivers]
     Looks for drivers here before looking in driverPath in [databaseType].properties.
     The drivers are usually contained in .jar or .zip files and are typically provided by your database vendor.
+    Supports a directory as argument, which will add directory and all content to classpath, will recurse.
+    Supports multiple paths separated by OS dependent path separator
 [-hq] or [-lq]
     Generate higher or lower-quality diagrams. Various installations of Graphviz (depending on OS and/or version) will default to generat /ing 
     either higher or lower quality images. That is, some might not have the "lower quality" libraries and others might not have the "higher quality" libraries.
