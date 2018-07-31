@@ -29,6 +29,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.db.CatalogResolver;
+import org.schemaspy.db.SchemaResolver;
 import org.schemaspy.model.*;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.output.OutputException;
@@ -188,10 +190,8 @@ public class SchemaAnalyzer {
             LOGGER.debug("supportsCatalogsInTableDefinitions: {}", databaseMetaData.supportsCatalogsInTableDefinitions());
 
             // set default Catalog and Schema of the connection
-            if (schema == null)
-                schema = databaseMetaData.getConnection().getSchema();
-            if (catalog == null)
-                catalog = databaseMetaData.getConnection().getCatalog();
+            catalog = new CatalogResolver(databaseMetaData).resolveCatalog(catalog);
+            schema = new SchemaResolver(databaseMetaData).resolveSchema(schema);
 
             SchemaMeta schemaMeta = config.getMeta() == null ? null : new SchemaMeta(config.getMeta(), dbName, schema);
             if (config.isHtmlGenerationEnabled()) {
