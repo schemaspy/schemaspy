@@ -19,6 +19,7 @@ $(document).ready(function() {
         lengthChange: false,
         paging: config.pagination,
 		pageLength: 50,
+        order: [[ 0, "asc" ]],
 		buttons: [
 						{
 							text: 'All',
