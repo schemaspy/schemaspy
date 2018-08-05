@@ -30,4 +30,4 @@ deploy:
     script: ./docker.sh deploy
     on:
       repo: schemaspy/schemaspy
-      branch: master
+      all_branches: true
