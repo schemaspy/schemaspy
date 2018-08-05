@@ -27,11 +27,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.MssqlServerSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,7 +45,6 @@ import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -72,10 +73,13 @@ public class MSSQLServerCheckConstraintIT {
 
     @ClassRule
     public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MSSQLServerContainer())
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/mssqlserver/dbScripts/check_constraint.sql");
+            new SuiteOrTestJdbcContainerRule<>(
+                    MssqlServerSuite.jdbcContainerRule,
+                    new JdbcContainerRule<>(() -> new MSSQLServerContainer())
+                        .assumeDockerIsPresent()
+                        .withAssumptions(assumeDriverIsPresent())
+                        .withInitScript("integrationTesting/mssqlserver/dbScripts/check_constraint.sql")
+            );
 
     @Before
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {

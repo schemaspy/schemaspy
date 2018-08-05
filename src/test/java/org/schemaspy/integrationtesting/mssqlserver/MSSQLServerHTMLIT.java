@@ -25,7 +25,9 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.integrationtesting.MssqlServerSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.schemaspy.testing.XmlOutputDiff;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,10 +61,13 @@ public class MSSQLServerHTMLIT {
 
     @ClassRule
     public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MSSQLServerContainer())
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql");
+            new SuiteOrTestJdbcContainerRule<>(
+                    MssqlServerSuite.jdbcContainerRule,
+                    new JdbcContainerRule<>(() -> new MSSQLServerContainer())
+                        .assumeDockerIsPresent()
+                        .withAssumptions(assumeDriverIsPresent())
+                    .   withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql")
+            );
 
     @Autowired
     private SchemaSpyRunner schemaSpyRunner;
