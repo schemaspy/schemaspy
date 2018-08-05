@@ -354,6 +354,7 @@
                     </includes>
                     <excludes>
                         <exclude>**/Mysql*IT.java</exclude>
+                        <exclude>**/MSSQLServer*IT.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>

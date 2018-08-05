@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2017, 2018 Rafal Kasa
  * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
@@ -17,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.testcontainer;
+package org.schemaspy.integrationtesting.mssqlserver;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.assertj.core.api.SoftAssertions;
@@ -28,10 +27,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.MssqlServerSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,7 +57,7 @@ import static org.mockito.BDDMockito.given;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext
-public class MSSQLServerIT {
+public class MSSQLServerCommentsIT {
 
     @Autowired
     private SqlService sqlService;
@@ -90,10 +91,13 @@ public class MSSQLServerIT {
 
     @ClassRule
     public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MSSQLServerContainer())
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/dbScripts/mssql_comments.sql");
+            new SuiteOrTestJdbcContainerRule<>(
+                    MssqlServerSuite.jdbcContainerRule,
+                    new JdbcContainerRule<>(() -> new MSSQLServerContainer())
+                            .assumeDockerIsPresent()
+                            .withAssumptions(assumeDriverIsPresent())
+                            .withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_comments.sql")
+            );
 
     @Before
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {

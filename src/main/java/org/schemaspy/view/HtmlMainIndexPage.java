@@ -31,7 +31,6 @@ import org.schemaspy.model.Table;
 import org.schemaspy.util.Markdown;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -61,26 +60,10 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         return instance;
     }
 
-    public void write(Database database, Collection<Table> tables, List<? extends ForeignKeyConstraint> impliedConstraints, File outputDir) throws IOException {
-        Comparator<Table> sorter = new Comparator<Table>() {
-            public int compare(Table table1, Table table2) {
-                return table1.compareTo(table2);
-            }
-        };
-
-        Collection<Table> remotes = database.getRemoteTables();
-        // sort tables and remotes by name
-        Collection<Table> tmp = new TreeSet<Table>(sorter);
-        tmp.addAll(tables);
-        tables = tmp;
-        tmp = new TreeSet<Table>(sorter);
-        tmp.addAll(remotes);
-
-        String databaseName = getDatabaseName(database);
-
-        List<MustacheTable> mustacheTables = new ArrayList<>();
+    public void write(Database database, Collection<Table> tables, List<? extends ForeignKeyConstraint> impliedConstraints, File outputDir) {
 
         long columnsAmount = 0;
+        List<MustacheTable> mustacheTables = new ArrayList<>();
 
         for(Table table: tables) {
             columnsAmount += table.getColumns().size();
@@ -90,13 +73,13 @@ public class HtmlMainIndexPage extends HtmlFormatter {
             mustacheTables.add(mustacheTable);
         }
 
-        long tablesAmount = tables.stream().filter(t -> !t.isView()).count();
         long viewsAmount = tables.stream().filter(Table::isView).count();
+        long tablesAmount = tables.size() - viewsAmount;
         long constraintsAmount = DbAnalyzer.getForeignKeyConstraints(tables).size();
         long routinesAmount = database.getRoutines().size();
         long anomaliesAmount = getAllAnomaliesAmount(tables, impliedConstraints);
 
-        HashMap<String, Object> scopes = new HashMap<String, Object>();
+        HashMap<String, Object> scopes = new HashMap<>();
         scopes.put("tablesAmount", tablesAmount);
         scopes.put("viewsAmount", viewsAmount);
         scopes.put("columnsAmount", columnsAmount);
@@ -106,7 +89,8 @@ public class HtmlMainIndexPage extends HtmlFormatter {
 
         scopes.put("tables", mustacheTables);
         scopes.put("database", database);
-        scopes.put("databaseName", databaseName);
+        scopes.put("databaseName", database.getName());
+        scopes.put("xmlName", getXmlName(database));
         scopes.put("description", Config.getInstance().getDescription());
         scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
         scopes.put("schema", new MustacheSchema(database.getSchema(), ""));
@@ -116,7 +100,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         mw.write("main.html", "index.html", "main.js");
     }
 
-    private long getAllAnomaliesAmount(Collection<Table> tables, List<? extends ForeignKeyConstraint> impliedConstraints) {
+    private static long getAllAnomaliesAmount(Collection<Table> tables, List<? extends ForeignKeyConstraint> impliedConstraints) {
         long anomalies = 0;
         anomalies += DbAnalyzer.getTablesWithoutIndexes(new HashSet<Table>(tables)).size();
         anomalies += impliedConstraints.stream().filter(c -> !c.getChildTable().isView()).count();
@@ -127,7 +111,7 @@ public class HtmlMainIndexPage extends HtmlFormatter {
         return anomalies;
     }
 
-    private String getDatabaseName(Database db) {
+    private static String getXmlName(Database db) {
         StringBuilder description = new StringBuilder();
 
         description.append(db.getName());

@@ -35,6 +35,7 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
         MysqlHTMLIT.class,
         MysqlKeyWordTableIT.class,
         MysqlRoutinesIT.class,
+        MysqlSchemaLeakageIT.class,
         MysqlSpacesIT.class,
         MysqlSpacesNoDotsIT.class,
         MysqlXMLIT.class
