@@ -23,8 +23,7 @@ function deploy() {
     fi
 }
 
-if [[ "${TRAVIS_BRANCH}" == "master" ]] &&
-   [[ "${TRAVIS_PULL_REQUEST}" == "false" ]] &&
+if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]] &&
    [[ -n ${DOCKER_USER} ]] &&
    [[ -n ${DOCKER_PASS} ]]; then
     case "$1" in
