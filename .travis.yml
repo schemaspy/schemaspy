@@ -31,3 +31,13 @@ deploy:
     on:
       repo: schemaspy/schemaspy
       all_branches: true
+  - provider: releases
+    api_key: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+    skip_cleanup: true
+    file_glob: true
+    file: target/schemaspy*.jar
+    draft: true
+    on:
+      repo: schemaspy/schemaspy
+      tags: true
+
