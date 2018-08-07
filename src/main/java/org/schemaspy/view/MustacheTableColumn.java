@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Rafal Kasa
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -30,13 +31,14 @@ import java.util.Set;
  * Created by rkasa on 2016-03-23.
  *
  * @author Rafal Kasa
+ * @author Nils Petzaell
  */
 public class MustacheTableColumn {
 
     private TableColumn column;
     private List<MustacheTableColumnRelatives> parents = new ArrayList<>();
     private List<MustacheTableColumnRelatives> children = new ArrayList<>();
-    private Set<TableColumn> indexedColumns;
+    private boolean indexColumn;
     private String rootPath;
 
     public MustacheTableColumn(TableColumn tableColumn) {
@@ -45,9 +47,9 @@ public class MustacheTableColumn {
         prepareRelatives(parents, true);
     }
 
-    public MustacheTableColumn(TableColumn tableColumn, Set<TableColumn> indexedColumns, String rootPath) {
+    public MustacheTableColumn(TableColumn tableColumn, boolean indexColumn, String rootPath) {
         this(tableColumn);
-        this.indexedColumns = indexedColumns;
+        this.indexColumn = indexColumn;
         this.rootPath = rootPath;
     }
 
@@ -68,17 +70,46 @@ public class MustacheTableColumn {
             keyType = " class='primaryKey' title='Primary Key'";
         } else if (column.isForeignKey()) {
             keyType = " class='foreignKey' title='Foreign Key'";
-        } else if (isIndex()) {
+        } else if (indexColumn) {
             keyType = " class='"+markAsIndexColumn()+"' title='Indexed'";
         }
+
         return keyType;
+    }
+
+    public String getKeyTitle() {
+        String keyTitle= "";
+
+        if (column.isPrimary()) {
+            keyTitle = "Primary Key";
+        } else if (column.isForeignKey()) {
+            keyTitle = "Foreign Key";
+        } else if (indexColumn) {
+            keyTitle = "Indexed";
+        }
+
+        return keyTitle;
+    }
+
+    public String getKeyClass() {
+        String keyClass= "";
+
+        if (column.isPrimary()) {
+            keyClass = "primaryKey";
+        } else if (column.isForeignKey()) {
+            keyClass = "foreignKey";
+        } else if (indexColumn) {
+            keyClass = "indexedColumn";
+        }
+
+        return keyClass;
     }
 
     public String getKeyIcon() {
         String keyIcon = "";
         if (column.isPrimary() || column.isForeignKey()) {
             keyIcon = "<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>";
-        } else if (isIndex()) {
+        } else if (indexColumn) {
             keyIcon = "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>";
         }
 
@@ -101,15 +132,8 @@ public class MustacheTableColumn {
         return column.isAutoUpdated() ? "Automatically updated by the database" : "";
     }
 
-    private boolean isIndex() {
-        if (indexedColumns != null) {
-            return indexedColumns.contains(column);
-        }
-        return false;
-    }
-
     private String markAsIndexColumn() {
-        return isIndex() ? "indexedColumn" : "";
+        return indexColumn ? "indexedColumn" : "";
     }
 
     public String getDefaultValue() {

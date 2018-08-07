@@ -98,121 +98,140 @@
 					  <th>Column</th>
 					  <th>Type</th>
 					  <th>Size</th>
-					  <th title='Are nulls allowed?'>Nulls</th>
+					  <th title='Are nulls allowed?'>Nullable</th>
 					  <th title='Is column automatically updated?'>Auto</th>
 					  <th title='Default value'>Default</th>
 					  <th title='Comments' class="toggle"><span>Comments</span></th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr>
-					 <td>userAndGroup</td>
-					 <td>View</td>
-					 <td>UserName</td>
-					 <td>VARCHAR</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td><p>UserName</p></td>
-					</tr>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
-					 <td>INT</td>
-					 <td>10</td>
-					 <td title=''></td>
-					 <td title='Automatically updated by the database'>√</td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
-					 <td>VARCHAR</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>userId</td>
-					 <td>INT</td>
-					 <td>10</td>
-					 <td title=''></td>
-					 <td title='Automatically updated by the database'>√</td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td>name</td>
-					 <td>VARCHAR</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td><p>UserName</p></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>email</td>
-					 <td>VARCHAR</td>
-					 <td>40</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
-					 <td>INT</td>
-					 <td>10</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td><p>FK to groups omitted, implied relationship</p></td>
-					</tr>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td>description</td>
-					 <td>VARCHAR</td>
-					 <td>80</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>userAndGroup</td>
-					 <td>View</td>
-					 <td>GroupName</td>
-					 <td>VARCHAR</td>
-					 <td>16</td>
-					 <td title='nullable'>√</td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-								</tbody>
+				<tbody/>
 				</table>				
 			</div>
 		</div>	
       </section>
 	  <script>
+		  var tableData = [
+          {
+		      "tableName":"user",
+              "tableType":"Table",
+			  "keyClass":"indexedColumn",
+			  "keyTitle":"Indexed",
+			  "name":"<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>email",
+              "type":"VARCHAR",
+              "length":"40",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"group",
+              "tableType":"Table",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"description",
+              "type":"VARCHAR",
+              "length":"80",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"user",
+              "tableType":"Table",
+			  "keyClass":"foreignKey",
+			  "keyTitle":"Foreign Key",
+			  "name":"<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId",
+              "type":"INT",
+              "length":"10",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":"<p>FK to groups omitted, implied relationship</p>"
+          },
+          {
+		      "tableName":"group",
+              "tableType":"Table",
+			  "keyClass":"indexedColumn",
+			  "keyTitle":"Indexed",
+			  "name":"<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name",
+              "type":"VARCHAR",
+              "length":"16",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"user",
+              "tableType":"Table",
+			  "keyClass":"primaryKey",
+			  "keyTitle":"Primary Key",
+			  "name":"<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>userId",
+              "type":"INT",
+              "length":"10",
+              "nullable":"",
+              "autoUpdated":"√",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"user",
+              "tableType":"Table",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"name",
+              "type":"VARCHAR",
+              "length":"16",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":"<p>UserName</p>"
+          },
+          {
+		      "tableName":"userAndGroup",
+              "tableType":"View",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"GroupName",
+              "type":"VARCHAR",
+              "length":"16",
+              "nullable":"√",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"group",
+              "tableType":"Table",
+			  "keyClass":"primaryKey",
+			  "keyTitle":"Primary Key",
+			  "name":"<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId",
+              "type":"INT",
+              "length":"10",
+              "nullable":"",
+              "autoUpdated":"√",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"userAndGroup",
+              "tableType":"View",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"UserName",
+              "type":"VARCHAR",
+              "length":"16",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":"<p>UserName</p>"
+          },
+		  ];
           var config = {
 	          pagination: true
-          }
+          };
 	  </script>    
   </div>
   <!-- /.content-wrapper -->

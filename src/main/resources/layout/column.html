@@ -22,33 +22,36 @@
 					  <th>Column</th>
 					  <th>Type</th>
 					  <th>Size</th>
-					  <th title='Are nulls allowed?'>Nulls</th>
+					  <th title='Are nulls allowed?'>Nullable</th>
 					  <th title='Is column automatically updated?'>Auto</th>
 					  <th title='Default value'>Default</th>
 					  <th title='Comments' class="toggle"><span>Comments</span></th>
 					</tr>
 				</thead>
-				<tbody>
-				{{#columns}}
-					<tr>
-					 <td>{{column.table.name}}</td>
-					 <td>{{column.table.type}}</td>
-					 <td{{{key}}}>{{{keyIcon}}}{{column.name}}</td>
-					 <td>{{column.typeName}}</td>
-					 <td>{{column.length}}</td>
-					 <td title='{{titleNullable}}'>{{nullable}}</td>
-					 <td title='{{titleAutoUpdated}}'>{{autoUpdated}}</td>
-					 <td>{{defaultValue}}</td>
-					 <td>{{{comments}}}</td>
-					</tr>
-				{{/columns}}				
-				</tbody>
+				<tbody/>
 				</table>				
 			</div>
 		</div>	
       </section>
 	  <script>
+		  var tableData = [
+		      {{#columns}}
+          {
+		      "tableName":"{{column.table.name}}",
+              "tableType":"{{column.table.type}}",
+			  "keyClass":"{{keyClass}}",
+			  "keyTitle":"{{keyTitle}}",
+			  "name":"{{{keyIcon}}}{{column.name}}",
+              "type":"{{column.typeName}}",
+              "length":"{{column.length}}",
+              "nullable":"{{nullable}}",
+              "autoUpdated":"{{autoUpdated}}",
+			  "defaultValue":"{{defaultValue}}",
+			  "comments":"{{{comments}}}"
+          },
+          	{{/columns}}
+		  ];
           var config = {
 	          pagination: {{paginationEnabled}}
-          }
+          };
 	  </script>

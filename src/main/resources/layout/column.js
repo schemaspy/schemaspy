@@ -16,13 +16,52 @@ $.fn.dataTable.ext.search.push(
 $(document).ready(function() {
 	var activeObject;
     var table = $('#column_table').DataTable( {
-        lengthChange: false,		
-		bSort: true,
+        deferRender: true,
+		data: tableData,
+        columns: [
+            { data: "tableName" },
+            { data: "tableType" },
+            { data: "name" },
+            { data: "type" },
+            { data: "length" },
+            { data: "nullable" },
+            { data: "autoUpdated" },
+            { data: "defaultValue" },
+            { data: "comments" }
+        ],
+        columnDefs: [
+            {
+                targets: 2,
+                createdCell: function(td, cellData, rowData, row, col) {
+                    if (rowData.keyTitle.length > 0) {
+                        $(td).prop('title', rowData.keyTitle);
+                    }
+                    if (rowData.keyClass.length > 0) {
+                        $(td).addClass(rowData.keyClass);
+                    }
+                }
+            },
+            {
+                targets: 5,
+                createdCell: function(td, cellData, rowData, row, col) {
+                    if (cellData == '√') {
+                        $(td).prop('title', "nullable");
+                    }
+                }
+            },
+            {
+                targets: 6,
+                createdCell: function(td, cellData, rowData, row, col) {
+                    if (cellData == '√') {
+                        $(td).prop('title', "Automatically updated by the database");
+                    }
+                }
+            }
+        ],
+        lengthChange: false,
 		paging: config.pagination,
 		pageLength: 50,
 		autoWidth: true,
-		bDeferRender: true,
-		bProcessing: true,
 		order: [[ 2, "asc" ]],		
 		buttons: [ 
 					{

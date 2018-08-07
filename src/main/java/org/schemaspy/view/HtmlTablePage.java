@@ -80,7 +80,7 @@ public class HtmlTablePage {
         }
 
         for (TableColumn column : table.getColumns()) {
-            tableColumns.add(new MustacheTableColumn(column, indexes, mustacheCompiler.getRootPath(1)));
+            tableColumns.add(new MustacheTableColumn(column, indexes.contains(column), mustacheCompiler.getRootPath(1)));
         }
 
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
