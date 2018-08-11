@@ -23,21 +23,17 @@ import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.schemaspy.integrationtesting.pgsql.PgSqlCheckConstraintsIT;
+import org.schemaspy.integrationtesting.pgsql.PgSqlRelationshipErrorIT;
 import org.schemaspy.integrationtesting.pgsql.PgSqlRoutinesIT;
+import org.schemaspy.testing.SQLScriptsRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.jdbc.ext.ScriptUtils;
-import org.testcontainers.shaded.com.google.common.base.Charsets;
-import org.testcontainers.shaded.com.google.common.io.Resources;
-
-import javax.script.ScriptException;
-import java.io.IOException;
-import java.net.URL;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         PgSqlCheckConstraintsIT.class,
+        PgSqlRelationshipErrorIT.class,
         PgSqlRoutinesIT.class
 })
 public class PgSqlSuite {
@@ -47,15 +43,5 @@ public class PgSqlSuite {
             new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withInitFunctions(connection -> {
-                        URL resource = Resources.getResource("integrationTesting/pgsql/dbScripts/dvdrental.sql");
-                        try {
-                            String sql = Resources.toString(resource, Charsets.UTF_8);
-                            ScriptUtils.executeSqlScript(connection, resource.getPath(), sql, false, true, ScriptUtils.DEFAULT_COMMENT_PREFIX, "\n\n\n", ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER, ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
-                        } catch (ScriptException e) {
-                            throw new RuntimeException(e);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+                    .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/", "\n\n\n"));
 }

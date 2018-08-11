@@ -17,30 +17,11 @@ SET client_min_messages = warning;
 
 SET search_path = public, pg_catalog;
 
-DROP EXTENSION plpgsql;
-DROP SCHEMA public;
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
---
-
-CREATE SCHEMA public;
-
-
-ALTER SCHEMA public OWNER TO test;
-
 --
 -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
 --
 
 COMMENT ON SCHEMA public IS 'Standard public schema';
-
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
 
 --
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
