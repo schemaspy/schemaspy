@@ -46,10 +46,23 @@ import java.sql.SQLException;
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Nils Petzaell
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext
-public class PgSqlRoutinesIT {
+public class PgSqlRelationshipErrorIT {
+
+    @ClassRule
+    public static JdbcContainerRule<PostgreSQLContainer> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<>(
+                    PgSqlSuite.jdbcContainerRule,
+                    new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10"))
+                            .assumeDockerIsPresent()
+                            .withAssumptions(assumeDriverIsPresent())
+                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/relationship_error.sql", "\n\n\n"))
+            );
 
     @Autowired
     private SqlService sqlService;
@@ -65,16 +78,6 @@ public class PgSqlRoutinesIT {
 
     private static Database database;
 
-    @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
-                    PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/dvdrental.sql", "\n\n\n"))
-            );
-
     @Before
     public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
         if (database == null) {
@@ -86,9 +89,9 @@ public class PgSqlRoutinesIT {
         String[] args = {
                 "-t", "pgsql",
                 "-db", "test",
-                "-s", "public",
-                "-cat", "%",
-                "-o", "target/integrationtesting/pgsqlroutines",
+                "-cat", "test",
+                "-s", "org_cendra_person",
+                "-o", "target/pgsqlrelationship_error",
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
@@ -108,23 +111,7 @@ public class PgSqlRoutinesIT {
     }
 
     @Test
-    public void databaseShouldExist() {
-        assertThat(database).isNotNull();
-        assertThat(database.getName()).isEqualToIgnoringCase("test");
-    }
-
-    @Test
-    public void databaseShouldHave8Routines() {
-        assertThat(database.getRoutines().size()).isEqualTo(10);
-    }
-
-    @Test
-    public void routinFilmInStockHasComment() {
-        assertThat(database.getRoutinesMap().get("film_in_stock").getComment()).isEqualToIgnoringCase("Current stock");
-    }
-
-    @Test
-    public void routineFilmInStockHas3Parameters() {
-        assertThat(database.getRoutinesMap().get("film_in_stock").getParameters().size()).isEqualTo(3);
+    public void onlyHasSingleRemoteTable() {
+        assertThat(database.getRemoteTables().size()).isEqualTo(1);
     }
 }

@@ -32,19 +32,15 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
+import org.schemaspy.testing.SQLScriptsRunner;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.jdbc.ext.ScriptUtils;
-import org.testcontainers.shaded.com.google.common.base.Charsets;
-import org.testcontainers.shaded.com.google.common.io.Resources;
 
-import javax.script.ScriptException;
 import java.io.IOException;
-import java.net.URL;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -76,17 +72,7 @@ public class PgSqlCheckConstraintsIT {
                     new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(connection -> {
-                                URL resource = Resources.getResource("integrationTesting/pgsql/dbScripts/dvdrental.sql");
-                                try {
-                                    String sql = Resources.toString(resource, Charsets.UTF_8);
-                                    ScriptUtils.executeSqlScript(connection, resource.getPath(), sql, false, true, ScriptUtils.DEFAULT_COMMENT_PREFIX, "\n\n\n", ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER, ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
-                                } catch (ScriptException e) {
-                                    throw new RuntimeException(e);
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            })
+                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/dvdrental.sql", "\n\n\n"))
             );
 
     @Before

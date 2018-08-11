@@ -50,9 +50,16 @@ public class SQLScriptsRunner implements Consumer<Connection> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final String initScriptDir;
+    private final String statementSeparator;
 
     public SQLScriptsRunner(String initScriptDir) {
         this.initScriptDir = initScriptDir;
+        this.statementSeparator = ScriptUtils.DEFAULT_STATEMENT_SEPARATOR;
+    }
+
+    public SQLScriptsRunner(String initScriptDir, String statementSeparator) {
+        this.initScriptDir = initScriptDir;
+        this.statementSeparator = statementSeparator;
     }
 
     @Override
@@ -62,7 +69,7 @@ public class SQLScriptsRunner implements Consumer<Connection> {
             for (URL resource : initScripts) {
                 try {
                     String sql = Resources.toString(resource, Charsets.UTF_8);
-                    ScriptUtils.executeSqlScript(connection, resource.getPath(), sql);
+                    ScriptUtils.executeSqlScript(connection, resource.getPath(), sql, false, false, ScriptUtils.DEFAULT_COMMENT_PREFIX, statementSeparator, ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER, ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
                 } catch (IOException | IllegalArgumentException e) {
                     LOGGER.error("Could not load classpath init script: {}", resource.getPath());
                     throw new InitScriptException("Could not load classpath init script: " + resource.getPath(), e);
