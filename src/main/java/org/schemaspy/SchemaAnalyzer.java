@@ -39,8 +39,8 @@ import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.util.Dot;
-import org.schemaspy.util.LineWriter;
 import org.schemaspy.util.ResourceWriter;
+import org.schemaspy.util.Writers;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.file.Files;
@@ -268,8 +269,8 @@ public class SchemaAnalyzer {
     }
 
     private void writeOrders(File outputDir, List<Table> orderedTables) throws IOException {
-        LineWriter out;
-        out = new LineWriter(new File(outputDir, "insertionOrder.txt"), 16 * 1024, Config.DOT_CHARSET);
+        PrintWriter out;
+        out = Writers.newPrintWriter(new File(outputDir, "insertionOrder.txt"));
         try {
             TextFormatter.getInstance().write(orderedTables, false, out);
         } catch (IOException e) {
@@ -278,7 +279,7 @@ public class SchemaAnalyzer {
             out.close();
         }
 
-        out = new LineWriter(new File(outputDir, "deletionOrder.txt"), 16 * 1024, Config.DOT_CHARSET);
+        out = Writers.newPrintWriter(new File(outputDir, "deletionOrder.txt"));
         try {
             Collections.reverse(orderedTables);
             TextFormatter.getInstance().write(orderedTables, false, out);
@@ -290,7 +291,7 @@ public class SchemaAnalyzer {
     }
 
     private void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
-        LineWriter out;
+        PrintWriter out;
         LOGGER.info("Gathered schema details in {} seconds", duration / 1000);
         LOGGER.info("Writing/graphing summary");
 
@@ -312,7 +313,7 @@ public class SchemaAnalyzer {
 
         // generate the compact form of the relationships .dot file
         String dotBaseFilespec = "relationships";
-        out = new LineWriter(new File(summaryDir, dotBaseFilespec + ".real.compact.dot"), Config.DOT_CHARSET);
+        out = Writers.newPrintWriter(new File(summaryDir, dotBaseFilespec + ".real.compact.dot"));
         WriteStats stats = new WriteStats(tables);
         DotFormatter.getInstance().writeRealRelationships(db, tables, true, showDetailedTables, stats, out, outputDir);
         boolean hasRealRelationships = stats.getNumTablesWritten() > 0 || stats.getNumViewsWritten() > 0;
@@ -321,7 +322,7 @@ public class SchemaAnalyzer {
         if (hasRealRelationships) {
             // real relationships exist so generate the 'big' form of the relationships .dot file
             progressListener.graphingSummaryProgressed();
-            out = new LineWriter(new File(summaryDir, dotBaseFilespec + ".real.large.dot"), Config.DOT_CHARSET);
+            out = Writers.newPrintWriter(new File(summaryDir, dotBaseFilespec + ".real.large.dot"));
             DotFormatter.getInstance().writeRealRelationships(db, tables, false, showDetailedTables, stats, out, outputDir);
             out.close();
         }
@@ -339,14 +340,14 @@ public class SchemaAnalyzer {
         progressListener.graphingSummaryProgressed();
 
         File impliedDotFile = new File(summaryDir, dotBaseFilespec + ".implied.compact.dot");
-        out = new LineWriter(impliedDotFile, Config.DOT_CHARSET);
+        out = Writers.newPrintWriter(impliedDotFile);
         boolean hasImplied = DotFormatter.getInstance().writeAllRelationships(db, tables, true, showDetailedTables, stats, out, outputDir);
 
         Set<TableColumn> excludedColumns = stats.getExcludedColumns();
         out.close();
         if (hasImplied) {
             impliedDotFile = new File(summaryDir, dotBaseFilespec + ".implied.large.dot");
-            out = new LineWriter(impliedDotFile, Config.DOT_CHARSET);
+            out = Writers.newPrintWriter(impliedDotFile);
             DotFormatter.getInstance().writeAllRelationships(db, tables, false, showDetailedTables, stats, out, outputDir);
             out.close();
         } else {

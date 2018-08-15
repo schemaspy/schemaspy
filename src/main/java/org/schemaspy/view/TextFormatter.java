@@ -20,9 +20,9 @@
 package org.schemaspy.view;
 
 import org.schemaspy.model.Table;
-import org.schemaspy.util.LineWriter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
 
 /**
@@ -41,10 +41,10 @@ public class TextFormatter {
         return instance;
     }
 
-    public void write(Collection<Table> tables, boolean includeViews, LineWriter out) throws IOException {
+    public void write(Collection<Table> tables, boolean includeViews, PrintWriter out) throws IOException {
         for (Table table : tables) {
             if (!table.isView() || includeViews)
-                out.writeln(table.getName());
+                out.println(table.getName());
         }
     }
 }

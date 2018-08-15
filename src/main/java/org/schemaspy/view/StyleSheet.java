@@ -23,13 +23,13 @@ package org.schemaspy.view;
 
 import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.util.LineWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
 
@@ -161,7 +161,7 @@ public class StyleSheet {
      * @param out
      * @throws IOException
      */
-    public void write(LineWriter out) throws IOException {
+    public void write(Writer out) throws IOException {
         out.write(css);
     }
 
