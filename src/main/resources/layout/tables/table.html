@@ -10,15 +10,15 @@
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                 </button>
                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>			  
+              </div>
             </div>
             <!-- /.box-header -->
             <div class="box-body clearfix">
-				<p>{{{comments}}}</p>              
+				<p>{{{comments}}}</p>
             </div>
             <!-- /.box-body -->
 		</div>
-		{{/comments}}		
+		{{/comments}}
       </section>
       <!-- Main content -->
       <section class="content">
@@ -72,7 +72,7 @@
 					</td>
 				   </tr>
 				   {{/children}}
-				  </table>				 
+				  </table>
 				 </td>
 				 <td>
 				  <table border='0' cellspacing='0' cellpadding='0'>
@@ -86,18 +86,18 @@
 					</td>
 				   </tr>
 				   {{/parents}}
-				  </table>					 
+				  </table>
 				 </td>
 				 <td>{{{comments}}}</td>
 				</tr>
-				{{/columns}}				
+				{{/columns}}
 				</tbody>
 				</table>
 				<p title='{{table.columns.size}} columns'>Table contained <span id="recordNumber">{{table.numRows}}</span> rows<p/>
 			</div>
 		</div>
 		{{#indexExists}}
-		<div class="box box-primary">		
+		<div class="box box-primary">
 			<div class="box-header with-border">
               <i class="fa fa-sitemap"></i>
 
@@ -126,16 +126,16 @@
 				  <td>{{index.type}}</td>
 				  <td>{{{index.sortAsString}}}</td>
 				  <td>{{index.columnsAsString}}</td>
-				 </tr>				 
+				 </tr>
 				 {{/indexes}}
 				</tbody>
-				</table>   			  
+				</table>
 			</div><!-- /.box-body -->
 		</div>
 		{{/indexExists}}
 		{{#graphvizExists}}
-		{{#diagramExists}}		
-		<div class="box box-primary">		
+		{{#diagramExists}}
+		<div class="box box-primary">
 			<div class="box-header with-border">
               <i class="fa fa-code-fork"></i>
 
@@ -147,22 +147,22 @@
                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
               </div>
             </div>	
-			<div class="box-body">	
+			<div class="box-body">
 			<div class="nav-tabs-custom" style="cursor: move;">
             <!-- Tabs within a box -->
 			<h5>Close relationships within degrees of separation</h5>
             <ul class="nav nav-tabs pull-left ui-sortable-handle">
-			  {{#diagrams}}			  			
-              <li class="{{active}}"><a href="#{{id}}-chart" data-toggle="tab" aria-expanded="true">{{name}}</a></li>			  			 
+			  {{#diagrams}}
+              <li class="{{active}}"><a href="#{{id}}-chart" data-toggle="tab" aria-expanded="true">{{name}}</a></li>
 			  {{/diagrams}}
             </ul>
             <div class="tab-content no-padding">            
 				{{#diagrams}}
-				<div class="chart tab-pane {{active}}" id="{{id}}-chart" style="position: relative; overflow-x:auto;">					
+				<div class="chart tab-pane {{active}}" id="{{id}}-chart" style="position: relative; overflow-x:auto;">
 					{{{map}}}
-					<a name='diagram'><img id='{{id}}' src='../diagrams/{{fileName}}' usemap='#{{mapName}}' class='diagram' border='0' alt='' align='left'></a>							
+					<a name='diagram'><img id='{{id}}' src='../diagrams/{{fileName}}' usemap='#{{mapName}}' class='diagram' border='0' alt='' align='left'></a>
 				</div>
-			  	{{/diagrams}}			  
+			  	{{/diagrams}}
 			</div>
 			</div>
 		  </div><!-- /.box-body -->
@@ -175,10 +175,10 @@
 			<h4><i class="icon fa fa-warning"></i> Graphviz Needed!</h4>
 			<p>SchemaSpy was unable to generate a diagram of table relationships.</br>
 			SchemaSpy requires Graphviz {{graphvizVersion}} from <a href='http://www.graphviz.org' target='_blank'>www.graphviz.org</a>.</p>
-	    </div>                   	
+	    </div>
 		{{/graphvizExists}}
 		{{#definitionExists}}
-		<div class="box box-primary">		
+		<div class="box box-primary">
 			<div class="box-header with-border">
 			  <i class="fa fa-file-code-o"></i>
 
@@ -207,8 +207,8 @@
 					  </ul>
 					</div>
 					<!-- /.box-body -->
-				 </div>					
-			</div><!-- /.box-body -->			
-		</div>		
-		{{/definitionExists}}	
+				 </div>
+			</div><!-- /.box-body -->
+		</div>
+		{{/definitionExists}}
       </section>

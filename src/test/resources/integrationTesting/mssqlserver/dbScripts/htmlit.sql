@@ -39,3 +39,8 @@ CREATE TABLE [htmlit].[group_resources] (
 
 CREATE VIEW htmlit.userAndGroup AS SELECT u.name AS UserName, g.name AS GroupName FROM [htmlit].[user] u JOIN [htmlit].[group] g ON u.groupId = g.groupId;
 
+EXEC sys.sp_addextendedproperty
+    @name=N'MS_Description',
+    @value=N'Unicode: ộ' ,
+    @level0type=N'SCHEMA',@level0name=N'htmlit',
+    @level1type=N'TABLE',@level1name=N'group'
