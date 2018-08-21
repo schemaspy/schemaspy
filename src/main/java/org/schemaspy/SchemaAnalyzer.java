@@ -165,12 +165,26 @@ public class SchemaAnalyzer {
             }
 
             prepareLayoutFiles(outputDir);
-            HtmlMultipleSchemasIndexPage.getInstance().write(outputDir, dbName, mustacheCatalog, mustacheSchemas, meta);
+            HtmlMultipleSchemasIndexPage.getInstance().write(outputDir, dbName, mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta));
 
             return db;
         } catch (Config.MissingRequiredParameterException missingParam) {
             config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
             return null;
+        }
+    }
+
+    /**
+     * Copy / paste from Database, but we can't use Database here...
+     *
+     * @param meta DatabaseMetaData
+     * @return String
+     */
+    private String getDatabaseProduct(DatabaseMetaData meta) {
+        try {
+            return meta.getDatabaseProductName() + " - " + meta.getDatabaseProductVersion();
+        } catch (SQLException exc) {
+            return "";
         }
     }
 
@@ -402,9 +416,9 @@ public class SchemaAnalyzer {
      * @param outputDir File
      * @throws IOException when not possible to copy layout files to outputDir
      */
-    private void prepareLayoutFiles(File outputDir) throws IOException {
+    private static void prepareLayoutFiles(File outputDir) throws IOException {
         URL url = null;
-        Enumeration<URL> possibleResources = getClass().getClassLoader().getResources("layout");
+        Enumeration<URL> possibleResources = SchemaAnalyzer.class.getClassLoader().getResources("layout");
         while (possibleResources.hasMoreElements() && Objects.isNull(url)) {
             URL possibleResource = possibleResources.nextElement();
             if (!possibleResource.getPath().contains("test-classes")) {

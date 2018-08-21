@@ -4,6 +4,17 @@
 			<h4>SchemaSpy Analysis of {{databaseName}}</h4>
 			<p>Generated on {{connectTime}}</p>
 		</div>
+		{{#description}}
+		<div class="row">
+			<div class="col-md-12">
+				<div class="box box-solid">
+					<div class="box-body">
+						<p>{{{description}}}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		{{/description}}
       </section>
       <!-- Main content -->
       <section class="content">
