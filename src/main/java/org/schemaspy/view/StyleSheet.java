@@ -23,14 +23,14 @@ package org.schemaspy.view;
 
 import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
+import org.schemaspy.util.ResourceFinder;
+import org.schemaspy.util.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -46,6 +46,8 @@ import java.util.*;
 public class StyleSheet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static final ResourceFinder resourceFinder = new ResourceFinder();
 
     private static StyleSheet instance;
     private final String css;
@@ -124,16 +126,25 @@ public class StyleSheet {
             try {
                 if (new File(cssFilename).exists()) {
                     LOGGER.info("Using external StyleSheet file: {}", cssFilename);
-                    instance = new StyleSheet(new BufferedReader(MustacheWriter.getReader(null, cssFilename)));
+                    instance = new StyleSheet(new BufferedReader(getReader(null, cssFilename)));
                 } else {
-                    instance = new StyleSheet(new BufferedReader(MustacheWriter.getReader(templateDirectory, cssFilename)));
+                    instance = new StyleSheet(new BufferedReader(getReader(templateDirectory, cssFilename)));
                 }
             } catch (IOException exc) {
-                throw new ParseException(exc);
+                throw new ParseException("Unable to find css '" + cssFilename + "' or same file in '" + templateDirectory + "'" , exc);
             }
         }
 
         return instance;
+    }
+
+    private static Reader getReader(String parent, String fileName) {
+        try {
+            InputStream inputStream = resourceFinder.find(parent, fileName);
+            return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        } catch (ResourceNotFoundException rnfe) {
+            throw new ParseException("Unable to find requested file: " + fileName + " in directory " + parent, rnfe);
+        }
     }
 
     private Map<String, String> parseAttributes(String data) {
@@ -252,15 +263,8 @@ public class StyleSheet {
         /**
          * @param cause root exception that caused the failure
          */
-        public ParseException(Exception cause) {
-            super(cause);
-        }
-
-        /**
-         * @param msg textual description of the failure
-         */
-        public ParseException(String msg) {
-            super(msg);
+        public ParseException(String message, Exception cause) {
+            super(message, cause);
         }
     }
 }

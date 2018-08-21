@@ -26,9 +26,7 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import org.schemaspy.Config;
-import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.ResourceFinder;
-import org.schemaspy.util.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +107,7 @@ public class MustacheWriter {
         }
     }
 
-    private Reader getReader(String fileName) throws IOException {
+    private Reader getReader(String fileName) {
         String parent = templateDirectory;
         return getReader(parent, fileName);
     }
@@ -131,24 +129,9 @@ public class MustacheWriter {
      * @throws IOException
      */
 
-    public static Reader getReader(String parent, String fileName) throws IOException {
-        try {
-            InputStream inputStream = resourceFinder.find(parent, fileName);
-            return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        } catch (ResourceNotFoundException rnfe) {
-            throw new ParseException("Unable to find requested file: " + fileName + " in directory " + parent, rnfe);
-        }
-    }
-
-    /**
-     * Indicates an exception in parsing the css
-     */
-    public static class ParseException extends InvalidConfigurationException {
-        private static final long serialVersionUID = 1L;
-
-        public ParseException(String msg, Throwable cause) {
-            super(msg, cause);
-        }
+    private static Reader getReader(String parent, String fileName) {
+        InputStream inputStream = resourceFinder.find(parent, fileName);
+        return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
     }
 
 }
