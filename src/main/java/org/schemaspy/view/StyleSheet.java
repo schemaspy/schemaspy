@@ -61,11 +61,7 @@ public class StyleSheet {
     private String bodyBackgroundColor;
     private String tableHeadBackgroundColor;
     private String tableBackgroundColor;
-    private String linkColor;
-    private String linkVisitedColor;
-    private String primaryKeyBackgroundColor;
     private String indexedColumnBackgroundColor;
-    private String selectedTableBackgroundColor;
     private String excludedColumnBackgroundColor;
 
     private StyleSheet(String cssContent) {
@@ -110,18 +106,10 @@ public class StyleSheet {
             tableHeadBackgroundColor = attribs.get(BACKGROUND_COLOR);
         else if ("td.diagram".equals(id))
             tableBackgroundColor = attribs.get(BACKGROUND_COLOR);
-        else if (".diagram .primarykey".equals(id))
-            primaryKeyBackgroundColor = attribs.get(BACKGROUND);
         else if (".diagram .indexedcolumn".equals(id))
             indexedColumnBackgroundColor = attribs.get(BACKGROUND);
-        else if (".selectedtable".equals(id))
-            selectedTableBackgroundColor = attribs.get(BACKGROUND);
         else if (".excludedcolumn".equals(id))
             excludedColumnBackgroundColor = attribs.get(BACKGROUND);
-        else if ("a:link".equals(id))
-            linkColor = attribs.get(COLOR);
-        else if ("a:visited".equals(id))
-            linkVisitedColor = attribs.get(COLOR);
     }
 
     /**
@@ -191,16 +179,6 @@ public class StyleSheet {
         return attribs;
     }
 
-    /**
-     * Write the contents of the original css to <code>out</code>.
-     *
-     * @param out
-     * @throws IOException
-     */
-    public void write(Writer out) throws IOException {
-        out.write(css);
-    }
-
     public String getBodyBackground() {
         if (bodyBackgroundColor == null)
             throw new MissingCssPropertyException(".diagram", BACKGROUND);
@@ -222,13 +200,6 @@ public class StyleSheet {
         return tableHeadBackgroundColor;
     }
 
-    public String getPrimaryKeyBackground() {
-        if (primaryKeyBackgroundColor == null)
-            throw new MissingCssPropertyException(".diagram .primaryKey", BACKGROUND);
-
-        return primaryKeyBackgroundColor;
-    }
-
     public String getIndexedColumnBackground() {
         if (indexedColumnBackgroundColor == null)
             throw new MissingCssPropertyException(".diagram .indexedColumn", BACKGROUND);
@@ -236,12 +207,6 @@ public class StyleSheet {
         return indexedColumnBackgroundColor;
     }
 
-    public String getSelectedTableBackground() {
-        if (selectedTableBackgroundColor == null)
-            throw new MissingCssPropertyException(".selectedTable", BACKGROUND);
-
-        return selectedTableBackgroundColor;
-    }
 
     public String getExcludedColumnBackgroundColor() {
         if (excludedColumnBackgroundColor == null)
@@ -250,19 +215,7 @@ public class StyleSheet {
         return excludedColumnBackgroundColor;
     }
 
-    public String getLinkColor() {
-        if (linkColor == null)
-            throw new MissingCssPropertyException("a:link", COLOR);
 
-        return linkColor;
-    }
-
-    public String getLinkVisitedColor() {
-        if (linkVisitedColor == null)
-            throw new MissingCssPropertyException("a:visited", COLOR);
-
-        return linkVisitedColor;
-    }
 
     /**
      * Indicates that a css property was missing
