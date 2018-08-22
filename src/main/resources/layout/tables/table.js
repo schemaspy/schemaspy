@@ -79,6 +79,7 @@ if (null != codeElement) {
 		smartIndent: true,
 		lineNumbers: true,
 		matchBrackets: true,
-		autofocus: true
+		autofocus: true,
+        readOnly: true
 	});
 }
