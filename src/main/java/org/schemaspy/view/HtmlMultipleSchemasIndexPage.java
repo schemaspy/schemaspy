@@ -22,9 +22,8 @@
 package org.schemaspy.view;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,9 +53,9 @@ public class HtmlMultipleSchemasIndexPage extends HtmlFormatter {
     }
 
 
-    public void write(File outputDir, String dbName, MustacheCatalog catalog, List<MustacheSchema> schemas, String description, String productName) throws IOException {
+    public void write(File outputDir, String dbName, MustacheCatalog catalog, List<MustacheSchema> schemas, String description, String productName) {
 
-        String connectTime = new SimpleDateFormat("EEE MMM dd HH:mm z yyyy").format(new Date());
+        String connectTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("EEE MMM dd HH:mm z yyyy"));
 
         HashMap<String, Object> scopes = new HashMap<>();
         scopes.put("databaseName", dbName);

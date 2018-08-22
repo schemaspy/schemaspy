@@ -21,7 +21,6 @@ package org.schemaspy.view;
 
 import org.schemaspy.model.Table;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 
@@ -41,7 +40,7 @@ public class TextFormatter {
         return instance;
     }
 
-    public void write(Collection<Table> tables, boolean includeViews, PrintWriter out) throws IOException {
+    public void write(Collection<Table> tables, boolean includeViews, PrintWriter out) {
         for (Table table : tables) {
             if (!table.isView() || includeViews)
                 out.println(table.getName());
