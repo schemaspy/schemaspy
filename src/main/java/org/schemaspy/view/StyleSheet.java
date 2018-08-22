@@ -33,6 +33,8 @@ import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static org.schemaspy.view.StyleSheetConst.*;
+
 /**
  * Represents our CSS style sheet (CSS) with accessors for important
  * data from that style sheet.
@@ -42,6 +44,7 @@ import java.util.*;
  * @author John Currier
  * @author Thomas Traude
  * @author Daniel Watt
+ * @author Nils Petzäll
  */
 public class StyleSheet {
 
@@ -74,11 +77,11 @@ public class StyleSheet {
 
         css = data.toString();
 
-        int startComment = data.indexOf("/*");
+        int startComment = data.indexOf(START_COMMENT);
         while (startComment != -1) {
-            int endComment = data.indexOf("*/");
-            data.replace(startComment, endComment + 2, "");
-            startComment = data.indexOf("/*");
+            int endComment = data.indexOf(END_COMMENT);
+            data.replace(startComment, endComment + END_COMMENT.length(), "");
+            startComment = data.indexOf(START_COMMENT);
         }
 
         StringTokenizer tokenizer = new StringTokenizer(data.toString(), "{}");
@@ -90,24 +93,24 @@ public class StyleSheet {
                 ids.add(id);
             } else {
                 Map<String, String> attribs = parseAttributes(token);
-                if (id.equals(".diagram"))
-                    bodyBackgroundColor = attribs.get("background");
-                else if (id.equals("th.diagram"))
-                    tableHeadBackgroundColor = attribs.get("background-color");
-                else if (id.equals("td.diagram"))
-                    tableBackgroundColor = attribs.get("background-color");
-                else if (id.equals(".diagram .primarykey"))
-                    primaryKeyBackgroundColor = attribs.get("background");
-                else if (id.equals(".diagram .indexedcolumn"))
-                    indexedColumnBackgroundColor = attribs.get("background");
-                else if (id.equals(".selectedtable"))
-                    selectedTableBackgroundColor = attribs.get("background");
-                else if (id.equals(".excludedcolumn"))
-                    excludedColumnBackgroundColor = attribs.get("background");
-                else if (id.equals("a:link"))
-                    linkColor = attribs.get("color");
-                else if (id.equals("a:visited"))
-                    linkVisitedColor = attribs.get("color");
+                if (".diagram".equals(id))
+                    bodyBackgroundColor = attribs.get(BACKGROUND);
+                else if ("th.diagram".equals(id))
+                    tableHeadBackgroundColor = attribs.get(BACKGROUND_COLOR);
+                else if ("td.diagram".equals(id))
+                    tableBackgroundColor = attribs.get(BACKGROUND_COLOR);
+                else if (".diagram .primarykey".equals(id))
+                    primaryKeyBackgroundColor = attribs.get(BACKGROUND);
+                else if (".diagram .indexedcolumn".equals(id))
+                    indexedColumnBackgroundColor = attribs.get(BACKGROUND);
+                else if (".selectedtable".equals(id))
+                    selectedTableBackgroundColor = attribs.get(BACKGROUND);
+                else if (".excludedcolumn".equals(id))
+                    excludedColumnBackgroundColor = attribs.get(BACKGROUND);
+                else if ("a:link".equals(id))
+                    linkColor = attribs.get(COLOR);
+                else if ("a:visited".equals(id))
+                    linkVisitedColor = attribs.get(COLOR);
                 id = null;
             }
         }
@@ -119,7 +122,7 @@ public class StyleSheet {
      * @return the singleton
      * @throws ParseException
      */
-    public static StyleSheet getInstance() throws ParseException {
+    public static StyleSheet getInstance() {
         if (instance == null) {
             String cssFilename = Config.getInstance().getCss();
             String templateDirectory = Config.getInstance().getTemplateDirectory();
@@ -147,7 +150,7 @@ public class StyleSheet {
         }
     }
 
-    private Map<String, String> parseAttributes(String data) {
+    private static Map<String, String> parseAttributes(String data) {
         Map<String, String> attribs = new HashMap<>();
 
         try {
@@ -159,7 +162,7 @@ public class StyleSheet {
                 attribs.put(attribute, value);
             }
         } catch (NoSuchElementException badToken) {
-            System.err.println("Failed to extract attributes from '" + data + "'");
+            LOGGER.warn("Failed to extract attributes from '{}'", data, badToken);
             throw badToken;
         }
 
@@ -178,63 +181,63 @@ public class StyleSheet {
 
     public String getBodyBackground() {
         if (bodyBackgroundColor == null)
-            throw new MissingCssPropertyException(".diagram", "background");
+            throw new MissingCssPropertyException(".diagram", BACKGROUND);
 
         return bodyBackgroundColor;
     }
 
     public String getTableBackground() {
         if (tableBackgroundColor == null)
-            throw new MissingCssPropertyException("td", "background-color");
+            throw new MissingCssPropertyException("td", BACKGROUND_COLOR);
 
         return tableBackgroundColor;
     }
 
     public String getTableHeadBackground() {
         if (tableHeadBackgroundColor == null)
-            throw new MissingCssPropertyException("th", "background-color");
+            throw new MissingCssPropertyException("th", BACKGROUND_COLOR);
 
         return tableHeadBackgroundColor;
     }
 
     public String getPrimaryKeyBackground() {
         if (primaryKeyBackgroundColor == null)
-            throw new MissingCssPropertyException(".diagram .primaryKey", "background");
+            throw new MissingCssPropertyException(".diagram .primaryKey", BACKGROUND);
 
         return primaryKeyBackgroundColor;
     }
 
     public String getIndexedColumnBackground() {
         if (indexedColumnBackgroundColor == null)
-            throw new MissingCssPropertyException(".diagram .indexedColumn", "background");
+            throw new MissingCssPropertyException(".diagram .indexedColumn", BACKGROUND);
 
         return indexedColumnBackgroundColor;
     }
 
     public String getSelectedTableBackground() {
         if (selectedTableBackgroundColor == null)
-            throw new MissingCssPropertyException(".selectedTable", "background");
+            throw new MissingCssPropertyException(".selectedTable", BACKGROUND);
 
         return selectedTableBackgroundColor;
     }
 
     public String getExcludedColumnBackgroundColor() {
         if (excludedColumnBackgroundColor == null)
-            throw new MissingCssPropertyException(".excludedColumn", "background");
+            throw new MissingCssPropertyException(".excludedColumn", BACKGROUND);
 
         return excludedColumnBackgroundColor;
     }
 
     public String getLinkColor() {
         if (linkColor == null)
-            throw new MissingCssPropertyException("a:link", "color");
+            throw new MissingCssPropertyException("a:link", COLOR);
 
         return linkColor;
     }
 
     public String getLinkVisitedColor() {
         if (linkVisitedColor == null)
-            throw new MissingCssPropertyException("a:visited", "color");
+            throw new MissingCssPropertyException("a:visited", COLOR);
 
         return linkVisitedColor;
     }
