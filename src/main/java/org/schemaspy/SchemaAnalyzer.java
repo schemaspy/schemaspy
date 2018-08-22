@@ -283,24 +283,13 @@ public class SchemaAnalyzer {
     }
 
     private void writeOrders(File outputDir, List<Table> orderedTables) throws IOException {
-        PrintWriter out;
-        out = Writers.newPrintWriter(new File(outputDir, "insertionOrder.txt"));
-        try {
+        try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "insertionOrder.txt"))) {
             TextFormatter.getInstance().write(orderedTables, false, out);
-        } catch (IOException e) {
-            throw new IOException(e);
-        } finally {
-            out.close();
         }
 
-        out = Writers.newPrintWriter(new File(outputDir, "deletionOrder.txt"));
-        try {
-            Collections.reverse(orderedTables);
+        Collections.reverse(orderedTables);
+        try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "deletionOrder.txt"))){
             TextFormatter.getInstance().write(orderedTables, false, out);
-        } catch (IOException e) {
-            throw new IOException(e);
-        } finally {
-            out.close();
         }
     }
 
