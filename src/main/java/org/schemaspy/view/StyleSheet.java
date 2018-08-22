@@ -2,6 +2,7 @@
  * Copyright (C) 2004 - 2011 John Currier
  * Copyright (C) 2017 Thomas Traude
  * Copyright (C) 2017 Daniel Watt
+ * Copyright (c) 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -31,7 +32,10 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 
 import static org.schemaspy.view.StyleSheetConst.*;
 
@@ -44,7 +48,7 @@ import static org.schemaspy.view.StyleSheetConst.*;
  * @author John Currier
  * @author Thomas Traude
  * @author Daniel Watt
- * @author Nils Petzäll
+ * @author Nils Petzaell
  */
 public class StyleSheet {
 
@@ -63,19 +67,31 @@ public class StyleSheet {
     private String indexedColumnBackgroundColor;
     private String selectedTableBackgroundColor;
     private String excludedColumnBackgroundColor;
-    private final List<String> ids = new ArrayList<>();
 
-    private StyleSheet(BufferedReader cssReader) throws IOException {
-        String lineSeparator = System.getProperty("line.separator");
-        StringBuilder data = new StringBuilder();
-        String line;
+    private StyleSheet(String cssContent) {
+        css = cssContent;
+        parseCss();
+    }
 
-        while ((line = cssReader.readLine()) != null) {
-            data.append(line);
-            data.append(lineSeparator);
+    private void parseCss() {
+        String cssNoComments = removeComments();
+
+        StringTokenizer tokenizer = new StringTokenizer(cssNoComments, "{}");
+        String id = null;
+        while (tokenizer.hasMoreTokens()) {
+            String token = tokenizer.nextToken().trim();
+            if (id == null) {
+                id = token.toLowerCase();
+            } else {
+                Map<String, String> attribs = parseAttributes(token);
+                bindAttribute(id, attribs);
+                id = null;
+            }
         }
+    }
 
-        css = data.toString();
+    private String removeComments() {
+        StringBuilder data = new StringBuilder(css);
 
         int startComment = data.indexOf(START_COMMENT);
         while (startComment != -1) {
@@ -84,36 +100,28 @@ public class StyleSheet {
             startComment = data.indexOf(START_COMMENT);
         }
 
-        StringTokenizer tokenizer = new StringTokenizer(data.toString(), "{}");
-        String id = null;
-        while (tokenizer.hasMoreTokens()) {
-            String token = tokenizer.nextToken().trim();
-            if (id == null) {
-                id = token.toLowerCase();
-                ids.add(id);
-            } else {
-                Map<String, String> attribs = parseAttributes(token);
-                if (".diagram".equals(id))
-                    bodyBackgroundColor = attribs.get(BACKGROUND);
-                else if ("th.diagram".equals(id))
-                    tableHeadBackgroundColor = attribs.get(BACKGROUND_COLOR);
-                else if ("td.diagram".equals(id))
-                    tableBackgroundColor = attribs.get(BACKGROUND_COLOR);
-                else if (".diagram .primarykey".equals(id))
-                    primaryKeyBackgroundColor = attribs.get(BACKGROUND);
-                else if (".diagram .indexedcolumn".equals(id))
-                    indexedColumnBackgroundColor = attribs.get(BACKGROUND);
-                else if (".selectedtable".equals(id))
-                    selectedTableBackgroundColor = attribs.get(BACKGROUND);
-                else if (".excludedcolumn".equals(id))
-                    excludedColumnBackgroundColor = attribs.get(BACKGROUND);
-                else if ("a:link".equals(id))
-                    linkColor = attribs.get(COLOR);
-                else if ("a:visited".equals(id))
-                    linkVisitedColor = attribs.get(COLOR);
-                id = null;
-            }
-        }
+        return data.toString();
+    }
+
+    private void bindAttribute(String id, Map<String,String> attribs) {
+        if (".diagram".equals(id))
+            bodyBackgroundColor = attribs.get(BACKGROUND);
+        else if ("th.diagram".equals(id))
+            tableHeadBackgroundColor = attribs.get(BACKGROUND_COLOR);
+        else if ("td.diagram".equals(id))
+            tableBackgroundColor = attribs.get(BACKGROUND_COLOR);
+        else if (".diagram .primarykey".equals(id))
+            primaryKeyBackgroundColor = attribs.get(BACKGROUND);
+        else if (".diagram .indexedcolumn".equals(id))
+            indexedColumnBackgroundColor = attribs.get(BACKGROUND);
+        else if (".selectedtable".equals(id))
+            selectedTableBackgroundColor = attribs.get(BACKGROUND);
+        else if (".excludedcolumn".equals(id))
+            excludedColumnBackgroundColor = attribs.get(BACKGROUND);
+        else if ("a:link".equals(id))
+            linkColor = attribs.get(COLOR);
+        else if ("a:visited".equals(id))
+            linkVisitedColor = attribs.get(COLOR);
     }
 
     /**
@@ -129,9 +137,9 @@ public class StyleSheet {
             try {
                 if (new File(cssFilename).exists()) {
                     LOGGER.info("Using external StyleSheet file: {}", cssFilename);
-                    instance = new StyleSheet(new BufferedReader(getReader(null, cssFilename)));
+                    instance = new StyleSheet(getContent(getReader(null, cssFilename)));
                 } else {
-                    instance = new StyleSheet(new BufferedReader(getReader(templateDirectory, cssFilename)));
+                    instance = new StyleSheet(getContent(getReader(templateDirectory, cssFilename)));
                 }
             } catch (IOException exc) {
                 throw new ParseException("Unable to find css '" + cssFilename + "' or same file in '" + templateDirectory + "'" , exc);
@@ -139,6 +147,20 @@ public class StyleSheet {
         }
 
         return instance;
+    }
+
+    private static String getContent(Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        String lineSeparator = System.getProperty("line.separator");
+        StringBuilder data = new StringBuilder();
+        String line;
+
+        while ((line = bufferedReader.readLine()) != null) {
+            data.append(line);
+            data.append(lineSeparator);
+        }
+
+        return data.toString();
     }
 
     private static Reader getReader(String parent, String fileName) {
