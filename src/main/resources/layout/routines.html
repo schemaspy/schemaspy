@@ -18,23 +18,25 @@
 				<table id="routine_table" class="table table-bordered table-striped dataTable" role="grid">
 				<thead align='left'>
 				<tr>
-				  <th>Name</th>
-				  <th>Type</th>
-				  <th>Language</th>
-				  <th>Deterministic</th>
-				  <th>Return Type</th>
-				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				  	<th>Name</th>
+				  	<th>Type</th>
+				  	<th>Language</th>
+				  	<th>Deterministic</th>
+				  	<th>Return Type</th>
+					<th>Security Restriction</th>
+				  	<th title='Comments' class="toggle"><span>Comments</span></th>
 				</tr>
 				</thead>
 				<tbody>
 				{{#routines}}
 				<tr>
 					<td><a href="routines/{{name}}.html">{{name}}</a></td>
-				 <td>{{type}}</td>
-				 <td>{{definitionLanguage}}</td>
-				 <td>{{deterministic}}</td>
-				 <td>{{returnType}}</td>
-				 <td>{{#md2html}}{{{comment}}}{{/md2html}}</td>
+				 	<td>{{type}}</td>
+				 	<td>{{definitionLanguage}}</td>
+				 	<td>{{deterministic}}</td>
+				 	<td>{{returnType}}</td>
+					<td>{{securityType}}</td>
+				 	<td>{{#md2html}}{{{comment}}}{{/md2html}}</td>
 				</tr>
 				{{/routines}}
 				</tbody>

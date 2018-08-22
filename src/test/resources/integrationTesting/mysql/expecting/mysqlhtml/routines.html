@@ -94,30 +94,33 @@
 				<table id="routine_table" class="table table-bordered table-striped dataTable" role="grid">
 				<thead align='left'>
 				<tr>
-				  <th>Name</th>
-				  <th>Type</th>
-				  <th>Language</th>
-				  <th>Deterministic</th>
-				  <th>Return Type</th>
-				  <th title='Comments' class="toggle"><span>Comments</span></th>
+				  	<th>Name</th>
+				  	<th>Type</th>
+				  	<th>Language</th>
+				  	<th>Deterministic</th>
+				  	<th>Return Type</th>
+					<th>Security Restriction</th>
+				  	<th title='Comments' class="toggle"><span>Comments</span></th>
 				</tr>
 				</thead>
 				<tbody>
 				<tr>
 					<td><a href="routines/no_det.html">no_det</a></td>
-				 <td>FUNCTION</td>
-				 <td>SQL</td>
-				 <td>false</td>
-				 <td>char(50)</td>
-				 <td></td>
+				 	<td>FUNCTION</td>
+				 	<td>SQL</td>
+				 	<td>false</td>
+				 	<td>char(50)</td>
+					<td>DEFINER</td>
+				 	<td></td>
 				</tr>
 				<tr>
 					<td><a href="routines/yes_det.html">yes_det</a></td>
-				 <td>FUNCTION</td>
-				 <td>SQL</td>
-				 <td>true</td>
-				 <td>char(50)</td>
-				 <td></td>
+				 	<td>FUNCTION</td>
+				 	<td>SQL</td>
+				 	<td>true</td>
+				 	<td>char(50)</td>
+					<td>DEFINER</td>
+				 	<td><p>is deterministic</p></td>
 				</tr>
 				</tbody>
 				</table>
