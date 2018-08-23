@@ -53,7 +53,7 @@ public class StackTraceLoggingIT {
     @DirtiesContext
     @Logger(value = SchemaSpyRunner.class, pattern = "%clr(%-5level) - %msg%n%debugEx")
     public void noStacktraceWhenLoggingIsOf() {
-        schemaSpyRunner.run(new String[] {"-sso","-o","somefolder", "-t", "doesnt-exist"});
+        schemaSpyRunner.run(new String[] {"-sso","-o","target/somefolder", "-t", "doesnt-exist"});
         String log = loggingRule.getLog();
         assertThat(log).isNotEmpty();
         assertThat(log).doesNotContain("Caused by: org.schemaspy.db.config.ResourceNotFoundException");
@@ -64,7 +64,7 @@ public class StackTraceLoggingIT {
     @Logger(value = SchemaSpyRunner.class, pattern = "%clr(%-5level) - %msg%n%debugEx")
     public void stacktraceWhenLoggingIsOn() {
         try {
-            schemaSpyRunner.run(new String[]{"-sso", "-o", "somefolder", "-t", "doesnt-exist", "-debug"});
+            schemaSpyRunner.run(new String[]{"-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug"});
             String log = loggingRule.getLog();
             assertThat(log).isNotEmpty();
             assertThat(log).contains("Caused by: org.schemaspy.db.config.ResourceNotFoundException");
