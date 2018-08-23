@@ -18,41 +18,42 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Rule;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.schemaspy.model.Catalog;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.io.StringWriter;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HtmlMultipleSchemasIndexPageTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private static HtmlConfig htmlConfig = mock(HtmlConfig.class);
 
-    @Test
-    public void multiMainIndexShouldHaveDescription() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        File outputDir = temporaryFolder.newFolder();
-        Files.createDirectories(outputDir.toPath());
-        HtmlMultipleSchemasIndexPage.getInstance().write(outputDir, "justADb", new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),"A Description", "JAVA_TEST 1.0");
-        String content = new String(Files.readAllBytes(outputDir.toPath().resolve("index.html")), StandardCharsets.UTF_8);
-        assertThat(content).contains("<p>A Description</p>");
+    @BeforeClass
+    public static void setup() {
+        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
     }
 
     @Test
-    public void multiMainIndexShouldNOTHaveDescription() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        File outputDir = temporaryFolder.newFolder();
-        Files.createDirectories(outputDir.toPath());
-        HtmlMultipleSchemasIndexPage.getInstance().write(outputDir, "justADb", new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),null, "JAVA_TEST 1.0");
-        String content = new String(Files.readAllBytes(outputDir.toPath().resolve("index.html")), StandardCharsets.UTF_8);
-        assertThat(content).doesNotContain("<p>A Description</p>");
+    public void multiMainIndexShouldHaveDescription() {
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("withComment", htmlConfig);
+        HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
+        StringWriter actual = new StringWriter();
+        htmlMultipleSchemasIndexPage.write(new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),"A Description", "JAVA_TEST 1.0", actual);
+        assertThat(actual.toString()).contains("<p>A Description</p>");
+    }
+
+    @Test
+    public void multiMainIndexShouldNOTHaveDescription() {
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("noComment", htmlConfig);
+        HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
+        StringWriter actual = new StringWriter();
+        htmlMultipleSchemasIndexPage.write(new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),null, "JAVA_TEST 1.0", actual);
+        assertThat(actual.toString()).doesNotContain("<p>A Description</p>");
     }
 
 }

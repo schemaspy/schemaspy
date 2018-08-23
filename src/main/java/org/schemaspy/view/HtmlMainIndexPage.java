@@ -23,15 +23,21 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.Markdown;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * The main index that contains all tables and views that were evaluated
@@ -42,28 +48,22 @@ import java.util.*;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-public class HtmlMainIndexPage extends HtmlFormatter {
-    private static HtmlMainIndexPage instance = new HtmlMainIndexPage();
+public class HtmlMainIndexPage {
 
-    /**
-     * Singleton: Don't allow instantiation
-     */
-    private HtmlMainIndexPage() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final MustacheCompiler mustacheCompiler;
+    private final String description;
+
+    public HtmlMainIndexPage(MustacheCompiler mustacheCompiler, String description) {
+        this.mustacheCompiler = mustacheCompiler;
+        this.description = description;
     }
 
-    /**
-     * Singleton accessor
-     *
-     * @return the singleton instance
-     */
-    public static HtmlMainIndexPage getInstance() {
-        return instance;
-    }
-
-    public void write(Database database, Collection<Table> tables, List<? extends ForeignKeyConstraint> impliedConstraints, File outputDir) {
+    public void write(Database database, Collection<Table> tables, List<? extends ForeignKeyConstraint> impliedConstraints, Writer writer) {
+        List<MustacheTable> mustacheTables = new ArrayList<>();
 
         long columnsAmount = 0;
-        List<MustacheTable> mustacheTables = new ArrayList<>();
 
         for(Table table: tables) {
             columnsAmount += table.getColumns().size();
@@ -73,40 +73,44 @@ public class HtmlMainIndexPage extends HtmlFormatter {
             mustacheTables.add(mustacheTable);
         }
 
+        long tablesAmount = tables.stream().filter(t -> !t.isView()).count();
         long viewsAmount = tables.stream().filter(Table::isView).count();
-        long tablesAmount = tables.size() - viewsAmount;
         long constraintsAmount = DbAnalyzer.getForeignKeyConstraints(tables).size();
         long routinesAmount = database.getRoutines().size();
         long anomaliesAmount = getAllAnomaliesAmount(tables, impliedConstraints);
 
-        HashMap<String, Object> scopes = new HashMap<>();
-        scopes.put("tablesAmount", tablesAmount);
-        scopes.put("viewsAmount", viewsAmount);
-        scopes.put("columnsAmount", columnsAmount);
-        scopes.put("constraintsAmount", constraintsAmount);
-        scopes.put("routinesAmount", routinesAmount);
-        scopes.put("anomaliesAmount", anomaliesAmount);
+        PageData pageData = new PageData.Builder()
+                .templateName("main.html")
+                .scriptName("main.js")
+                .addToScope("tablesAmount", tablesAmount)
+                .addToScope("viewsAmount", viewsAmount)
+                .addToScope("columnsAmount", columnsAmount)
+                .addToScope("constraintsAmount", constraintsAmount)
+                .addToScope("routinesAmount", routinesAmount)
+                .addToScope("anomaliesAmount", anomaliesAmount)
+                .addToScope("tables", mustacheTables)
+                .addToScope("database", database)
+                .addToScope("description", description)
+                .addToScope("schema", new MustacheSchema(database.getSchema(), ""))
+                .addToScope("catalog", new MustacheCatalog(database.getCatalog(), ""))
+                .addToScope("xmlName", getXmlName(database))
+                .depth(0)
+                .getPageData();
 
-        scopes.put("tables", mustacheTables);
-        scopes.put("database", database);
-        scopes.put("databaseName", database.getName());
-        scopes.put("xmlName", getXmlName(database));
-        scopes.put("description", Config.getInstance().getDescription());
-        scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
-        scopes.put("schema", new MustacheSchema(database.getSchema(), ""));
-        scopes.put("catalog", new MustacheCatalog(database.getCatalog(), ""));
-        
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", database.getName(), false);
-        mw.write("main.html", "index.html", "main.js");
+        try {
+            mustacheCompiler.write(pageData, writer);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write main index page", e);
+        }
     }
 
     private static long getAllAnomaliesAmount(Collection<Table> tables, List<? extends ForeignKeyConstraint> impliedConstraints) {
         long anomalies = 0;
-        anomalies += DbAnalyzer.getTablesWithoutIndexes(new HashSet<Table>(tables)).size();
+        anomalies += DbAnalyzer.getTablesWithoutIndexes(new HashSet<>(tables)).size();
         anomalies += impliedConstraints.stream().filter(c -> !c.getChildTable().isView()).count();
         anomalies += DbAnalyzer.getTablesWithOneColumn(tables).stream().filter(t -> !t.isView()).count();
         anomalies += DbAnalyzer.getTablesWithIncrementingColumnNames(tables).stream().filter(t -> !t.isView()).count();
-        anomalies += DbAnalyzer.getDefaultNullStringColumns(new HashSet<Table>(tables)).size();
+        anomalies += DbAnalyzer.getDefaultNullStringColumns(new HashSet<>(tables)).size();
 
         return anomalies;
     }

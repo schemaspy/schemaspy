@@ -2,6 +2,7 @@
  * Copyright (C) 2004 - 2011 John Currier
  * Copyright (C) 2016 Rafal Kasa
  * Copyright (C) 2016, 2017 Ismail Simsek
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -21,10 +22,14 @@
  */
 package org.schemaspy.view;
 
-import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -33,45 +38,37 @@ import java.util.List;
  * @author John Currier
  * @author Rafal Kasa
  * @author Ismail Simsek
+ * @author Nils Petzaell
  */
-public class HtmlMultipleSchemasIndexPage extends HtmlFormatter {
-    private static HtmlMultipleSchemasIndexPage instance = new HtmlMultipleSchemasIndexPage();
+public class HtmlMultipleSchemasIndexPage {
 
-    /**
-     * Singleton: Don't allow instantiation
-     */
-    private HtmlMultipleSchemasIndexPage() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final MustacheCompiler mustacheCompiler;
+
+    public HtmlMultipleSchemasIndexPage(MustacheCompiler mustacheCompiler) {
+        this.mustacheCompiler = mustacheCompiler;
     }
 
-    /**
-     * Singleton accessor
-     *
-     * @return the singleton instance
-     */
-    public static HtmlMultipleSchemasIndexPage getInstance() {
-        return instance;
-    }
-
-
-    public void write(File outputDir, String dbName, MustacheCatalog catalog, List<MustacheSchema> schemas, String description, String productName) {
+    public void write(MustacheCatalog catalog, List<MustacheSchema> schemas, String description, String productName, Writer writer) {
 
         String connectTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("EEE MMM dd HH:mm z yyyy"));
 
-        HashMap<String, Object> scopes = new HashMap<>();
-        scopes.put("databaseName", dbName);
-        scopes.put("description", description);
-        scopes.put("connectTime", connectTime);
+        PageData pageData = new PageData.Builder()
+                .templateName("multi.html")
+                .addToScope("description", description)
+                .addToScope("connectTime", connectTime)
+                .addToScope("databaseProduct", productName)
+                .addToScope("schemas", schemas)
+                .addToScope("catalog", catalog)
+                .addToScope("schemasNumber", Integer.toString(schemas.size()))
+                .addToScope("multipleSchemas", true)
+                .getPageData();
 
-        scopes.put("databaseProduct", productName);
-        scopes.put("schemas", schemas);
-        scopes.put("catalog", catalog);
-        scopes.put("schemasNumber", Integer.toString(schemas.size()));
-
-        scopes.put("multipleSchemas", true);
-
-
-
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, "", dbName, true);
-        mw.write("multi.html", "index.html", "");
+        try {
+            mustacheCompiler.write(pageData, writer);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write multischema index", e);
+        }
     }
 }

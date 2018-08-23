@@ -45,10 +45,7 @@ import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.nio.file.Files;
@@ -165,8 +162,11 @@ public class SchemaAnalyzer {
             }
 
             prepareLayoutFiles(outputDir);
-            HtmlMultipleSchemasIndexPage.getInstance().write(outputDir, dbName, mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta));
-
+            MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config);
+            HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
+            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("index.html").toFile())) {
+                htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta), writer);
+            }
             return db;
         } catch (Config.MissingRequiredParameterException missingParam) {
             config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
@@ -357,37 +357,65 @@ public class SchemaAnalyzer {
             Files.deleteIfExists(impliedDotFile.toPath());
         }
 
-        HtmlRelationshipsPage.getInstance().write(db, summaryDir, dotBaseFilespec, hasRealRelationships, hasImplied, excludedColumns,
-                progressListener, outputDir);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config);
+
+        HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler);
+        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {
+            htmlRelationshipsPage.write(summaryDir,dotBaseFilespec, hasRealRelationships, hasImplied, progressListener, writer);
+        }
 
         progressListener.graphingSummaryProgressed();
 
         File orphansDir = new File(outputDir, "diagrams/orphans");
         FileUtils.forceMkdir(orphansDir);
-        HtmlOrphansPage.getInstance().write(db, orphans, orphansDir, outputDir);
-        out.close();
+        HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(mustacheCompiler);
+        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("orphans.html").toFile())) {
+            htmlOrphansPage.write(orphans, orphansDir, outputDir.toString(), writer);
+        }
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlMainIndexPage.getInstance().write(db, tables, impliedConstraints, outputDir);
+        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config.getDescription());
+        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("index.html").toFile())) {
+            htmlMainIndexPage.write(db, tables, impliedConstraints, writer);
+        }
 
         progressListener.graphingSummaryProgressed();
 
         List<ForeignKeyConstraint> constraints = DbAnalyzer.getForeignKeyConstraints(tables);
-        HtmlConstraintsPage constraintIndexFormatter = HtmlConstraintsPage.getInstance();
-        constraintIndexFormatter.write(db, constraints, tables, outputDir);
+
+        HtmlConstraintsPage htmlConstraintsPage = new HtmlConstraintsPage(mustacheCompiler);
+        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("constraints.html").toFile())) {
+            htmlConstraintsPage.write(constraints, tables, writer);
+        }
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlAnomaliesPage.getInstance().write(db, tables, impliedConstraints, outputDir);
+        HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
+        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("anomalies.html").toFile())) {
+            htmlAnomaliesPage.write(tables, impliedConstraints, writer);
+        }
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlColumnsPage.getInstance().write(db, tables, outputDir);
+        HtmlColumnsPage htmlColumnsPage = new HtmlColumnsPage(mustacheCompiler);
+        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("columns.html").toFile())) {
+            htmlColumnsPage.write(tables, writer);
+        }
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlRoutinesPage.getInstance().write(db, outputDir);
+        HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
+        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines.html").toFile())) {
+            htmlRoutinesPage.write(db.getRoutines(), writer);
+        }
+
+        HtmlRoutinePage htmlRoutinePage = new HtmlRoutinePage(mustacheCompiler);
+        for (Routine routine : db.getRoutines()) {
+            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines").resolve(routine.getName() + ".html").toFile())) {
+                htmlRoutinePage.write(routine, writer);
+            }
+        }
 
         // create detailed diagrams
 
@@ -395,8 +423,15 @@ public class SchemaAnalyzer {
 
         LOGGER.info("Completed summary in {} seconds", duration / 1000);
         LOGGER.info("Writing/diagramming details");
-
-        generateTables(progressListener, outputDir, db, tables, stats);
+        SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
+        HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, sqlAnalyzer, config.getImageFormat());
+        for (Table table : tables) {
+            progressListener.graphingDetailsProgressed(table);
+            LOGGER.debug("Writing details of {}", table.getName());
+            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("tables").resolve(table.getName()+".html").toFile())) {
+                htmlTablePage.write(table, outputDir, stats, writer);
+            }
+        }
     }
 
     /**
@@ -423,16 +458,6 @@ public class SchemaAnalyzer {
     private Connection getConnection(Config config) throws IOException {
         DbDriverLoader driverLoader = new DbDriverLoader();
         return driverLoader.getConnection(config);
-    }
-
-    private void generateTables(ProgressListener progressListener, File outputDir, Database db, Collection<Table> tables, WriteStats stats) throws IOException {
-        HtmlTablePage htmlTablePage = new HtmlTablePage(db);
-        for (Table table : tables) {
-            progressListener.graphingDetailsProgressed(table);
-            LOGGER.debug("Writing details for {}", table.getName());
-
-            htmlTablePage.write(db, table, outputDir, stats);
-        }
     }
 
     /**

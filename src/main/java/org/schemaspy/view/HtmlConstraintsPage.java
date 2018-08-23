@@ -3,6 +3,7 @@
  * Copyright (C) 2016 Rafal Kasa
  * Copyright (C) 2016 Ismail Simsek
  * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -22,15 +23,15 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.Config;
-import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,32 +45,31 @@ import java.util.stream.Collectors;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-public class HtmlConstraintsPage extends HtmlFormatter {
-    private static HtmlConstraintsPage instance = new HtmlConstraintsPage();
+public class HtmlConstraintsPage {
 
-    /**
-     * Singleton: Don't allow instantiation
-     */
-    private HtmlConstraintsPage() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final MustacheCompiler mustacheCompiler;
+
+    public HtmlConstraintsPage(MustacheCompiler mustacheCompiler) {
+        this.mustacheCompiler = mustacheCompiler;
     }
 
-    /**
-     * Singleton accessor
-     *
-     * @return the singleton instance
-     */
-    public static HtmlConstraintsPage getInstance() {
-        return instance;
-    }
+    public void write(List<ForeignKeyConstraint> constraints, Collection<Table> tables, Writer writer) {
 
-    public void write(Database database, List<ForeignKeyConstraint> constraints, Collection<Table> tables, File outputDir) throws IOException {
-        HashMap<String, Object> scopes = new HashMap<String, Object>();
-        scopes.put("constraints", constraints);
-        scopes.put("checkConstraints", collectCheckConstraints(tables));
-        scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
+        PageData pageData = new PageData.Builder()
+                .templateName("constraint.html")
+                .scriptName("constraint.js")
+                .addToScope("constraints", constraints)
+                .addToScope("checkConstraints", collectCheckConstraints(tables))
+                .depth(0)
+                .getPageData();
 
-        MustacheWriter mw = new MustacheWriter( outputDir, scopes, getPathToRoot(), database.getName(), false);
-        mw.write("constraint.html", "constraints.html", "constraint.js");
+        try {
+            mustacheCompiler.write(pageData, writer);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write constraints page", e);
+        }
     }
 
     private static List<MustacheCheckConstraint> collectCheckConstraints(Collection<Table> tables) {

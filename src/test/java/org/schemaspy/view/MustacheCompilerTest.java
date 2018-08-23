@@ -19,16 +19,33 @@
 package org.schemaspy.view;
 
 import org.assertj.core.api.SoftAssertions;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.regex.Pattern;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class MustacheCompilerTest {
 
-    private MustacheCompiler mustacheCompilerSingle = new MustacheCompiler("testingSingle", "mustache", false);
-    private MustacheCompiler mustacheCompilerMulti = new MustacheCompiler("testingMulti", "mustache", true);
+    private static MustacheCompiler mustacheCompilerSingle;
+    private static MustacheCompiler mustacheCompilerMulti;
+
+    @BeforeClass
+    public static void setup() {
+        HtmlConfig single = mock(HtmlConfig.class);
+        when(single.getTemplateDirectory()).thenReturn("mustache");
+        when(single.isOneOfMultipleSchemas()).thenReturn(false);
+        mustacheCompilerSingle = new MustacheCompiler("testingSingle", single);
+
+        HtmlConfig multi = mock(HtmlConfig.class);
+        when(multi.getTemplateDirectory()).thenReturn("mustache");
+        when(multi.isOneOfMultipleSchemas()).thenReturn(true);
+        mustacheCompilerMulti = new MustacheCompiler("testingMulti", multi);
+    }
 
     private PageData pageData = new PageData.Builder()
             .templateName("databaseName.html")

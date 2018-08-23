@@ -3,7 +3,7 @@
  * Copyright (C) 2016 Ismail Simsek
  * Copyright (C) 2017 Thomas Traude
  * Copyright (C) 2017 Daniel Watt
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2017, 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -45,29 +45,33 @@ import java.util.stream.IntStream;
 public class MustacheCompiler {
 
     private final String databaseName;
+    private final HtmlConfig htmlConfig;
     private final MustacheFactory mustacheFactory;
-    private final boolean multipleSchemas;
 
-    public MustacheCompiler(String databaseName, String templateDirectory, boolean isMultipleSchemas) {
+    public MustacheCompiler(String databaseName, HtmlConfig htmlConfig) {
         this.databaseName = databaseName;
-        this.mustacheFactory = new DefaultMustacheFactory(templateDirectory);
-        this.multipleSchemas = isMultipleSchemas;
+        this.htmlConfig = htmlConfig;
+        this.mustacheFactory = new DefaultMustacheFactory(htmlConfig.getTemplateDirectory());
     }
 
     public void write(PageData pageData, Writer writer) throws IOException {
         StringWriter result = new StringWriter();
 
-        HashMap<String, Object> containerScope = new HashMap<>();
+        HashMap<String, Object> pageScope = new HashMap<>();
+        pageScope.put("databaseName", databaseName);
+        pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());
+        pageScope.put("displayNumRows", htmlConfig.isNumRowsEnabled());
+        pageScope.putAll(pageData.getScope());
 
         Mustache mustachePage = mustacheFactory.compile(pageData.getTemplateName());
-        mustachePage.execute(result, pageData.getScope()).flush();
+        mustachePage.execute(result, pageScope).flush();
 
-        containerScope.put("databaseName", databaseName);
+        HashMap<String, Object> containerScope = new HashMap<>();
         containerScope.put("content", result);
-        containerScope.put("pageScript",pageData.getScriptName());
+        containerScope.put("pageScript", pageData.getScriptName());
         containerScope.put("rootPath", getRootPath(pageData.getDepth()));
         containerScope.put("rootPathtoHome", getRootPathToHome(pageData.getDepth()));
-        containerScope.putAll(pageData.getScope());
+        containerScope.putAll(pageScope);
 
         Mustache mustacheContainer = mustacheFactory.compile("container.html");
         mustacheContainer.execute(writer, containerScope).flush();
@@ -80,7 +84,7 @@ public class MustacheCompiler {
 
     private String getRootPathToHome(int depth) {
         String path = getRootPath(depth);
-        if (multipleSchemas) {
+        if (htmlConfig.isOneOfMultipleSchemas()) {
             path += "../";
         }
         return path;

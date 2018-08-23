@@ -26,7 +26,7 @@ import org.schemaspy.util.Dot;
  * @author John Currier
  * @author Rafal Kasa
  */
-public class HtmlDiagramFormatter extends HtmlFormatter {
+public class HtmlDiagramFormatter {
     private static boolean printedNoDotWarning = false;
     private static boolean printedInvalidVersionWarning = false;
 

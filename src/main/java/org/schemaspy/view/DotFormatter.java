@@ -38,6 +38,7 @@ import java.util.*;
  *
  * @author John Currier
  * @author Rafal Kasa
+ * @author Nils Petzaell
  */
 public class DotFormatter {
     private static DotFormatter instance = new DotFormatter();
@@ -330,10 +331,10 @@ public class DotFormatter {
         }
     }
 
-    public void writeOrphan(Table table, PrintWriter dot, File outputDir) {
+    public void writeOrphan(Table table, PrintWriter dot, String outputDir) {
         writeHeader(table.getName(), false, dot);
         DotNodeConfig nodeConfig = new DotNodeConfig(true, true);
-        dot.println(new DotNode(table, "tables/", outputDir.toString(), nodeConfig).toString());
+        dot.println(new DotNode(table, "tables/", outputDir, nodeConfig).toString());
         dot.println("}");
     }
 }

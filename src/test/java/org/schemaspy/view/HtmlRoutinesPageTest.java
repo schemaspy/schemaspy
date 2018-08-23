@@ -18,17 +18,10 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.schemaspy.model.Database;
 import org.schemaspy.model.Routine;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -38,19 +31,18 @@ import static org.mockito.Mockito.when;
 
 public class HtmlRoutinesPageTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
     @Test
-    public void markdownComment() throws IOException {
-        Database database = mock(Database.class);
-        Collection<Routine> routines =Collections.singletonList(new Routine("ARoutine", "Function", "Integer", "SQL", "SELECT 1", true, "IMMUTABLE", "INVOKER", "normal *emp* **strong**"));
-        when(database.getRoutines()).thenReturn(routines);
-        File outputDir = temporaryFolder.newFolder();
-        Files.createDirectory(outputDir.toPath().resolve("routines"));
-        HtmlRoutinesPage.getInstance().write(database, outputDir);
-        String routinesHtml = new String(Files.readAllBytes(Paths.get(outputDir.getPath(),"routines.html")), StandardCharsets.UTF_8);
-        assertThat(routinesHtml).contains("<p>normal <em>emp</em> <strong>strong</strong></p>");
+    public void markdownComment() {
+        HtmlConfig htmlConfig = mock(HtmlConfig.class);
+        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig);
+        HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
+        Collection<Routine> routines = Collections.singletonList(new Routine("ARoutine", "Function", "Integer", "SQL", "SELECT 1", true, "IMMUTABLE", "INVOKER", "normal *emp* **strong**"));
+        StringWriter actual = new StringWriter();
+
+        htmlRoutinesPage.write(routines, actual);
+
+        assertThat(actual.toString()).contains("<p>normal <em>emp</em> <strong>strong</strong></p>");
     }
 
 }

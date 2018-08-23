@@ -31,6 +31,7 @@ import org.schemaspy.db.config.PropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.Dot;
+import org.schemaspy.view.HtmlConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ import java.util.stream.Stream;
  * @author Nils Petzaell
  * @author Daniel Watt
  */
-public final class Config {
+public final class Config implements HtmlConfig {
     private static Config instance;
     private final List<String> options;
     private Map<String, String> dbSpecificOptions;
@@ -261,7 +262,7 @@ public final class Config {
         if (templateDirectory == null) {
             templateDirectory = pullParam("-template");
             if (templateDirectory == null) {
-                templateDirectory = "/layout";
+                templateDirectory = "layout";
             }
         }
         return templateDirectory;
@@ -633,6 +634,7 @@ public final class Config {
     /**
      * @see #setDescription(String)
      */
+    @Override
     public String getDescription() {
         if (description == null)
             description = pullParam("-desc");
@@ -939,6 +941,7 @@ public final class Config {
      *
      * @return boolean
      */
+    @Override
     public boolean isOneOfMultipleSchemas() {
         return oneOfMultipleSchemas;
     }
@@ -1117,6 +1120,7 @@ public final class Config {
      * @return
      * @see #setPaginationEnabled(boolean)
      */
+    @Override
     public boolean isPaginationEnabled() {
         if (paginationEnabled == null)
             paginationEnabled = !options.remove("-nopages");
