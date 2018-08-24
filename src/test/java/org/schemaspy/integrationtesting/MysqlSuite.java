@@ -34,6 +34,7 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 @Suite.SuiteClasses({
         MysqlHTMLIT.class,
         MysqlKeyWordTableIT.class,
+        MysqlMultiSchemaIT.class,
         MysqlRoutinesIT.class,
         MysqlSchemaLeakageIT.class,
         MysqlSpacesIT.class,
