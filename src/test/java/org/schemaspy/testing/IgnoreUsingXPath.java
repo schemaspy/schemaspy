@@ -21,24 +21,23 @@ package org.schemaspy.testing;
 import org.xmlunit.diff.Comparison;
 import org.xmlunit.diff.ComparisonResult;
 import org.xmlunit.diff.DifferenceEvaluator;
-import java.util.Objects;
 
 /**
  * @author Nils Petzaell
  */
 public class IgnoreUsingXPath implements DifferenceEvaluator{
 
-    private final String xPath;
+    private final String ignoredXPath;
 
     public IgnoreUsingXPath(String xPath) {
-        this.xPath = xPath;
+        ignoredXPath = xPath;
     }
 
     @Override
     public ComparisonResult evaluate(Comparison comparison, ComparisonResult outcome) {
         if (outcome == ComparisonResult.EQUAL) return outcome;
         String xPath = comparison.getTestDetails().getXPath();
-        if (Objects.nonNull(xPath) && xPath.equals(xPath)) {
+        if (ignoredXPath.equals(xPath)) {
             return ComparisonResult.EQUAL;
         }
         return outcome;
