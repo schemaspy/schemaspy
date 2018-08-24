@@ -115,7 +115,7 @@ public class XmlProducerUsingDOM implements XmlProducer {
         }
     }
 
-    private void write(Document document, Writer writer) throws TransformerException {
+    private static void write(Document document, Writer writer) throws TransformerException {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = transformerFactory.newTransformer();

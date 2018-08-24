@@ -41,7 +41,7 @@ public class XmlRoutineFormatter {
         }
     }
 
-    private void appendRoutine(Element routinesElement, Routine routine) {
+    private static void appendRoutine(Element routinesElement, Routine routine) {
         Element routineElement = routinesElement.getOwnerDocument().createElement("routine");
         routinesElement.appendChild(routineElement);
         DOMUtil.appendAttribute(routineElement, "name", routine.getName());
@@ -67,7 +67,7 @@ public class XmlRoutineFormatter {
         }
     }
 
-    private boolean notNullOrEmpty(String string) {
+    private static boolean notNullOrEmpty(String string) {
         return string != null && !string.isEmpty();
     }
 }

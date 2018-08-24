@@ -29,6 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +81,7 @@ public class XmlTableFormatter {
      * @param tablesNode
      * @param table
      */
-    private void appendTable(Element tablesNode, Table table) {
+    private static void appendTable(Element tablesNode, Table table) {
         Document document = tablesNode.getOwnerDocument();
         Element tableNode = document.createElement(TABLE);
         tablesNode.appendChild(tableNode);
@@ -106,7 +107,7 @@ public class XmlTableFormatter {
      * @param tableNode
      * @param table
      */
-    private void appendColumns(Element tableNode, Table table) {
+    private static void appendColumns(Element tableNode, Table table) {
         for (TableColumn column : table.getColumns()) {
             appendColumn(tableNode, column);
         }
@@ -119,7 +120,7 @@ public class XmlTableFormatter {
      * @param column
      * @return
      */
-    private Node appendColumn(Node tableNode, TableColumn column) {
+    private static Node appendColumn(Node tableNode, TableColumn column) {
         Document document = tableNode.getOwnerDocument();
         Node columnNode = document.createElement(COLUMN);
         tableNode.appendChild(columnNode);
@@ -180,7 +181,7 @@ public class XmlTableFormatter {
      * @param tableNode
      * @param table
      */
-    private void appendPrimaryKeys(Element tableNode, Table table) {
+    private static void appendPrimaryKeys(Element tableNode, Table table) {
         Document document = tableNode.getOwnerDocument();
         int index = 1;
 
@@ -199,7 +200,7 @@ public class XmlTableFormatter {
      * @param tableNode
      * @param table
      */
-    private void appendCheckConstraints(Element tableNode, Table table) {
+    private static void appendCheckConstraints(Element tableNode, Table table) {
         Document document = tableNode.getOwnerDocument();
         Map<String, String> constraints = table.getCheckConstraints();
         if (constraints != null && !constraints.isEmpty()) {
@@ -219,7 +220,7 @@ public class XmlTableFormatter {
      * @param tableNode
      * @param table
      */
-    private void appendIndexes(Node tableNode, Table table) {
+    private static void appendIndexes(Node tableNode, Table table) {
         boolean showId = table.getId() != null;
         Set<TableIndex> indexes = table.getIndexes();
         if (indexes != null && !indexes.isEmpty()) {
@@ -252,7 +253,7 @@ public class XmlTableFormatter {
      * @param tableNode
      * @param table
      */
-    private void appendView(Element tableNode, Table table) {
+    private static void appendView(Element tableNode, Table table) {
         String sql;
         if (table.isView() && (sql = table.getViewDefinition()) != null) {
             DOMUtil.appendAttribute(tableNode, "viewSql", sql);
@@ -277,8 +278,8 @@ public class XmlTableFormatter {
      * @param str
      * @return
      */
-    private String asBinary(String str) {
-        byte[] bytes = str.getBytes();
+    private static String asBinary(String str) {
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
         StringBuilder buf = new StringBuilder(bytes.length * 2);
 		for (byte aByte : bytes) {
 			buf.append(String.format("%02X", aByte));
