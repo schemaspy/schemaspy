@@ -62,7 +62,7 @@ public class HtmlMultipleSchemasIndexPage {
                 .addToScope("schemas", schemas)
                 .addToScope("catalog", catalog)
                 .addToScope("schemasNumber", Integer.toString(schemas.size()))
-                .addToScope("multipleSchemas", true)
+                .addToScope("isMultipleSchemas", true)
                 .getPageData();
 
         try {
