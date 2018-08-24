@@ -49,27 +49,11 @@ public class XmlTableFormatter {
     private static final String TABLE = "table";
     private static final String COLUMN = "column";
 
-    private static final XmlTableFormatter instance = new XmlTableFormatter();
-
     // valid chars came from http://www.w3.org/TR/REC-xml/#charsets
     // and attempting to match 0x10000-0x10FFFF with the \p Unicode escapes
     // (from http://www.regular-expressions.info/unicode.html)
     private static final Pattern validXmlChars =
         Pattern.compile("^[ -\uD7FF\uE000-\uFFFD\\p{L}\\p{M}\\p{Z}\\p{S}\\p{N}\\p{P}]*$");
-
-    /**
-     * Singleton...don't allow instantiation
-     */
-    private XmlTableFormatter() {}
-
-    /**
-     * Singleton accessor
-     *
-     * @return
-     */
-    public static XmlTableFormatter getInstance() {
-        return instance;
-    }
 
     /**
      * Append the specified tables to the XML node
