@@ -4,6 +4,7 @@
  * Copyright (C) 2016 Ismail Simsek
  * Copyright (C) 2017 Wojciech Kasa
  * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -23,14 +24,17 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.Writers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
 import java.util.*;
 
 /**
@@ -41,93 +45,88 @@ import java.util.*;
  * @author Ismail Simsek
  * @author Wojciech Kasa
  * @author Daniel Watt
+ * @author Nils Petzaell
  */
 public class HtmlOrphansPage extends HtmlDiagramFormatter {
-    private static HtmlOrphansPage instance = new HtmlOrphansPage();
-    private static int MAX_COLUMNS = 4;
 
-    /**
-     * Singleton: Don't allow instantiation
-     */
-    private HtmlOrphansPage() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static final int KB_64 = 64 * 1024;
+
+    private final MustacheCompiler mustacheCompiler;
+
+    public HtmlOrphansPage(MustacheCompiler mustacheCompiler) {
+        this.mustacheCompiler = mustacheCompiler;
     }
 
-    /**
-     * Singleton accessor
-     *
-     * @return the singleton instance
-     */
-    public static HtmlOrphansPage getInstance() {
-        return instance;
-    }
-
-    public boolean write(Database db, List<Table> orphanTables, File diagramDir, File outputDir) throws IOException {
+    public boolean write(
+            List<Table> orphanTables,
+            File diagramDir,
+            String outputDir,
+            Writer writer
+    ) throws IOException {
         Dot dot = getDot();
         if (dot == null)
             return false;
 
-        Set<Table> orphansWithImpliedRelationships = new HashSet<Table>();
 
-        Collections.sort(orphanTables, new Comparator() {
-            @Override
-            public int compare(Object t1, Object t2) {
-                Integer size1 = ((Table) t1).getColumns().size();
-                Integer size2 = ((Table) t2).getColumns().size();
-                int sizeComp = size1.compareTo(size2);
+        Collections.sort(orphanTables, (Comparator) (t1, t2) -> {
+            Integer size1 = ((Table) t1).getColumns().size();
+            Integer size2 = ((Table) t2).getColumns().size();
+            int sizeComp = size1.compareTo(size2);
 
-                if (sizeComp != 0) {
-                    return sizeComp;
-                } else {
-                    String name1 = ((Table) t1).getName();
-                    String name2 = ((Table) t1).getName();
-                    return name1.compareTo(name2);
-                }
+            if (sizeComp != 0) {
+                return sizeComp;
+            } else {
+                String name1 = ((Table) t1).getName();
+                String name2 = ((Table) t1).getName();
+                return name1.compareTo(name2);
             }
         });
 
+        Set<Table> orphansWithImpliedRelationships = new HashSet<>();
         for (Table table : orphanTables) {
             if (!table.isOrphan(true)){
                 orphansWithImpliedRelationships.add(table);
             }
         }
 
-        try {
-            StringBuilder maps = new StringBuilder(64 * 1024);
-            int element = 0;
-            List<MustacheTable> mustacheTables = new ArrayList<>();
-            for (Table table : orphanTables) {
-                element++;
-                String dotBaseFilespec = table.getName();
+        StringBuilder maps = new StringBuilder(KB_64);
+        List<MustacheTable> mustacheTables = new ArrayList<>();
+        for (Table table : orphanTables) {
+            String dotBaseFilespec = table.getName();
 
-                File dotFile = new File(diagramDir, dotBaseFilespec + ".1degree.dot");
-                File imgFile = new File(diagramDir, dotBaseFilespec + ".1degree." + dot.getFormat());
+            File dotFile = new File(diagramDir, dotBaseFilespec + ".1degree.dot");
 
-                try (PrintWriter dotOut = Writers.newPrintWriter(dotFile)) {
-                    DotFormatter.getInstance().writeOrphan(table, dotOut, outputDir);
-                } catch (IOException e) {
-                    throw new IOException(e);
-                }
-
-                try {
-                    maps.append(dot.generateDiagram(dotFile, imgFile));
-                } catch (Dot.DotFailure dotFailure) {
-                    System.err.println(dotFailure);
-                    return false;
-                }
-                mustacheTables.add(new MustacheTable(table, imgFile.getName()));
+            try (PrintWriter dotOut = Writers.newPrintWriter(dotFile)) {
+                DotFormatter.getInstance().writeOrphan(table, dotOut, outputDir);
+            } catch (IOException e) {
+                throw new IOException(e);
             }
 
-            HashMap<String, Object> scopes = new HashMap<String, Object>();
-            scopes.put("mustacheTables", mustacheTables);
-            int size = 12/MAX_COLUMNS;
-            scopes.put("size", size);
-            scopes.put("maps", maps);
-
-            MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
-            mw.write("orphans.html", "orphans.html", "");
-
-            return true;
-        } finally {
+            File imgFile = new File(diagramDir, dotBaseFilespec + ".1degree." + dot.getFormat());
+            try {
+                maps.append(dot.generateDiagram(dotFile, imgFile));
+            } catch (Dot.DotFailure dotFailure) {
+                LOGGER.error("Failed to write Orphan '{}'", table.getName(), dotFailure);
+                return false;
+            }
+            mustacheTables.add(new MustacheTable(table, imgFile.getName()));
         }
+
+        PageData pageData = new PageData.Builder()
+                .templateName("orphans.html")
+                .scriptName("")
+                .addToScope("mustacheTables", mustacheTables)
+                .addToScope("maps", maps)
+                .depth(0)
+                .getPageData();
+
+        try {
+            mustacheCompiler.write(pageData, writer);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write orphans page", e);
+        }
+        return true;
     }
 }

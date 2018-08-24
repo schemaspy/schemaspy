@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2011 John Currier
  * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -20,15 +21,15 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.Config;
-import org.schemaspy.model.Database;
 import org.schemaspy.model.Routine;
 import org.schemaspy.util.Markdown;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.function.Function;
 
 /**
@@ -39,42 +40,30 @@ import java.util.function.Function;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-public class HtmlRoutinesPage extends HtmlFormatter {
-    private static HtmlRoutinesPage instance = new HtmlRoutinesPage();
+public class HtmlRoutinesPage {
 
-    /**
-     * Singleton: Don't allow instantiation
-     */
-    private HtmlRoutinesPage() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final MustacheCompiler mustacheCompiler;
+
+    public HtmlRoutinesPage(MustacheCompiler mustacheCompiler) {
+        this.mustacheCompiler = mustacheCompiler;
     }
 
-    /**
-     * Singleton accessor
-     *
-     * @return the singleton instance
-     */
-    public static HtmlRoutinesPage getInstance() {
-        return instance;
-    }
+    public void write(Collection<Routine> routines, Writer writer) {
 
-    public void write(Database db, File outputDir) {
-        Collection<Routine> routines = new TreeSet<>(db.getRoutines());
+        PageData pageData = new PageData.Builder()
+                .templateName("routines.html")
+                .scriptName("routines.js")
+                .addToScope("routines", routines)
+                .addToScope("md2html", (Function<String,String>) md -> Markdown.toHtml(md, mustacheCompiler.getRootPath(0)))
+                .getPageData();
 
-        HashMap<String, Object> scopes = new HashMap<>();
-        scopes.put("routines", routines);
-        scopes.put("paginationEnabled", Config.getInstance().isPaginationEnabled());
-        scopes.put("md2html", (Function<String,String>) md -> Markdown.toHtml(md, getPathToRoot()));
-
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
-        mw.write("routines.html", "routines.html", "routines.js");
-
-        for (Routine routine : routines) {
-            writeRoutineFile(db, routine, outputDir);
+        try {
+            mustacheCompiler.write(pageData, writer);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write routines page", e);
         }
-    }
-
-    private static void writeRoutineFile(Database db, Routine routine, File outputDir) {
-        HtmlRoutinePage.getInstance().write(db,routine,outputDir);
     }
 
 }

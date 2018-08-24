@@ -82,7 +82,7 @@ public class MysqlSpacesIT {
                     new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
-                            .withInitScript("integrationTesting/mysql/dbScripts/spacesit.sql")
+                            .withInitScript("integrationTesting/mysql/dbScripts/spacesit.sql_ignore")
                             .withInitUser("root", "test")
             );
 

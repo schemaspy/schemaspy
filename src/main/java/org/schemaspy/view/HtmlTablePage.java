@@ -4,6 +4,7 @@
  * Copyright (C) 2016 Ismail Simsek
  * Copyright (C) 2017 Wojciech Kasa
  * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -23,16 +24,22 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.Config;
-import org.schemaspy.model.*;
+import org.schemaspy.model.ForeignKeyConstraint;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+import org.schemaspy.model.TableIndex;
 import org.schemaspy.util.DiagramUtil;
 import org.schemaspy.util.Dot;
 import org.schemaspy.util.Markdown;
 import org.schemaspy.util.Writers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -46,15 +53,21 @@ import java.util.*;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-public class HtmlTablePage extends HtmlFormatter {
+public class HtmlTablePage {
 
-    private SqlAnalyzer sqlAnalyzer;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public HtmlTablePage(Database database) {
-        sqlAnalyzer = new SqlAnalyzer(database.getDbmsMeta().getAllKeywords(), database.getTables(), database.getViews());
+    private final MustacheCompiler mustacheCompiler;
+    private final SqlAnalyzer sqlAnalyzer;
+    private final String imageFormat;
+
+    public HtmlTablePage(MustacheCompiler mustacheCompiler, SqlAnalyzer sqlAnalyzer, String imageFormat) {
+        this.mustacheCompiler = mustacheCompiler;
+        this.sqlAnalyzer = sqlAnalyzer;
+        this.imageFormat = imageFormat;
     }
 
-    public void write(Database db, Table table, File outputDir, WriteStats stats) throws IOException {
+    public void write(Table table, File outputDir, WriteStats stats, Writer writer) throws IOException {
         Set<TableColumn> primaries = new HashSet<>(table.getPrimaryColumns());
         Set<TableColumn> indexes = new HashSet<>();
         Set<MustacheTableColumn> tableColumns = new LinkedHashSet<>();
@@ -67,31 +80,38 @@ public class HtmlTablePage extends HtmlFormatter {
         }
 
         for (TableColumn column : table.getColumns()) {
-            tableColumns.add(new MustacheTableColumn(column, indexes, getPathToRoot()));
+            tableColumns.add(new MustacheTableColumn(column, indexes, mustacheCompiler.getRootPath(1)));
         }
-
-        HashMap<String, Object> scopes = new HashMap<>();
-        scopes.put("table", table);
-        scopes.put("comments", Markdown.toHtml(table.getComments(), getPathToRoot()));
-        scopes.put("primaries", primaries);
-        scopes.put("columns", tableColumns);
-        scopes.put("indexes", indexedColumns);
 
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
         Object graphvizExists = generateDiagrams(table, stats, outputDir, diagrams);
         String graphvizVersion = Dot.getInstance().getSupportedVersions().substring(4);
-        scopes.put("graphvizExists", graphvizExists);
-        scopes.put("graphvizVersion", graphvizVersion);
+        LOGGER.debug("Writing table page -> {}", table.getName());
 
-        scopes.put("diagrams", diagrams);
-        scopes.put("sqlCode", sqlCode(table));
-        scopes.put("references", sqlReferences(table));
+        PageData pageData = new PageData.Builder()
+                .templateName("tables/table.html")
+                .scriptName("table.js")
+                .addToScope("table", table)
+                .addToScope("comments", Markdown.toHtml(table.getComments(), mustacheCompiler.getRootPath(1)))
+                .addToScope("primaries", primaries)
+                .addToScope("columns", tableColumns)
+                .addToScope("indexes", indexedColumns)
+                .addToScope("graphvizExists", graphvizExists)
+                .addToScope("graphvizVersion", graphvizVersion)
+                .addToScope("diagrams", diagrams)
+                .addToScope("sqlCode", sqlCode(table))
+                .addToScope("references", sqlReferences(table))
+                .addToScope("diagramExists", DiagramUtil.diagramExists(diagrams))
+                .addToScope("indexExists", indexExists(table, indexedColumns))
+                .addToScope("definitionExists", definitionExists(table))
+                .depth(1)
+                .getPageData();
 
-        scopes.put("diagramExists", DiagramUtil.diagramExists(diagrams));
-        scopes.put("indexExists", indexExists(table, indexedColumns));
-        scopes.put("definitionExists", definitionExists(table));
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
-        mw.write("tables/table.html", Markdown.pagePath(table.getName()), "table.js");
+        try {
+            mustacheCompiler.write(pageData, writer);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write table page for '{}'", table.getName(), e);
+        }
     }
 
 
@@ -108,7 +128,7 @@ public class HtmlTablePage extends HtmlFormatter {
         return table.getViewDefinition() != null ? table.getViewDefinition().trim() : "";
     }
 
-    private Object indexExists(Table table, Set<MustacheTableIndex> indexedColumns) {
+    private static Object indexExists(Table table, Set<MustacheTableIndex> indexedColumns) {
         Object exists = null;
         if (!table.isView() && !indexedColumns.isEmpty()) {
             exists = new Object();
@@ -140,7 +160,7 @@ public class HtmlTablePage extends HtmlFormatter {
      */
     private boolean generateDots(Table table, File diagramDir, WriteStats stats, File outputDir) throws IOException {
         Dot dot = Dot.getInstance();
-        String extension = dot == null ? Config.getInstance().getImageFormat() : dot.getFormat();
+        String extension = dot == null ? imageFormat : dot.getFormat();
 
         File oneDegreeDotFile = new File(diagramDir, table.getName() + ".1degree.dot");
         File oneDegreeDiagramFile = new File(diagramDir, table.getName() + ".1degree." + extension);
@@ -167,28 +187,29 @@ public class HtmlTablePage extends HtmlFormatter {
             Set<ForeignKeyConstraint> impliedConstraints;
 
             DotFormatter formatter = DotFormatter.getInstance();
-            PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile);
-            WriteStats oneStats = new WriteStats(stats);
-            formatter.writeRealRelationships(table, false, oneStats, dotOut, outputDir);
-            dotOut.close();
 
-            dotOut = Writers.newPrintWriter(twoDegreesDotFile);
+            WriteStats oneStats = new WriteStats(stats);
+            try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
+                formatter.writeRealRelationships(table, false, oneStats, dotOut, outputDir);
+            }
+
             WriteStats twoStats = new WriteStats(stats);
-            impliedConstraints = formatter.writeRealRelationships(table, true, twoStats, dotOut, outputDir);
-            dotOut.close();
+            try (PrintWriter dotOut = Writers.newPrintWriter(twoDegreesDotFile)) {
+                impliedConstraints = formatter.writeRealRelationships(table, true, twoStats, dotOut, outputDir);
+            }
 
             if (oneStats.getNumTablesWritten() + oneStats.getNumViewsWritten() == twoStats.getNumTablesWritten() + twoStats.getNumViewsWritten()) {
                 Files.deleteIfExists(twoDegreesDotFile.toPath()); // no different than before, so don't show it
             }
 
             if (!impliedConstraints.isEmpty()) {
-                dotOut = Writers.newPrintWriter(oneImpliedDotFile);
-                formatter.writeAllRelationships(table, false, stats, dotOut, outputDir);
-                dotOut.close();
+                try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
+                    formatter.writeAllRelationships(table, false, stats, dotOut, outputDir);
+                }
 
-                dotOut = Writers.newPrintWriter(twoImpliedDotFile);
-                formatter.writeAllRelationships(table, true, stats, dotOut, outputDir);
-                dotOut.close();
+                try (PrintWriter dotOut = Writers.newPrintWriter(twoImpliedDotFile)) {
+                    formatter.writeAllRelationships(table, true, stats, dotOut, outputDir);
+                }
                 return true;
             }
         }
@@ -202,19 +223,11 @@ public class HtmlTablePage extends HtmlFormatter {
         File diagramsDir = new File(outputDir, "diagrams");
         generateDots(table, diagramsDir, stats, outputDir);
 
-        if (table.getMaxChildren() + table.getMaxParents() > 0) {
-            if (HtmlTableDiagrammer.getInstance().write(table, diagramsDir, diagrams)) {
-                //writeExcludedColumns(stats.getExcludedColumns(), table, html);
-            } else {
-                graphviz = null;
-            }
+        if (table.getMaxChildren() + table.getMaxParents() > 0 && !HtmlTableDiagrammer.getInstance().write(table, diagramsDir, diagrams)) {
+            graphviz = null;
         }
 
         return graphviz;
     }
 
-    @Override
-    protected String getPathToRoot() {
-        return "../";
-    }
 }

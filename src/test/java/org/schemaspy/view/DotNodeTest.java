@@ -36,7 +36,6 @@ public class DotNodeTest {
         Database database = mock(Database.class);
         Table table = new LogicalTable(database, "catalog", "schema", "<table>", "comment");
         DotNode dotNode = new DotNode(table,"", "output");
-        System.out.println(dotNode.toString());
         assertThat(dotNode.toString()).contains("tooltip=\"&lt;table&gt;");
     }
 

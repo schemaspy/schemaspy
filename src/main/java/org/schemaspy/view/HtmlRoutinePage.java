@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -18,35 +19,44 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.model.Database;
 import org.schemaspy.model.Routine;
 import org.schemaspy.util.Markdown;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.HashMap;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
 
 /**
  * @author Daniel Watt
+ * @author Nils Petzaell
  */
-public class HtmlRoutinePage extends HtmlFormatter {
-    private static HtmlRoutinePage instance = new HtmlRoutinePage();
+public class HtmlRoutinePage {
 
-    public static HtmlRoutinePage getInstance() {
-        return instance;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final MustacheCompiler mustacheCompiler;
+
+    public HtmlRoutinePage(MustacheCompiler mustacheCompiler) {
+        this.mustacheCompiler = mustacheCompiler;
     }
 
-    public void write(Database db, Routine routine, File outputDir) {
-        HashMap<String, Object> scopes = new HashMap<String, Object>();
-        scopes.put("routineName", routine.getName());
-        scopes.put("routineComment", Markdown.toHtml(routine.getComment(), getPathToRoot()));
-        scopes.put("routineParameters",routine.getParameters());
-        scopes.put("routineDefinition",routine.getDefinition());
+    public void write(Routine routine, Writer writer) {
+        PageData pageData = new PageData.Builder()
+                .templateName("routines/routine.html")
+                .scriptName("routine.js")
+                .addToScope("routineName", routine.getName())
+                .addToScope("routineComment", Markdown.toHtml(routine.getComment(), mustacheCompiler.getRootPath(1)))
+                .addToScope("routineParameters",routine.getParameters())
+                .addToScope("routineDefinition",routine.getDefinition())
+                .depth(1)
+                .getPageData();
 
-        MustacheWriter mw = new MustacheWriter(outputDir, scopes, getPathToRoot(), db.getName(), false);
-        mw.write("routines/routine.html", "routines/" + routine.getName() + ".html", "routine.js");
-    }
-
-    @Override protected String getPathToRoot() {
-        return "../";
+        try {
+            mustacheCompiler.write(pageData, writer);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write routine page for '{}'", routine.getName(), e);
+        }
     }
 }
