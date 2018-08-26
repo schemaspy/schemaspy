@@ -418,13 +418,13 @@ public class DatabaseService {
                                                    DatabaseMetaData metadata,
                                                    boolean forTables,
                                                    String... types) throws SQLException {
-        List<BasicTableMeta> basics = getBasicTableMetaFromSql(config, db, forTables);
-        if (Objects.isNull(basics)) {
-            basics = getBasicTableMetaFromDatabaseMetaData(metadata, db, forTables, types);
+        List<BasicTableMeta> basics = new ArrayList<>();
+        if (!getBasicTableMetaFromSql(basics, config, db, forTables)) {
+            getBasicTableMetaFromDatabaseMetaData(basics, metadata, db, forTables, types);
         }
         return basics;
     }
-    private List<BasicTableMeta> getBasicTableMetaFromSql(Config config, Database database, boolean forTables) {
+    private boolean getBasicTableMetaFromSql(List<BasicTableMeta> basics, Config config, Database database, boolean forTables) {
         String queryName = forTables ? "selectTablesSql" : "selectViewsSql";
         String sql = config.getDbProperties().getProperty(queryName);
 
@@ -432,7 +432,6 @@ public class DatabaseService {
             String clazz = forTables ? "table" : "view";
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, database, null);
                  ResultSet rs = stmt.executeQuery()) {
-                List<BasicTableMeta> basics = new ArrayList<>();
                 while (rs.next()) {
                     String name = rs.getString(clazz + "_name");
                     String cat = getOptionalString(rs, clazz + "_catalog");
@@ -446,16 +445,16 @@ public class DatabaseService {
 
                     basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, viewDefinition, numRows));
                 }
-                return basics;
+                return true;
             } catch (SQLException sqlException) {
                 LOGGER.warn("Failed to retrieve '{}' names with custom SQL '{}", clazz, sql, sqlException);
             }
         }
-        return null;
+        basics.clear();
+        return false;
     }
 
-    private static List<BasicTableMeta> getBasicTableMetaFromDatabaseMetaData(DatabaseMetaData databaseMetaData, Database database, boolean forTables, String... types) throws SQLException {
-        List<BasicTableMeta> basics = new ArrayList<>();
+    private static void getBasicTableMetaFromDatabaseMetaData(List<BasicTableMeta> basics, DatabaseMetaData databaseMetaData, Database database, boolean forTables, String... types) throws SQLException {
         String lastTableName = null;
         try (ResultSet rs = databaseMetaData.getTables(null, database.getSchema().getName(), "%", types)){
             while (rs.next()) {
@@ -473,7 +472,6 @@ public class DatabaseService {
                 throw exc;
             LOGGER.warn("Ignoring view '{}' due to exception", lastTableName, exc);
         }
-        return basics;
     }
 
     /**
