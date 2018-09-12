@@ -58,7 +58,7 @@ public class PgSqlRelationshipErrorIT {
     public static JdbcContainerRule<PostgreSQLContainer> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<>(
                     PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10"))
+                    new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10.4"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/relationship_error.sql", "\n\n\n"))
