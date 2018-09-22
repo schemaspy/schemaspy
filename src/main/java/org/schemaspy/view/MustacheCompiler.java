@@ -51,7 +51,7 @@ public class MustacheCompiler {
     public MustacheCompiler(String databaseName, HtmlConfig htmlConfig) {
         this.databaseName = databaseName;
         this.htmlConfig = htmlConfig;
-        this.mustacheFactory = new DefaultMustacheFactory(htmlConfig.getTemplateDirectory());
+        this.mustacheFactory = new DefaultMustacheFactory(new MustacheCustomResolver(htmlConfig.getTemplateDirectory()));
     }
 
     public void write(PageData pageData, Writer writer) throws IOException {
