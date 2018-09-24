@@ -18,14 +18,21 @@
  */
 package org.schemaspy.view;
 
+import com.sun.nio.file.ExtendedOpenOption;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.regex.Pattern;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -96,5 +103,30 @@ public class MustacheCompilerTest {
                 Pattern.compile("^rootPathToHome=\\.\\./$", Pattern.MULTILINE).matcher(string).find()
         );
         softAssertions.assertAll();
+    }
+
+    @Test
+    public void overrideLayoutTest() throws IOException {
+        Path overridePath = Paths.get("target","override.html");
+        HtmlConfig htmlConfig = mock(HtmlConfig.class);
+        when(htmlConfig.getTemplateDirectory()).thenReturn("target");
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("Override", htmlConfig);
+        Files.deleteIfExists(overridePath);
+        String before = write(mustacheCompiler);
+        assertThat(before).isEqualTo("normal");
+        Files.write(overridePath, "custom".getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+        //Create new MustacheCompiler this is to evict cache, else the already processed override.html will be used
+        mustacheCompiler = new MustacheCompiler("Override", htmlConfig);
+        String after = write(mustacheCompiler);
+        assertThat(after).isEqualTo("custom");
+    }
+
+    private String write(MustacheCompiler mustacheCompiler) throws IOException {
+        StringWriter writer = new StringWriter();
+        PageData pageData = new PageData.Builder()
+                .templateName("override.html")
+                .getPageData();
+        mustacheCompiler.write(pageData, writer);
+        return writer.toString();
     }
 }
