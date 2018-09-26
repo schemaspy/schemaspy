@@ -19,7 +19,12 @@
  */
 package org.schemaspy.util;
 
-import org.pegdown.PegDownProcessor;
+import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.profiles.pegdown.Extensions;
+import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
+import com.vladsch.flexmark.util.options.DataHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +40,12 @@ import java.util.regex.Pattern;
  */
 public class Markdown {
 
-    private final static PegDownProcessor processor = new PegDownProcessor();
+    private static final DataHolder OPTIONS = PegdownOptionsAdapter.flexmarkOptions(true,
+            Extensions.ALL
+    );
+
+    private static final Parser PARSER = Parser.builder(OPTIONS).build();
+    private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
     private final static HashMap<String, String> pages = new HashMap<>();
 
     public static String toHtml(String markdownText, String rootPath) {
@@ -43,7 +53,8 @@ public class Markdown {
 
         if (text != null) {
             text = addReferenceLink(text, rootPath);
-            text = processor.markdownToHtml(text);
+            Node content = PARSER.parse(text);
+            text = RENDERER.render(content).trim();
         }
 
         return text;
