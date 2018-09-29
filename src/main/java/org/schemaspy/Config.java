@@ -114,6 +114,9 @@ public final class Config implements HtmlConfig {
     private Boolean lowQuality;
     private Boolean paginationEnabled;
     private String imageFormat;
+    /**      
+     * @deprecated replaced by -dp expanding folders
+     */
     @Deprecated
     private Boolean loadJDBCJarsEnabled = false;
     private String schemaSpec;  // used in conjunction with evaluateAll
@@ -335,7 +338,7 @@ public final class Config implements HtmlConfig {
         return port;
     }
 
-    private boolean hasText(String string) {
+    private static boolean hasText(String string) {
         return Objects.nonNull(string) && !string.trim().isEmpty();
     }
 
@@ -1066,7 +1069,7 @@ public final class Config implements HtmlConfig {
         if (loadedFrom.contains("!/BOOT-INF")) {
             try {
                 loadedFrom = new URL(loadedFrom).getFile();
-                loadedFrom = loadedFrom.substring(0, loadedFrom.indexOf("!"));
+                loadedFrom = loadedFrom.substring(0, loadedFrom.indexOf('!'));
             } catch (MalformedURLException e) {
                 String classpath = System.getProperty("java.class.path");
                 return new StringTokenizer(classpath, File.pathSeparator).nextToken();
@@ -1135,6 +1138,7 @@ public final class Config implements HtmlConfig {
      * Defaults to <code>false</code> (enabled).
      *
      * @param enabled
+     * @deprecated replaced by -dp expanding folders
      */
     @Deprecated
     public void setLoadJDBCJarsEnabled(boolean enabled) {
@@ -1144,11 +1148,12 @@ public final class Config implements HtmlConfig {
     /**
      * @return
      * @see #setLoadJDBCJarsEnabled(boolean)
+     * @deprecated replaced by -dp expanding folders
      */
     @Deprecated
     public boolean isLoadJDBCJarsEnabled() {
         String loadJars = pullParam("-loadjars");
-        if (loadJars != null && loadJars.equals("true")) {
+        if (loadJars != null && "true".equals(loadJars)) {
             loadJDBCJarsEnabled = true;
         }
 
@@ -1293,7 +1298,7 @@ public final class Config implements HtmlConfig {
      * @param args List
      * @return List
      */
-    protected List<String> fixupArgs(List<String> args) {
+    private List<String> fixupArgs(List<String> args) {
         List<String> expandedArgs = new ArrayList<>();
 
         for (String arg : args) {
@@ -1331,13 +1336,17 @@ public final class Config implements HtmlConfig {
     }
 
     private void loadProperties(String path) {
-        try (Stream<String> lineStream = Files.lines(Paths.get(path))) {
-            String content = lineStream
-                    .map(l -> l.replace("\\", "\\\\"))
-                    .map(Config::rtrim)
+        if (Paths.get(path).toFile().exists()) {
+            try (Stream<String> lineStream = Files.lines(Paths.get(path))) {
+                String content = lineStream
+                        .map(l -> l.replace("\\", "\\\\"))
+                        .map(Config::rtrim)
                     .collect(Collectors.joining(System.lineSeparator()));
-            this.schemaspyProperties.load(new StringReader(content));
-        } catch (IOException e) {
+                this.schemaspyProperties.load(new StringReader(content));
+            } catch (IOException e) {
+                LOGGER.info("Failed to load properties", e);
+            }
+        } else {
             LOGGER.info("Configuration file not found");
         }
     }
@@ -1400,49 +1409,42 @@ public final class Config implements HtmlConfig {
      * @param detailedDb
      */
     @Deprecated
-    protected void dumpUsage(String errorMessage, boolean detailedDb) {
+    void dumpUsage(String errorMessage, boolean detailedDb) {
+
         if (errorMessage != null) {
-            System.out.flush();
-            System.err.println("*** " + errorMessage + " ***");
+            LOGGER.error("*** {} ***", errorMessage );
         } else {
-            System.out.println("SchemaSpy generates an HTML representation of a database schema's relationships.");
+            LOGGER.info("SchemaSpy generates an HTML representation of a database schema's relationships.");
         }
 
-        System.err.flush();
-        System.out.println();
 
         if (!detailedDb) {
-            System.out.println("Usage:");
-            System.out.println(" java -jar " + getLoadedFromJar() + " [options]");
-            System.out.println("   -t databaseType       type of database - defaults to ora");
-            System.out.println("                           use -dbhelp for a list of built-in types");
-            System.out.println("   -u user               connect to the database with this user id");
-            System.out.println("   -s schema             defaults to the specified user");
-            System.out.println("   -p password           defaults to no password");
-            System.out.println("   -o outputDirectory    directory to place the generated output in");
-            System.out.println("   -dp pathToDrivers     optional - looks for JDBC drivers here before looking");
-            System.out.println("                           in driverPath in [databaseType].properties.");
-            System.out.println("Go to http://schemaspy.org for a complete list/description");
-            System.out.println(" of additional parameters.");
-            System.out.println();
+            LOGGER.info("Usage:");
+            LOGGER.info(" java -jar {} [options]", getLoadedFromJar());
+            LOGGER.info("   -t databaseType       type of database - defaults to ora");
+            LOGGER.info("                           use -dbhelp for a list of built-in types");
+            LOGGER.info("   -u user               connect to the database with this user id");
+            LOGGER.info("   -s schema             defaults to the specified user");
+            LOGGER.info("   -p password           defaults to no password");
+            LOGGER.info("   -o outputDirectory    directory to place the generated output in");
+            LOGGER.info("   -dp pathToDrivers     optional - looks for JDBC drivers here before looking");
+            LOGGER.info("                           in driverPath in [databaseType].properties.");
+            LOGGER.info("Go to http://schemaspy.org for a complete list/description");
+            LOGGER.info(" of additional parameters.");
         }
 
         if (detailedDb) {
-            System.out.println("Missing required connection parameters for '" + getDbType() + "':");
+            LOGGER.info("Missing required connection parameters for '{}'", getDbType());
             new DbSpecificConfig(getDbProperties()).dumpUsage();
-            System.out.println();
         }
 
         if (detailedDb) {
-            System.out.println("You can use your own database types by specifying the filespec of a .properties file with -t.");
-            System.out.println("Grab one out of " + getLoadedFromJar() + " and modify it to suit your needs.");
-            System.out.println();
+            LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
+            LOGGER.info("Grab one out of {} and modify it to suit your needs.", getLoadedFromJar());
         }
 
-        System.out.println("Sample usage using the default database type (implied -t ora):");
-        System.out.println(" java -jar schemaSpy.jar -db mydb -s myschema -u devuser -p password -o output");
-        System.out.println();
-        System.out.flush();
+        LOGGER.info("Sample usage using the default database type (implied -t ora):");
+        LOGGER.info(" java -jar schemaSpy.jar -db mydb -s myschema -u devuser -p password -o output");
     }
 
     /**
