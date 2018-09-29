@@ -1334,11 +1334,20 @@ public final class Config implements HtmlConfig {
         try (Stream<String> lineStream = Files.lines(Paths.get(path))) {
             String content = lineStream
                     .map(l -> l.replace("\\", "\\\\"))
+                    .map(Config::rtrim)
                     .collect(Collectors.joining(System.lineSeparator()));
             this.schemaspyProperties.load(new StringReader(content));
         } catch (IOException e) {
             LOGGER.info("Configuration file not found");
         }
+    }
+
+    private static String rtrim(String s) {
+        int i = s.length()-1;
+        while (i >= 0 && Character.isWhitespace(s.charAt(i))) {
+            i--;
+        }
+        return s.substring(0,i+1);
     }
 
     /**

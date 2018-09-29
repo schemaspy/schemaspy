@@ -61,6 +61,24 @@ public class ConfigTest {
     }
 
     @Test
+    public void propertiesShouldHaveTrailingSpacesTrimmed() {
+        Config config = new Config("-configFile", "src/test/resources/configTest/propertiesWithTrailingSpace.properties");
+        assertThat(config.getSchema()).isEqualToIgnoringCase("schema");
+        assertThat(config.getPassword()).isEqualToIgnoringCase("database_password");
+        assertThat(config.getUser()).isEqualToIgnoringCase("database_user");
+        assertThat(config.getDb()).isEqualToIgnoringCase("db_name");
+    }
+
+    @Test
+    public void propertiesShouldHaveTrailingSpaces() {
+        Config config = new Config("-configFile", "src/test/resources/configTest/propertiesWithTrailingSpaceRetained.properties");
+        assertThat(config.getSchema()).isEqualToIgnoringCase("schema");
+        assertThat(config.getPassword()).isEqualToIgnoringCase("database_password ");
+        assertThat(config.getUser()).isEqualToIgnoringCase("database_user");
+        assertThat(config.getDb()).isEqualToIgnoringCase("db_name");
+    }
+
+    @Test
     public void determineDdPropertiesWillExtend() throws IOException {
         Config config = new Config();
         Map expected = new HashMap<>();
