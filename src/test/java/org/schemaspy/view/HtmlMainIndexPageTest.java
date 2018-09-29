@@ -19,30 +19,35 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.model.Catalog;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.Schema;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.TreeSet;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HtmlMainIndexPageTest {
 
     @Test
-    public void whatsTheResultOfWeirdCode() {
-        Collection<String> tableName = new ArrayList<>();
-        tableName.add("local");
+    public void descriptionSupportsMarkdown() {
+        HtmlConfig htmlConfig = mock(HtmlConfig.class);
+        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig);
+        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, "normal *emp* **strong**");
+        StringWriter writer = new StringWriter();
+        Database database = mock(Database.class);
+        when(database.getSchema()).thenReturn(new Schema("schema"));
+        when(database.getCatalog()).thenReturn(new Catalog("catalog"));
+        htmlMainIndexPage.write(database, Collections.emptyList(), Collections.emptyList(), writer);
 
-        Collection<String> remotes = new ArrayList<>();
-        remotes.add("remote");
-        // sort tables and remotes by name
-        Collection<String> tmp = new TreeSet<>();
-        tmp.addAll(tableName);
-        tableName = tmp;
-        tmp = new TreeSet<>();
-        tmp.addAll(remotes);
-
-        for(String table : tableName) {
-            System.out.println(table);
-        }
+        assertThat(writer.toString()).contains("<p>normal <em>emp</em> <strong>strong</strong></p>");
     }
 
 }
