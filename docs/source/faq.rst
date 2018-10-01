@@ -2,8 +2,8 @@
 
    <br />
 
-FAQ
-====
+Frequent Asked Questions
+=========================
 
 General
 --------

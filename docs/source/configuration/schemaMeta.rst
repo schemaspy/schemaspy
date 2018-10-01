@@ -1,3 +1,7 @@
+.. |br| raw:: html
+
+   <br />
+
 .. _schemameta:
 
 SchemaMeta
