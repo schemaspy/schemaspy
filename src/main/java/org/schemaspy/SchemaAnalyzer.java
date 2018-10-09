@@ -39,6 +39,7 @@ import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
 import org.schemaspy.util.Dot;
+import org.schemaspy.util.ManifestUtils;
 import org.schemaspy.util.ResourceWriter;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.*;
@@ -48,10 +49,15 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -293,13 +299,20 @@ public class SchemaAnalyzer {
         }
     }
 
-    private void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
+    private static void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
         PrintWriter out;
         LOGGER.info("Gathered schema details in {} seconds", duration / 1000);
         LOGGER.info("Writing/graphing summary");
 
         prepareLayoutFiles(outputDir);
 
+        Path htmlInfoFile = outputDir.toPath().resolve("info-html.txt");
+        Files.deleteIfExists(htmlInfoFile);
+        writeInfo("date", ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ")), htmlInfoFile);
+        writeInfo("os", System.getProperty("os.name") + " " + System.getProperty("os.version"), htmlInfoFile);
+        writeInfo("schemaspy-version", ManifestUtils.getImplementationVersion(), htmlInfoFile);
+        writeInfo("schemaspy-build", ManifestUtils.getImplementationBuild(), htmlInfoFile);
+        writeInfo("diagramImplementation", Dot.getInstance().getImplementationDetails(), htmlInfoFile);
         progressListener.graphingSummaryProgressed();
 
         boolean showDetailedTables = tables.size() <= config.getMaxDetailedTables();
@@ -453,6 +466,14 @@ public class SchemaAnalyzer {
         IOFileFilter notHtmlFilter = FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter(".html"));
         FileFilter filter = FileFilterUtils.and(notHtmlFilter);
         ResourceWriter.copyResources(url, outputDir, filter);
+    }
+
+    private static void writeInfo(String key, String value, Path infoFile) {
+        try {
+            Files.write(infoFile, (key + "=" + value + "\n").getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write '{}', to '{}'", key + "=" + value, infoFile, e);
+        }
     }
 
     private Connection getConnection(Config config) throws IOException {

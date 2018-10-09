@@ -369,6 +369,10 @@
                         <exclude>**/MSSQLServer*IT.java</exclude>
                         <exclude>**/PgSql*IT.java</exclude>
                     </excludes>
+                    <systemPropertyVariables>
+                        <pomImplementationVersion>${project.version}</pomImplementationVersion>
+                        <pomImplementationBuild>${buildNumber}</pomImplementationBuild>
+                    </systemPropertyVariables>
                 </configuration>
                 <executions>
                     <execution>

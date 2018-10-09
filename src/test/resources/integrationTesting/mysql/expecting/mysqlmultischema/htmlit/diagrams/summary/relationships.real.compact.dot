@@ -1,5 +1,3 @@
-// dot 2.38 on Linux 4.4.0-130-generic
-// SchemaSpy rev Unknown
 digraph "compactRelationshipsDiagram" {
   graph [
     rankdir="RL"

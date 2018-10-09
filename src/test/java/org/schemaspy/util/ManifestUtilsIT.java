@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -16,21 +16,21 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy;
+package org.schemaspy.util;
 
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * @author Daniel Watt
- */
-public class RevisionTest {
+//Only run from maven
+public class ManifestUtilsIT {
 
     @Test
-    public void revisionDefaultsToUnknown() {
-        Revision revision = new Revision();
-        assertThat(revision.toString()).isEqualTo("Unknown");
+    public void getImplementationVersion() {
+        assertThat(ManifestUtils.getImplementationVersion()).isEqualTo(System.getProperty("pomImplementationVersion"));
     }
 
+    @Test
+    public void getImplementationBuild() {
+        assertThat(ManifestUtils.getImplementationBuild()).isEqualTo(System.getProperty("pomImplementationBuild"));
+    }
 }
