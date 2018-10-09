@@ -37,7 +37,7 @@ public class WriteStats {
     private final Set<TableColumn> excludedColumns;
 
     public WriteStats(Collection<Table> tables) {
-        excludedColumns = new HashSet<TableColumn>();
+        excludedColumns = new HashSet<>();
 
         for (Table table : tables) {
             for (TableColumn column : table.getColumns()) {
