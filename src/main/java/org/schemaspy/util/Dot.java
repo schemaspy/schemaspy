@@ -320,6 +320,10 @@ public class Dot {
         }
     }
 
+    public String getImplementationDetails() {
+        return "Graphviz dot " + getGraphvizVersion().toString();
+    }
+
     public class DotFailure extends IOException {
         private static final long serialVersionUID = 3833743270181351987L;
 
