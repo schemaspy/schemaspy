@@ -88,7 +88,14 @@ public class XmlProducerUsingDOM implements XmlProducer {
 
         XmlTableFormatter.getInstance().appendTables(rootNode, tables);
 
-        String xmlName = database.getName();
+        String xmlName = "UNKNOWN";
+        if (Objects.nonNull(database.getName())) {
+            xmlName = database.getName();
+        } else {
+            if (Objects.nonNull(database.getDbmsMeta().getProductName())) {
+                xmlName = database.getDbmsMeta().getProductName().replaceAll("[^a-zA-Z0-9.]", "_");
+            }
+        }
 
         // some dbNames have path info in the name...strip it
         xmlName = new File(xmlName).getName();
