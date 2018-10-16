@@ -8,7 +8,6 @@ jdk:
 addons:
   apt:
     packages:
-      - oracle-java8-installer
       - graphviz
 script:
   - ./travis.sh
