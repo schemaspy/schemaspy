@@ -55,8 +55,7 @@ public class ConnectionURLBuilder {
 
     public String build() {
         List<String> args = getArgs();
-        List<String> remaining = config.getRemainingParameters();
-        args.addAll(remaining);
+        args.addAll(config.getRemainingParameters());
 
         String connectionURL = dbType.getProperty("connectionSpec");
         DbSpecificConfig dbConfig = new DbSpecificConfig(config.getDbProperties());
@@ -67,14 +66,6 @@ public class ConnectionURLBuilder {
 
             // replace e.g. <host> with myDbHost
             connectionURL = connectionURL.replaceAll("\\<" + option.getName() + "\\>", option.getValue());
-        }
-
-        for (DbSpecificOption option : dbConfig.getOptions()) {
-            int idx = remaining.indexOf("-" + option.getName());
-            if (idx >= 0) {
-                remaining.remove(idx);  // -paramKey
-                remaining.remove(idx);  // paramValue
-            }
         }
 
         LOGGER.trace("connectionURL: {}", connectionURL);
