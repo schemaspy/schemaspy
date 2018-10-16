@@ -23,17 +23,13 @@
 package org.schemaspy.view;
 
 import org.schemaspy.model.ProgressListener;
-import org.schemaspy.util.DiagramUtil;
-import org.schemaspy.util.Dot;
+import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The page that contains the overview entity relationship diagrams.
@@ -54,54 +50,17 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
     }
 
     public boolean write(
-            File diagramDir,
-            String dotBaseFilespec,
-            boolean hasRealRelationships,
-            boolean hasImpliedRelationships,
-            ProgressListener listener,
+            MustacheSummaryDiagramResults results,
             Writer writer
     ) {
         try {
-            Dot dot = getDot();
-
-            if (dot == null) //if null mean that it was problem with dot Graphviz initialization
-                return false;
-
-            File compactRelationshipsDotFile = new File(diagramDir, dotBaseFilespec + ".real.compact.dot");
-            File compactRelationshipsDiagramFile = new File(diagramDir, dotBaseFilespec + ".real.compact." + dot.getFormat());
-            File largeRelationshipsDotFile = new File(diagramDir, dotBaseFilespec + ".real.large.dot");
-            File largeRelationshipsDiagramFile = new File(diagramDir, dotBaseFilespec + ".real.large." + dot.getFormat());
-            File compactImpliedDotFile = new File(diagramDir, dotBaseFilespec + ".implied.compact.dot");
-            File compactImpliedDiagramFile = new File(diagramDir, dotBaseFilespec + ".implied.compact." + dot.getFormat());
-            File largeImpliedDotFile = new File(diagramDir, dotBaseFilespec + ".implied.large.dot");
-            File largeImpliedDiagramFile = new File(diagramDir, dotBaseFilespec + ".implied.large." + dot.getFormat());
-
-            List<MustacheTableDiagram> diagrams = new ArrayList<>();
-
-            if (hasRealRelationships) {
-                generateRelationshipDiagrams(listener, dot, compactRelationshipsDotFile, compactRelationshipsDiagramFile, largeRelationshipsDotFile, largeRelationshipsDiagramFile, diagrams);
-            }
-
-            if (hasImpliedRelationships) {
-                generateImpliedRelationshipDiagrams(listener, dot, compactImpliedDotFile, compactImpliedDiagramFile, largeImpliedDotFile, largeImpliedDiagramFile, diagrams);
-            }
-
-            listener.graphingSummaryProgressed();
-
-            DiagramUtil.markFirstAsActive(diagrams);
-
-            String graphvizVersion = Dot.getInstance().getSupportedVersions().substring(4);
-            Object graphvizExists = dot;
-
             PageData pageData = new PageData.Builder()
                     .templateName("relationships.html")
                     .scriptName("relationships.js")
-                    .addToScope("graphvizExists", graphvizExists)
-                    .addToScope("graphvizVersion", graphvizVersion)
-                    .addToScope("diagramExists", DiagramUtil.diagramExists(diagrams))
-                    .addToScope("hasOnlyImpliedRelationships", hasOnlyImpliedRelationships(hasRealRelationships, hasImpliedRelationships))
-                    .addToScope("anyRelationships", anyRelationships(hasRealRelationships, hasImpliedRelationships))
-                    .addToScope("diagrams", diagrams)
+                    .addToScope("hasOnlyImpliedRelationships", hasOnlyImpliedRelationships(results))
+                    .addToScope("anyRelationships", anyRelationships(results))
+                    .addToScope("diagrams", results.getDiagrams())
+                    .addToScope("diagramErrors", results.getOutputExceptions())
                     .depth(0)
                     .getPageData();
 
@@ -113,42 +72,11 @@ public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
         }
     }
 
-    private static void generateRelationshipDiagrams(ProgressListener listener, Dot dot, File compactRelationshipsDotFile, File compactRelationshipsDiagramFile, File largeRelationshipsDotFile, File largeRelationshipsDiagramFile, List<MustacheTableDiagram> diagrams) throws IOException {
-        try {
-            listener.graphingSummaryProgressed();
-            DiagramUtil.generateDiagram("Compact", dot, compactRelationshipsDotFile, compactRelationshipsDiagramFile, diagrams, false, false);
-        } catch (Dot.DotFailure dotFailure) {
-            LOGGER.error("Failed to generate compact relationship diagram", dotFailure);
-        }
-
-        try {
-            listener.graphingSummaryProgressed();
-            DiagramUtil.generateDiagram("Large", dot, largeRelationshipsDotFile, largeRelationshipsDiagramFile, diagrams, false, false);
-        } catch (Dot.DotFailure dotFailure) {
-            LOGGER.error("Failed to generate large relationship diagram", dotFailure);
-        }
+    private static boolean hasOnlyImpliedRelationships(MustacheSummaryDiagramResults results) {
+        return !results.hasRealRelationships() && !results.getImpliedConstraints().isEmpty() ? true : false;
     }
 
-    private static void generateImpliedRelationshipDiagrams(ProgressListener listener, Dot dot, File compactImpliedDotFile, File compactImpliedDiagramFile, File largeImpliedDotFile, File largeImpliedDiagramFile, List<MustacheTableDiagram> diagrams) throws IOException {
-        try {
-            listener.graphingSummaryProgressed();
-            DiagramUtil.generateDiagram("Compact Implied", dot, compactImpliedDotFile, compactImpliedDiagramFile, diagrams, false, true);
-        } catch (Dot.DotFailure dotFailure) {
-            LOGGER.error("Failed to generate compact implied relationship diagram", dotFailure);
-        }
-        try {
-            listener.graphingSummaryProgressed();
-            DiagramUtil.generateDiagram("Large Implied", dot, largeImpliedDotFile, largeImpliedDiagramFile, diagrams, false, true);
-        } catch (Dot.DotFailure dotFailure) {
-            LOGGER.error("Failed to generate large implied relationship diagram", dotFailure);
-        }
-    }
-
-    private static Object hasOnlyImpliedRelationships(boolean hasRealRelationships, boolean hasImpliedRelationships) {
-        return !hasRealRelationships && hasImpliedRelationships ? new Object() : null;
-    }
-
-    private static Object anyRelationships(boolean hasRealRelationships, boolean hasImpliedRelationships) {
-        return !hasRealRelationships && !hasImpliedRelationships ? new Object() : null;
+    private static boolean anyRelationships(MustacheSummaryDiagramResults results) {
+        return !results.hasRealRelationships() && results.getImpliedConstraints().isEmpty() ? true : false;
     }
 }

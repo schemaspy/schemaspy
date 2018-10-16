@@ -314,7 +314,7 @@ public class DotFormatter {
         }
 
         dot.println("}");
-
+        dot.flush();
         return wroteImplied;
     }
 
