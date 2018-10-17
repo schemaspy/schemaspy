@@ -22,7 +22,6 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ import java.lang.invoke.MethodHandles;
  * @author Ismail Simsek
  * @author Nils Petzaell
  */
-public class HtmlRelationshipsPage extends HtmlDiagramFormatter {
+public class HtmlRelationshipsPage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

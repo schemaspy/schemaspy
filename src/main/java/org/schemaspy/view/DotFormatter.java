@@ -332,5 +332,6 @@ public class DotFormatter {
         DotNodeConfig nodeConfig = new DotNodeConfig(true, true);
         dot.println(new DotNode(table, "tables/", outputDir, nodeConfig).toString());
         dot.println("}");
+        dot.flush();
     }
 }

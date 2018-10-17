@@ -39,9 +39,9 @@ import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.diagram.DiagramProducer;
 import org.schemaspy.output.diagram.graphviz.DiagramProducerUsingGraphvizWrapper;
 import org.schemaspy.output.html.mustache.diagrams.MustacheDiagramFactory;
+import org.schemaspy.output.html.mustache.diagrams.MustacheOrphanDiagramFactory;
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramFactory;
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
-import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
@@ -331,14 +331,15 @@ public class SchemaAnalyzer {
         if (config.isRailsEnabled())
             DbAnalyzer.getRailsConstraints(db.getTablesMap());
 
+        DotFormatter dotProducer = DotFormatter.getInstance();
         DiagramProducer diagramProducer = new DiagramProducerUsingGraphvizWrapper(Dot.getInstance(), outputDir);
         MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(diagramProducer);
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(DotFormatter.getInstance(), mustacheDiagramFactory, impliedConstraintsFinder, outputDir);
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, impliedConstraintsFinder, outputDir);
         MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, includeImpliedConstraints, showDetailedTables, progressListener);
-        results.getOutputExceptions().stream().forEachOrdered(exception -> {
-            LOGGER.error("RelationShipDiagramError", exception);
-        });
+        results.getOutputExceptions().stream().forEachOrdered(exception ->
+                LOGGER.error("RelationShipDiagramError", exception)
+        );
         MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config);
 
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler);
@@ -348,11 +349,12 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        File orphansDir = new File(outputDir, "diagrams/orphans");
-        FileUtils.forceMkdir(orphansDir);
+        List<Table> orphans = DbAnalyzer.getOrphans(tables);
+        MustacheOrphanDiagramFactory mustacheOrphanDiagramFactory = new MustacheOrphanDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        List<MustacheTableDiagram> orphanDiagrams = mustacheOrphanDiagramFactory.generateOrphanDiagrams(orphans);
         HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(mustacheCompiler);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("orphans.html").toFile())) {
-            htmlOrphansPage.write(DbAnalyzer.getOrphans(tables), orphansDir, outputDir.toString(), writer);
+            htmlOrphansPage.write(orphanDiagrams, orphanDiagrams.size() == orphans.size(), writer);
         }
 
         progressListener.graphingSummaryProgressed();
