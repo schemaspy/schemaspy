@@ -53,7 +53,6 @@ public class MustacheOrphanDiagramFactory {
     }
 
     public List<MustacheTableDiagram> generateOrphanDiagrams(List<Table> orphanTables) {
-        List<MustacheTableDiagram> mustacheTableDiagrams = new ArrayList<>();
 
         Collections.sort(orphanTables, (Comparator) (t1, t2) -> {
             Integer size1 = ((Table) t1).getColumns().size();
@@ -69,6 +68,7 @@ public class MustacheOrphanDiagramFactory {
             }
         });
 
+        List<MustacheTableDiagram> mustacheTableDiagrams = new ArrayList<>();
         for(Table table : orphanTables) {
             String dotBaseFilespec = table.getName();
 
