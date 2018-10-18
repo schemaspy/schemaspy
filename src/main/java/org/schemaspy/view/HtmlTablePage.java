@@ -24,23 +24,16 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
-import org.schemaspy.util.DiagramUtil;
-import org.schemaspy.util.Dot;
 import org.schemaspy.util.Markdown;
-import org.schemaspy.util.Writers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -59,15 +52,13 @@ public class HtmlTablePage {
 
     private final MustacheCompiler mustacheCompiler;
     private final SqlAnalyzer sqlAnalyzer;
-    private final String imageFormat;
 
-    public HtmlTablePage(MustacheCompiler mustacheCompiler, SqlAnalyzer sqlAnalyzer, String imageFormat) {
+    public HtmlTablePage(MustacheCompiler mustacheCompiler, SqlAnalyzer sqlAnalyzer) {
         this.mustacheCompiler = mustacheCompiler;
         this.sqlAnalyzer = sqlAnalyzer;
-        this.imageFormat = imageFormat;
     }
 
-    public void write(Table table, File outputDir, WriteStats stats, Writer writer) throws IOException {
+    public void write(Table table, List<MustacheTableDiagram> diagrams, Writer writer) {
         Set<TableColumn> primaries = new HashSet<>(table.getPrimaryColumns());
         Set<TableColumn> indexes = new HashSet<>();
         Set<MustacheTableColumn> tableColumns = new LinkedHashSet<>();
@@ -83,9 +74,6 @@ public class HtmlTablePage {
             tableColumns.add(new MustacheTableColumn(column, indexes, mustacheCompiler.getRootPath(1)));
         }
 
-        List<MustacheTableDiagram> diagrams = new ArrayList<>();
-        Object graphvizExists = generateDiagrams(table, stats, outputDir, diagrams);
-        String graphvizVersion = Dot.getInstance().getSupportedVersions().substring(4);
         LOGGER.debug("Writing table page -> {}", table.getName());
 
         PageData pageData = new PageData.Builder()
@@ -96,14 +84,9 @@ public class HtmlTablePage {
                 .addToScope("primaries", primaries)
                 .addToScope("columns", tableColumns)
                 .addToScope("indexes", indexedColumns)
-                .addToScope("graphvizExists", graphvizExists)
-                .addToScope("graphvizVersion", graphvizVersion)
                 .addToScope("diagrams", diagrams)
                 .addToScope("sqlCode", sqlCode(table))
                 .addToScope("references", sqlReferences(table))
-                .addToScope("diagramExists", DiagramUtil.diagramExists(diagrams))
-                .addToScope("indexExists", indexExists(table, indexedColumns))
-                .addToScope("definitionExists", definitionExists(table))
                 .depth(1)
                 .getPageData();
 
@@ -116,118 +99,16 @@ public class HtmlTablePage {
 
 
     private Set<Table> sqlReferences(Table table) {
-        Set<Table> references = null;
+        Set<Table> references = new LinkedHashSet<>();
 
         if (table.isView() && table.getViewDefinition() != null) {
-            references = sqlAnalyzer.getReferencedTables(table.getViewDefinition());
+            references.addAll(sqlAnalyzer.getReferencedTables(table.getViewDefinition()));
         }
         return references;
     }
 
     private static String sqlCode(Table table) {
         return table.getViewDefinition() != null ? table.getViewDefinition().trim() : "";
-    }
-
-    private static Object indexExists(Table table, Set<MustacheTableIndex> indexedColumns) {
-        Object exists = null;
-        if (!table.isView() && !indexedColumns.isEmpty()) {
-            exists = new Object();
-        }
-        return exists;
-    }
-
-    private static Object definitionExists(Table table) {
-        Object exists = null;
-        if (table.isView() && table.getViewDefinition() != null) {
-            exists = new Object();
-        }
-        return exists;
-    }
-
-    /**
-     * Generate the .dot file(s) to represent the specified table's relationships.
-     * <p>
-     * Generates a <TABLENAME>.dot if the table has real relatives.
-     * <p>
-     * Also generates a <TABLENAME>.implied2degrees.dot if the table has implied relatives within
-     * two degrees of separation.
-     *
-     * @param table       Table
-     * @param diagramDir File
-     * @return boolean <code>true</code> if the table has implied relatives within two
-     * degrees of separation.
-     * @throws IOException
-     */
-    private boolean generateDots(Table table, File diagramDir, WriteStats stats, File outputDir) throws IOException {
-        Dot dot = Dot.getInstance();
-        String extension = dot == null ? imageFormat : dot.getFormat();
-
-        File oneDegreeDotFile = new File(diagramDir, table.getName() + ".1degree.dot");
-        File oneDegreeDiagramFile = new File(diagramDir, table.getName() + ".1degree." + extension);
-        File twoDegreesDotFile = new File(diagramDir, table.getName() + ".2degrees.dot");
-        File twoDegreesDiagramFile = new File(diagramDir, table.getName() + ".2degrees." + extension);
-        File oneImpliedDotFile = new File(diagramDir, table.getName() + ".implied1degrees.dot");
-        File oneImpliedDiagramFile = new File(diagramDir, table.getName() + ".implied1degrees." + extension);
-        File twoImpliedDotFile = new File(diagramDir, table.getName() + ".implied2degrees.dot");
-        File twoImpliedDiagramFile = new File(diagramDir, table.getName() + ".implied2degrees." + extension);
-
-        // delete before we start because we'll use the existence of these files to determine
-        // if they should be turned into pngs & presented
-        Files.deleteIfExists(oneDegreeDotFile.toPath());
-        Files.deleteIfExists(oneDegreeDiagramFile.toPath());
-        Files.deleteIfExists(twoDegreesDotFile.toPath());
-        Files.deleteIfExists(twoDegreesDiagramFile.toPath());
-        Files.deleteIfExists(oneImpliedDotFile.toPath());
-        Files.deleteIfExists(oneImpliedDiagramFile.toPath());
-        Files.deleteIfExists(twoImpliedDotFile.toPath());
-        Files.deleteIfExists(twoImpliedDiagramFile.toPath());
-
-
-        if (table.getMaxChildren() + table.getMaxParents() > 0) {
-            Set<ForeignKeyConstraint> impliedConstraints;
-
-            DotFormatter formatter = DotFormatter.getInstance();
-
-            WriteStats oneStats = new WriteStats(stats);
-            try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
-                formatter.writeRealRelationships(table, false, oneStats, dotOut, outputDir);
-            }
-
-            WriteStats twoStats = new WriteStats(stats);
-            try (PrintWriter dotOut = Writers.newPrintWriter(twoDegreesDotFile)) {
-                impliedConstraints = formatter.writeRealRelationships(table, true, twoStats, dotOut, outputDir);
-            }
-
-            if (oneStats.getNumTablesWritten() + oneStats.getNumViewsWritten() == twoStats.getNumTablesWritten() + twoStats.getNumViewsWritten()) {
-                Files.deleteIfExists(twoDegreesDotFile.toPath()); // no different than before, so don't show it
-            }
-
-            if (!impliedConstraints.isEmpty()) {
-                try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
-                    formatter.writeAllRelationships(table, false, stats, dotOut, outputDir);
-                }
-
-                try (PrintWriter dotOut = Writers.newPrintWriter(twoImpliedDotFile)) {
-                    formatter.writeAllRelationships(table, true, stats, dotOut, outputDir);
-                }
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private Object generateDiagrams(Table table, WriteStats stats, File outputDir, List<MustacheTableDiagram> diagrams) throws IOException {
-        Object graphviz = new Object();
-
-        File diagramsDir = new File(outputDir, "diagrams");
-        generateDots(table, diagramsDir, stats, outputDir);
-
-        if (table.getMaxChildren() + table.getMaxParents() > 0 && !HtmlTableDiagrammer.getInstance().write(table, diagramsDir, diagrams)) {
-            graphviz = null;
-        }
-
-        return graphviz;
     }
 
 }
