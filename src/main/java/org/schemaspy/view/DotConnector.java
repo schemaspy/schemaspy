@@ -21,7 +21,6 @@ package org.schemaspy.view;
 
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
-import org.schemaspy.util.Dot;
 
 /**
  * Represents Graphvis dot's concept of an edge.  That is, a connector between two nodes.
@@ -34,7 +33,6 @@ public class DotConnector implements Comparable<DotConnector> {
     private final TableColumn childColumn;
     private final Table childTable;
     private final boolean implied;
-    private final boolean bottomJustify;
     private String parentPort;
     private String childPort;
 
@@ -53,7 +51,6 @@ public class DotConnector implements Comparable<DotConnector> {
         parentTable = parentColumn.getTable();
         childPort = childColumn.getName();
         childTable = childColumn.getTable();
-        bottomJustify = !Dot.getInstance().supportsCenteredEastWestEdges();
     }
 
     /**
@@ -102,8 +99,6 @@ public class DotConnector implements Comparable<DotConnector> {
         edge.append("\":\"");
         edge.append(childPort);
         edge.append("\":");
-        if (bottomJustify)
-            edge.append("s");
         edge.append("w -> \"");
         if (parentTable.isRemote()) {
             edge.append(parentTable.getContainer());
@@ -113,8 +108,6 @@ public class DotConnector implements Comparable<DotConnector> {
         edge.append("\":\"");
         edge.append(parentPort);
         edge.append("\":");
-        if (bottomJustify)
-            edge.append("s");
         edge.append("e ");
 
         // if enabled makes the diagram unreadable
