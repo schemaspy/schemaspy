@@ -1,23 +1,32 @@
       <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>Utility Tables</h1>
+          <h1>Utility Tables</h1>
       </section>
       <!-- Main content -->
       <section class="content">
-		<div class="box box-primary">
-			<div class="box-header with-border">
-              <i class="fa fa-code-fork"></i>
-              <h3 class="box-title">Orphan Tables</h3>
-            </div>			
-            <div class="box-body">
-			<div id="grid" data-columns>
-				{{#mustacheTables}}
-				<div class="item">
-					<img src='diagrams/orphans/{{diagramName}}' usemap='#{{table.name}}' style="max-width:100%;" border='0' alt='' align='top'></img>
-				</div>
-				{{/mustacheTables}}
-			</div>
-			{{{maps}}}
-			</div>
-		</div>			
+          <div class="box box-primary">
+              <div class="box-header with-border">
+                  <i class="fa fa-code-fork"></i>
+                  <h3 class="box-title">Orphan Tables</h3>
+              </div>
+              <div class="box-body">
+                  <div id="grid" data-columns>
+                      {{#diagrams}}
+                      <div class="item">
+                          <img src='diagrams/orphans/{{fileName}}' usemap='#{{mapName}}' style="max-width:100%;" border='0' alt='' align='top'/>
+                      </div>
+                      {{/diagrams}}
+                  </div>
+                  {{#diagrams}}{{{map}}}{{/diagrams}}
+              </div>
+          </div>
+          {{^allWritten}}
+          <div class="alert alert-warning alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+              <h4><i class="icon fa fa-warning"></i>Not all diagrams were created</h4>
+              <p>SchemaSpy was unable to generate diagrams for all orphan tables.</br>
+                  Check application output for details.
+              </p>
+          </div>
+          {{/allWritten}}
       </section>

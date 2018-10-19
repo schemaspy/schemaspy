@@ -74,59 +74,57 @@
   <!-- Main content -->
   <!-- Full Width Column -->
   <div class="content-wrapper">
-          <!-- Content Header (Page header) -->
-      <section class="content-header">
+        <!-- Content Header (Page header) -->
+    <section class="content-header">
         <h1>All Relationships</h1>
-      </section>
-      <!-- Main content -->
-      <section class="content">
-				<div class="box box-primary">		
-			<div class="box-header with-border">
-              <i class="fa fa-code-fork"></i>
-              <h3 class="box-title">Diagrams</h3>
-            </div>	
-			<div class="box-body">	
-			<div class="nav-tabs-custom" style="cursor: move;">
-            <!-- Tabs within a box -->
-			<h5>By default only columns that are primary keys, foreign keys or indexes are shown.</h5>
-            <ul class="nav nav-tabs pull-left ui-sortable-handle">
-			  			              <li class="active"><a href="#compactimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact Implied</a></li>			  			 
-			  			              <li class=""><a href="#largeimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large Implied</a></li>			  			 
-            </ul>
-            <div class="tab-content no-padding">            
-				<div class="chart tab-pane active" id="compactimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
-							<div class="alert alert-warning alert-dismissible">
-								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-								<h4><i class="icon fa fa-info-circle"></i> Implied Relationships</h4>
-								<p>No 'real' Foreign Key relationships were detected in the schema.<br>
-								Displayed relationships are implied by a column's name/type/size matching another table's primary key.</p>
-							</div> 
-																											<map id="compactImpliedRelationshipsDiagram" name="compactImpliedRelationshipsDiagram">
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <i class="fa fa-code-fork"></i>
+                <h3 class="box-title">Diagrams</h3>
+            </div>
+            <div class="box-body">
+                <div class="nav-tabs-custom" style="cursor: move;">
+                    <!-- Tabs within a box -->
+                    <h5>By default only columns that are primary keys, foreign keys or indexes are shown.</h5>
+                    <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                        <li class="active"><a href="#compactimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact Implied</a></li>
+                        <li class=""><a href="#largeimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large Implied</a></li>
+                    </ul>
+                    <div class="tab-content no-padding">
+                        <div class="chart tab-pane active" id="compactimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                            <div class="alert alert-warning alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                <h4><i class="icon fa fa-info-circle"></i> Implied Relationships</h4>
+                                <p>No 'real' Foreign Key relationships were detected in the schema.<br>
+                                    Displayed relationships are implied by a column's name/type/size matching another table's primary key.</p>
+                            </div>
+                            <map id="compactImpliedRelationshipsDiagram" name="compactImpliedRelationshipsDiagram">
 <area shape="rect" id="node1" href="tables/group.html" title="group" alt="" coords="5,35,156,181">
 <area shape="rect" id="node2" href="tables/user.html" title="user" alt="" coords="200,5,319,181">
 </map>
-
-					<a name='diagram'><img id='compactimpliedDegreeImg' src='diagrams/summary/relationships.implied.compact.png' usemap='#compactImpliedRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
-				</div>
-				<div class="chart tab-pane " id="largeimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
-							<div class="alert alert-warning alert-dismissible">
-								<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-								<h4><i class="icon fa fa-info-circle"></i> Implied Relationships</h4>
-								<p>No 'real' Foreign Key relationships were detected in the schema.<br>
-								Displayed relationships are implied by a column's name/type/size matching another table's primary key.</p>
-							</div> 
-																											<map id="largeImpliedRelationshipsDiagram" name="largeImpliedRelationshipsDiagram">
+                            <a name='diagram'><img id='compactimpliedDegreeImg' src='diagrams/summary/relationships.implied.compact.png' usemap='#compactImpliedRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>
+                        </div>
+                        <div class="chart tab-pane " id="largeimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                            <div class="alert alert-warning alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                <h4><i class="icon fa fa-info-circle"></i> Implied Relationships</h4>
+                                <p>No 'real' Foreign Key relationships were detected in the schema.<br>
+                                    Displayed relationships are implied by a column's name/type/size matching another table's primary key.</p>
+                            </div>
+                            <map id="largeImpliedRelationshipsDiagram" name="largeImpliedRelationshipsDiagram">
 <area shape="rect" id="node1" href="tables/group.html" title="group" alt="" coords="5,35,156,187">
 <area shape="rect" id="node2" href="tables/user.html" title="user" alt="" coords="200,5,319,187">
 </map>
-
-					<a name='diagram'><img id='largeimpliedDegreeImg' src='diagrams/summary/relationships.implied.large.png' usemap='#largeImpliedRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>							
-				</div>
-			  			</div>
-			</div>
-		  </div><!-- /.box-body -->
-		</div>
-		      </section>    
+                            <a name='diagram'><img id='largeimpliedDegreeImg' src='diagrams/summary/relationships.implied.large.png' usemap='#largeImpliedRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.box-body -->
+        </div>
+    </section>
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">

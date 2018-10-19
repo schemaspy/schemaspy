@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -16,18 +16,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.output;
+package org.schemaspy.output.diagram;
+
+import org.schemaspy.output.OutputException;
 
 /**
  * @author Nils Petzaell
  */
-public class OutputException extends RuntimeException {
+public class DiagramException extends OutputException {
 
-    public OutputException(String message) {
+    public DiagramException(String message) {
         super(message);
     }
 
-    public OutputException(String message, Throwable cause) {
+    public DiagramException(String message, Throwable cause) {
         super(message, cause);
     }
 }

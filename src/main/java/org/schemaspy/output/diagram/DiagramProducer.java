@@ -1,5 +1,6 @@
+
 /*
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -16,18 +17,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.output;
+package org.schemaspy.output.diagram;
+
+import java.io.File;
 
 /**
  * @author Nils Petzaell
  */
-public class OutputException extends RuntimeException {
+public interface DiagramProducer {
 
-    public OutputException(String message) {
-        super(message);
-    }
+    String implementationDetails();
 
-    public OutputException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    DiagramResults generateOrphanDiagram(File dotFile, String diagramName);
+    DiagramResults generateTableDiagram(File dotFile, String diagramName);
+    DiagramResults generateSummaryDiagram(File dotFile, String diagramName);
 }

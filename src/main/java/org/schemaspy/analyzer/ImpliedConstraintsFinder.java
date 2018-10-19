@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -16,18 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.output;
+package org.schemaspy.analyzer;
 
-/**
- * @author Nils Petzaell
- */
-public class OutputException extends RuntimeException {
+import org.schemaspy.DbAnalyzer;
+import org.schemaspy.model.ImpliedForeignKeyConstraint;
+import org.schemaspy.model.Table;
 
-    public OutputException(String message) {
-        super(message);
-    }
+import java.util.Collection;
+import java.util.List;
 
-    public OutputException(String message, Throwable cause) {
-        super(message, cause);
+public class ImpliedConstraintsFinder {
+    public List<ImpliedForeignKeyConstraint> find(Collection<Table> tables) {
+        return DbAnalyzer.getImpliedConstraints(tables);
     }
 }

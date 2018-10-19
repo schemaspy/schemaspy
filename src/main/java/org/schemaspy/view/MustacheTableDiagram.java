@@ -77,7 +77,7 @@ public class MustacheTableDiagram {
     }
 
     public void setActive(boolean active) {
-        this.active = active ? "active" : "";
+        this.active = active ? "active" : null;
     }
 
     public boolean isImplied() {

@@ -76,230 +76,207 @@
   <div class="content-wrapper">
           <!-- Content Header (Page header) -->
       <section class="content-header">
-        <h1>group</h1></br>
-		<div class="box box-primary">
-            <div class="box-header with-border">
-              <i class="fa fa-file-text-o"></i>
-              <h3 id="Description" class="box-title">Description</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body clearfix">
-				<p><p>Unicode: ộ</p></p>
-            </div>
-            <!-- /.box-body -->
-		</div>
+          <h1>group</h1></br>
+          <div class="box box-primary">
+              <div class="box-header with-border">
+                  <i class="fa fa-file-text-o"></i>
+                  <h3 id="Description" class="box-title">Description</h3>
+                  <div class="box-tools pull-right">
+                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+              </div><!-- /.box-header -->
+              <div class="box-body clearfix">
+                  <p><p>Unicode: ộ</p></p>
+              </div><!-- /.box-body -->
+          </div>
       </section>
       <!-- Main content -->
       <section class="content">
-		<div class="box box-primary">
-			<div class="box-header with-border">
-			  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-              <h3 id="Columns" class="box-title">Columns</h3>
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+          <div class="box box-primary">
+              <div class="box-header with-border">
+                  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                  <h3 id="Columns" class="box-title">Columns</h3>
+                  <div class="box-tools pull-right">
+                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
               </div>
-            </div>	
-            <div class="box-body">
-				<div class="row">
-					<div id="button_group_one" class="col-md-3 col-sm-6"></div>
-					<div id="button_group_two" class="col-md-2 col-sm-4 pull-right text-right"></div>
-				</div>
-				<table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
-				<thead align='left'>
-				<tr>
-				  <th>Column</th>
-				  <th>Type</th>
-				  <th>Size</th>
-				  <th title='Are nulls allowed?'>Nulls</th>
-				  <th title='Is column automatically updated?'>Auto</th>
-				  <th title='Default value'>Default</th>
-				  <th title='Columns in tables that reference this column'>Children</th>
-				  <th title='Columns in tables that are referenced by this column'>Parents</th>
-				  <th title='Comments' class="toggle"><span>Comments</span></th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr>
-				 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="groupId">groupId</span></td>
-				 <td>int identity</td>
-				 <td>4</td>
-				 <td title=''></td>
-				 <td title='Automatically updated by the database'>√</td>
-				 <td>null</td>
-				 <td>
-				  <table border='0' cellspacing='0' cellpadding='0'>
-				   <tr>
-					<td title="group_resources.gid references group.groupId via FK_gid">
-						<a href='group_resources.html'>group_resources</a><span class='relatedKey'>.gid</span>
-					</td>
-					<td class="constraint detail">
-						FK_gid <span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span>
-					</td>
-				   </tr>
-				   <tr>
-					<td title="user.groupId&#39;s name implies that it&#39;s a child of group.groupId, but it doesn&#39;t reference that column.">
-						<a href='user.html'>user</a><span class='relatedKey'>.groupId</span>
-					</td>
-					<td class="constraint detail">
-						Implied Constraint <span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span>
-					</td>
-				   </tr>
-				  </table>
-				 </td>
-				 <td>
-				  <table border='0' cellspacing='0' cellpadding='0'>
-				  </table>
-				 </td>
-				 <td></td>
-				</tr>
-				<tr>
-				 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="name">name</span></td>
-				 <td>varchar</td>
-				 <td>16</td>
-				 <td title=''></td>
-				 <td title=''></td>
-				 <td>null</td>
-				 <td>
-				  <table border='0' cellspacing='0' cellpadding='0'>
-				  </table>
-				 </td>
-				 <td>
-				  <table border='0' cellspacing='0' cellpadding='0'>
-				  </table>
-				 </td>
-				 <td></td>
-				</tr>
-				<tr>
-				 <td><span id="description">description</span></td>
-				 <td>varchar</td>
-				 <td>80</td>
-				 <td title=''></td>
-				 <td title=''></td>
-				 <td>null</td>
-				 <td>
-				  <table border='0' cellspacing='0' cellpadding='0'>
-				  </table>
-				 </td>
-				 <td>
-				  <table border='0' cellspacing='0' cellpadding='0'>
-				  </table>
-				 </td>
-				 <td></td>
-				</tr>
-				</tbody>
-				</table>
-				<p title='3 columns'>Table contained <span id="recordNumber">0</span> rows<p/>
-			</div>
-		</div>
-		<div class="box box-primary">
-			<div class="box-header with-border">
-              <i class="fa fa-sitemap"></i>
-
-              <h3 id="Indexes" class="box-title">Indexes</h3>
-
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              <div class="box-body">
+                  <div class="row">
+                      <div id="button_group_one" class="col-md-3 col-sm-6"></div>
+                      <div id="button_group_two" class="col-md-2 col-sm-4 pull-right text-right"></div>
+                  </div>
+                  <table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+                      <thead align='left'>
+                      <tr>
+                          <th>Column</th>
+                          <th>Type</th>
+                          <th>Size</th>
+                          <th title='Are nulls allowed?'>Nulls</th>
+                          <th title='Is column automatically updated?'>Auto</th>
+                          <th title='Default value'>Default</th>
+                          <th title='Columns in tables that reference this column'>Children</th>
+                          <th title='Columns in tables that are referenced by this column'>Parents</th>
+                          <th title='Comments' class="toggle"><span>Comments</span></th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr>
+                          <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="groupId">groupId</span></td>
+                          <td>int identity</td>
+                          <td>4</td>
+                          <td title=''></td>
+                          <td title='Automatically updated by the database'>√</td>
+                          <td>null</td>
+                          <td>
+                              <table border='0' cellspacing='0' cellpadding='0'>
+                                  <tr>
+                                      <td title="group_resources.gid references group.groupId via FK_gid"><a href='group_resources.html'>group_resources</a><span class='relatedKey'>.gid</span></td>
+                                      <td class="constraint detail">FK_gid<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                  </tr>
+                                  <tr>
+                                      <td title="user.groupId&#39;s name implies that it&#39;s a child of group.groupId, but it doesn&#39;t reference that column."><a href='user.html'>user</a><span class='relatedKey'>.groupId</span></td>
+                                      <td class="constraint detail">Implied Constraint<span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                  </tr>
+                              </table>
+                          </td>
+                          <td>
+                              <table border='0' cellspacing='0' cellpadding='0'>
+                              </table>
+                          </td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="name">name</span></td>
+                          <td>varchar</td>
+                          <td>16</td>
+                          <td title=''></td>
+                          <td title=''></td>
+                          <td>null</td>
+                          <td>
+                              <table border='0' cellspacing='0' cellpadding='0'>
+                              </table>
+                          </td>
+                          <td>
+                              <table border='0' cellspacing='0' cellpadding='0'>
+                              </table>
+                          </td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td><span id="description">description</span></td>
+                          <td>varchar</td>
+                          <td>80</td>
+                          <td title=''></td>
+                          <td title=''></td>
+                          <td>null</td>
+                          <td>
+                              <table border='0' cellspacing='0' cellpadding='0'>
+                              </table>
+                          </td>
+                          <td>
+                              <table border='0' cellspacing='0' cellpadding='0'>
+                              </table>
+                          </td>
+                          <td></td>
+                      </tr>
+                      </tbody>
+                  </table>
+                  <p title='3 columns'>Table contained <span id="recordNumber">0</span> rows<p/>
               </div>
-            </div>	
-			<div class="box-body">
-				<table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
-				<thead>
-				 <tr>
-				  <th>Constraint Name</th>
-				  <th>Type</th>
-				  <th>Sort</th>
-				  <th>Column(s)</th>
-				 </tr>
-				</thead>
-				<tbody>
-				 <tr>
-				  <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> PK_groupId</td>
-				  <td>Primary key</td>
-				  <td><span title='Ascending'>Asc</span></td>
-				  <td>groupId</td>
-				 </tr>
-				 <tr>
-				  <td class='uniqueKey' title='Unique Key'><i class='icon ion-key iconkey'></i> UQ_grp_name</td>
-				  <td>Must be unique</td>
-				  <td><span title='Ascending'>Asc</span></td>
-				  <td>name</td>
-				 </tr>
-				</tbody>
-				</table>
-			</div><!-- /.box-body -->
-		</div>
-		<div class="box box-primary">
-			<div class="box-header with-border">
-              <i class="fa fa-code-fork"></i>
-
-              <h3 id="Relationships" class="box-title">Relationships</h3>
-
-              <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+          </div>
+          <div class="box box-primary">
+              <div class="box-header with-border">
+                  <i class="fa fa-sitemap"></i>
+                  <h3 id="Indexes" class="box-title">Indexes</h3>
+                  <div class="box-tools pull-right">
+                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
               </div>
-            </div>	
-			<div class="box-body">
-			<div class="nav-tabs-custom" style="cursor: move;">
-            <!-- Tabs within a box -->
-			<h5>Close relationships within degrees of separation</h5>
-            <ul class="nav nav-tabs pull-left ui-sortable-handle">
-              <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>
-              <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>
-              <li class=""><a href="#oneimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">One implied</a></li>
-              <li class=""><a href="#twoimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two implied</a></li>
-            </ul>
-            <div class="tab-content no-padding">            
-				<div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
-					<map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+              <div class="box-body">
+                  <table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+                      <thead>
+                      <tr>
+                          <th>Constraint Name</th>
+                          <th>Type</th>
+                          <th>Sort</th>
+                          <th>Column(s)</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr>
+                          <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> PK_groupId</td>
+                          <td>Primary key</td>
+                          <td><span title='Ascending'>Asc</span></td>
+                          <td>groupId</td>
+                      </tr>
+                      <tr>
+                          <td class='uniqueKey' title='Unique Key'><i class='icon ion-key iconkey'></i> UQ_grp_name</td>
+                          <td>Must be unique</td>
+                          <td><span title='Ascending'>Asc</span></td>
+                          <td>name</td>
+                      </tr>
+                      </tbody>
+                  </table>
+              </div><!-- /.box-body -->
+          </div>
+          <div class="box box-primary">
+              <div class="box-header with-border">
+                  <i class="fa fa-code-fork"></i>
+                  <h3 id="Relationships" class="box-title">Relationships</h3>
+                  <div class="box-tools pull-right">
+                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+              </div>
+              <div class="box-body">
+                  <div class="nav-tabs-custom" style="cursor: move;"><!-- Tabs within a box -->
+                      <h5>Close relationships within degrees of separation</h5>
+                      <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                          <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>
+                          <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>
+                          <li class=""><a href="#oneimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">One implied</a></li>
+                          <li class=""><a href="#twoimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two implied</a></li>
+                      </ul>
+                      <div class="tab-content no-padding">
+                          <div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                              <map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
 <area shape="rect" id="node1" href="group_resources.html" title="group_resources" alt="" coords="295,8,496,155">
 <area shape="rect" id="node2" href="group.html" title="group" alt="" coords="5,5,251,163">
 </map>
-
-					<a name='diagram'><img id='oneDegreeImg' src='../diagrams/group.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>
-				</div>
-				<div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">
-					<map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+                              <a name='diagram'><img id='oneDegreeImg' src='../diagrams/group.1degree.png' usemap='#oneDegreeRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>
+                          </div>
+                          <div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                              <map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
 <area shape="rect" id="node1" href="group_resources.html" title="group_resources" alt="" coords="295,79,496,225">
 <area shape="rect" id="node2" href="group.html" title="group" alt="" coords="5,5,251,163">
 <area shape="rect" id="node3" href="resources.html" title="resources" alt="" coords="53,180,203,268">
 </map>
-
-					<a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/group.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>
-				</div>
-				<div class="chart tab-pane " id="oneimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
-					<map id="oneDegreeRelationshipsDiagramImplied" name="oneDegreeRelationshipsDiagramImplied">
+                              <a name='diagram'><img id='twodegreesDegreeImg' src='../diagrams/group.2degrees.png' usemap='#twoDegreesRelationshipsDiagram' class='diagram' border='0' alt='' align='left'></a>
+                          </div>
+                          <div class="chart tab-pane " id="oneimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                              <map id="oneDegreeRelationshipsDiagramImplied" name="oneDegreeRelationshipsDiagramImplied">
 <area shape="rect" id="node1" href="group_resources.html" title="group_resources" alt="" coords="295,5,496,152">
 <area shape="rect" id="node2" href="group.html" title="group" alt="" coords="5,100,251,257">
 <area shape="rect" id="node3" href="user.html" title="user" alt="" coords="335,169,455,345">
 </map>
-
-					<a name='diagram'><img id='oneimpliedDegreeImg' src='../diagrams/group.implied1degrees.png' usemap='#oneDegreeRelationshipsDiagramImplied' class='diagram' border='0' alt='' align='left'></a>
-				</div>
-				<div class="chart tab-pane " id="twoimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
-					<map id="twoDegreesRelationshipsDiagramImplied" name="twoDegreesRelationshipsDiagramImplied">
+                              <a name='diagram'><img id='oneimpliedDegreeImg' src='../diagrams/group.implied1degrees.png' usemap='#oneDegreeRelationshipsDiagramImplied' class='diagram' border='0' alt='' align='left'></a>
+                          </div>
+                          <div class="chart tab-pane " id="twoimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                              <map id="twoDegreesRelationshipsDiagramImplied" name="twoDegreesRelationshipsDiagramImplied">
 <area shape="rect" id="node1" href="group_resources.html" title="group_resources" alt="" coords="295,199,496,345">
 <area shape="rect" id="node2" href="group.html" title="group" alt="" coords="5,44,251,201">
 <area shape="rect" id="node3" href="resources.html" title="resources" alt="" coords="53,231,203,319">
 <area shape="rect" id="node4" href="user.html" title="user" alt="" coords="335,5,455,181">
 </map>
-
-					<a name='diagram'><img id='twoimpliedDegreeImg' src='../diagrams/group.implied2degrees.png' usemap='#twoDegreesRelationshipsDiagramImplied' class='diagram' border='0' alt='' align='left'></a>
-				</div>
-			</div>
-			</div>
-		  </div><!-- /.box-body -->
-		</div>
+                              <a name='diagram'><img id='twoimpliedDegreeImg' src='../diagrams/group.implied2degrees.png' usemap='#twoDegreesRelationshipsDiagramImplied' class='diagram' border='0' alt='' align='left'></a>
+                          </div>
+                      </div>
+                  </div>
+              </div><!-- /.box-body -->
+          </div>
       </section>
     
   </div>

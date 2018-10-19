@@ -52,7 +52,7 @@ public class SqlAnalyzer {
      * @return
      */
     public Set<Table> getReferencedTables(String sql) {
-        Set<Table> referenced = new HashSet<>();
+        Set<Table> referenced = new LinkedHashSet<>();
 
         StringTokenizer tokenizer = new StringTokenizer(sql, TOKENS, true);
         while (tokenizer.hasMoreTokens()) {

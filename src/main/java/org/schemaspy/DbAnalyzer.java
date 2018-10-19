@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -44,18 +43,19 @@ import java.util.regex.Pattern;
  * @author Wojciech Kasa
  * @author Daniel Watt
  * @author Mårten Bohlin
+ * @author Nils Petzaell
  */
 public class DbAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	
     public static List<ImpliedForeignKeyConstraint> getImpliedConstraints(Collection<Table> tables) {
-        List<TableColumn> columnsWithoutParents = new ArrayList<TableColumn>();
-        Map<DatabaseObject, Table> keyedTablesByPrimary = new TreeMap<DatabaseObject, Table>();
+        List<TableColumn> columnsWithoutParents = new ArrayList<>();
+        Map<DatabaseObject, Table> keyedTablesByPrimary = new TreeMap<>();
         
         // gather all the primary key columns and columns without parents
         for (Table table : tables) {
             List<TableColumn> tablePrimaries = table.getPrimaryColumns();
-            if (tablePrimaries.size() == 1 || tablePrimaries.stream().anyMatch(t -> t.getName().equals("LanguageId"))) { // can't match up multiples...yet...
+            if (tablePrimaries.size() == 1 || tablePrimaries.stream().anyMatch(t -> "LanguageId".equals(t.getName()))) { // can't match up multiples...yet...
             	TableColumn tableColumn = tablePrimaries.get(0);
                 DatabaseObject primary = new DatabaseObject(tableColumn);
                 if (tableColumn.allowsImpliedChildren()) {
@@ -66,13 +66,13 @@ public class DbAnalyzer {
 
             //TODO fixed column name "LanguageId" should be moved to schemaspy properties
             for (TableColumn column : table.getColumns()) {
-                if (!column.isForeignKey() && !column.isPrimary() && column.allowsImpliedParents() && !column.getName().equals("LanguageId"))
+                if (!column.isForeignKey() && !column.isPrimary() && column.allowsImpliedParents() && !"LanguageId".equals(column.getName()))
                     columnsWithoutParents.add(column);
             }
         }
 
         sortColumnsByTable(columnsWithoutParents);
-        List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<ImpliedForeignKeyConstraint>();
+        List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<>();
         
         for (TableColumn childColumn : columnsWithoutParents) {
             DatabaseObject columnWithoutParent = new DatabaseObject(childColumn);
@@ -148,7 +148,7 @@ public class DbAnalyzer {
      * @return List of {@link RailsForeignKeyConstraint}s
      */
     public static List<RailsForeignKeyConstraint> getRailsConstraints(Map<String, Table> tables) {
-        List<RailsForeignKeyConstraint> railsConstraints = new ArrayList<RailsForeignKeyConstraint>(tables.size());
+        List<RailsForeignKeyConstraint> railsConstraints = new ArrayList<>(tables.size());
 
         // iterate thru each column in each table looking for columns that
         // match Rails naming conventions
@@ -156,7 +156,7 @@ public class DbAnalyzer {
             for (TableColumn column : table.getColumns()) {
                 String columnName = column.getName().toLowerCase();
                 if (!column.isForeignKey() && column.allowsImpliedParents() && columnName.endsWith("_id")) {
-                    String singular = columnName.substring(0, columnName.length() - 3);
+                    String singular = columnName.substring(0, columnName.length() - "_id".length());
                     String primaryTableName = Inflection.pluralize(singular);
                     Table primaryTable = tables.get(primaryTableName);
                     if (primaryTable != null) {
@@ -180,7 +180,7 @@ public class DbAnalyzer {
      * @return List
      */
     public static List<ForeignKeyConstraint> getForeignKeyConstraints(Collection<Table> tables) {
-        List<ForeignKeyConstraint> constraints = new ArrayList<ForeignKeyConstraint>();
+        List<ForeignKeyConstraint> constraints = new ArrayList<>();
 
         for (Table table : tables) {
             constraints.addAll(table.getForeignKeys());
@@ -190,7 +190,7 @@ public class DbAnalyzer {
     }
 
     public static List<Table> getOrphans(Collection<Table> tables) {
-        List<Table> orphans = new ArrayList<Table>();
+        List<Table> orphans = new ArrayList<>();
 
         for (Table table : tables) {
             if (table.isOrphan(false) && !table.isView()) {
@@ -205,7 +205,7 @@ public class DbAnalyzer {
      * Return a list of <code>Table</code>s that have neither an index nor a primary key.
      */
     public static List<Table> getTablesWithoutIndexes(Collection<Table> tables) {
-        List<Table> withoutIndexes = new ArrayList<Table>();
+        List<Table> withoutIndexes = new ArrayList<>();
 
         for (Table table : tables) {
             if (table.getIndexes().isEmpty() && !table.isView() && !table.isLogical())
@@ -216,10 +216,10 @@ public class DbAnalyzer {
     }
 
     public static List<Table> getTablesWithIncrementingColumnNames(Collection<Table> tables) {
-        List<Table> denormalizedTables = new ArrayList<Table>();
+        List<Table> denormalizedTables = new ArrayList<>();
 
         for (Table table : tables) {
-            Map<String, Long> columnPrefixes = new HashMap<String, Long>();
+            Map<String, Long> columnPrefixes = new HashMap<>();
 
             for (TableColumn column : table.getColumns()) {
                 // search for columns that start with the same prefix
@@ -260,7 +260,7 @@ public class DbAnalyzer {
     }
 
     public static List<Table> getTablesWithOneColumn(Collection<Table> tables) {
-        List<Table> singleColumnTables = new ArrayList<Table>();
+        List<Table> singleColumnTables = new ArrayList<>();
 
         for (Table table : tables) {
             if (table.getColumns().size() == 1)
@@ -295,14 +295,14 @@ public class DbAnalyzer {
      * @return List
      */
     public static List<TableColumn> getDefaultNullStringColumns(Collection<Table> tables) {
-        List<TableColumn> defaultNullStringColumns = new ArrayList<TableColumn>();
+        List<TableColumn> defaultNullStringColumns = new ArrayList<>();
 
         for (Table table : tables) {
             for (TableColumn column : table.getColumns()) {
                 Object defaultValue = column.getDefaultValue();
-                if (defaultValue != null && defaultValue instanceof String) {
+                if (defaultValue instanceof String) {
                     String defaultString = defaultValue.toString();
-                    if (defaultString.trim().equalsIgnoreCase("'null'")) {
+                    if ("'null'".equalsIgnoreCase(defaultString.trim())) {
                         defaultNullStringColumns.add(column);
                     }
                 }
@@ -318,7 +318,7 @@ public class DbAnalyzer {
      * @param meta DatabaseMetaData
      */
     public static List<String> getCatalogs(DatabaseMetaData meta) throws SQLException {
-        List<String> catalogs = new ArrayList<String>();
+        List<String> catalogs = new ArrayList<>();
 
         ResultSet rs = meta.getCatalogs();
         while (rs.next()) {
@@ -335,7 +335,7 @@ public class DbAnalyzer {
      * @param meta DatabaseMetaData
      */
     public static List<String> getSchemas(DatabaseMetaData meta) throws SQLException {
-        List<String> schemas = new ArrayList<String>();
+        List<String> schemas = new ArrayList<>();
 
         ResultSet rs = meta.getSchemas();
         while (rs.next()) {
@@ -362,7 +362,7 @@ public class DbAnalyzer {
      * @param meta DatabaseMetaData
      */
     public static List<String> getPopulatedSchemas(DatabaseMetaData meta, String schemaSpec, boolean isCatalog) throws SQLException {
-        Set<String> schemas = new TreeSet<String>(); // alpha sorted
+        Set<String> schemas = new TreeSet<>(); // alpha sorted
         Pattern schemaRegex = Pattern.compile(schemaSpec);
 
         for (String schema : (isCatalog ? getCatalogs(meta) : getSchemas(meta))) {
@@ -376,34 +376,18 @@ public class DbAnalyzer {
                     } else {
                         LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex);
                     }
-                } catch (SQLException ignore) {
+                } catch (SQLException sqlex) {
+                    LOGGER.debug("SQLException caught during populateSchemas", sqlex);
                 } finally {
                     if (rs != null)
                         rs.close();
                 }
             } else {
-                LOGGER.debug("Excluding schema {}: doesn't match \"{}" + '"', schema, schemaRegex);
+                LOGGER.debug("Excluding schema {}: doesn't match '{}'", schema, schemaRegex);
             }
         }
 
-        return new ArrayList<String>(schemas);
+        return new ArrayList<>(schemas);
     }
 
-    /**
-     * For debugging/analyzing result sets
-     * @param rs ResultSet
-     * @throws SQLException
-     */
-    public static void dumpResultSetRow(ResultSet rs, String description) throws SQLException {
-        ResultSetMetaData meta = rs.getMetaData();
-        int numColumns = meta.getColumnCount();
-        System.out.println(numColumns + " columns of " + description + ":");
-        for (int i = 1; i <= numColumns; ++i) {
-            System.out.print(meta.getColumnLabel(i));
-            System.out.print(": ");
-            System.out.print(String.valueOf(rs.getString(i)));
-            System.out.print("\t");
-        }
-        System.out.println();
-    }
 }

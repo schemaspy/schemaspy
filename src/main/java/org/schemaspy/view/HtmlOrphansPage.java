@@ -24,18 +24,13 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.model.Table;
-import org.schemaspy.util.Dot;
-import org.schemaspy.util.Writers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
-import java.util.*;
+import java.util.List;
 
 /**
  * The page that contains the all tables that aren't related to others (orphans)
@@ -47,11 +42,9 @@ import java.util.*;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-public class HtmlOrphansPage extends HtmlDiagramFormatter {
+public class HtmlOrphansPage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private static final int KB_64 = 64 * 1024;
 
     private final MustacheCompiler mustacheCompiler;
 
@@ -59,67 +52,16 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
         this.mustacheCompiler = mustacheCompiler;
     }
 
-    public boolean write(
-            List<Table> orphanTables,
-            File diagramDir,
-            String outputDir,
+    public void write(
+            List<MustacheTableDiagram> orphanDiagrams,
+            boolean allWritten,
             Writer writer
-    ) throws IOException {
-        Dot dot = getDot();
-        if (dot == null)
-            return false;
-
-
-        Collections.sort(orphanTables, (Comparator) (t1, t2) -> {
-            Integer size1 = ((Table) t1).getColumns().size();
-            Integer size2 = ((Table) t2).getColumns().size();
-            int sizeComp = size1.compareTo(size2);
-
-            if (sizeComp != 0) {
-                return sizeComp;
-            } else {
-                String name1 = ((Table) t1).getName();
-                String name2 = ((Table) t1).getName();
-                return name1.compareTo(name2);
-            }
-        });
-
-        Set<Table> orphansWithImpliedRelationships = new HashSet<>();
-        for (Table table : orphanTables) {
-            if (!table.isOrphan(true)){
-                orphansWithImpliedRelationships.add(table);
-            }
-        }
-
-        StringBuilder maps = new StringBuilder(KB_64);
-        List<MustacheTable> mustacheTables = new ArrayList<>();
-        for (Table table : orphanTables) {
-            String dotBaseFilespec = table.getName();
-
-            File dotFile = new File(diagramDir, dotBaseFilespec + ".1degree.dot");
-
-            try (PrintWriter dotOut = Writers.newPrintWriter(dotFile)) {
-                DotFormatter.getInstance().writeOrphan(table, dotOut, outputDir);
-            } catch (IOException e) {
-                throw new IOException(e);
-            }
-
-            File imgFile = new File(diagramDir, dotBaseFilespec + ".1degree." + dot.getFormat());
-            try {
-                maps.append(dot.generateDiagram(dotFile, imgFile));
-            } catch (Dot.DotFailure dotFailure) {
-                LOGGER.error("Failed to write Orphan '{}'", table.getName(), dotFailure);
-                return false;
-            }
-            mustacheTables.add(new MustacheTable(table, imgFile.getName()));
-        }
+    ) {
 
         PageData pageData = new PageData.Builder()
                 .templateName("orphans.html")
-                .scriptName("")
-                .addToScope("mustacheTables", mustacheTables)
-                .addToScope("maps", maps)
-                .depth(0)
+                .addToScope("diagrams", orphanDiagrams)
+                .addToScope("allWritten", allWritten)
                 .getPageData();
 
         try {
@@ -127,6 +69,5 @@ public class HtmlOrphansPage extends HtmlDiagramFormatter {
         } catch (IOException e) {
             LOGGER.error("Failed to write orphans page", e);
         }
-        return true;
     }
 }
