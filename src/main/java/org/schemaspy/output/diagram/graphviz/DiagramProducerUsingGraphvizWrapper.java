@@ -63,7 +63,7 @@ public class DiagramProducerUsingGraphvizWrapper implements DiagramProducer {
     }
 
     @Override
-    public DiagramResults generateOrphanDiagram(File dotFile, String diagramName) throws DiagramException {
+    public DiagramResults generateOrphanDiagram(File dotFile, String diagramName) {
         try {
             File diagramFile = new File(orphanDir, diagramName + "." + graphvizWrapper.getFormat());
             String diagramMap = graphvizWrapper.generateDiagram(dotFile, diagramFile);
@@ -74,7 +74,7 @@ public class DiagramProducerUsingGraphvizWrapper implements DiagramProducer {
     }
 
     @Override
-    public DiagramResults generateTableDiagram(File dotFile, String diagramName) throws DiagramException {
+    public DiagramResults generateTableDiagram(File dotFile, String diagramName) {
         try {
             File diagramFile = new File(diagramDir, diagramName + "." + graphvizWrapper.getFormat());
             String diagramMap = graphvizWrapper.generateDiagram(dotFile, diagramFile);
@@ -85,7 +85,7 @@ public class DiagramProducerUsingGraphvizWrapper implements DiagramProducer {
     }
 
     @Override
-    public DiagramResults generateSummaryDiagram(File dotFile, String diagramName) throws DiagramException {
+    public DiagramResults generateSummaryDiagram(File dotFile, String diagramName) {
         try {
             File diagramFile = new File(summaryDir, diagramName + "." + graphvizWrapper.getFormat());
             String diagramMap = graphvizWrapper.generateDiagram(dotFile, diagramFile);
@@ -102,7 +102,7 @@ public class DiagramProducerUsingGraphvizWrapper implements DiagramProducer {
         try {
             line = reader.readLine();
             if (line != null) {
-                diagramMapName = line.substring(9,line.indexOf("name")-2);
+                diagramMapName = line.substring("<map id=\"".length(),line.indexOf("name")-"\" ".length());
             }
         } catch (IOException e) {
             LOGGER.error("Error reading diagram map",e);

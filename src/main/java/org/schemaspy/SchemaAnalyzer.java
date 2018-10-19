@@ -76,6 +76,10 @@ import java.util.stream.Collectors;
  */
 public class SchemaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final int SECONDS_IN_MS = 1000;
+    private static final String DOT_HTML = ".html";
+    private static final String INDEX_DOT_HTML = "index.html";
+
 
     private final SqlService sqlService;
 
@@ -126,7 +130,7 @@ public class SchemaAnalyzer {
             List<String> schemas = config.getSchemas();
             Database db = null;
             String schemaSpec = config.getSchemaSpec();
-            Connection connection = this.getConnection(config);
+            Connection connection = getConnection(config);
             DatabaseMetaData meta = connection.getMetaData();
             //-all(evaluteAll) given then get list of the database schemas
             if (schemas == null || config.isEvaluateAllEnabled()) {
@@ -143,7 +147,8 @@ public class SchemaAnalyzer {
                     schemas.add(config.getUser());
             }
 
-            LOGGER.info("Analyzing schemas: " + System.lineSeparator() + "{}",
+            LOGGER.info("Analyzing schemas: {}{}",
+                    System.lineSeparator(),
                     schemas.stream().collect(Collectors.joining(System.lineSeparator())));
 
             String dbName = config.getDb();
@@ -174,7 +179,7 @@ public class SchemaAnalyzer {
             prepareLayoutFiles(outputDir);
             MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config);
             HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
-            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("index.html").toFile())) {
+            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
                 htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta), writer);
             }
             return db;
@@ -190,7 +195,7 @@ public class SchemaAnalyzer {
      * @param meta DatabaseMetaData
      * @return String
      */
-    private String getDatabaseProduct(DatabaseMetaData meta) {
+    private static String getDatabaseProduct(DatabaseMetaData meta) {
         try {
             return meta.getDatabaseProductName() + " - " + meta.getDatabaseProductVersion();
         } catch (SQLException exc) {
@@ -236,7 +241,6 @@ public class SchemaAnalyzer {
             Database db = new Database(dbmsMeta, dbName, catalog, schema);
             databaseService.gatheringSchemaDetails(config, db, schemaMeta, progressListener);
 
-            long duration = progressListener.startedGraphingSummaries();
 
             Collection<Table> tables = new ArrayList<>(db.getTables());
             tables.addAll(db.getViews());
@@ -247,6 +251,7 @@ public class SchemaAnalyzer {
                     throw new EmptySchemaException();
             }
 
+            long duration = progressListener.startedGraphingSummaries();
             if (config.isHtmlGenerationEnabled()) {
                 generateHtmlDoc(config, progressListener, outputDir, db, duration, tables);
             }
@@ -279,10 +284,10 @@ public class SchemaAnalyzer {
             long overallDuration = progressListener.finished(tables, config);
 
             if (config.isHtmlGenerationEnabled()) {
-                LOGGER.info("Wrote table details in {} seconds", duration / 1000);
+                LOGGER.info("Wrote table details in {} seconds", duration / SECONDS_IN_MS);
 
-                LOGGER.info("Wrote relationship details of {} tables/views to directory '{}' in {} seconds.", tables.size(), outputDir, overallDuration / 1000);
-                LOGGER.info("View the results by opening {}", new File(outputDir, "index.html"));
+                LOGGER.info("Wrote relationship details of {} tables/views to directory '{}' in {} seconds.", tables.size(), outputDir, overallDuration / SECONDS_IN_MS);
+                LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
             }
 
             return db;
@@ -292,7 +297,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    private void writeOrders(File outputDir, List<Table> orderedTables) throws IOException {
+    private static void writeOrders(File outputDir, List<Table> orderedTables) throws IOException {
         try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "insertionOrder.txt"))) {
             TextFormatter.getInstance().write(orderedTables, false, out);
         }
@@ -304,7 +309,7 @@ public class SchemaAnalyzer {
     }
 
     private static void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
-        LOGGER.info("Gathered schema details in {} seconds", duration / 1000);
+        LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/graphing summary");
 
         prepareLayoutFiles(outputDir);
@@ -357,7 +362,7 @@ public class SchemaAnalyzer {
         progressListener.graphingSummaryProgressed();
 
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config.getDescription());
-        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("index.html").toFile())) {
+        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
             htmlMainIndexPage.write(db, tables, results.getImpliedConstraints(), writer);
         }
 
@@ -393,7 +398,7 @@ public class SchemaAnalyzer {
 
         HtmlRoutinePage htmlRoutinePage = new HtmlRoutinePage(mustacheCompiler);
         for (Routine routine : db.getRoutines()) {
-            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines").resolve(routine.getName() + ".html").toFile())) {
+            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines").resolve(routine.getName() + DOT_HTML).toFile())) {
                 htmlRoutinePage.write(routine, writer);
             }
         }
@@ -402,7 +407,7 @@ public class SchemaAnalyzer {
 
         duration = progressListener.startedGraphingDetails();
 
-        LOGGER.info("Completed summary in {} seconds", duration / 1000);
+        LOGGER.info("Completed summary in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/diagramming details");
         SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
@@ -411,7 +416,7 @@ public class SchemaAnalyzer {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table, results.getStats());
             progressListener.graphingDetailsProgressed(table);
             LOGGER.debug("Writing details of {}", table.getName());
-            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("tables").resolve(table.getName()+".html").toFile())) {
+            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("tables").resolve(table.getName() + DOT_HTML).toFile())) {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
             }
         }
@@ -433,7 +438,7 @@ public class SchemaAnalyzer {
             }
         }
 
-        IOFileFilter notHtmlFilter = FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter(".html"));
+        IOFileFilter notHtmlFilter = FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter(DOT_HTML));
         FileFilter filter = FileFilterUtils.and(notHtmlFilter);
         ResourceWriter.copyResources(url, outputDir, filter);
     }
@@ -446,7 +451,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    private Connection getConnection(Config config) throws IOException {
+    private static Connection getConnection(Config config) throws IOException {
         DbDriverLoader driverLoader = new DbDriverLoader();
         return driverLoader.getConnection(config);
     }
@@ -470,7 +475,6 @@ public class SchemaAnalyzer {
 
         if (Objects.isNull(schemas)) {
             LOGGER.error("Failed to retrieve any schemas");
-            return;
         } else if (schemas.contains(schema)) {
             LOGGER.error(
                     "The schema exists in the database, but the user you specified '{}'" +
@@ -488,14 +492,16 @@ public class SchemaAnalyzer {
                     "Also not that schema names are usually case sensitive.",
                     schema, user);
             LOGGER.info(
-                    "Available schemas(Some of these may be user or system schemas):" +
-                    System.lineSeparator() + "{}",
+                    "Available schemas(Some of these may be user or system schemas):{}{}",
+                    System.lineSeparator(),
                     schemas.stream().collect(Collectors.joining(System.lineSeparator())));
             List<String> populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta);
             if (populatedSchemas.isEmpty()) {
                 LOGGER.error("Unable to determine if any of the schemas contain tables/views");
             } else {
-                LOGGER.info("Schemas with tables/views visible to '{}':" + System.lineSeparator() + "{}",
+                LOGGER.info("Schemas with tables/views visible to '{}':{}{}",
+                        user,
+                        System.lineSeparator(),
                         populatedSchemas.stream().collect(Collectors.joining(System.lineSeparator())));
             }
         }
