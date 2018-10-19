@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author Nils Petzaell
+ */
 public class MustacheTableDiagramFactory {
 
     private final DotFormatter dotProducer;

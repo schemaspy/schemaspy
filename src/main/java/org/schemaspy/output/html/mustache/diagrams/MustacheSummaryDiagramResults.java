@@ -25,6 +25,9 @@ import org.schemaspy.view.WriteStats;
 
 import java.util.List;
 
+/**
+ * @author Nils Petzaell
+ */
 public class MustacheSummaryDiagramResults {
 
     private final List<MustacheTableDiagram> diagrams;

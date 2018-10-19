@@ -21,6 +21,9 @@ package org.schemaspy.output.diagram;
 import java.io.File;
 import java.util.Objects;
 
+/**
+ * @author Nils Petzaell
+ */
 public class DiagramResults {
 
     private final File diagramFile;

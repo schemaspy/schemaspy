@@ -39,6 +39,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * @author Nils Petzaell
+ */
 public class MustacheSummaryDiagramFactory {
 
     private static final String FILE_PREFIX = "relationships";

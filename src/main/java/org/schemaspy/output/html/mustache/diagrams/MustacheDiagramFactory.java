@@ -24,6 +24,9 @@ import org.schemaspy.view.MustacheTableDiagram;
 
 import java.io.File;
 
+/**
+ * @author Nils Petzaell
+ */
 public class MustacheDiagramFactory {
 
     private final DiagramProducer diagramProducer;

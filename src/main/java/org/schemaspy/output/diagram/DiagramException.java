@@ -20,6 +20,9 @@ package org.schemaspy.output.diagram;
 
 import org.schemaspy.output.OutputException;
 
+/**
+ * @author Nils Petzaell
+ */
 public class DiagramException extends OutputException {
 
     public DiagramException(String message) {

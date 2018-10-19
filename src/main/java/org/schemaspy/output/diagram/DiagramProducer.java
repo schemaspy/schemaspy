@@ -21,6 +21,9 @@ package org.schemaspy.output.diagram;
 
 import java.io.File;
 
+/**
+ * @author Nils Petzaell
+ */
 public interface DiagramProducer {
 
     String implementationDetails();

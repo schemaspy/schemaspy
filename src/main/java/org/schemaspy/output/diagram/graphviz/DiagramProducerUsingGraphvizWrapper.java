@@ -31,6 +31,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.invoke.MethodHandles;
 
+/**
+ * @author Nils Petzaell
+ */
 public class DiagramProducerUsingGraphvizWrapper implements DiagramProducer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
