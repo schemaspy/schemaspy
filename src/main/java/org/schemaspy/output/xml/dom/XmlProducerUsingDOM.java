@@ -60,6 +60,9 @@ public class XmlProducerUsingDOM implements XmlProducer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private final XmlTableFormatter xmlTableFormatter = new XmlTableFormatter();
+    private final XmlRoutineFormatter xmlRoutineFormatter = new XmlRoutineFormatter();
+
     @Override
     public void generate(Database database, File outputDir) {
         Collection<Table> tables = new ArrayList<>(database.getTables());
@@ -86,7 +89,8 @@ public class XmlProducerUsingDOM implements XmlProducer {
             DOMUtil.appendAttribute(rootNode, "schema", database.getSchema().getName());
         DOMUtil.appendAttribute(rootNode, "type", database.getDatabaseProduct());
 
-        XmlTableFormatter.getInstance().appendTables(rootNode, tables);
+        xmlTableFormatter.appendTables(rootNode, tables);
+        xmlRoutineFormatter.appendRoutines(rootNode, database.getRoutines());
 
         String xmlName = database.getName();
 
@@ -111,7 +115,7 @@ public class XmlProducerUsingDOM implements XmlProducer {
         }
     }
 
-    private void write(Document document, Writer writer) throws TransformerException {
+    private static void write(Document document, Writer writer) throws TransformerException {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = transformerFactory.newTransformer();
