@@ -98,187 +98,218 @@
 					  <th>Column</th>
 					  <th>Type</th>
 					  <th>Size</th>
-					  <th title='Are nulls allowed?'>Nulls</th>
+					  <th title='Are nulls allowed?'>Nullable</th>
 					  <th title='Is column automatically updated?'>Auto</th>
 					  <th title='Default value'>Default</th>
 					  <th title='Comments' class="toggle"><span>Comments</span></th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>userId</td>
-					 <td>int identity</td>
-					 <td>4</td>
-					 <td title=''></td>
-					 <td title='Automatically updated by the database'>√</td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>group_resources</td>
-					 <td>Table</td>
-					 <td>access</td>
-					 <td>varchar</td>
-					 <td>2</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>(&#39;n&#39;)</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
-					 <td>int</td>
-					 <td>4</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>group_resources</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>gid</td>
-					 <td>int</td>
-					 <td>4</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
-					 <td>varchar</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td>name</td>
-					 <td>varchar</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>resources</td>
-					 <td>Table</td>
-					 <td>description</td>
-					 <td>varchar</td>
-					 <td>80</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>userAndGroup</td>
-					 <td>View</td>
-					 <td>UserName</td>
-					 <td>varchar</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId</td>
-					 <td>int identity</td>
-					 <td>4</td>
-					 <td title=''></td>
-					 <td title='Automatically updated by the database'>√</td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>resources</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>rid</td>
-					 <td>int</td>
-					 <td>4</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>resources</td>
-					 <td>Table</td>
-					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name</td>
-					 <td>varchar</td>
-					 <td>40</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>group</td>
-					 <td>Table</td>
-					 <td>description</td>
-					 <td>varchar</td>
-					 <td>80</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>group_resources</td>
-					 <td>Table</td>
-					 <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i>rid</td>
-					 <td>int</td>
-					 <td>4</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>user</td>
-					 <td>Table</td>
-					 <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>email</td>
-					 <td>varchar</td>
-					 <td>40</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-					<tr>
-					 <td>userAndGroup</td>
-					 <td>View</td>
-					 <td>GroupName</td>
-					 <td>varchar</td>
-					 <td>16</td>
-					 <td title=''></td>
-					 <td title=''></td>
-					 <td>null</td>
-					 <td></td>
-					</tr>
-								</tbody>
+				<tbody/>
 				</table>				
 			</div>
 		</div>	
       </section>
 	  <script>
+		  var tableData = [
+          {
+		      "tableName":"group_resources",
+              "tableType":"Table",
+			  "keyClass":"primaryKey",
+			  "keyTitle":"Primary Key",
+			  "name":"<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>rid",
+              "type":"int",
+              "length":"4",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"group",
+              "tableType":"Table",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"description",
+              "type":"varchar",
+              "length":"80",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"userAndGroup",
+              "tableType":"View",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"UserName",
+              "type":"varchar",
+              "length":"16",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"userAndGroup",
+              "tableType":"View",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"GroupName",
+              "type":"varchar",
+              "length":"16",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"resources",
+              "tableType":"Table",
+			  "keyClass":"indexedColumn",
+			  "keyTitle":"Indexed",
+			  "name":"<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name",
+              "type":"varchar",
+              "length":"40",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"user",
+              "tableType":"Table",
+			  "keyClass":"indexedColumn",
+			  "keyTitle":"Indexed",
+			  "name":"<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>email",
+              "type":"varchar",
+              "length":"40",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"user",
+              "tableType":"Table",
+			  "keyClass":"primaryKey",
+			  "keyTitle":"Primary Key",
+			  "name":"<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>userId",
+              "type":"int identity",
+              "length":"4",
+              "nullable":"",
+              "autoUpdated":"√",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"group_resources",
+              "tableType":"Table",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"access",
+              "type":"varchar",
+              "length":"2",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"(&#39;n&#39;)",
+			  "comments":""
+          },
+          {
+		      "tableName":"resources",
+              "tableType":"Table",
+			  "keyClass":"primaryKey",
+			  "keyTitle":"Primary Key",
+			  "name":"<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>rid",
+              "type":"int",
+              "length":"4",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"user",
+              "tableType":"Table",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"name",
+              "type":"varchar",
+              "length":"16",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"group_resources",
+              "tableType":"Table",
+			  "keyClass":"primaryKey",
+			  "keyTitle":"Primary Key",
+			  "name":"<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>gid",
+              "type":"int",
+              "length":"4",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"user",
+              "tableType":"Table",
+			  "keyClass":"foreignKey",
+			  "keyTitle":"Foreign Key",
+			  "name":"<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId",
+              "type":"int",
+              "length":"4",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"group",
+              "tableType":"Table",
+			  "keyClass":"primaryKey",
+			  "keyTitle":"Primary Key",
+			  "name":"<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId",
+              "type":"int identity",
+              "length":"4",
+              "nullable":"",
+              "autoUpdated":"√",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"group",
+              "tableType":"Table",
+			  "keyClass":"indexedColumn",
+			  "keyTitle":"Indexed",
+			  "name":"<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name",
+              "type":"varchar",
+              "length":"16",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+          {
+		      "tableName":"resources",
+              "tableType":"Table",
+			  "keyClass":"",
+			  "keyTitle":"",
+			  "name":"description",
+              "type":"varchar",
+              "length":"80",
+              "nullable":"",
+              "autoUpdated":"",
+			  "defaultValue":"null",
+			  "comments":""
+          },
+		  ];
           var config = {
 	          pagination: true
-          }
+          };
 	  </script>    
   </div>
   <!-- /.content-wrapper -->

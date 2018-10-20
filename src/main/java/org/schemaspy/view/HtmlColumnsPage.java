@@ -62,7 +62,7 @@ public class HtmlColumnsPage {
 
         Set<MustacheTableColumn> tableColumns = tables.stream()
                 .flatMap(table -> table.getColumns().stream())
-                .map(tableColumn -> new MustacheTableColumn(tableColumn, indexedColumns, mustacheCompiler.getRootPath(0)))
+                .map(tableColumn -> new MustacheTableColumn(tableColumn, indexedColumns.contains(tableColumn), mustacheCompiler.getRootPath(0)))
                 .collect(Collectors.toSet());
 
         PageData pageData = new PageData.Builder()
