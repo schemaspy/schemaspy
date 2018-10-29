@@ -1,188 +1,188 @@
-      <!-- Content Header (Page header) -->
-      <section class="content-header">
-          <h1>{{table.name}}</h1></br>
-          {{#comments}}
-          <div class="box box-primary">
-              <div class="box-header with-border">
-                  <i class="fa fa-file-text-o"></i>
-                  <h3 id="Description" class="box-title">Description</h3>
-                  <div class="box-tools pull-right">
-                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                  </div>
-              </div><!-- /.box-header -->
-              <div class="box-body clearfix">
-                  <p>{{{comments}}}</p>
-              </div><!-- /.box-body -->
-          </div>
-          {{/comments}}
-      </section>
-      <!-- Main content -->
-      <section class="content">
-          <div class="box box-primary">
-              <div class="box-header with-border">
-                  <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-                  <h3 id="Columns" class="box-title">Columns</h3>
-                  <div class="box-tools pull-right">
-                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                  </div>
-              </div>
-              <div class="box-body">
-                  <div class="row">
-                      <div id="button_group_one" class="col-md-3 col-sm-6"></div>
-                      <div id="button_group_two" class="col-md-2 col-sm-4 pull-right text-right"></div>
-                  </div>
-                  <table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
-                      <thead align='left'>
-                      <tr>
-                          <th>Column</th>
-                          <th>Type</th>
-                          <th>Size</th>
-                          <th title='Are nulls allowed?'>Nulls</th>
-                          <th title='Is column automatically updated?'>Auto</th>
-                          <th title='Default value'>Default</th>
-                          <th title='Columns in tables that reference this column'>Children</th>
-                          <th title='Columns in tables that are referenced by this column'>Parents</th>
-                          <th title='Comments' class="toggle"><span>Comments</span></th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      {{#columns}}
-                      <tr>
-                          <td{{{key}}}>{{{keyIcon}}}<span id="{{column.name}}">{{column.name}}</span></td>
-                          <td>{{column.typeName}}</td>
-                          <td>{{column.detailedSize}}</td>
-                          <td title='{{titleNullable}}'>{{nullable}}</td>
-                          <td title='{{titleAutoUpdated}}'>{{autoUpdated}}</td>
-                          <td>{{defaultValue}}</td>
-                          <td>
-                              <table border='0' cellspacing='0' cellpadding='0'>
-                                  {{#children}}
-                                  <tr>
-                                      <td title="{{constraint}}"><a href='{{path}}{{table.name}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span></td>
-                                      <td class="constraint detail">{{constraint.name}}<span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span></td>
-                                  </tr>
-                                  {{/children}}
-                              </table>
-                          </td>
-                          <td>
-                              <table border='0' cellspacing='0' cellpadding='0'>
-                                  {{#parents}}
-                                  <tr>
-                                      <td title="{{constraint}}"><a href='{{path}}{{table.name}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span></td>
-                                      <td class="constraint detail">{{constraint.name}}<span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span></td>
-                                  </tr>
-                                  {{/parents}}
-                              </table>
-                          </td>
-                          <td>{{{comments}}}</td>
-                      </tr>
-                      {{/columns}}
-                      </tbody>
-                  </table>
-                  <p title='{{table.columns.size}} columns'>Table contained <span id="recordNumber">{{table.numRows}}</span> rows<p/>
-              </div>
-          </div>
-          {{^indexes.isEmpty}}
-          <div class="box box-primary">
-              <div class="box-header with-border">
-                  <i class="fa fa-sitemap"></i>
-                  <h3 id="Indexes" class="box-title">Indexes</h3>
-                  <div class="box-tools pull-right">
-                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                  </div>
-              </div>
-              <div class="box-body">
-                  <table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
-                      <thead>
-                      <tr>
-                          <th>Constraint Name</th>
-                          <th>Type</th>
-                          <th>Sort</th>
-                          <th>Column(s)</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      {{#indexes}}
-                      <tr>
-                          <td{{{key}}}>{{{keyIcon}}}{{index.name}}</td>
-                          <td>{{index.type}}</td>
-                          <td>{{{index.sortAsString}}}</td>
-                          <td>{{index.columnsAsString}}</td>
-                      </tr>
-                      {{/indexes}}
-                      </tbody>
-                  </table>
-              </div><!-- /.box-body -->
-          </div>
-          {{/indexes.isEmpty}}
-          {{^diagrams.isEmpty}}
-          <div class="box box-primary">
-              <div class="box-header with-border">
-                  <i class="fa fa-code-fork"></i>
-                  <h3 id="Relationships" class="box-title">Relationships</h3>
-                  <div class="box-tools pull-right">
-                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                  </div>
-              </div>
-              <div class="box-body">
-                  <div class="nav-tabs-custom" style="cursor: move;"><!-- Tabs within a box -->
-                      <h5>Close relationships within degrees of separation</h5>
-                      <ul class="nav nav-tabs pull-left ui-sortable-handle">
-                          {{#diagrams}}
-                          <li class="{{active}}"><a href="#{{id}}-chart" data-toggle="tab" aria-expanded="true">{{name}}</a></li>
-                          {{/diagrams}}
-                      </ul>
-                      <div class="tab-content no-padding">
-                          {{#diagrams}}
-                          <div class="chart tab-pane {{active}}" id="{{id}}-chart" style="position: relative; overflow-x:auto;">
-                              {{{map}}}
-                              <a name='diagram'><img id='{{id}}' src='../diagrams/{{fileName}}' usemap='#{{mapName}}' class='diagram' border='0' alt='' align='left'></a>
-                          </div>
-                          {{/diagrams}}
-                      </div>
-                  </div>
-              </div><!-- /.box-body -->
-          </div>
-          {{/diagrams.isEmpty}}
-          {{#diagrams.isEmpty}}{{^table.isView}}
-          <div class="alert alert-warning alert-dismissible">
-              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-              <h4><i class="icon fa fa-warning"></i>Diagram producer might be missing</h4>
-              <p>No diagrams were produced please see application output for any errors</p>
-          </div>
-          {{/table.isView}}{{/diagrams.isEmpty}}
-          {{#sqlCode}}
-          <div class="box box-primary">
-              <div class="box-header with-border">
-                  <i class="fa fa-file-code-o"></i>
-                  <h3 id="ViewDefinition" class="box-title">View Definition</h3>
-                  <div class="box-tools pull-right">
-                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                  </div>
-              </div>
-              <div class="box-body">
-                  <textarea id="sql-script-codemirror" name="sql-script-codemirror" rows="" style="display: none;">{{sqlCode}}</textarea>
-                  <div style="padding-top: 5px;"><hr></div>
-                  <div class="box box-solid">
-                      <div class="box-header with-border">
-                          <i class="fa fa-puzzle-piece"></i>
-                          <h3 class="box-title">Possibly Referenced Tables/Views</h3>
-                      </div>
-                      <!-- /.box-header -->
-                      <div class="box-body">
-                          <ul class="list-unstyled">
-                              {{#references}}
-                              <li><a href="{{name}}.html">{{name}}</a></li>
-                              {{/references}}
-                          </ul>
-                      </div><!-- /.box-body -->
-                  </div>
-              </div><!-- /.box-body -->
-          </div>
-          {{/sqlCode}}
-      </section>
+<!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>{{table.name}}</h1></br>
+                    {{#comments}}
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-file-text-o"></i>
+                            <h3 id="Description" class="box-title">Description</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div><!-- /.box-header -->
+                        <div class="box-body clearfix">
+                            <p>{{{comments}}}</p>
+                        </div><!-- /.box-body -->
+                    </div>
+                    {{/comments}}
+                </section>
+                <!-- Main content -->
+                <section class="content">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                            <h3 id="Columns" class="box-title">Columns</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div id="button_group_one" class="col-md-3 col-sm-6"></div>
+                                <div id="button_group_two" class="col-md-2 col-sm-4 pull-right text-right"></div>
+                            </div>
+                            <table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+                                <thead align='left'>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Size</th>
+                                    <th title='Are nulls allowed?'>Nulls</th>
+                                    <th title='Is column automatically updated?'>Auto</th>
+                                    <th title='Default value'>Default</th>
+                                    <th title='Columns in tables that reference this column'>Children</th>
+                                    <th title='Columns in tables that are referenced by this column'>Parents</th>
+                                    <th title='Comments' class="toggle"><span>Comments</span></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {{#columns}}
+                                <tr>
+                                    <td{{{key}}}>{{{keyIcon}}}<span id="{{column.name}}">{{column.name}}</span></td>
+                                    <td>{{column.typeName}}</td>
+                                    <td>{{column.detailedSize}}</td>
+                                    <td title='{{titleNullable}}'>{{nullable}}</td>
+                                    <td title='{{titleAutoUpdated}}'>{{autoUpdated}}</td>
+                                    <td>{{defaultValue}}</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            {{#children}}
+                                            <tr>
+                                                <td title="{{constraint}}"><a href='{{path}}{{table.name}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span></td>
+                                                <td class="constraint detail">{{constraint.name}}<span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span></td>
+                                            </tr>
+                                            {{/children}}
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            {{#parents}}
+                                            <tr>
+                                                <td title="{{constraint}}"><a href='{{path}}{{table.name}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span></td>
+                                                <td class="constraint detail">{{constraint.name}}<span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span></td>
+                                            </tr>
+                                            {{/parents}}
+                                        </table>
+                                    </td>
+                                    <td>{{{comments}}}</td>
+                                </tr>
+                                {{/columns}}
+                                </tbody>
+                            </table>
+                            <p title='{{table.columns.size}} columns'>Table contained <span id="recordNumber">{{table.numRows}}</span> rows<p/>
+                        </div>
+                    </div>
+                    {{^indexes.isEmpty}}
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-sitemap"></i>
+                            <h3 id="Indexes" class="box-title">Indexes</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+                                <thead>
+                                <tr>
+                                    <th>Constraint Name</th>
+                                    <th>Type</th>
+                                    <th>Sort</th>
+                                    <th>Column(s)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {{#indexes}}
+                                <tr>
+                                    <td{{{key}}}>{{{keyIcon}}}{{index.name}}</td>
+                                    <td>{{index.type}}</td>
+                                    <td>{{{index.sortAsString}}}</td>
+                                    <td>{{index.columnsAsString}}</td>
+                                </tr>
+                                {{/indexes}}
+                                </tbody>
+                            </table>
+                        </div><!-- /.box-body -->
+                    </div>
+                    {{/indexes.isEmpty}}
+                    {{^diagrams.isEmpty}}
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-code-fork"></i>
+                            <h3 id="Relationships" class="box-title">Relationships</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="nav-tabs-custom" style="cursor: move;"><!-- Tabs within a box -->
+                                <h5>Close relationships within degrees of separation</h5>
+                                <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                                    {{#diagrams}}
+                                    <li class="{{active}}"><a href="#{{id}}-chart" data-toggle="tab" aria-expanded="true">{{name}}</a></li>
+                                    {{/diagrams}}
+                                </ul>
+                                <div class="tab-content no-padding">
+                                    {{#diagrams}}
+                                    <div class="chart tab-pane {{active}}" id="{{id}}-chart" style="position: relative; overflow-x:auto;">
+                                        {{{map}}}
+                                        <a name='diagram'><img id='{{id}}' src='../diagrams/{{fileName}}' usemap='#{{mapName}}' class='diagram' border='0' alt='' align='left'></a>
+                                    </div>
+                                    {{/diagrams}}
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div>
+                    {{/diagrams.isEmpty}}
+                    {{#diagrams.isEmpty}}{{^table.isView}}
+                    <div class="alert alert-warning alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4><i class="icon fa fa-warning"></i>Diagram producer might be missing</h4>
+                        <p>No diagrams were produced please see application output for any errors</p>
+                    </div>
+                    {{/table.isView}}{{/diagrams.isEmpty}}
+                    {{#sqlCode}}
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-file-code-o"></i>
+                            <h3 id="ViewDefinition" class="box-title">View Definition</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <textarea id="sql-script-codemirror" name="sql-script-codemirror" rows="" style="display: none;">{{sqlCode}}</textarea>
+                            <div style="padding-top: 5px;"><hr></div>
+                            <div class="box box-solid">
+                                <div class="box-header with-border">
+                                    <i class="fa fa-puzzle-piece"></i>
+                                    <h3 class="box-title">Possibly Referenced Tables/Views</h3>
+                                </div>
+                                <!-- /.box-header -->
+                                <div class="box-body">
+                                    <ul class="list-unstyled">
+                                        {{#references}}
+                                        <li><a href="{{name}}.html">{{name}}</a></li>
+                                        {{/references}}
+                                    </ul>
+                                </div><!-- /.box-body -->
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div>
+                    {{/sqlCode}}
+                </section>
