@@ -124,7 +124,7 @@ public class DotNode {
         buf.append("<TD " + colspanHeader + " BGCOLOR=\"" + css.getTableHeadBackground() + "\">");
         buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\">");
         buf.append("<TR>");
-        buf.append("<TD ALIGN=\"LEFT\"><B>" + fqTableName + "</B></TD>");
+        buf.append("<TD ALIGN=\"LEFT\"><B>" + escapeHtml(fqTableName) + "</B></TD>");
         buf.append("<TD ALIGN=\"RIGHT\">[" + tableOrView + "]</TD>");
         buf.append("</TR>");
         buf.append("</TABLE>");
@@ -148,7 +148,7 @@ public class DotNode {
             for (TableColumn column : table.getColumns()) {
                 if (config.showTrivialColumns || config.showColumnDetails || column.isPrimary() || column.isForeignKey() || indexColumns.contains(column)) {
                     buf.append("      <TR>");
-                    buf.append("<TD PORT=\"" + column.getName() + "\" " + colspan);
+                    buf.append("<TD PORT=\"" + escapeHtml(column.getName()) + "\" " + colspan);
                     if (excludedColumns.contains(column))
                         buf.append("BGCOLOR=\"" + css.getExcludedColumnBackgroundColor() + "\" ");
                     else if (indexColumns.contains(column))
@@ -164,7 +164,7 @@ public class DotNode {
                     }
                     buf.append("</TD>");
                     buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxwidth + "\" HEIGHT=\"16\">");
-                    buf.append(column.getName());
+                    buf.append(escapeHtml(column.getName()));
                     buf.append("</TD>");
                     buf.append("</TR>");
                     buf.append("</TABLE>");
@@ -172,7 +172,7 @@ public class DotNode {
 
                     if (config.showColumnDetails) {
                         buf.append("<TD PORT=\"");
-                        buf.append(column.getName());
+                        buf.append(escapeHtml(column.getName()));
                         buf.append(".type\" ALIGN=\"LEFT\">");
                         buf.append(column.getShortTypeName().toLowerCase());
                         buf.append("[");
