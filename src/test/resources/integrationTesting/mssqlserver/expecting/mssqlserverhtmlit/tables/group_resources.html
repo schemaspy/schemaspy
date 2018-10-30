@@ -198,6 +198,32 @@
                     </div>
                     <div class="box box-primary">
                         <div class="box-header with-border">
+                            <i class="fa fa-sitemap"></i>
+                            <h3 class="box-title">Check Constraints</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table id="check_table" class="table table-bordered table-striped dataTable" role="grid">
+                                <thead align='left'>
+                                <tr>
+                                    <th>Constraint Name</th>
+                                    <th>Constraint</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>CK_access_value</td>
+                                    <td>([access]=&#39;rw&#39; OR [access]=&#39;r&#39; OR [access]=&#39;n&#39;)</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
                             <i class="fa fa-code-fork"></i>
                             <h3 id="Relationships" class="box-title">Relationships</h3>
                             <div class="box-tools pull-right">
@@ -244,6 +270,11 @@
                         </div><!-- /.box-body -->
                     </div>
                 </section>
+                <script>
+                    var config = {
+                        pagination: true
+                    }
+                </script>
             </div>
             <!-- /.content-wrapper -->
             <footer class="main-footer">
