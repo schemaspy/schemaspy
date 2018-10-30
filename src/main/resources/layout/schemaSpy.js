@@ -7,7 +7,12 @@ $(function() {
 });
 
 function dataTableExportButtons(table) {
+    $("<div class=\"row\">\n" +
+        "    <div id=\"button_group_one\" class=\"col-md-6 col-sm-6\"></div>\n" +
+        "    <div id=\"button_group_two\" class=\"col-md-2 col-sm-4 pull-right text-right\"></div>\n" +
+        "</div>").prependTo('#' + table.table().container().id);
    new $.fn.dataTable.Buttons( table, {
+       name: 'exports',
        buttons: [
            {
                extend:    'copyHtml5',
@@ -33,11 +38,8 @@ function dataTableExportButtons(table) {
        ]
    } );
 
-   table.buttons().container()
-       .appendTo( '#button_group_one' );
-
-   table.buttons( 1, null ).container()
-       .appendTo( '#button_group_two' );
+    table.buttons().container().appendTo( '#' + table.table().container().id + ' #button_group_one' );
+    table.buttons( 'exports', null ).container().appendTo( '#' + table.table().container().id + ' #button_group_two' );
 }
 
  
