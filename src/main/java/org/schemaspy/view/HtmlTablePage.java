@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The page that contains the details of a specific table or view
@@ -63,6 +64,9 @@ public class HtmlTablePage {
         Set<TableColumn> indexes = new HashSet<>();
         Set<MustacheTableColumn> tableColumns = new LinkedHashSet<>();
         Set<MustacheTableIndex> indexedColumns = new LinkedHashSet<>();
+        Set<MustacheCheckConstraint> checkConstraints = table.getCheckConstraints().entrySet().stream()
+                .map(entry -> new MustacheCheckConstraint(table.getName(), entry.getKey(), entry.getValue()))
+                .collect(Collectors.toSet());
         Set<TableIndex> sortIndexes = new TreeSet<>(table.getIndexes()); // sort primary keys first
 
         for (TableIndex index : sortIndexes) {
@@ -84,6 +88,7 @@ public class HtmlTablePage {
                 .addToScope("primaries", primaries)
                 .addToScope("columns", tableColumns)
                 .addToScope("indexes", indexedColumns)
+                .addToScope("checkConstraints", checkConstraints)
                 .addToScope("diagrams", diagrams)
                 .addToScope("sqlCode", sqlCode(table))
                 .addToScope("references", sqlReferences(table))

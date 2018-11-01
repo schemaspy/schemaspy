@@ -1,15 +1,11 @@
-function enableAnchors() {
+$(document).ready(function() {
     anchors.options.visible = 'always';
     anchors.add('h3');
-}
-
-$(document).ready(function() {
-    enableAnchors();
 
     var table = $('#standard_table').DataTable( {
-        lengthChange: false,		
-		bSort: false,
-		bPaginate: false,
+        lengthChange: false,
+        ordering: false,
+        paging: config.pagination,
 		autoWidth: true,		
 		buttons: [ 
 					{
@@ -35,19 +31,21 @@ $(document).ready(function() {
 				]
 					
     } );
-
-    //schemaSpy.js
     dataTableExportButtons(table);
-} );
 
-$(document).ready(function() {
     var indexes = $('#indexes_table').DataTable( {
-        lengthChange: false,		
-		bPaginate: false,
-		bSort: false									
+        lengthChange: false,
+        paging: config.pagination,
+        ordering: false
     } );
- 
-    
+    dataTableExportButtons(indexes);
+
+    var check = $('#check_table').DataTable( {
+		lengthChange: false,
+        paging: config.pagination,
+        ordering: false
+    } );
+    dataTableExportButtons(check);
 } );
 
 
