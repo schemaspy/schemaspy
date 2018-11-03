@@ -26,7 +26,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.diagram.DiagramProducer;
 import org.schemaspy.output.diagram.graphviz.DiagramProducerUsingGraphvizWrapper;
-import org.schemaspy.util.Dot;
+import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +51,10 @@ public class DotNodeIT {
 
     @BeforeClass
     public static void setup() throws IOException {
-        diagramProducer = new DiagramProducerUsingGraphvizWrapper(Dot.getInstance(), temporaryFolder.newFolder());
+        GraphvizConfig graphvizConfig = mock(GraphvizConfig.class);
+        when(graphvizConfig.isHighQuality()).thenReturn(true);
+        when(graphvizConfig.getImageFormat()).thenReturn("png");
+        diagramProducer = new DiagramProducerUsingGraphvizWrapper(graphvizConfig, temporaryFolder.newFolder());
     }
 
     @Test

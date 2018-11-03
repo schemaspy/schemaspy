@@ -43,8 +43,8 @@ public class DiagramProducerUsingGraphvizWrapper implements DiagramProducer {
     private final File summaryDir;
     private final File orphanDir;
 
-    public DiagramProducerUsingGraphvizWrapper(Dot graphvizWrapper, File outputDir) {
-        this.graphvizWrapper = graphvizWrapper;
+    public DiagramProducerUsingGraphvizWrapper(GraphvizConfig graphvizConfig, File outputDir) {
+        this.graphvizWrapper = new Dot(graphvizConfig);
         this.diagramDir = new File(outputDir, "diagrams");
         this.summaryDir = new File(diagramDir, "summary");
         this.orphanDir = new File(diagramDir, "orphans");

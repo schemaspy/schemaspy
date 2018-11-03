@@ -42,7 +42,6 @@ import org.schemaspy.output.html.mustache.diagrams.*;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.service.DatabaseService;
 import org.schemaspy.service.SqlService;
-import org.schemaspy.util.Dot;
 import org.schemaspy.util.ManifestUtils;
 import org.schemaspy.util.ResourceWriter;
 import org.schemaspy.util.Writers;
@@ -314,13 +313,14 @@ public class SchemaAnalyzer {
 
         prepareLayoutFiles(outputDir);
 
+        DiagramProducer diagramProducer = new DiagramProducerUsingGraphvizWrapper(config, outputDir);
         Path htmlInfoFile = outputDir.toPath().resolve("info-html.txt");
         Files.deleteIfExists(htmlInfoFile);
         writeInfo("date", ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ")), htmlInfoFile);
         writeInfo("os", System.getProperty("os.name") + " " + System.getProperty("os.version"), htmlInfoFile);
         writeInfo("schemaspy-version", ManifestUtils.getImplementationVersion(), htmlInfoFile);
         writeInfo("schemaspy-build", ManifestUtils.getImplementationBuild(), htmlInfoFile);
-        writeInfo("diagramImplementation", Dot.getInstance().getImplementationDetails(), htmlInfoFile);
+        writeInfo("diagramImplementation", diagramProducer.implementationDetails(), htmlInfoFile);
         progressListener.graphingSummaryProgressed();
 
         boolean showDetailedTables = tables.size() <= config.getMaxDetailedTables();
@@ -334,7 +334,6 @@ public class SchemaAnalyzer {
             DbAnalyzer.getRailsConstraints(db.getTablesMap());
 
         DotFormatter dotProducer = DotFormatter.getInstance();
-        DiagramProducer diagramProducer = new DiagramProducerUsingGraphvizWrapper(Dot.getInstance(), outputDir);
         MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(diagramProducer);
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, impliedConstraintsFinder, outputDir);
