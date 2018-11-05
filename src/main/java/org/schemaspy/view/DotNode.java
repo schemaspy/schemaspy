@@ -3,6 +3,7 @@
  * Copyright (C) 2016 Rafal Kasa
  * Copyright (C) 2017 Wojciech Kasa
  * Copyright (C) 2017 Daniel Watt
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -22,25 +23,24 @@
  */
 package org.schemaspy.view;
 
-import com.github.mustachejava.util.HtmlEscaper;
 import org.schemaspy.Config;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
+import org.schemaspy.util.Html;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -54,6 +54,10 @@ import java.util.Set;
 public class DotNode {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Html html = new Html();
+    private static final StyleSheet CSS = StyleSheet.getInstance();
+
+    private static final String INDENT_6 = "      ";
 
     private final Table table;
     private final DotNodeConfig config;
@@ -62,6 +66,7 @@ public class DotNode {
     private final Set<TableColumn> excludedColumns = new HashSet<>();
     private final String lineSeparator = System.getProperty("line.separator");
     private final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
+    private final String columnSpan;
 
     /**
      * Create a DotNode that is a focal point of a diagram.
@@ -80,6 +85,7 @@ public class DotNode {
         this.path = path + (table.isRemote() ? ("../../" + table.getContainer() + "/tables/") : "");
         this.outputDir = outputDir;
         this.config = config;
+        this.columnSpan = config.showColumnDetails ? "COLSPAN=\"2\" " : "COLSPAN=\"3\" ";
     }
 
     /**
@@ -108,117 +114,30 @@ public class DotNode {
 
     @Override
     public String toString() {
-        StyleSheet css = StyleSheet.getInstance();
         StringBuilder buf = new StringBuilder();
         String tableName = table.getName();
         // fully qualified table name (optionally prefixed with schema)
         String fqTableName = (table.isRemote() ? table.getContainer() + "." : "") + tableName;
-        String colspan = config.showColumnDetails ? "COLSPAN=\"2\" " : "COLSPAN=\"3\" ";
         String colspanHeader = config.showColumnDetails ? "COLSPAN=\"4\" " : "COLSPAN=\"3\" ";
         String tableOrView = table.isView() ? "view" : "table";
 
         buf.append("  \"" + fqTableName + "\" [" + lineSeparator);
         buf.append("   label=<" + lineSeparator);
-        buf.append("    <TABLE BORDER=\"" + (config.showColumnDetails ? "2" : "0") + "\" CELLBORDER=\"1\" CELLSPACING=\"0\" BGCOLOR=\"" + css.getTableBackground() + "\">" + lineSeparator);
-        buf.append("      <TR>");
-        buf.append("<TD " + colspanHeader + " BGCOLOR=\"" + css.getTableHeadBackground() + "\">");
+        buf.append("    <TABLE BORDER=\"" + (config.showColumnDetails ? "2" : "0") + "\" CELLBORDER=\"1\" CELLSPACING=\"0\" BGCOLOR=\"" + CSS.getTableBackground() + "\">" + lineSeparator);
+        buf.append(INDENT_6 + Html.TR_START);
+        buf.append("<TD " + colspanHeader + " BGCOLOR=\"" + CSS.getTableHeadBackground() + "\">");
         buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\">");
-        buf.append("<TR>");
-        buf.append("<TD ALIGN=\"LEFT\"><B>" + escapeHtml(fqTableName) + "</B></TD>");
-        buf.append("<TD ALIGN=\"RIGHT\">[" + tableOrView + "]</TD>");
-        buf.append("</TR>");
+        buf.append(Html.TR_START);
+        buf.append("<TD ALIGN=\"LEFT\"><B>" + escapeHtml(fqTableName) + "</B>" + Html.TD_END);
+        buf.append("<TD ALIGN=\"RIGHT\">[" + tableOrView + "]" + Html.TD_END);
+        buf.append(Html.TR_END);
         buf.append("</TABLE>");
-        buf.append("</TD>");
-        buf.append("</TR>" + lineSeparator);
+        buf.append(Html.TD_END);
+        buf.append(Html.TR_END + lineSeparator);
 
-
-        boolean skippedTrivial = false;
-
-        if (config.showColumns) {
-            List<TableColumn> primaryColumns = table.getPrimaryColumns();
-            Set<TableColumn> indexColumns = new HashSet<>();
-
-            for (TableIndex index : table.getIndexes()) {
-                indexColumns.addAll(index.getColumns());
-            }
-            indexColumns.removeAll(primaryColumns);
-
-            int maxwidth = getColumnMaxWidth();
-
-            for (TableColumn column : table.getColumns()) {
-                if (config.showTrivialColumns || config.showColumnDetails || column.isPrimary() || column.isForeignKey() || indexColumns.contains(column)) {
-                    buf.append("      <TR>");
-                    buf.append("<TD PORT=\"" + escapeHtml(column.getName()) + "\" " + colspan);
-                    if (excludedColumns.contains(column))
-                        buf.append("BGCOLOR=\"" + css.getExcludedColumnBackgroundColor() + "\" ");
-                    else if (indexColumns.contains(column))
-                        buf.append("BGCOLOR=\"" + css.getIndexedColumnBackground() + "\" ");
-                    buf.append("ALIGN=\"LEFT\">");
-                    buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\" ALIGN=\"LEFT\">");
-                    buf.append("<TR ALIGN=\"LEFT\">");
-                    buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"15\" HEIGHT=\"16\">");
-                    if (column.isPrimary()) {
-                        buf.append("<IMG SRC=\"" + outputDir + "/images/primaryKeys.png\"/>");
-                    } else if (column.isForeignKey()) {
-                        buf.append("<IMG SRC=\"" + outputDir + "/images/foreignKeys.png\"/>");
-                    }
-                    buf.append("</TD>");
-                    buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxwidth + "\" HEIGHT=\"16\">");
-                    buf.append(escapeHtml(column.getName()));
-                    buf.append("</TD>");
-                    buf.append("</TR>");
-                    buf.append("</TABLE>");
-                    buf.append("</TD>");
-
-                    if (config.showColumnDetails) {
-                        buf.append("<TD PORT=\"");
-                        buf.append(escapeHtml(column.getName()));
-                        buf.append(".type\" ALIGN=\"LEFT\">");
-                        buf.append(column.getShortTypeName().toLowerCase());
-                        buf.append("[");
-                        buf.append(column.getDetailedSize());
-                        buf.append("]</TD>");
-                    }
-                    buf.append("</TR>" + lineSeparator);
-                } else {
-                    skippedTrivial = true;
-                }
-            }
-        }
-
-        if (skippedTrivial || !config.showColumns) {
-            buf.append("      <TR><TD PORT=\"elipses\" COLSPAN=\"3\" ALIGN=\"LEFT\">...</TD></TR>" + lineSeparator);
-        }
-
+        buf.append(columnsToString());
         if (!table.isView()) {
-            buf.append("      <TR>");
-            buf.append("<TD ALIGN=\"LEFT\" BGCOLOR=\"" + css.getBodyBackground() + "\">");
-            int numParents = config.showImpliedRelationships ? table.getNumParents() : table.getNumNonImpliedParents();
-            if (numParents > 0 || config.showColumnDetails)
-                buf.append("&lt; " + numParents);
-            else
-                buf.append("  ");
-
-            buf.append("</TD>");
-            buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + css.getBodyBackground() + "\">");
-            final long numRows = table.getNumRows();
-            if (displayNumRows && numRows >= 0) {
-                buf.append(NumberFormat.getInstance().format(numRows));
-                buf.append(" row");
-                if (numRows != 1)
-                    buf.append('s');
-            } else {
-                buf.append("  ");
-            }
-            buf.append("</TD>");
-
-            buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + css.getBodyBackground() + "\">");
-            int numChildren = config.showImpliedRelationships ? table.getNumChildren() : table.getNumNonImpliedChildren();
-            if (numChildren > 0 || config.showColumnDetails)
-                buf.append(numChildren + " &gt;");
-            else
-                buf.append("  ");
-            buf.append("</TD></TR>" + lineSeparator);
+            buf.append(tableToString());
         }
 
         buf.append("    </TABLE>>" + lineSeparator);
@@ -228,6 +147,37 @@ public class DotNode {
         buf.append("  ];");
 
         return buf.toString();
+    }
+
+    private String columnsToString() {
+        StringBuilder buf = new StringBuilder();
+        boolean skippedTrivial = false;
+
+        if (config.showColumns) {
+            Set<TableColumn> indexColumns = getIndexColumns();
+            int maxWidth = getColumnMaxWidth();
+            for (TableColumn column : table.getColumns()) {
+                if (config.showTrivialColumns || config.showColumnDetails || column.isPrimary() || column.isForeignKey() || indexColumns.contains(column)) {
+                    buf.append(columnToString(column, indexColumns, maxWidth));
+                } else {
+                    skippedTrivial = true;
+                }
+            }
+        }
+
+        if (skippedTrivial || !config.showColumns) {
+            buf.append(INDENT_6 + Html.TR_START + "<TD PORT=\"elipses\" COLSPAN=\"3\" ALIGN=\"LEFT\">..." + Html.TD_END + Html.TR_END + lineSeparator);
+        }
+        return buf.toString();
+    }
+
+    private Set<TableColumn> getIndexColumns() {
+        Set<TableColumn> indexColumns = new LinkedHashSet<>();
+        for (TableIndex index : table.getIndexes()) {
+            indexColumns.addAll(index.getColumns());
+        }
+        indexColumns.removeAll(table.getPrimaryColumns());
+        return indexColumns;
     }
 
     private int getColumnMaxWidth() {
@@ -249,6 +199,77 @@ public class DotNode {
         return (int) (font.getStringBounds(text, frc).getWidth());
     }
 
+    private String columnToString(TableColumn column, Set<TableColumn> indexColumns, int maxWidth) {
+        StringBuilder buf = new StringBuilder();
+        buf.append(INDENT_6 + Html.TR_START);
+        buf.append("<TD PORT=\"" + escapeHtml(column.getName()) + "\" " + columnSpan);
+        if (excludedColumns.contains(column))
+            buf.append("BGCOLOR=\"" + CSS.getExcludedColumnBackgroundColor() + "\" ");
+        else if (indexColumns.contains(column))
+            buf.append("BGCOLOR=\"" + CSS.getIndexedColumnBackground() + "\" ");
+        buf.append("ALIGN=\"LEFT\">");
+        buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\" ALIGN=\"LEFT\">");
+        buf.append("<TR ALIGN=\"LEFT\">");
+        buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"15\" HEIGHT=\"16\">");
+        if (column.isPrimary()) {
+            buf.append("<IMG SRC=\"" + outputDir + "/images/primaryKeys.png\"/>");
+        } else if (column.isForeignKey()) {
+            buf.append("<IMG SRC=\"" + outputDir + "/images/foreignKeys.png\"/>");
+        }
+        buf.append(Html.TD_END);
+        buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxWidth + "\" HEIGHT=\"16\">");
+        buf.append(escapeHtml(column.getName()));
+        buf.append(Html.TD_END);
+        buf.append(Html.TR_END);
+        buf.append("</TABLE>");
+        buf.append(Html.TD_END);
+
+        if (config.showColumnDetails) {
+            buf.append("<TD PORT=\"");
+            buf.append(escapeHtml(column.getName()));
+            buf.append(".type\" ALIGN=\"LEFT\">");
+            buf.append(column.getShortTypeName().toLowerCase());
+            buf.append("[");
+            buf.append(column.getDetailedSize());
+            buf.append("]" + Html.TD_END);
+        }
+        buf.append(Html.TR_END + lineSeparator);
+        return buf.toString();
+    }
+
+    private String tableToString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append(INDENT_6 + Html.TR_START);
+        buf.append("<TD ALIGN=\"LEFT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
+        int numParents = config.showImpliedRelationships ? table.getNumParents() : table.getNumNonImpliedParents();
+        if (numParents > 0 || config.showColumnDetails)
+            buf.append("&lt; " + numParents);
+        else
+            buf.append("  ");
+
+        buf.append(Html.TD_END);
+        buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
+        final long numRows = table.getNumRows();
+        if (displayNumRows && numRows >= 0) {
+            buf.append(NumberFormat.getInstance().format(numRows));
+            buf.append(" row");
+            if (numRows != 1)
+                buf.append('s');
+        } else {
+            buf.append("  ");
+        }
+        buf.append(Html.TD_END);
+
+        buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
+        int numChildren = config.showImpliedRelationships ? table.getNumChildren() : table.getNumNonImpliedChildren();
+        if (numChildren > 0 || config.showColumnDetails)
+            buf.append(numChildren + " &gt;");
+        else
+            buf.append("  ");
+        buf.append(Html.TD_END + Html.TR_END + lineSeparator);
+        return buf.toString();
+    }
+
     /**
      * HTML escape the specified string
      *
@@ -256,10 +277,7 @@ public class DotNode {
      * @return
      */
     private static String escapeHtml(String string) {
-        StringWriter writer = new StringWriter();
-        //TODO Try to replace usage of HtmlEscaper so that the "dot-lang" doesn't have dependency on mustache
-        HtmlEscaper.escape(string, writer);
-        return writer.toString();
+        return html.escape(string);
     }
 
     private static String urlEncodeLink(String string) {
