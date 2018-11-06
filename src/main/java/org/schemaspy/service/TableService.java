@@ -91,7 +91,7 @@ public class TableService {
      * @param forceQuotes
      * @throws SQLException
      */
-    private void initColumnAutoUpdate(Database db, Table table, boolean forceQuotes) throws SQLException {
+    private void initColumnAutoUpdate(Database db, Table table, boolean forceQuotes) {
 
         if (table.isView() || table.isRemote())
             return;
@@ -402,7 +402,7 @@ public class TableService {
         }
     }
 
-    private String getSchemaOrCatalog(Table table, boolean forceQuotes) throws SQLException {
+    private String getSchemaOrCatalog(Table table, boolean forceQuotes) {
         String schemaOrCatalog = null;
         if (table.getSchema() != null) {
             schemaOrCatalog = table.getSchema();
