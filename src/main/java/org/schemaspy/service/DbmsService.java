@@ -98,7 +98,7 @@ public class DbmsService {
             "| YEAR" +
             "| ZONE").split("[| ]"));
 
-    public DbmsMeta fetchDbmsMeta(DatabaseMetaData databaseMetaData) throws SQLException {
+    public DbmsMeta fetchDbmsMeta(DatabaseMetaData databaseMetaData) {
         DbmsMeta.Builder builder = new DbmsMeta.Builder();
 
         onlyLogException(() -> builder.productName(databaseMetaData.getDatabaseProductName()));
