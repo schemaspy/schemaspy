@@ -29,8 +29,8 @@ import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.db.config.PropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
+import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.util.DbSpecificConfig;
-import org.schemaspy.util.Dot;
 import org.schemaspy.view.HtmlConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,14 +67,14 @@ import java.util.stream.Stream;
  * @author Nils Petzaell
  * @author Daniel Watt
  */
-public final class Config implements HtmlConfig {
+public final class Config implements HtmlConfig, GraphvizConfig {
     private static Config instance;
     private final List<String> options;
     private Map<String, String> dbSpecificOptions;
     private Map<String, String> originalDbSpecificOptions;
     private boolean helpRequired;
     private boolean dbHelpRequired;
-    private File graphvizDir;
+    private String graphvizDir;
     private String dbType;
     private String schema;
     private List<String> schemas;
@@ -111,9 +111,9 @@ public final class Config implements HtmlConfig {
     private Boolean railsEnabled;
     private Boolean evaluateAll;
     private Boolean highQuality;
-    private Boolean lowQuality;
-    private Boolean paginationEnabled;
     private String imageFormat;
+    private String renderer;
+    private Boolean paginationEnabled;
     /**      
      * @deprecated replaced by -dp expanding folders
      */
@@ -179,10 +179,6 @@ public final class Config implements HtmlConfig {
         instance = config;
     }
 
-    public void setHtmlGenerationEnabled(boolean generateHtml) {
-        this.generateHtml = generateHtml;
-    }
-
     public boolean isHtmlGenerationEnabled() {
         if (generateHtml == null)
             generateHtml = !options.remove("-nohtml");
@@ -206,16 +202,7 @@ public final class Config implements HtmlConfig {
         if (graphvizDir.endsWith("\""))
             graphvizDir = graphvizDir.substring(0, graphvizDir.length() - 1);
 
-        setGraphvizDir(new File(graphvizDir));
-    }
-
-    /**
-     * Set the path to Graphviz so we can find dot to generate ER diagrams
-     *
-     * @param graphvizDir
-     */
-    public void setGraphvizDir(File graphvizDir) {
-        this.graphvizDir = graphvizDir;
+        this.graphvizDir = new File(graphvizDir).toString();
     }
 
     /**
@@ -227,7 +214,7 @@ public final class Config implements HtmlConfig {
      *
      * @return
      */
-    public File getGraphvizDir() {
+    public String getGraphvizDir() {
         if (graphvizDir == null) {
             String gv = pullParam("-gv");
             if (gv != null) {
@@ -981,7 +968,7 @@ public final class Config implements HtmlConfig {
      * over using this method.
      */
     public void setRenderer(String renderer) {
-        Dot.getInstance().setRenderer(renderer);
+        this.renderer = renderer;
     }
 
     /**
@@ -990,10 +977,10 @@ public final class Config implements HtmlConfig {
      */
     public String getRenderer() {
         String renderer = pullParam("-renderer");
-        if (renderer != null)
-            setRenderer(renderer);
-
-        return Dot.getInstance().getRenderer();
+        if (renderer != null) {
+            this.renderer = renderer;
+        }
+        return renderer;
     }
 
     /**
@@ -1009,8 +996,6 @@ public final class Config implements HtmlConfig {
      */
     public void setHighQuality(boolean highQuality) {
         this.highQuality = highQuality;
-        lowQuality = !highQuality;
-        Dot.getInstance().setHighQuality(highQuality);
     }
 
     /**
@@ -1019,13 +1004,7 @@ public final class Config implements HtmlConfig {
     public boolean isHighQuality() {
         if (highQuality == null) {
             highQuality = options.remove("-hq");
-            if (highQuality) {
-                // use whatever is the default unless explicitly specified otherwise
-                Dot.getInstance().setHighQuality(highQuality);
-            }
         }
-
-        highQuality = Dot.getInstance().isHighQuality();
         return highQuality;
     }
 
@@ -1033,16 +1012,10 @@ public final class Config implements HtmlConfig {
      * @see #setHighQuality(boolean)
      */
     public boolean isLowQuality() {
-        if (lowQuality == null) {
-            lowQuality = options.remove("-lq");
-            if (lowQuality) {
-                // use whatever is the default unless explicitly specified otherwise
-                Dot.getInstance().setHighQuality(!lowQuality);
-            }
+        if (highQuality == null) {
+            highQuality = !options.remove("-lq");
         }
-
-        lowQuality = !Dot.getInstance().isHighQuality();
-        return lowQuality;
+        return !highQuality;
     }
 
     /**

@@ -2,7 +2,7 @@
  * Copyright (C) 2004 - 2011 John Currier
  * Copyright (C) 2016 Rafal Kasa
  * Copyright (C) 2017 Wojciech Kasa
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2017 - 2018 Nils Petzaell
  * Copyright (C) 2017 Daniel Watt
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
@@ -25,7 +25,7 @@ package org.schemaspy.util;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.schemaspy.Config;
+import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +33,7 @@ import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,22 +47,29 @@ import java.util.regex.Pattern;
  */
 public class Dot {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static Dot instance = new Dot();
+
+    private final GraphvizConfig graphvizConfig;
     private final GraphvizVersion graphvizVersion;
     private final GraphvizVersion supportedGraphvizVersion = new GraphvizVersion("2.26");
     private final GraphvizVersion badGraphvizVersion = new GraphvizVersion("2.31");
     private final String lineSeparator = System.getProperty("line.separator");
     private String dotExe;
-    private String format = Config.getInstance().getImageFormat();
-    private String renderer;
     private final Set<String> validatedRenderers = Collections.synchronizedSet(new HashSet<String>());
     private final Set<String> invalidatedRenderers = Collections.synchronizedSet(new HashSet<String>());
 
+    private String effective_renderer;
     private static final String CAIRO_RENDERER = ":cairo";
     private static final String GD_RENDERER = ":gd";
     private static final String EMPTY_RENDERER = "";
 
-    private Dot() {
+    public Dot(GraphvizConfig graphvizConfig) {
+        this.graphvizConfig = graphvizConfig;
+        this.graphvizVersion = initVersion();
+        this.effective_renderer = initRenderer();
+        validatedRenderers.add("");
+    }
+
+    private GraphvizVersion initVersion() {
         String versionText = null;
         // dot -V should return something similar to:
         //  dot graphvizVersion 2.8 (Fri Feb  3 22:38:53 UTC 2006)
@@ -80,22 +88,20 @@ public class Dot {
             if (matcher.find()) {
                 versionText = matcher.group();
             } else {
-                if (Config.getInstance().isHtmlGenerationEnabled()) {
-                    LOGGER.warn("Invalid dot configuration detected. '{}' returned: '{}'", getDisplayableCommand(dotCommand), versionLine);
-                }
+                LOGGER.warn("Invalid dot configuration detected. '{}' returned: '{}'", getDisplayableCommand(dotCommand), versionLine);
             }
         } catch (Exception validDotDoesntExist) {
-            if (Config.getInstance().isHtmlGenerationEnabled()) {
-                LOGGER.warn("Failed to query Graphviz version using '{}'", getDisplayableCommand(dotCommand), validDotDoesntExist);
-            }
+            LOGGER.warn("Failed to query Graphviz version using '{}'", getDisplayableCommand(dotCommand), validDotDoesntExist);
         }
 
-        graphvizVersion = new GraphvizVersion(versionText);
-        validatedRenderers.add("");
+        return new GraphvizVersion(versionText);
     }
 
-    public static Dot getInstance() {
-        return instance;
+    private String initRenderer() {
+        if (isValid() && !supportsRenderer(graphvizConfig.getRenderer())) {
+            LOGGER.info("renderer '{}' is not supported by your graphvizVersion of dot", graphvizConfig.getRenderer());
+        }
+        return graphvizConfig.getRenderer();
     }
 
     public boolean exists() {
@@ -119,22 +125,14 @@ public class Dot {
     }
 
     /**
-     * Set the image format to generate.  Defaults to <code>png</code>.
+     * Get the image format to generate.  Defaults to <code>png</code>.
      * See <a href='http://www.graphviz.org/doc/info/output.html'>http://www.graphviz.org/doc/info/output.html</a>
      * for valid formats.
      *
-     * @param format image format to generate
-     */
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    /**
-     * @return
-     * @see #setFormat(String)
+     * @return image format to generate
      */
     public String getFormat() {
-        return format;
+        return Objects.isNull(graphvizConfig.getImageFormat()) ? "png": graphvizConfig.getImageFormat();
     }
 
     /**
@@ -155,30 +153,16 @@ public class Dot {
     /**
      * Set the renderer to use for the -Tformat[:renderer[:formatter]] dot option as specified
      * at <a href='http://www.graphviz.org/doc/info/command.html'>
-     * http://www.graphviz.org/doc/info/command.html</a> where "format" is specified by
-     * {@link #setFormat(String)}<p>
+     * http://www.graphviz.org/doc/info/command.html</a> where "format" is specified by getFormat
      * Note that the leading ":" is required while :formatter is optional.
      *
-     * @param renderer
-     */
-    public void setRenderer(String renderer) {
-        if (isValid() && !supportsRenderer(renderer)) {
-            LOGGER.info("renderer '{}' is not supported by your graphvizVersion of dot", renderer);
-        }
-
-        this.renderer = renderer;
-    }
-
-    /**
-     * @return the renderer to use
-     * @see #setRenderer(String)
+     * @return renderer
      */
     public String getRenderer() {
-        if (renderer == null) {
+        if (effective_renderer == null) {
             setHighQuality(true);
         }
-
-        return supportsRenderer(renderer) ? renderer : (requiresGdRenderer() ? GD_RENDERER : "");
+        return supportsRenderer(effective_renderer) ? effective_renderer : (requiresGdRenderer() ? GD_RENDERER : "");
     }
 
     /**
@@ -190,29 +174,22 @@ public class Dot {
      */
     public void setHighQuality(boolean highQuality) {
         if (highQuality && supportsRenderer(CAIRO_RENDERER)) {
-            setRenderer(CAIRO_RENDERER);
+            effective_renderer = CAIRO_RENDERER;
         } else if (supportsRenderer(GD_RENDERER)) {
-            setRenderer(GD_RENDERER);
+            effective_renderer = GD_RENDERER;
         } else {
-            setRenderer(EMPTY_RENDERER);
+            effective_renderer = EMPTY_RENDERER;
         }
     }
 
     /**
-     * @see #setHighQuality(boolean)
-     */
-    public boolean isHighQuality() {
-        return getRenderer().contains(CAIRO_RENDERER);
-    }
-
-    /**
      * Returns <code>true</code> if the specified renderer is supported.
-     * See {@link #setRenderer(String)} for renderer details.
+     * See {@link #getRenderer()} for renderer details.
      *
      * @param renderer
      * @return
      */
-    public boolean supportsRenderer(@SuppressWarnings("hiding") String renderer) {
+    private boolean supportsRenderer(@SuppressWarnings("hiding") String renderer) {
         if (!exists())
             return false;
 
@@ -256,13 +233,13 @@ public class Dot {
      */
     private String getExe() {
         if (dotExe == null) {
-            File gv = Config.getInstance().getGraphvizDir();
 
-            if (gv == null) {
+            if (Objects.isNull(graphvizConfig.getGraphvizDir())) {
                 // default to finding dot in the PATH
                 dotExe = "dot";
             } else {
                 // pull dot from the Graphviz bin directory specified
+                File gv = new File(graphvizConfig.getGraphvizDir());
                 dotExe = new File(new File(gv, "bin"), "dot").toString();
             }
         }
@@ -318,10 +295,6 @@ public class Dot {
         } finally {
             IOUtils.closeQuietly(mapReader);
         }
-    }
-
-    public String getImplementationDetails() {
-        return "Graphviz dot " + getGraphvizVersion().toString();
     }
 
     public class DotFailure extends IOException {
