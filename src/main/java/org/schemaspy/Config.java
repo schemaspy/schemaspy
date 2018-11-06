@@ -68,6 +68,10 @@ import java.util.stream.Stream;
  * @author Daniel Watt
  */
 public final class Config implements HtmlConfig, GraphvizConfig {
+
+    private static final int DEFAULT_FONT_SIZE = 11;
+    private static final int DEFAULT_TABLE_DETAILS_THRESHOLD = 300;
+
     private static Config instance;
     private final List<String> options;
     private Map<String, String> dbSpecificOptions;
@@ -431,7 +435,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
 
     public int getMaxDetailedTables() {
         if (maxDetailedTables == null) {
-            int max = 300; // default
+            int max = DEFAULT_TABLE_DETAILS_THRESHOLD;
             String param = pullParam("-maxdet");
             if (param != null) {
                 try {
@@ -597,7 +601,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      */
     public int getFontSize() {
         if (fontSize == null) {
-            int size = 11; // default
+            int size = DEFAULT_FONT_SIZE;
             String param = pullParam("-fontsize");
             if (param != null) {
                 try {
@@ -1571,7 +1575,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
         }
         if (getGraphvizDir() != null) {
             params.add("-gv");
-            params.add(getGraphvizDir().toString());
+            params.add(getGraphvizDir());
         }
         params.add("-i");
         params.add(getTableInclusions().toString());
