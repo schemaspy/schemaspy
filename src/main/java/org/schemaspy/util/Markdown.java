@@ -46,7 +46,9 @@ public class Markdown {
 
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
-    private final static HashMap<String, String> pages = new HashMap<>();
+    private static final HashMap<String, String> pages = new HashMap<>();
+
+    private Markdown() {}
 
     public static String toHtml(String markdownText, String rootPath) {
         String text = markdownText;
@@ -96,7 +98,7 @@ public class Markdown {
             }
 
             String path = rootPath+pagePath(pageLink);
-            if (!anchorLink.equals("")) {
+            if (!"".equals(anchorLink)) {
 				path = path + "#" + anchorLink;
 			}
             text.append("[").append(link).append("]: ./").append(path).append(newLine);

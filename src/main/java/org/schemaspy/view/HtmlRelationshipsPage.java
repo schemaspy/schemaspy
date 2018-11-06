@@ -72,10 +72,10 @@ public class HtmlRelationshipsPage {
     }
 
     private static boolean hasOnlyImpliedRelationships(MustacheSummaryDiagramResults results) {
-        return !results.hasRealRelationships() && !results.getImpliedConstraints().isEmpty() ? true : false;
+        return !results.hasRealRelationships() && !results.getImpliedConstraints().isEmpty();
     }
 
     private static boolean anyRelationships(MustacheSummaryDiagramResults results) {
-        return !results.hasRealRelationships() && results.getImpliedConstraints().isEmpty() ? true : false;
+        return !results.hasRealRelationships() && results.getImpliedConstraints().isEmpty();
     }
 }

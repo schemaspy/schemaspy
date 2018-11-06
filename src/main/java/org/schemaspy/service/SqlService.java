@@ -194,7 +194,7 @@ public class SqlService {
      * @return
      * @throws SQLException
      */
-    public String getQuotedIdentifier(String id) throws SQLException {
+    public String getQuotedIdentifier(String id) {
         // look for any character that isn't valid (then matcher.find() returns true)
         Matcher matcher = invalidIdentifierPattern.matcher(id);
 
@@ -209,7 +209,7 @@ public class SqlService {
         return id;
     }
 
-    public String quoteIdentifier(String id) throws SQLException {
+    public String quoteIdentifier(String id) {
         String quote = dbmsMeta.getIdentifierQuoteString();
         return quote + id + quote;
     }

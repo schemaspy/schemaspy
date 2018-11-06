@@ -34,7 +34,7 @@ import java.util.StringTokenizer;
  * @version 1.0
  */
 public class GraphvizVersion implements Comparable<GraphvizVersion> {
-    private final List<Integer> segments = new ArrayList<Integer>();
+    private final List<Integer> segments = new ArrayList<>();
     private final String asString;
     private final int hashCode;
 
@@ -78,9 +78,9 @@ public class GraphvizVersion implements Comparable<GraphvizVersion> {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null || !(other instanceof GraphvizVersion))
-            return false;
-        return compareTo((GraphvizVersion)other) == 0;
+        if (other instanceof GraphvizVersion)
+            return compareTo((GraphvizVersion)other) == 0;
+        return false;
     }
 
     @Override

@@ -62,7 +62,7 @@ public class ConnectionURLBuilder {
         for (DbSpecificOption option : dbConfig.getOptions()) {
             option.setValue(getParam(args, option));
 
-            LOGGER.debug("{}",option.toString());
+            LOGGER.debug("{}",option);
 
             // replace e.g. <host> with myDbHost
             connectionURL = connectionURL.replaceAll("\\<" + option.getName() + "\\>", option.getValue());
