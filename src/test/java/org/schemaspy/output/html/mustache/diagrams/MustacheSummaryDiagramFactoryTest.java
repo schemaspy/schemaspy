@@ -17,6 +17,7 @@ import org.schemaspy.view.WriteStats;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -25,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -141,6 +142,7 @@ public class MustacheSummaryDiagramFactoryTest {
 
     @Test
     public void exceptionsAreCaught() throws IOException {
+        assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         doThrow(new DiagramException("byDesign")).
                 when(mustacheDiagramFactory)
