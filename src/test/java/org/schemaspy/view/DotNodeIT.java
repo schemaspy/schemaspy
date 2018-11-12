@@ -24,9 +24,9 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
-import org.schemaspy.output.diagram.DiagramProducer;
-import org.schemaspy.output.diagram.graphviz.DiagramProducerUsingGraphvizWrapper;
+import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
+import org.schemaspy.output.diagram.graphviz.GraphvizDot;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,14 +47,14 @@ public class DotNodeIT {
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private static DotFormatter dotFormatter = DotFormatter.getInstance();
-    private static DiagramProducer diagramProducer;
+    private static DiagramFactory diagramFactory;
 
     @BeforeClass
     public static void setup() throws IOException {
         GraphvizConfig graphvizConfig = mock(GraphvizConfig.class);
         when(graphvizConfig.isHighQuality()).thenReturn(true);
         when(graphvizConfig.getImageFormat()).thenReturn("png");
-        diagramProducer = new DiagramProducerUsingGraphvizWrapper(graphvizConfig, temporaryFolder.newFolder());
+        diagramFactory = new DiagramFactory(new GraphvizDot(graphvizConfig), temporaryFolder.newFolder());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class DotNodeIT {
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
         dotFormatter.writeOrphan(table, printWriter, "test");
-        diagramProducer.generateOrphanDiagram(dotFile,"illegalTableName");
+        diagramFactory.generateOrphanDiagram(dotFile,"illegalTableName");
     }
 
     @Test
@@ -84,7 +84,7 @@ public class DotNodeIT {
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
         dotFormatter.writeOrphan(table, printWriter, "test");
-        diagramProducer.generateOrphanDiagram(dotFile,"illegalColumnName");
+        diagramFactory.generateOrphanDiagram(dotFile,"illegalColumnName");
     }
 
 }

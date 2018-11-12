@@ -60,8 +60,8 @@ public class HtmlOutputValidator {
         List<Path> actualPaths;
         try (Stream<Path> pathStream = Files.find(actualPath, 5, (p, a) -> a.isRegularFile())) {
             actualPaths = pathStream.filter(p -> {
-                String fileName = p.getFileName().toString().toLowerCase();
-                return fileName.endsWith("html") || fileName.endsWith("dot");
+                String path = p.toString().toLowerCase();
+                return path.endsWith("html") || (path.contains("diagrams") && (path.endsWith("dot") || path.endsWith("svg")));
             }).collect(Collectors.toList());
         }
         assertThat(actualPaths.size()).isGreaterThan(0);

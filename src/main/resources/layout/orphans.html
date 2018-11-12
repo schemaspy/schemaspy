@@ -13,7 +13,12 @@
                             <div id="grid" data-columns>
                                 {{#diagrams}}
                                 <div class="item">
-                                    <{{#isEmbed}}embed{{/isEmbed}}{{^isEmbed}}img{{/isEmbed}} src='diagrams/orphans/{{fileName}}' usemap='#{{mapName}}' style="max-width:100%;" border='0' alt='' align='top'/>
+                                    {{#isEmbed}}
+                                    <object type="image/svg+xml" id="{{id}}" data="diagrams/orphans/{{fileName}}" style="max-width:100%;" border="0" align="top"></object>
+                                    {{/isEmbed}}
+                                    {{^isEmbed}}
+                                    <img id="{{id}}" src="diagrams/orphans/{{fileName}}" usemap="#{{mapName}}" style="max-width:100%;" border="0" align="top">
+                                    {{/isEmbed}}
                                 </div>
                                 {{/diagrams}}
                             </div>

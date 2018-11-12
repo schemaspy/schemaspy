@@ -18,7 +18,7 @@
  */
 package org.schemaspy.output.html.mustache.diagrams;
 
-import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramResults;
 import org.schemaspy.view.MustacheTableDiagram;
 
@@ -29,24 +29,24 @@ import java.io.File;
  */
 public class MustacheDiagramFactory {
 
-    private final DiagramProducer diagramProducer;
+    private final DiagramFactory diagramFactory;
 
-    public MustacheDiagramFactory(DiagramProducer diagramProducer) {
-        this.diagramProducer = diagramProducer;
+    public MustacheDiagramFactory(DiagramFactory diagramFactory) {
+        this.diagramFactory = diagramFactory;
     }
 
     public MustacheTableDiagram generateOrphanDiagram(String name, File dotFile, String diagramName) {
-        DiagramResults results = diagramProducer.generateOrphanDiagram(dotFile, diagramName);
+        DiagramResults results = diagramFactory.generateOrphanDiagram(dotFile, diagramName);
         return createMustacheTableDiagram(name, results);
     }
 
     public MustacheTableDiagram generateTableDiagram(String name, File dotFile, String diagramName) {
-        DiagramResults results = diagramProducer.generateTableDiagram(dotFile, diagramName);
+        DiagramResults results = diagramFactory.generateTableDiagram(dotFile, diagramName);
         return createMustacheTableDiagram(name, results);
     }
 
     public MustacheTableDiagram generateSummaryDiagram(String name, File dotFile, String diagramName) {
-        DiagramResults results = diagramProducer.generateSummaryDiagram(dotFile, diagramName);
+        DiagramResults results = diagramFactory.generateSummaryDiagram(dotFile, diagramName);
         return createMustacheTableDiagram(name, results);
     }
 

@@ -36,8 +36,9 @@ import org.schemaspy.model.*;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
-import org.schemaspy.output.diagram.DiagramProducer;
-import org.schemaspy.output.diagram.graphviz.DiagramProducerUsingGraphvizWrapper;
+import org.schemaspy.output.diagram.DiagramFactory;
+import org.schemaspy.output.diagram.graphviz.GraphvizDot;
+import org.schemaspy.output.diagram.vizjs.VizJSDot;
 import org.schemaspy.output.html.mustache.diagrams.*;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.service.DatabaseService;
@@ -252,7 +253,7 @@ public class SchemaAnalyzer {
 
             long duration = progressListener.startedGraphingSummaries();
             if (config.isHtmlGenerationEnabled()) {
-                generateHtmlDoc(config, progressListener, outputDir, db, duration, tables);
+                generateHtmlDoc(config, commandLineArguments.useVizJS() , progressListener, outputDir, db, duration, tables);
             }
 
             outputProducers.forEach(
@@ -307,20 +308,24 @@ public class SchemaAnalyzer {
         }
     }
 
-    private static void generateHtmlDoc(Config config, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
+    private static void generateHtmlDoc(Config config, boolean useVizJS, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
         LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/graphing summary");
 
         prepareLayoutFiles(outputDir);
-
-        DiagramProducer diagramProducer = new DiagramProducerUsingGraphvizWrapper(config, outputDir);
+        DiagramFactory diagramFactory;
+        if (useVizJS) {
+            diagramFactory = new DiagramFactory(new VizJSDot(),outputDir);
+        } else {
+            diagramFactory = new DiagramFactory(new GraphvizDot(config),outputDir);
+        }
         Path htmlInfoFile = outputDir.toPath().resolve("info-html.txt");
         Files.deleteIfExists(htmlInfoFile);
         writeInfo("date", ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ")), htmlInfoFile);
         writeInfo("os", System.getProperty("os.name") + " " + System.getProperty("os.version"), htmlInfoFile);
         writeInfo("schemaspy-version", ManifestUtils.getImplementationVersion(), htmlInfoFile);
         writeInfo("schemaspy-build", ManifestUtils.getImplementationBuild(), htmlInfoFile);
-        writeInfo("diagramImplementation", diagramProducer.implementationDetails(), htmlInfoFile);
+        writeInfo("diagramImplementation", diagramFactory.getImplementationDetails(), htmlInfoFile);
         progressListener.graphingSummaryProgressed();
 
         boolean showDetailedTables = tables.size() <= config.getMaxDetailedTables();
@@ -334,7 +339,7 @@ public class SchemaAnalyzer {
             DbAnalyzer.getRailsConstraints(db.getTablesMap());
 
         DotFormatter dotProducer = DotFormatter.getInstance();
-        MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(diagramProducer);
+        MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(diagramFactory);
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, impliedConstraintsFinder, outputDir);
         MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, includeImpliedConstraints, showDetailedTables, progressListener);

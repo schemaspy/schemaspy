@@ -26,9 +26,7 @@ import java.io.File;
  */
 public interface DiagramProducer {
 
-    String implementationDetails();
-
-    DiagramResults generateOrphanDiagram(File dotFile, String diagramName);
-    DiagramResults generateTableDiagram(File dotFile, String diagramName);
-    DiagramResults generateSummaryDiagram(File dotFile, String diagramName);
+    String getImplementationDetails();
+    String generateDiagram(File dotFile, File diagramFile);
+    String getDiagramFormat();
 }

@@ -188,12 +188,12 @@ public class CommandLineArguments {
 
     @Parameter(
             names = {
-                    "-dv", "-dotinjvm", "schemaspy.dotInJvm"
+                    "-vizjs", "schemaspy.vizjs"
             },
-            descriptionKey = "dotInJvm",
+            descriptionKey = "vizjs",
             required = false
     )
-    private boolean renderDotInJvm;
+    private boolean useVizJS;
 
     public boolean isHelpRequired() {
         return helpRequired;
@@ -251,7 +251,7 @@ public class CommandLineArguments {
         return port;
     }
 
-    public boolean isRenderDotInJvm() {
-        return renderDotInJvm;
+    public boolean useVizJS() {
+        return useVizJS;
     }
 }

@@ -41,22 +41,22 @@ public class MustacheTableDiagramFactory {
     private final DotFormatter dotProducer;
     private final MustacheDiagramFactory mustacheDiagramFactory;
     private final File outputDir;
-    private final File diagramDir;
+    private final File tableDir;
 
     public MustacheTableDiagramFactory(DotFormatter dotProducer, MustacheDiagramFactory mustacheDiagramFactory, File outputDir) {
         this.dotProducer = dotProducer;
         this.mustacheDiagramFactory = mustacheDiagramFactory;
         this.outputDir = outputDir;
-        this.diagramDir = new File(outputDir, "diagrams");
-        diagramDir.mkdirs();
+        this.tableDir = outputDir.toPath().resolve("diagrams").resolve("tables").toFile();
+        tableDir.mkdirs();
     }
 
     public List<MustacheTableDiagram> generateTableDiagrams(Table table, WriteStats stats) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
-        File oneDegreeDotFile = new File(diagramDir, table.getName() + ".1degree.dot");
-        File twoDegreesDotFile = new File(diagramDir, table.getName() + ".2degrees.dot");
-        File oneImpliedDotFile = new File(diagramDir, table.getName() + ".implied1degrees.dot");
-        File twoImpliedDotFile = new File(diagramDir, table.getName() + ".implied2degrees.dot");
+        File oneDegreeDotFile = new File(tableDir, table.getName() + ".1degree.dot");
+        File twoDegreesDotFile = new File(tableDir, table.getName() + ".2degrees.dot");
+        File oneImpliedDotFile = new File(tableDir, table.getName() + ".implied1degrees.dot");
+        File twoImpliedDotFile = new File(tableDir, table.getName() + ".implied2degrees.dot");
 
         // delete before we start because we'll use the existence of these files to determine
         // if they should be turned into pngs & presented

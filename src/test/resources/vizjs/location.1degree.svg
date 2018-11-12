@@ -12,14 +12,14 @@
 <!-- location -->
 <g id="node1" class="node">
 <title>location</title>
-<g id="a_node1"><a xlink:href="tables/location.html" xlink:title="location">
+<g id="a_node1"><a xlink:href="../../tables/location.html" xlink:title="location">
 <polygon fill="#ffffff" stroke="transparent" points="8,-4 8,-200 139,-200 139,-4 8,-4"/>
 <polygon fill="#f5f5f5" stroke="transparent" points="8.5,-177 8.5,-200 139.5,-200 139.5,-177 8.5,-177"/>
 <polygon fill="none" stroke="#000000" points="8.5,-177 8.5,-200 139.5,-200 139.5,-177 8.5,-177"/>
 <text text-anchor="start" x="13.5" y="-186.1" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00" fill="#000000">location</text>
 <text text-anchor="start" x="104.5437" y="-185.1" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#000000">[table]</text>
 <polygon fill="none" stroke="#000000" points="8.5,-155 8.5,-177 139.5,-177 139.5,-155 8.5,-155"/>
-<image xlink:href="report/images/primaryKeys.png" width="11px" height="12px" preserveAspectRatio="xMinYMin meet" x="13.5" y="-172"/>
+<image xlink:href="../../images/primaryKeys.png" width="11px" height="12px" preserveAspectRatio="xMinYMin meet" x="13.5" y="-172"/>
 <text text-anchor="start" x="28.5" y="-162.1" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#000000">id</text>
 <polygon fill="none" stroke="#000000" points="8.5,-133 8.5,-155 139.5,-155 139.5,-133 8.5,-133"/>
 <text text-anchor="start" x="28.5" y="-140.1" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#000000">count</text>
