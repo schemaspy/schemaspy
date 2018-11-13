@@ -33,7 +33,7 @@ import java.io.InputStream;
 public class VizJSDot implements DiagramProducer {
 
     private static final String ICON_SIZE = " , width: \"261px\" , height: \"261px\"";
-    private static final int ONE_GB = 1 << 30;
+    private static final int MB_64 = 1024 * 1024 * 64;
     protected ScriptEngine scriptEngine;
 
     public VizJSDot() {
@@ -63,7 +63,7 @@ public class VizJSDot implements DiagramProducer {
     public String generateDiagram(File dotFile, File diagramFile) {
         try {
             String dotSource = IOUtils.toString(dotFile.toURI().toURL(), "UTF-8");
-            String svg = toSvg(dotSource, ONE_GB);
+            String svg = toSvg(dotSource, MB_64);
             try (FileWriter diagramWriter = new FileWriter(diagramFile)){
                 IOUtils.write(svg, diagramWriter);
             }
