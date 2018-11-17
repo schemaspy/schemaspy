@@ -22,7 +22,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.diagram.DiagramProducer;
-import org.schemaspy.util.GraphvizVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
