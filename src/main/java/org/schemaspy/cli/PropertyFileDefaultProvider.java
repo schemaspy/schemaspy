@@ -48,7 +48,7 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
 
     private final Properties properties;
 
-    private final List<String> booleans = Arrays.asList("schemaspy.sso","schemaspy.debug");
+    private final List<String> booleans = Arrays.asList("schemaspy.sso","schemaspy.debug","schemaspy.nohtml");
 
     public PropertyFileDefaultProvider(String propertiesFilename) {
         Objects.requireNonNull(propertiesFilename);

@@ -172,6 +172,31 @@ public class CommandLineArgumentParserTest {
         assertThat(log).contains("GNU LESSER GENERAL PUBLIC LICENSE");
     }
 
+    @Test
+    public void skipHtmlIsFalseByDefault() {
+        String[] args = {
+                "-o", "aFolder",
+                "-sso"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(),NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        assertThat(arguments.isHtmlDisabled()).isFalse();
+        assertThat(arguments.isHtmlEnabled()).isTrue();
+    }
+
+    @Test
+    public void skipHtmlCanBeEnabled() {
+        String[] args = {
+                "-o", "aFolder",
+                "-sso",
+                "-nohtml"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(),NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        assertThat(arguments.isHtmlDisabled()).isTrue();
+        assertThat(arguments.isHtmlEnabled()).isFalse();
+    }
+
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.
 
     // given only parameter -configFile without value -> error
