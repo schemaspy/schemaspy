@@ -22,3 +22,16 @@ What's new
     * hive
     * hive-kerberos-driverwrapper
     * hive-kerberos-driverwrapper-zookeeper
+
+6.1.0
+-----
+
+* Diagrams
+    * Now has option to use embedded viz.js (no need for Graphviz) ``-vizjs``
+
+* XML
+    * Now includes routines
+
+* Html report
+    * Column page loads faster
+    * Table page contains check constraints

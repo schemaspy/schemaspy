@@ -112,9 +112,9 @@ Diagram related
 [-renderer :rendererName]
     Specify which renderer to use should be prefixed with ':' example ``-renderer :cairo``
 [-hq] or [-lq]
-    Generate higher or lower-quality diagrams. Various installations of Graphviz (depending on OS and/or version) will default to generat /ing
+    Generate higher or lower-quality diagrams. Various installations of Graphviz (depending on OS and/or version) will default to generating
     either higher or lower quality images. That is, some might not have the "lower quality" libraries and others might not have the "higher quality" libraries.
-    Higher quality output takes longer to generate and results in significantly larger image files (which take longer to download / display),
+    Higher quality output takes longer to generate and results in significantly larger image files (which take longer to download/display),
     but the resultant Entity Relationship diagrams generally look better.
 [-imageformat outputImageFormat]
     The format of the image that gets generated. Supported formats are svg and png. Defaults to png.
@@ -131,4 +131,6 @@ Diagram related
     Exclude column(s), regular expression to exclude column(s) from diagrams, defaults to nothing.
 [-x excludeIndirectColumnsRegex]
     Exclude column(s) from diagrams where column(s) aren't directly referenced by focal table, defaults to nothing.
+[-vizjs]
+    Use embedded viz.js instead of Graphviz. Useful when graphviz isn't installed. Memory is set to 64 MB, if you receive ther error "Cannot enlarge memory arrays" please report this to us.
 

@@ -15,6 +15,16 @@ I this case you need to add options ``-s [schemaName]`` or ``-cat [catalogName]`
 In most cases for catalog you can use ``-cat %`` |br|
 In mysql you can use same as ``-db`` |br|
 
+"Cannot enlarge memory arrays" when using viz.js
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+According to viz.js documentation the memory is default 16MB this should be enough. |br|
+We have increased this to 64 MB if you receive this error, please report this to us. |br|
+
+I just receive a cryptic error like "ERROR - null"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The code has previously avoided to log stracktraces, we now log them but only when |br|
+``-debug`` is used. So any cryptic error can be enhanced with stacktrace by running |br|
+SchemaSpy with the argument ``-debug`` |br|
 
 OSX
 ----
