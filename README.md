@@ -135,5 +135,5 @@ Thanks to SonarQube Team for free analysis solution for open source projects.
 SchemaSpy is distributed under LGPL version 3 or later, see COPYING.LESSER(LGPL) and COPYING(GPL).   
 LGPLv3 is additional permissions on top of GPLv3.
 
-
+![image](https://user-images.githubusercontent.com/19885116/48661948-6cf97e80-ea7a-11e8-97e7-b45332a13e49.png)
 
