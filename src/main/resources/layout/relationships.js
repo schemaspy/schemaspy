@@ -7,9 +7,7 @@ $(function() {
 });
 
 $(function() {
-	var $imgs = $('img.diagram', 'object.diagram');
+	var $imgs = $('img.diagram, object.diagram');
     $imgs.css("cursor", "move")
     $imgs.draggable();
 });
- 
- 

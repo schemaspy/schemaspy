@@ -6,8 +6,8 @@ $(document).ready(function() {
         lengthChange: false,
         ordering: false,
         paging: config.pagination,
-		autoWidth: true,		
-		buttons: [ 
+		autoWidth: true,
+		buttons: [
 					{
 						text: 'Related columns',
 						action: function ( e, dt, node, config ) {
@@ -29,7 +29,7 @@ $(document).ready(function() {
 						columns: '.toggle'
 					}
 				]
-					
+
     } );
     dataTableExportButtons(table);
 
@@ -54,7 +54,7 @@ $(document).ready(function() {
 
 
 $(function() {
-	var $imgs = $('img.diagram', 'object.diagram');
+	var $imgs = $('img.diagram, object.diagram');
 	$imgs.css("cursor", "move")
 	$imgs.draggable();
 });
