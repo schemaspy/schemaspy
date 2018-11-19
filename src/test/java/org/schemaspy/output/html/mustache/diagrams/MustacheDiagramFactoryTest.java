@@ -20,7 +20,7 @@ package org.schemaspy.output.html.mustache.diagrams;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramResults;
 import org.schemaspy.view.MustacheTableDiagram;
 
@@ -34,31 +34,31 @@ import static org.mockito.Mockito.when;
 
 public class MustacheDiagramFactoryTest {
 
-    private static final DiagramProducer diagramProducer = mock(DiagramProducer.class);
-    private static final MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(diagramProducer);
+    private static final DiagramFactory DIAGRAM_FACTORY = mock(DiagramFactory.class);
+    private static final MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(DIAGRAM_FACTORY);
 
     @BeforeClass
     public static void setupOrphan() {
         File orphan = mock(File.class);
         when(orphan.getName()).thenReturn("orphan.png");
-        DiagramResults results = new DiagramResults(orphan, "orphanMap", "<map name=\"orphanMap\">");
-        when(diagramProducer.generateOrphanDiagram(any(File.class),anyString())).thenReturn(results);
+        DiagramResults results = new DiagramResults(orphan,"<map name=\"orphanMap\">","png");
+        when(DIAGRAM_FACTORY.generateOrphanDiagram(any(File.class),anyString())).thenReturn(results);
     }
 
     @BeforeClass
     public static void setupTable() {
         File orphan = mock(File.class);
         when(orphan.getName()).thenReturn("table.png");
-        DiagramResults results = new DiagramResults(orphan, "tableMap", "<map name=\"tableMap\">");
-        when(diagramProducer.generateTableDiagram(any(File.class),anyString())).thenReturn(results);
+        DiagramResults results = new DiagramResults(orphan,"<map name=\"tableMap\">","png");
+        when(DIAGRAM_FACTORY.generateTableDiagram(any(File.class),anyString())).thenReturn(results);
     }
 
     @BeforeClass
     public static void setupSummary() {
         File orphan = mock(File.class);
         when(orphan.getName()).thenReturn("summary.png");
-        DiagramResults results = new DiagramResults(orphan, "summaryMap", "<map name=\"summaryMap\">");
-        when(diagramProducer.generateSummaryDiagram(any(File.class),anyString())).thenReturn(results);
+        DiagramResults results = new DiagramResults(orphan,"<map name=\"summaryMap\">", "png");
+        when(DIAGRAM_FACTORY.generateSummaryDiagram(any(File.class),anyString())).thenReturn(results);
     }
 
     @Test

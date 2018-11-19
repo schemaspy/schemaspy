@@ -20,25 +20,39 @@ package org.schemaspy.output.diagram;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Nils Petzaell
  */
 public class DiagramResults {
 
+    private static final Pattern MAP_NAME_PATTERN = Pattern.compile("<map.*name=\"([\\w\\s]+).*");
+
     private final File diagramFile;
     private final String diagramMapName;
     private final String diagramMap;
+    private final String imageFormat;
 
-    public DiagramResults(File diagramFile, String diagramMapName, String diagramMap) {
+    public DiagramResults(File diagramFile, String diagramMap, String imageFormat) {
         this.diagramFile = diagramFile;
-        this.diagramMapName = diagramMapName;
         if (Objects.nonNull(diagramMap)) {
+            this.diagramMapName = diagramMapName(diagramMap);
             this.diagramMap = diagramMap.trim();
         } else {
+            this.diagramMapName = "";
             this.diagramMap = "";
         }
+        this.imageFormat = imageFormat;
+    }
 
+    private static String diagramMapName(String diagramMap) {
+        Matcher matcher = MAP_NAME_PATTERN.matcher(diagramMap);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return "";
     }
 
     public File getDiagramFile() {
@@ -51,5 +65,9 @@ public class DiagramResults {
 
     public String getDiagramMap() {
         return diagramMap;
+    }
+
+    public String getImageFormat() {
+        return imageFormat;
     }
 }

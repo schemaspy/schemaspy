@@ -6,8 +6,8 @@ $(document).ready(function() {
         lengthChange: false,
         ordering: false,
         paging: config.pagination,
-		autoWidth: true,		
-		buttons: [ 
+		autoWidth: true,
+		buttons: [
 					{
 						text: 'Related columns',
 						action: function ( e, dt, node, config ) {
@@ -29,43 +29,45 @@ $(document).ready(function() {
 						columns: '.toggle'
 					}
 				]
-					
+
     } );
     dataTableExportButtons(table);
 
-    var indexes = $('#indexes_table').DataTable( {
-        lengthChange: false,
-        paging: config.pagination,
-        ordering: false
-    } );
-    dataTableExportButtons(indexes);
+    if ($('#indexes_table').length) {
+        var indexes = $('#indexes_table').DataTable({
+            lengthChange: false,
+            paging: config.pagination,
+            ordering: false
+        });
+        dataTableExportButtons(indexes);
+    }
 
-    var check = $('#check_table').DataTable( {
-		lengthChange: false,
-        paging: config.pagination,
-        ordering: false
-    } );
-    dataTableExportButtons(check);
+    if ($('#check_table').length) {
+        var check = $('#check_table').DataTable( {
+            lengthChange: false,
+            paging: config.pagination,
+            ordering: false
+        } );
+        dataTableExportButtons(check);
+    }
 } );
 
 
- $(function() {
-	var $imgs = $('img.diagram');
+$(function() {
+	var $imgs = $('img.diagram, object.diagram');
+	$imgs.css("cursor", "move")
+	$imgs.draggable();
+});
 
-	$imgs.each(function () {
-		eval("$('#"+$(this).attr('id')+"').draggable();")		
-	});	 
- });
- 
- $.fn.digits = function(){ 
-    return this.each(function(){ 
-        $(this).text( $(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "1 ") ); 
-    })
- } 
+$.fn.digits = function(){
+	return this.each(function(){
+		$(this).text( $(this).text().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "1 ") );
+	})
+}
 
- $(function() {
+$(function() {
 	$("#recordNumber").digits();
- });
+});
 
 var codeElement = document.getElementById("sql-script-codemirror");
 var editor = null;

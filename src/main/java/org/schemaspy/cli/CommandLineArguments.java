@@ -186,6 +186,15 @@ public class CommandLineArguments {
     )
     private Integer port;
 
+    @Parameter(
+            names = {
+                    "-vizjs", "schemaspy.vizjs"
+            },
+            descriptionKey = "vizjs",
+            required = false
+    )
+    private boolean useVizJS;
+
     public boolean isHelpRequired() {
         return helpRequired;
     }
@@ -240,5 +249,9 @@ public class CommandLineArguments {
 
     public Integer getPort() {
         return port;
+    }
+
+    public boolean useVizJS() {
+        return useVizJS;
     }
 }

@@ -28,6 +28,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">  </TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">1 &gt;</TD></TR>
     </TABLE>>
     URL="tables/group.html"
+    target="_top"
     tooltip="group"
   ];
   "group_resources" [
@@ -40,6 +41,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD></TR>
     </TABLE>>
     URL="tables/group_resources.html"
+    target="_top"
     tooltip="group_resources"
   ];
   "resources" [
@@ -52,6 +54,7 @@ digraph "largeRelationshipsDiagram" {
       <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">  </TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">0 rows</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">1 &gt;</TD></TR>
     </TABLE>>
     URL="tables/resources.html"
+    target="_top"
     tooltip="resources"
   ];
   "group_resources":"gid":w -> "group":"groupId":e [arrowhead=none dir=back arrowtail=crowodot];

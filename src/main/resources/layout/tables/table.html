@@ -1,6 +1,6 @@
 <!-- Content Header (Page header) -->
                 <section class="content-header">
-                    <h1>{{table.name}}</h1></br>
+                    <h1>{{table.name}}</h1><br />
                     {{#comments}}
                     <div class="box box-primary">
                         <div class="box-header with-border">
@@ -12,7 +12,7 @@
                             </div>
                         </div><!-- /.box-header -->
                         <div class="box-body clearfix">
-                            <p>{{{comments}}}</p>
+                            {{{comments}}}
                         </div><!-- /.box-body -->
                     </div>
                     {{/comments}}
@@ -77,7 +77,7 @@
                                 {{/columns}}
                                 </tbody>
                             </table>
-                            <p title='{{table.columns.size}} columns'>Table contained <span id="recordNumber">{{table.numRows}}</span> rows<p/>
+                            <p title='{{table.columns.size}} columns'>Table contained <span id="recordNumber">{{table.numRows}}</span> rows</p>
                         </div>
                     </div>
                     {{^indexes.isEmpty}}
@@ -155,7 +155,7 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            <div class="nav-tabs-custom" style="cursor: move;"><!-- Tabs within a box -->
+                            <div class="nav-tabs-custom"><!-- Tabs within a box -->
                                 <h5>Close relationships within degrees of separation</h5>
                                 <ul class="nav nav-tabs pull-left ui-sortable-handle">
                                     {{#diagrams}}
@@ -166,7 +166,12 @@
                                     {{#diagrams}}
                                     <div class="chart tab-pane {{active}}" id="{{id}}-chart" style="position: relative; overflow-x:auto;">
                                         {{{map}}}
-                                        <a name='diagram'><img id='{{id}}' src='../diagrams/{{fileName}}' usemap='#{{mapName}}' class='diagram' border='0' alt='' align='left'></a>
+                                        {{#isEmbed}}
+                                        <a name='diagram'><object type="image/svg+xml" id="{{id}}" data="../diagrams/tables/{{fileName}}" class="diagram" border="0" align="left"></object></a>
+                                        {{/isEmbed}}
+                                        {{^isEmbed}}
+                                        <a name='diagram'><img id="{{id}}" src="../diagrams/tables/{{fileName}}" usemap="#{{mapName}}" class="diagram" border="0" align="left"></a>
+                                        {{/isEmbed}}
                                     </div>
                                     {{/diagrams}}
                                 </div>

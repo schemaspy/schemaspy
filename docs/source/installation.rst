@@ -11,6 +11,11 @@ Java 8
 
 Download instructions for all operating systems: `https://java.com/en/download/manual.jsp <https://java.com/en/download/manual.jsp>`_
 
+Optional
+--------
+
+Since version 6.1.0 Graphviz is no longer required. There is an embedded viz.js that can be used by adding command line argument ``vizjs``
+
 Graphviz
 ^^^^^^^^
 
