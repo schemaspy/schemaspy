@@ -19,26 +19,30 @@
 package org.schemaspy.output.diagram.vizjs;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class VizJSDotTest {
-
-    private static final String ENCODING = "UTF-8";
     private VizJSDot javaDotViz = new VizJSDot();
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
     public void transformDotToSvg() throws Exception {
-        URL sourceDot = VizJSDotTest.class.getResource("/vizjs/location.1degree.dot");
-        URL expectedSvg = VizJSDotTest.class.getResource("/vizjs/location.1degree.svg");
-        File diagramFile = File.createTempFile("test", "svg");
-        javaDotViz.generateDiagram(new File(sourceDot.getFile()), diagramFile);
-        String svgContent = IOUtils.toString(diagramFile.toURI(),"UTF-8");
-        assertThat(svgContent).isEqualTo(IOUtils.toString(expectedSvg, ENCODING));
+        Path vizJSPath = Paths.get("src","test","resources","vizjs");
+        File diagramFile = temporaryFolder.newFile("location.1degree.svg");
+        javaDotViz.generateDiagram(vizJSPath.resolve("location.1degree.dot").toFile(), diagramFile);
+        assertThat(diagramFile.toPath()).hasSameContentAs(vizJSPath.resolve("location.1degree.svg"), StandardCharsets.UTF_8);
     }
 }
