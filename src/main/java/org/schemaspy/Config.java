@@ -91,6 +91,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     private String host;
     private Integer port;
     private String meta;
+    private Boolean exportedKeysEnabled;
     private String templateDirectory;
     private Pattern tableInclusions;
     private Pattern tableExclusions;
@@ -250,6 +251,13 @@ public final class Config implements HtmlConfig, GraphvizConfig {
         if (meta == null)
             meta = pullParam("-meta");
         return meta;
+    }
+
+    public boolean isExportedKeysEnabled() {
+        if (Objects.isNull(exportedKeysEnabled)) {
+            exportedKeysEnabled = !options.remove("-noexportedkeys");
+        }
+        return exportedKeysEnabled;
     }
 
     public String getTemplateDirectory() {

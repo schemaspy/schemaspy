@@ -243,7 +243,7 @@ public class TableService {
         // also try to find all of the 'remote' tables in other schemas that
         // point to our primary keys (not necessary in the normal case
         // as we infer this from the opposite direction)
-        if (table.getSchema() != null || table.getCatalog() != null) {
+        if ((table.getSchema() != null || table.getCatalog() != null) && Config.getInstance().isExportedKeysEnabled() ) {
             try (ResultSet rs = sqlService.getDatabaseMetaData().getExportedKeys(table.getCatalog(), table.getSchema(), table.getName())) {
                 // get the foreign keys that reference our primary keys
                 // note that this can take an insane amount of time on Oracle (i.e. 30 secs per call)
