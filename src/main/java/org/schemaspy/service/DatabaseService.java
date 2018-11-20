@@ -52,6 +52,7 @@ import java.util.regex.Pattern;
  * @author Thomas Traude
  * @author Daniel Watt
  * @author Nils Petzaell
+ * @author Ben Hartwich
  */
 public class DatabaseService {
 
@@ -98,6 +99,7 @@ public class DatabaseService {
         initColumnTypes(config, db);
         initRoutines(config, db);
         initRoutineParameters(config, db);
+        initTriggers(config, db);
 
         listener.startedConnectingTables();
 
@@ -778,6 +780,39 @@ public class DatabaseService {
             } catch (SQLException sqlException) {
                 // don't die just because this failed
                 LOGGER.warn("Failed to retrieve stored procedure/function details using SQL '{}'", sql, sqlException);
+            }
+        }
+    }
+
+    /**
+     * Initializes triggers
+     *
+     * @throws SQLException
+     */
+    private void initTriggers(Config config, Database db) {
+        String sql = config.getDbProperties().getProperty("selectTriggersSql");
+
+        if (sql != null) {
+
+            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
+                 ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+                    String triggerSchema = rs.getString("trigger_schema");
+                    String triggerName = rs.getString("trigger_name");
+                    String actionStatement = rs.getString("action_statement");
+                    String eventObjectTable = rs.getString("event_object_table");
+                    String actionTiming = rs.getString("action_timing");
+                    String eventManipulation = rs.getString("event_manipulation");
+
+                    Trigger trigger = new Trigger(triggerSchema, triggerName,
+                            actionStatement, eventObjectTable, actionTiming,
+                            eventManipulation);
+                    db.getTriggersMap().put(triggerName, trigger);
+                }
+            } catch (SQLException sqlException) {
+                // don't die just because this failed
+                LOGGER.warn("Failed to retrieve trigger details using sql '{}'", sql, sqlException);
             }
         }
     }

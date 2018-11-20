@@ -1,0 +1,40 @@
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <h1>Triggers</h1>
+</section>
+<!-- Main content -->
+<section class="content">
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <i class="ion ion-flash" aria-hidden="true"></i>
+            <h3 class="box-title">Triggers</h3>
+        </div>
+        <div class="box-body">
+            <table id="trigger_table" class="table table-bordered table-striped dataTable" role="grid">
+                <thead align='left'>
+                    <tr>
+                        <th title='Name of the trigger'>Trigger</th>
+                        <th title='Name of the table that the trigger belongs to'>Table</th>
+                        <th title='BEFORE or AFTER?'>Timing</th>
+                        <th title='applied to UPDATE or INSERT?'>Event</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#triggers}}
+                    <tr>
+                        <td><a href="triggers/{{name}}.html">{{name}}</a></td>
+                        <td><a href="tables/{{tableName}}.html">{{tableName}}</a></td>
+                        <td>{{actionTiming}}</td>
+                        <td>{{eventManipulation}}</td>
+                    </tr>
+                    {{/triggers}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<script>
+                    var config = {
+                        pagination: {{paginationEnabled}}
+                    }
+                </script>
