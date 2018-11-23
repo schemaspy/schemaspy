@@ -31,6 +31,12 @@ $(document).ready(function() {
         ],
         columnDefs: [
             {
+                targets: 0,
+                render: function ( data, type, row, meta ) {
+                    return '<a href="tables/'+data+'.html" target="_top">'+data+'</a>';
+                }
+            },
+            {
                 targets: 2,
                 createdCell: function(td, cellData, rowData, row, col) {
                     if (rowData.keyTitle.length > 0) {
