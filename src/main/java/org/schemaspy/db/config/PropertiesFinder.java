@@ -85,7 +85,7 @@ public class PropertiesFinder implements ResourceFinder {
                 } else {
                     path = Paths.get(url.toURI());
                 }
-                if (Files.isRegularFile(path)) {
+                if (Files.isRegularFile(path)) { //NOSONAR toFile().isFile() doesn't work with Zip filesystem
                     return url;
                 }
             } catch (URISyntaxException e) {

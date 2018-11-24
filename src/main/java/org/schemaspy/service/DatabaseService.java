@@ -44,6 +44,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static org.schemaspy.service.ColumnLabel.*;
 /**
  * Created by rkasa on 2016-12-10.
  * @author John Currier
@@ -246,48 +247,49 @@ public class DatabaseService {
      * @throws SQLException
      */
     private void updateFromXmlMetadata(Database db, SchemaMeta schemaMeta) throws SQLException {
-        if (schemaMeta != null) {
-            if (Objects.nonNull(schemaMeta.getComments())) {
-                db.getSchema().setComment(schemaMeta.getComments());
-            }
+        if (Objects.isNull(schemaMeta)) {
+            return;
+        }
+        if (Objects.nonNull(schemaMeta.getComments())) {
+            db.getSchema().setComment(schemaMeta.getComments());
+        }
 
-            // done in three passes:
-            // 1: create any new tables
-            // 2: add/mod columns
-            // 3: connect
+        // done in three passes:
+        // 1: create any new tables
+        // 2: add/mod columns
+        // 3: connect
 
-            // add the newly defined tables and columns first
-            for (TableMeta tableMeta : schemaMeta.getTables()) {
-                Table table;
+        // add the newly defined tables and columns first
+        for (TableMeta tableMeta : schemaMeta.getTables()) {
+            Table table;
 
-                if (tableMeta.getRemoteSchema() != null || tableMeta.getRemoteCatalog() != null) {
-                    // will add it if it doesn't already exist
-                    table = tableService.addRemoteTable(db, tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName(), db.getSchema().getName(), true);
-                } else {
-                    table = db.getLocals().get(tableMeta.getName());
+            if (tableMeta.getRemoteSchema() != null || tableMeta.getRemoteCatalog() != null) {
+                // will add it if it doesn't already exist
+                table = tableService.addRemoteTable(db, tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName(), db.getSchema().getName(), true);
+            } else {
+                table = db.getLocals().get(tableMeta.getName());
 
-                    if (table == null) {
-                        // new table defined only in XML metadata
-                        table = new LogicalTable(db, db.getCatalog().getName(), db.getSchema().getName(), tableMeta.getName(), tableMeta.getComments());
-                        db.getTablesMap().put(table.getName(), table);
-                    }
+                if (table == null) {
+                    // new table defined only in XML metadata
+                    table = new LogicalTable(db, db.getCatalog().getName(), db.getSchema().getName(), tableMeta.getName(), tableMeta.getComments());
+                    db.getTablesMap().put(table.getName(), table);
                 }
-
-                table.update(tableMeta);
             }
 
-            // then tie the tables together
-            for (TableMeta tableMeta : schemaMeta.getTables()) {
-                Table table;
+            table.update(tableMeta);
+        }
 
-                if (tableMeta.getRemoteCatalog() != null || tableMeta.getRemoteSchema() != null) {
-                    table = db.getRemoteTablesMap().get(db.getRemoteTableKey(tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName()));
-                } else {
-                    table = db.getLocals().get(tableMeta.getName());
-                }
+        // then tie the tables together
+        for (TableMeta tableMeta : schemaMeta.getTables()) {
+            Table table;
 
-                tableService.connect(db, table, tableMeta, db.getLocals());
+            if (tableMeta.getRemoteCatalog() != null || tableMeta.getRemoteSchema() != null) {
+                table = db.getRemoteTablesMap().get(db.getRemoteTableKey(tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName()));
+            } else {
+                table = db.getLocals().get(tableMeta.getName());
             }
+
+            tableService.connect(db, table, tableMeta, db.getLocals());
         }
     }
 
@@ -302,7 +304,8 @@ public class DatabaseService {
                 durationOneTable = Duration.between(startTables, clock.instant());
                 long timeLeft = durationOneTable.toMillis()*(db.getTables().size()-1);
                 if (timeLeft > THIRTY_MINUTES && Config.getInstance().isExportedKeysEnabled()) {
-                    LOGGER.info("Estimated time remaining for connecting tables is {}, most time might be spent in getExportedKeys, you can disable getExportedKeys with `-noexportedkeys`. The implication of this is that you won't get cross schema relationships where table in analysis is FK, and the remote schema isn't analyzed", DurationFormatter.formatMS(timeLeft));
+                    String remaining = DurationFormatter.formatMS(timeLeft);
+                    LOGGER.info("Estimated time remaining for connecting tables is {}, most time might be spent in getExportedKeys, you can disable getExportedKeys with `-noexportedkeys`. The implication of this is that you won't get cross schema relationships where table in analysis is FK, and the remote schema isn't analyzed", remaining);
                 }
             }
         }
@@ -316,7 +319,8 @@ public class DatabaseService {
                 durationOneView = Duration.between(startViews, clock.instant());
                 long timeLeft = durationOneView.toMillis()*(db.getViews().size()-1);
                 if (timeLeft > THIRTY_MINUTES && Config.getInstance().isExportedKeysEnabled()) {
-                    LOGGER.info("Estimated time remaining for connecting views is {}, most time might be spent in getExportedKeys, you can disable getExportedKeys with `-noexportedkeys`. The implication of this is that you won't get cross schema relationships where table in analysis is FK, and the remote schema isn't analyzed", DurationFormatter.formatMS(timeLeft));
+                    String remaining = DurationFormatter.formatMS(timeLeft);
+                    LOGGER.info("Estimated time remaining for connecting views is {}, most time might be spent in getExportedKeys, you can disable getExportedKeys with `-noexportedkeys`. The implication of this is that you won't get cross schema relationships where table in analysis is FK, and the remote schema isn't analyzed", remaining);
                 }
             }
         }
@@ -459,17 +463,7 @@ public class DatabaseService {
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, database, null);
                  ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    String name = rs.getString(clazz + "_name");
-                    String cat = getOptionalString(rs, clazz + "_catalog");
-                    String sch = getOptionalString(rs, clazz + "_schema");
-                    if (cat == null && sch == null)
-                        sch = database.getSchema().getName();
-                    String remarks = getOptionalString(rs, clazz + "_comment");
-                    String viewDefinition = forTables ? null : getOptionalString(rs, "view_definition");
-                    String rows = forTables ? getOptionalString(rs, "table_rows") : null;
-                    long numRows = rows == null ? -1 : Long.parseLong(rows);
-
-                    basics.add(new BasicTableMeta(cat, sch, name, clazz, remarks, viewDefinition, numRows));
+                    basics.add(basicTableMetaFromResultSetRow(rs, forTables, clazz, database.getSchema().getName()));
                 }
                 return true;
             } catch (SQLException sqlException) {
@@ -478,6 +472,19 @@ public class DatabaseService {
         }
         basics.clear();
         return false;
+    }
+
+    private static BasicTableMeta basicTableMetaFromResultSetRow(ResultSet rs, boolean forTables, String clazz, String schemaName) throws SQLException {
+        String name = rs.getString(clazz + "_name");
+        String cat = getOptionalString(rs, clazz + "_catalog");
+        String sch = getOptionalString(rs, clazz + "_schema");
+        if (cat == null && sch == null)
+            sch = schemaName;
+        String remarks = getOptionalString(rs, clazz + "_comment");
+        String viewDefinition = forTables ? null : getOptionalString(rs, "view_definition");
+        String rows = forTables ? getOptionalString(rs, "table_rows") : null;
+        long numRows = rows == null ? -1 : Long.parseLong(rows);
+        return new BasicTableMeta(cat, sch, name, clazz, remarks, viewDefinition, numRows);
     }
 
     private static void getBasicTableMetaFromDatabaseMetaData(List<BasicTableMeta> basics, DatabaseMetaData databaseMetaData, Database database, boolean forTables, String... types) throws SQLException {
@@ -520,7 +527,7 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
                     if (table != null)
                         table.addCheckConstraint(rs.getString("constraint_name"), rs.getString("text"));
@@ -540,10 +547,10 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
                     if (table != null) {
-                        String columnName = rs.getString("column_name");
+                        String columnName = rs.getString(COLUMN_NAME);
                         TableColumn column = table.getColumn(columnName);
                         if (column != null) {
                             column.setTypeName(rs.getString("column_type"));
@@ -566,7 +573,7 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
                     if (table != null)
                         table.setId(rs.getObject("table_id"));
@@ -586,7 +593,7 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
                     if (table != null) {
                         TableIndex index = table.getIndex(rs.getString("index_name"));
@@ -616,7 +623,7 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
                     if (table != null)
                         table.setComments(rs.getString("comments"));
@@ -643,7 +650,7 @@ public class DatabaseService {
                 while (rs.next()) {
                     String viewName = rs.getString("view_name");
                     if (viewName == null)
-                        viewName = rs.getString("table_name");
+                        viewName = rs.getString(TABLE_NAME);
                     Table view = db.getViewsMap().get(viewName);
 
                     if (view != null)
@@ -671,12 +678,12 @@ public class DatabaseService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String tableName = rs.getString("table_name");
+                    String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
                     if (table != null) {
-                        TableColumn column = table.getColumn(rs.getString("column_name"));
+                        TableColumn column = table.getColumn(rs.getString(COLUMN_NAME));
                         if (column != null)
-                            column.setComments(rs.getString("comments"));
+                            column.setComments(rs.getString(COMMENTS));
                     }
                 }
             } catch (SQLException sqlException) {
@@ -701,13 +708,13 @@ public class DatabaseService {
                 while (rs.next()) {
                     String viewName = rs.getString("view_name");
                     if (viewName == null)
-                        viewName = rs.getString("table_name");
+                        viewName = rs.getString(TABLE_NAME);
                     Table view = db.getViewsMap().get(viewName);
 
                     if (view != null) {
-                        TableColumn column = view.getColumn(rs.getString("column_name"));
+                        TableColumn column = view.getColumn(rs.getString(COLUMN_NAME));
                         if (column != null)
-                            column.setComments(rs.getString("comments"));
+                            column.setComments(rs.getString(COMMENTS));
                     }
                 }
             } catch (SQLException sqlException) {
