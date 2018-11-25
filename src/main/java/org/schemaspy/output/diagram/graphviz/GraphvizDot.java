@@ -18,8 +18,6 @@
  */
 package org.schemaspy.output.diagram.graphviz;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.diagram.DiagramProducer;
 import org.slf4j.Logger;
@@ -27,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
@@ -257,7 +256,6 @@ public class GraphvizDot implements DiagramProducer {
     public String generateDiagram(File dotFile, File diagramFile) {
         StringBuilder mapBuffer = new StringBuilder(1024);
 
-        BufferedReader mapReader = null;
         // this one is for executing.  it can (hopefully) deal with funky things in filenames.
         String[] dotCommand = new String[]{
                 getExe(),
@@ -274,11 +272,12 @@ public class GraphvizDot implements DiagramProducer {
         try {
             Process process = Runtime.getRuntime().exec(dotCommand);
             new ProcessOutputReader(commandLine, process.getErrorStream()).start();
-            mapReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = mapReader.readLine()) != null) {
-                mapBuffer.append(line);
-                mapBuffer.append(lineSeparator);
+            try (BufferedReader mapReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = mapReader.readLine()) != null) {
+                    mapBuffer.append(line);
+                    mapBuffer.append(lineSeparator);
+                }
             }
             int rc = process.waitFor();
             if (rc != 0)
@@ -289,15 +288,15 @@ public class GraphvizDot implements DiagramProducer {
             // dot generates post-HTML 4.0.1 output...convert trailing />'s to >'s
             return mapBuffer.toString().replace("/>", ">");
         } catch (InterruptedException interrupted) {
-            throw new RuntimeException(interrupted);
-        } catch (DiagramException failed) {
-            FileUtils.deleteQuietly(diagramFile);
-            throw failed;
-        } catch (IOException failed) {
-            FileUtils.deleteQuietly(diagramFile);
-            throw new DiagramException("'" + commandLine + "' failed with exception " + failed);
-        } finally {
-            IOUtils.closeQuietly(mapReader);
+            Thread.currentThread().interrupt();
+            throw new DiagramException("Interrupted during execution", interrupted);
+        } catch (DiagramException | IOException exception) {
+            try {
+                Files.deleteIfExists(diagramFile.toPath());
+            } catch (IOException ioexception) {
+                LOGGER.debug("Failed to delete '{}'", diagramFile, ioexception);
+            }
+            throw new DiagramException("'" + commandLine + "' failed with exception " + exception);
         }
     }
 

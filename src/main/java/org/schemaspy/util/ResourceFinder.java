@@ -65,7 +65,7 @@ public class ResourceFinder {
 
     private InputStream findFile(String first, String... more) {
         Path path = Paths.get(first, more);
-        if (Files.exists(path)) {
+        if (path.toFile().exists()) {
             try {
                 return Files.newInputStream(path);
             } catch (IOException e) {

@@ -45,6 +45,8 @@ import java.util.jar.JarFile;
 public class ResourceWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private ResourceWriter() {}
+
     /**
      * Copies resources to target folder.
      *

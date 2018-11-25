@@ -6,6 +6,8 @@ public class DurationFormatter {
     private static final long MS_TO_MIN = MS_TO_SEC * 60;
     private static final long MS_TO_HR = MS_TO_MIN * 60;
 
+    private DurationFormatter() {}
+
     public static String formatMS(final long durationInMilliseconds) {
         long timeToProcess = durationInMilliseconds;
         StringBuilder stringBuilder = new StringBuilder();

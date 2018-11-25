@@ -89,8 +89,7 @@ public class VizJSDot implements DiagramProducer {
     private String fixPathsAndUrls(final String dotSource) {
         String fixedImage = dotSource.replaceAll("(<IMG SRC=\\\").*(images.*)(\\\"/>)","$1../../$2$3");
         String addedTableIfMissing = fixedImage.replaceAll("(URL=\")([^tables])(.*)(\")","$1tables/$2$3$4");
-        String fixedUrlsInOrphansRelationShips = addedTableIfMissing.replaceAll("(URL=\")(.*)(\")","$1../../$2$3");
-        return fixedUrlsInOrphansRelationShips;
+        return addedTableIfMissing.replaceAll("(URL=\")(.*)(\")","$1../../$2$3");
     }
 
 }
