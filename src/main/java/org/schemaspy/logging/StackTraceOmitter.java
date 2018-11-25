@@ -27,21 +27,30 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ApplicationListener;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * @author Nils Petzaell
  */
-public class LogLevelConditionalThrowableProxyConverter extends ThrowableProxyConverter implements ApplicationListener<ApplicationStartingEvent> {
+public class StackTraceOmitter extends ThrowableProxyConverter implements ApplicationListener<ApplicationStartingEvent> { //NOSONAR
 
     private static final Logger SCHEMA_SPY_LOGGER = LoggerFactory.getLogger("org.schemaspy");
 
-    public static void register() {
-        PatternLayout.defaultConverterMap.put("debugEx", LogLevelConditionalThrowableProxyConverter.class.getName());
+    private static AtomicBoolean omittedStackTrace = new AtomicBoolean(false);
+
+    public void register() {
+        PatternLayout.defaultConverterMap.put("debugEx", StackTraceOmitter.class.getName());
+    }
+
+    public static boolean hasOmittedStackTrace() {
+        return omittedStackTrace.get();
     }
 
     @Override
     public String convert(ILoggingEvent event) {
         if (SCHEMA_SPY_LOGGER.isDebugEnabled())
             return super.convert(event);
+        omittedStackTrace.set(true);
         return CoreConstants.EMPTY_STRING;
     }
 
