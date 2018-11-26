@@ -1419,7 +1419,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
 
         if (detailedDb) {
             LOGGER.info("Missing required connection parameters for '{}'", getDbType());
-            new DbSpecificConfig(getDbProperties()).dumpUsage();
+            new DbSpecificConfig(getDbType(), getDbProperties()).dumpUsage();
         }
 
         if (detailedDb) {
