@@ -24,5 +24,5 @@ public class ColumnLabel {
     public static final String COLUMN_NAME = "column_name";
     public static final String COMMENTS = "comments";
 
-    private ColumnLabel() {};
+    private ColumnLabel() {}
 }
