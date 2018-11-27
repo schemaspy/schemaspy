@@ -20,6 +20,7 @@
  */
 package org.schemaspy.cli;
 
+import com.beust.jcommander.IDefaultProvider;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.ParameterException;
@@ -56,24 +57,17 @@ public class CommandLineArgumentParser {
 
     private final CommandLineArguments arguments;
 
-    private final PropertyFileDefaultProvider defaultProvider;
-
     private static final String[] requiredFields = {"outputDirectory"};
 
-    public CommandLineArgumentParser(CommandLineArguments arguments, PropertyFileDefaultProvider defaultProvider) {
-        this.defaultProvider = defaultProvider;
-        this.arguments = arguments;
-        jCommander = createJCommander();
-        jCommander.addObject(arguments);
-    }
-
-    private JCommander createJCommander() {
-        return JCommander.newBuilder()
+    public CommandLineArgumentParser(CommandLineArguments commandLineArguments, IDefaultProvider defaultProvider) {
+        this.arguments = commandLineArguments;
+        jCommander = JCommander.newBuilder()
                 .acceptUnknownOptions(true)
                 .programName("java -jar " + Config.getLoadedFromJar())
                 .columnSize(120)
                 .defaultProvider(defaultProvider)
                 .build();
+        jCommander.addObject(arguments);
     }
 
     public CommandLineArguments parse(String... localArgs) {

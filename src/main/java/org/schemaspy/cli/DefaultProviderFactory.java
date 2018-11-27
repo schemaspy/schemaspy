@@ -19,21 +19,25 @@
  */
 package org.schemaspy.cli;
 
+import com.beust.jcommander.IDefaultProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.Optional;
 
 /**
+ * This class creates instances of {@link CombinedDefaultProvider}
+ * Which might contain properties from -configFile or schemaspy.properties
+ * and
+ * {@link EnvDefaultProvider}.
  * This class creates instances of {@link PropertyFileDefaultProvider} based on a name of the {@link java.util.Properties} file.
  * @author Thomas Traude
  * @author Daniel Watt
  */
 @Component
-public class PropertyFileDefaultProviderFactory {
+public class DefaultProviderFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -44,22 +48,26 @@ public class PropertyFileDefaultProviderFactory {
     }
 
     /**
-     * Return a {@link PropertyFileDefaultProvider} instance based on propertiesFilename.
+     * Return a {@link CombinedDefaultProvider} which at least contains EnvDefaultProvider and if available a
+     * PropertyFileDefaultProvider base on -configFile or schemaspy.properties
      * <p>
      * If for the given propertiesFilename there exists no file the method will exit the application.
      * <p>
      * If the given propertiesFilename is null it falls back to the {@link #DEFAULT_PROPERTIES_FILE_NAME}.
-     * If this file does not exist the method returns {@link Optional#empty()}.
+     * If a properties file exists it will return CombinedDefaultProvider search order Properties -> Env
+     * If this file does not exist the method returns CombinedDefaultProvider with only EnvDefaultProvider
      *
      * @param propertiesFilename
-     * @return PropertyFileDefaultProvider instance of the propertiesfileName, empty if no such file exists.
+     * @return IDefaultProvider
      */
-    public Optional<PropertyFileDefaultProvider> create(String propertiesFilename) {
+    public IDefaultProvider create(String propertiesFilename) {
         if (propertiesFilename != null) {
             if (exists(propertiesFilename)) {
 				LOGGER.info("Found configuration file: {}", propertiesFilename);
-                PropertyFileDefaultProvider value = new PropertyFileDefaultProvider(propertiesFilename);
-                return Optional.of(value);
+                return new CombinedDefaultProvider(
+                        new PropertyFileDefaultProvider(propertiesFilename),
+                        new EnvDefaultProvider()
+                );
             } else {
 				LOGGER.error("Could not find config file: {}", propertiesFilename);
                 System.exit(0);
@@ -69,9 +77,12 @@ public class PropertyFileDefaultProviderFactory {
 
         if (exists(DEFAULT_PROPERTIES_FILE_NAME)) {
             LOGGER.info("Found configuration file: {}",DEFAULT_PROPERTIES_FILE_NAME);
-            return Optional.of(new PropertyFileDefaultProvider(DEFAULT_PROPERTIES_FILE_NAME));
+            return new CombinedDefaultProvider(
+                    new PropertyFileDefaultProvider(DEFAULT_PROPERTIES_FILE_NAME),
+                    new EnvDefaultProvider()
+            );
         }
-        return Optional.empty();
+        return new CombinedDefaultProvider(new EnvDefaultProvider());
     }
 
 }

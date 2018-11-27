@@ -27,8 +27,6 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -47,8 +45,6 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final Properties properties;
-
-    private final List<String> booleans = Arrays.asList("schemaspy.sso", "schemaspy.debug", "schemaspy.nohtml", "schemaspy.vizjs");
 
     public PropertyFileDefaultProvider(String propertiesFilename) {
         Objects.requireNonNull(propertiesFilename);
@@ -71,10 +67,6 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
 
     @Override
     public String getDefaultValueFor(String optionName) {
-        if (booleans.contains(optionName)) {
-            String value = properties.getProperty(optionName, Boolean.FALSE.toString());
-            return value.isEmpty() ? Boolean.TRUE.toString() : value;
-        }
         return properties.getProperty(optionName);
     }
 }
