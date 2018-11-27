@@ -46,10 +46,12 @@ public class DbSpecificConfig {
     private static final Pattern OPTION_PATTER = Pattern.compile("<([a-zA-Z0-9.\\-_]+)>");
     private static final String DUMP_FORMAT = "   -%s   \t\t%s";
 
+    private String dbType;
     private String description;
     private final List<DbSpecificOption> options = new ArrayList<>();
 
-    public DbSpecificConfig(Properties props) {
+    public DbSpecificConfig(String dbType, Properties props) {
+        this.dbType = dbType;
         description = props.getProperty("description");
         loadOptions(props);
     }
@@ -91,6 +93,7 @@ public class DbSpecificConfig {
      */
     public void dumpUsage() {
         LOGGER.info(description);
+        LOGGER.info("Usage -t {}", dbType);
         getOptions().stream().flatMap(option -> {
             if ("hostOptionalPort".equals(option.getName())) {
                 return Stream.of(

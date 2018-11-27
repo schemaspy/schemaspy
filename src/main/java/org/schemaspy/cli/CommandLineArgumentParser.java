@@ -170,7 +170,7 @@ public class CommandLineArgumentParser {
 
         LOGGER.info("Built-in database types and their required connection parameters:");
         for (String type : Config.getBuiltInDatabaseTypes(schemaspyJarFileName)) {
-            new DbSpecificConfig(propertiesResolver.getDbProperties(type)).dumpUsage();
+            new DbSpecificConfig(type, propertiesResolver.getDbProperties(type)).dumpUsage();
         }
         LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
         LOGGER.info("Grab one out of {} and modify it to suit your needs.", schemaspyJarFileName);

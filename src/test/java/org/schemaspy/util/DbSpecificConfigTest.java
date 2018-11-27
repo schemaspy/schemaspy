@@ -55,7 +55,7 @@ public class DbSpecificConfigTest {
 
     @Test
     public void worksWithoutHostAndOptionalPort() {
-        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig(withoutHostAndOptionalPort);
+        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withoutHostAndOptionalPort", withoutHostAndOptionalPort);
         assertThat(dbSpecificConfig.getOptions()).usingElementComparatorOnFields("name", "description").containsExactly(
                 new DbSpecificOption("host", "host where database resides with optional port"),
                 new DbSpecificOption("db", "database name"),
@@ -67,14 +67,14 @@ public class DbSpecificConfigTest {
     @Test
     @Logger(DbSpecificConfig.class)
     public void dumpUsageWithoutHostAndOptionalPort() {
-        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig(withoutHostAndOptionalPort);
+        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withoutHostAndOptionalPort", withoutHostAndOptionalPort);
         dbSpecificConfig.dumpUsage();
-        assertThat(loggingRule.getLog()).isEqualTo("MySQL   -host   \t\thost where database resides with optional port   -db   \t\tdatabase name   -socketFactory   \t\tClassName of socket factory which must be in your classpath   -socket   \t\tPath To Socket");
+        assertThat(loggingRule.getLog()).isEqualTo("MySQLUsage -t withoutHostAndOptionalPort   -host   \t\thost where database resides with optional port   -db   \t\tdatabase name   -socketFactory   \t\tClassName of socket factory which must be in your classpath   -socket   \t\tPath To Socket");
     }
 
     @Test
     public void worksWithHostAndOptionalPort() {
-        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig(withHostAndOptionalPort);
+        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withHostAndOptionalPort", withHostAndOptionalPort);
         assertThat(dbSpecificConfig.getOptions()).usingElementComparatorOnFields("name", "description").containsExactly(
                 new DbSpecificOption("hostOptionalPort", null),
                 new DbSpecificOption("db", "database name")
@@ -84,9 +84,9 @@ public class DbSpecificConfigTest {
     @Test
     @Logger(DbSpecificConfig.class)
     public void dumpUsageWithHostAndOptionalPort(){
-        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig(withHostAndOptionalPort);
+        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withHostAndOptionalPort", withHostAndOptionalPort);
         dbSpecificConfig.dumpUsage();
-        assertThat(loggingRule.getLog()).isEqualTo("MySQL   -host   \t\thost of database, may contain port   -port   \t\toptional port if not default   -db   \t\tdatabase name");
+        assertThat(loggingRule.getLog()).isEqualTo("MySQLUsage -t withHostAndOptionalPort   -host   \t\thost of database, may contain port   -port   \t\toptional port if not default   -db   \t\tdatabase name");
     }
 
 }
