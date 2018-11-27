@@ -1,1 +1,1 @@
-org.springframework.context.ApplicationListener=org.schemaspy.logging.LogLevelConditionalThrowableProxyConverter
+org.springframework.context.ApplicationListener=org.schemaspy.logging.StackTraceOmitter

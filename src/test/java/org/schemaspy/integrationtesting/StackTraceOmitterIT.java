@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class StackTraceLoggingIT {
+public class StackTraceOmitterIT {
 
     @Rule
     public LoggingRule loggingRule = new LoggingRule();
