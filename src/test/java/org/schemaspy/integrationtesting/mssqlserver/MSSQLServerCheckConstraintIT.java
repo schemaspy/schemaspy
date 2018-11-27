@@ -75,7 +75,7 @@ public class MSSQLServerCheckConstraintIT {
     public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<>(
                     MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLServerContainer())
+                    new JdbcContainerRule<>(() -> new MSSQLServerContainer("microsoft/mssql-server-linux:2017-CU6"))
                         .assumeDockerIsPresent()
                         .withAssumptions(assumeDriverIsPresent())
                         .withInitScript("integrationTesting/mssqlserver/dbScripts/check_constraint.sql")
