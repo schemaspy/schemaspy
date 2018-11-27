@@ -42,7 +42,7 @@ public class MssqlServerSuite {
 
     @ClassRule
     public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MSSQLServerContainer())
+            new JdbcContainerRule<>(() -> new MSSQLServerContainer("microsoft/mssql-server-linux:2017-CU6"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitFunctions(new SQLScriptsRunner("integrationTesting/mssqlserver/dbScripts/"));

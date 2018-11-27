@@ -75,7 +75,7 @@ public class OracleIT {
     public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
 
     public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer())
+            new JdbcContainerRule<>(() -> new OracleContainer("wnameless/oracle-xe-11g"))
             .assumeDockerIsPresent()
             .withAssumptions(assumeDriverIsPresent())
             .withInitScript("integrationTesting/dbScripts/oracle.sql");

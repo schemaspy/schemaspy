@@ -20,22 +20,23 @@ package org.testcontainers.containers;
 
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
-import org.testcontainers.containers.wait.HostPortWaitStrategy;
-import org.testcontainers.containers.wait.LogMessageWaitStrategy;
-import org.testcontainers.containers.wait.WaitStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author Nils Petzaell
  */
 public class InformixContainer<SELF extends InformixContainer<SELF>> extends JdbcDatabaseContainer<SELF> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     static final String IMAGE = "ibmcom/informix-developer-database";
     static final Integer INFORMIX_PORT = 9088;
-
-    private final WaitStrategy logMessageWaitStrategy = new LogMessageWaitStrategy().withRegEx(".*Startup of dev SUCCESS.*\r\n");
-    private final WaitStrategy hostPortWaitStrategy = new HostPortWaitStrategy();
 
     public InformixContainer(){
         this(IMAGE + ":latest");
@@ -45,10 +46,8 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
         super(dockerImageName);
     }
 
-
-
     @Override
-    protected String getDriverClassName() {
+    public String getDriverClassName() {
         return "com.informix.jdbc.IfxDriver";
     }
 
@@ -77,8 +76,8 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
     }
 
     @Override
-    protected Integer getLivenessCheckPort() {
-        return getMappedPort(INFORMIX_PORT);
+    public Set<Integer> getLivenessCheckPortNumbers() {
+        return Collections.singleton(getMappedPort(INFORMIX_PORT));
     }
 
     @Override
@@ -96,7 +95,8 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
 
     @Override
     protected void waitUntilContainerStarted() {
-        logMessageWaitStrategy.waitUntilReady(this);
+        super.waitUntilContainerStarted();
+        LOGGER.info("Restart container");
         dockerClient.restartContainerCmd(containerId).exec();
         updateContainerInfo();
         super.waitUntilContainerStarted();
