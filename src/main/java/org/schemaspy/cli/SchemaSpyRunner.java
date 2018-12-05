@@ -24,7 +24,6 @@ import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.model.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.model.ProcessExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,9 @@ import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 @Component
@@ -105,14 +106,14 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
             exitCode = EXIT_CODE_CONFIG_ERROR;
             LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
             if (badConfig.getParamName() != null) {
-                LOGGER.error("Bad parameter: '{} = {}' , {}", badConfig.getParamName(), badConfig.getParamValue(), badConfig.getMessage(), badConfig);
+                LOGGER.error("Bad parameter: '{} = {}'", badConfig.getParamName(), badConfig.getParamValue(), badConfig);
             } else {
-                LOGGER.error("Bad config: {}", badConfig.getMessage(), badConfig);
+                LOGGER.error("Bad config", badConfig);
             }
-        } catch (ProcessExecutionException badLaunch) {
-            LOGGER.warn(badLaunch.getMessage(), badLaunch);
-        } catch (Exception exc) {
-            LOGGER.error(exc.getMessage(), exc);
+        } catch (SQLException e) {
+            LOGGER.error("SqlException", e);
+        } catch (IOException e) {
+            LOGGER.error("IOException", e);
         }
     }
 
