@@ -23,6 +23,7 @@ Or are you in QA and the developers expect you to understand all the relationshi
     installation
     started
     advanced_usage
+    sso
     configuration/commandline
     configuration/databaseType
     configuration/schemaMeta
