@@ -21,14 +21,10 @@
 package org.schemaspy;
 
 import com.beust.jcommander.IDefaultProvider;
-import com.beust.jcommander.ParameterException;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.ConfigFileArgumentParser;
 import org.schemaspy.cli.DefaultProviderFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.schemaspy.cli.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.Bean;
