@@ -40,7 +40,7 @@ Connecting
 [-p password]
     Password associated with that user. Defaults to no password.
 [-sso]
-    Single sign-on, used when -u and -p should be ignored.
+    Single sign-on, used when -u and -p should be ignored. See also :ref:`singlesignon`
 [-pfp]
     Prompt for password, if you don't want to have password in command history.
 [-connprops filePathOrKeyValue]
