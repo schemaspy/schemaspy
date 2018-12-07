@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationStartingEvent;
 import org.springframework.context.ApplicationListener;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -51,6 +52,9 @@ public class StackTraceOmitter extends ThrowableProxyConverter implements Applic
         if (SCHEMA_SPY_LOGGER.isDebugEnabled())
             return super.convert(event);
         omittedStackTrace.set(true);
+        if (Objects.nonNull(event.getThrowableProxy())) {
+            return event.getThrowableProxy().getMessage() + CoreConstants.LINE_SEPARATOR;
+        }
         return CoreConstants.EMPTY_STRING;
     }
 
