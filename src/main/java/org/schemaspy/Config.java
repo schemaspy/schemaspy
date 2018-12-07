@@ -51,6 +51,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
@@ -71,6 +72,8 @@ public final class Config implements HtmlConfig, GraphvizConfig {
 
     private static final int DEFAULT_FONT_SIZE = 11;
     private static final int DEFAULT_TABLE_DETAILS_THRESHOLD = 300;
+
+    private static final Pattern DBTYPE_PATTERN = Pattern.compile(".*org/schemaspy/types/(.*)\\.properties");
 
     private static Config instance;
     private final List<String> options;
@@ -1373,11 +1376,9 @@ public final class Config implements HtmlConfig, GraphvizConfig {
             JarEntry entry;
 
             while ((entry = jar.getNextJarEntry()) != null) {
-                String entryName = entry.getName();
-                if (entryName.contains("types")) {
-                    int dotPropsIndex = entryName.indexOf(".properties");
-                    if (dotPropsIndex != -1)
-                        databaseTypes.add(entryName.substring(0, dotPropsIndex));
+                Matcher dbTypeMatcher = DBTYPE_PATTERN.matcher(entry.getName());
+                if (dbTypeMatcher.find()) {
+                    databaseTypes.add(dbTypeMatcher.group(1));
                 }
             }
         } catch (IOException exc) {
@@ -1388,7 +1389,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     }
 
     /**
-     * @deprecated use {@link CommandLineArgumentParser#printUsage()} resp. {@link CommandLineArgumentParser#printDatabaseTypesHelp()}
+     * @deprecated use {@link CommandLineArgumentParser#printUsage()}
      * @param errorMessage
      * @param detailedDb
      */
