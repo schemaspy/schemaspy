@@ -2,6 +2,8 @@
 
    <br />
 
+.. _databaseType:
+
 DatabaseType
 ============
 
@@ -31,6 +33,8 @@ It will look for:
     1. file: $user.dir/my_conf/mydbtype.properties
     2. Classpath: my_conf/mydbtype.properties
     3. Classpath: org/schemaspy/types/my_conf/mydbtype.properties
+
+.. _databaseType-layout:
 
 Layout
 ------
@@ -67,6 +71,8 @@ connectionSpec=
 driver=
     FQDN of the JDBC driver as an example ``org.h2.Driver``
 
+.. _databaseType-connectionSpec:
+
 ConnectionSpec
 --------------
 
@@ -99,6 +105,8 @@ The presence of the keys in the databaseType properties file is only for descrip
 There is also a synthetic token that can be replaced <hostOptionalPort> which combines host and port if port is supplied. |br|
 Default separator is ``:`` but can be changed by specifying another under the key ``hostPortSeparator``
 
+.. _databaseType-other-properties:
+
 Other Properties
 ----------------
 
@@ -109,6 +117,15 @@ dbThreads=
     number of threads that can be used to analyze the database
 schemaSpec=
     regular expression used in conjunction with ``-all`` (and can be command line param ``-schemaSpec``)
+tableTypes=
+    Which types should be considered tables, default is TABLE
+viewTypes=
+    Which types should be considered views, default is VIEW
+
+.. _databaseType-sql:
+
+Sql query instead of DatabaseMetaData
+-------------------------------------
 
 When metadata in JDBC isn't cutting the mustard. You can replace it with a sql query.
 They are prepared and supports named parameters as long as they are available. Data is retrieved by column label.
@@ -127,38 +144,34 @@ So additional columns are ok, but you might need to alias columns so that they a
     :catalog
         Catalog ``-cat``
 
-**Possible Metadata overrides and expected columns in result**:
-    **selectSchemasSql=**
-        schema_comment
-    **selectCatalogsSql=**
-        catalog_comment
-    **selectTablesSql=**
-        table_name, table_catalog, table_schema, table_comment, table_rows
-    **selectViewsSql=**
-        view_name, view_catalog, view_schema, view_comment, view_definition
-    **selectIndexesSql=**
-        INDEX_NAME, TYPE, NON_UNIQUE, COLUMN_NAME, ASC_OR_DESC
-    **selectRowCountSql=**
-        row_count
-    **selectColumnTypesSql=**
-        table_name, column_name, column_type, short_column_type
-    **selectRoutinesSql=**
-        routine_name, routine_type, dtd_identifier, routine_body, routine_definition,sql_data_access, security_type, is_deterministic, routine_comment
-    **selectRoutineParametersSql=**
-        specific_name, parameter_name, dtd_identifier, parameter_mode
-    **selectViewSql=**
-        view_definition, text (text has been deprecated)
-    **selectCheckConstraintsSql=**
-        table_name, constraint_name
-    **selectTableIdsSql=**
-        table_name, table_id
-    **selectIndexIdsSql=**
-        table_name, index_name, index_id
-    **selectTableCommentsSql=**
-        table_name, comments
-    **selectColumnCommentsSql=**
-        table_name, column_name, comments
-
-**Define viewTypes**
-    **viewTypes=**
-        default is VIEW
+**Possible overrides:**
+    selectSchemasSql=
+        *Fetch comments for a schema, expected columns:* |br| **schema_comment**
+    selectCatalogsSql=
+        *Fetch comments for a catalog, expected columns:* |br| **catalog_comment**
+    selectTablesSql=
+        *Fetch tables, expected columns:* |br| **table_name, table_catalog, table_schema, table_comment, table_rows**
+    selectViewsSql=
+        *Fetch views, expected columns:* |br| **view_name, view_catalog, view_schema, view_comment, view_definition**
+    selectIndexesSql=
+        *Fetch indexes, expected columns:* |br| **INDEX_NAME, TYPE, NON_UNIQUE, COLUMN_NAME, ASC_OR_DESC**
+    selectRowCountSql=
+        *Fetch row count for a table, expected columns:* |br| **row_count**
+    selectColumnTypesSql=
+        *Fetch column type for all columns, expected columns:* |br| **table_name, column_name, column_type, short_column_type**
+    selectRoutinesSql=
+        *Fetch routines, expected columns:* |br| **routine_name, routine_type, dtd_identifier, routine_body, routine_definition,sql_data_access, security_type, is_deterministic, routine_comment**
+    selectRoutineParametersSql=
+        *Fetch parameters for routines, expected columns:* |br| **specific_name, parameter_name, dtd_identifier, parameter_mode**
+    selectViewSql=
+        *Fetch definition for a view, expected columns:* |br| **view_definition, text (text has been deprecated)**
+    selectCheckConstraintsSql=
+        *Fetch check constraints for all tables, expected columns:* |br| **table_name, constraint_name**
+    selectTableIdsSql=
+        *Fetch ids for all tables, expected columns:* |br| **table_name, table_id**
+    selectIndexIdsSql=
+        *Fetch ids for all indexes, expected columns:* |br| **table_name, index_name, index_id**
+    selectTableCommentsSql=
+        *Fetch comments for all tables, expected columns:* |br| **table_name, comments**
+    selectColumnCommentsSql=
+        *Fetch comments for all columns, expected columns:* |br| **table_name, column_name, comments**
