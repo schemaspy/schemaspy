@@ -85,7 +85,7 @@ public class MustacheTableDiagramFactoryTest {
         when(tableNoRelationships.getMaxChildren()).thenReturn(0);
         when(tableNoRelationships.getMaxParents()).thenReturn(0);
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(null, null, temporaryFolder.newFolder("nodiagrams"));
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(null, null, temporaryFolder.newFolder("nodiagrams"), 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(tableNoRelationships, writeStats);
         assertThat(mustacheTableDiagramList).isEmpty();
     }
@@ -104,7 +104,7 @@ public class MustacheTableDiagramFactoryTest {
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).thenReturn(new MustacheTableDiagram());
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(1);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -124,7 +124,7 @@ public class MustacheTableDiagramFactoryTest {
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(2);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -155,7 +155,7 @@ public class MustacheTableDiagramFactoryTest {
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(3);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -188,7 +188,7 @@ public class MustacheTableDiagramFactoryTest {
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(4);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
