@@ -420,7 +420,7 @@ public class SchemaAnalyzer {
         LOGGER.info("Completed summary in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/diagramming details");
         SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, config.getRelationDegreeDepth());
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, sqlAnalyzer);
         for (Table table : tables) {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table, results.getStats());

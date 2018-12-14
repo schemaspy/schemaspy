@@ -72,6 +72,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
 
     private static final int DEFAULT_FONT_SIZE = 11;
     private static final int DEFAULT_TABLE_DETAILS_THRESHOLD = 300;
+    private static final int DEFAULT_RELATION_DEGREE_DEPTH = 2;
 
     private static final Pattern DBTYPE_PATTERN = Pattern.compile(".*org/schemaspy/types/(.*)\\.properties");
 
@@ -122,6 +123,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     private String imageFormat;
     private String renderer;
     private Boolean paginationEnabled;
+    private Integer relationDegreeDepth;
     /**      
      * @deprecated replaced by -dp expanding folders
      */
@@ -625,6 +627,33 @@ public final class Config implements HtmlConfig, GraphvizConfig {
         }
 
         return fontSize;
+    }
+    
+    /**
+     * @return
+     * @see #setRelationDegreeDepth(int)
+     */
+    public int getRelationDegreeDepth() {
+        if (relationDegreeDepth == null) {
+            int iRelationDegreeDepth = DEFAULT_RELATION_DEGREE_DEPTH;
+            String param = pullParam("-relationdegreedepth");
+            if (param != null) {
+                try {
+                	iRelationDegreeDepth = Integer.parseInt(param);
+                	if (iRelationDegreeDepth != 1 && iRelationDegreeDepth != 2) {
+                		iRelationDegreeDepth = DEFAULT_RELATION_DEGREE_DEPTH;
+                		LOGGER.warn("relationdegreedepth must be 1 or 2, set default value to 2");
+                	}
+                } catch (NumberFormatException e) {
+                    LOGGER.warn(e.getMessage(), e);
+                    LOGGER.warn("relationdegreedepth must be 1 or 2, set default value to 2");
+                    iRelationDegreeDepth = DEFAULT_RELATION_DEGREE_DEPTH;
+                }
+            }
+            relationDegreeDepth = new Integer(iRelationDegreeDepth);
+        }
+
+        return relationDegreeDepth;
     }
 
     /**
@@ -1516,6 +1545,8 @@ public final class Config implements HtmlConfig, GraphvizConfig {
         params.add(getFont());
         params.add("-fontsize");
         params.add(String.valueOf(getFontSize()));
+        params.add("-relationdegreedepth");
+        params.add(String.valueOf(getRelationDegreeDepth()));
         params.add("-t");
         params.add(getDbType());
         params.add("-imageformat");

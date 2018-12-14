@@ -28,6 +28,7 @@ What's new
 
 * Diagrams
     * Now has option to use embedded viz.js (no need for Graphviz) ``-vizjs``
+    * Choose the relation depth degree 1 or 2 to simplify relation graphs for database with lot of tables and relations
 
 * XML
     * Now includes routines
