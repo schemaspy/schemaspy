@@ -18,8 +18,8 @@
  */
 package org.schemaspy.service.helper;
 
-import org.schemaspy.model.xml.ForeignKeyMeta;
-import org.schemaspy.model.xml.TableMeta;
+import org.schemaspy.input.dbms.xml.ForeignKeyMeta;
+import org.schemaspy.input.dbms.xml.TableMeta;
 
 public class RemoteTableIdentifier {
 

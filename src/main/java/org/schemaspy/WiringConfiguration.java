@@ -19,10 +19,10 @@
 package org.schemaspy;
 
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.service.DatabaseService;
-import org.schemaspy.service.SqlService;
-import org.schemaspy.service.TableService;
-import org.schemaspy.service.ViewService;
+import org.schemaspy.input.dbms.service.DatabaseService;
+import org.schemaspy.input.dbms.service.SqlService;
+import org.schemaspy.input.dbms.service.TableService;
+import org.schemaspy.input.dbms.service.ViewService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

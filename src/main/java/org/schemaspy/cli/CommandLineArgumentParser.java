@@ -25,7 +25,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.Config;
-import org.schemaspy.db.config.PropertiesResolver;
+import org.schemaspy.input.dbms.config.PropertiesResolver;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
