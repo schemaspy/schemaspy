@@ -24,8 +24,7 @@
 package org.schemaspy.input.dbms;
 
 import org.schemaspy.Config;
-import org.schemaspy.model.ConnectionFailure;
-import org.schemaspy.util.ConnectionURLBuilder;
+import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

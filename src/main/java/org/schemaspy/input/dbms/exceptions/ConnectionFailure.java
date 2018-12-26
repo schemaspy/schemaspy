@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.schemaspy.model;
+package org.schemaspy.input.dbms.exceptions;
 
 /**
  * Indicates that we couldn't connect to the database

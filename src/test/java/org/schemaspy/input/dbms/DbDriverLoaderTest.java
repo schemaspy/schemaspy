@@ -24,7 +24,7 @@ import org.dummy.DummyDriverUnsatisfiedCtor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.Config;
-import org.schemaspy.model.ConnectionFailure;
+import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.testing.H2MemoryRule;
 
 import java.io.File;

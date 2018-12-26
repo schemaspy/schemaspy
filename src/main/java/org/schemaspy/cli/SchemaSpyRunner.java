@@ -21,7 +21,7 @@ package org.schemaspy.cli;
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.Config;
 import org.schemaspy.SchemaAnalyzer;
-import org.schemaspy.model.ConnectionFailure;
+import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.slf4j.Logger;
