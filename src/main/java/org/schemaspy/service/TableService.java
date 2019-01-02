@@ -238,6 +238,8 @@ public class TableService {
                         importedKey.getUPDATE_RULE(), importedKey.getDELETE_RULE(),
                         tables);
             }
+        } catch (SQLException sqlex) {
+            LOGGER.warn("Failed to getImportedKeys", sqlex);
         }
 
         // also try to find all of the 'remote' tables in other schemas that
