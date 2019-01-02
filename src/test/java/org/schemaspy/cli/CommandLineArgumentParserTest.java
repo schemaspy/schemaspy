@@ -25,8 +25,7 @@ import org.junit.Test;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -195,6 +194,41 @@ public class CommandLineArgumentParserTest {
         CommandLineArguments arguments = parser.parse(args);
         assertThat(arguments.isHtmlDisabled()).isTrue();
         assertThat(arguments.isHtmlEnabled()).isFalse();
+    }
+
+    @Test
+    public void degreeOfSeparationIsTwoByDefault() {
+        String[] args = {
+                "-o", "aFolder",
+                "-sso"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(),NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        assertThat(arguments.getDegreeOfSeparation()).isEqualTo(2);
+    }
+
+    @Test
+    public void degreeOfSeparationCanBeSetToOne() {
+        String[] args = {
+                "-o", "aFolder",
+                "-sso",
+                "-degree", "1"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(),NO_DEFAULT_PROVIDER);
+        CommandLineArguments arguments = parser.parse(args);
+        assertThat(arguments.getDegreeOfSeparation()).isEqualTo(1);
+    }
+
+    @Test
+    public void degreeOfSeparationThreeThrowsException() {
+        String[] args = {
+                "-o", "aFolder",
+                "-sso",
+                "-degree", "3"
+        };
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(),NO_DEFAULT_PROVIDER);
+        assertThatExceptionOfType(ParameterException.class)
+                .isThrownBy(() ->parser.parse(args));
     }
 
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.
