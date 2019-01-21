@@ -75,7 +75,12 @@ In mysql you can use same as `-db`
 
 #### Graphviz
 There have been lots of issue with graphviz and OSX  
-So install using brew `brew install graphviz --with-librsvg --with-pango`
+So install using brew `brew install graphviz --with-librsvg --with-pango`  
+If you already have graphviz installed you need to uninstall and then install  
+```
+brew uninstall graphviz
+brew install graphviz --with-pango --with-librsvg
+```
 Depending on OSX version  
 *Older than High Sierra*, add `-renderer :quartz` to the commandline  
 *High Sierra or newer*, add `-renderer :cairo` to the commandline  
