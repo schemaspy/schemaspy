@@ -51,8 +51,8 @@ public class StackTraceOmitter extends ThrowableProxyConverter implements Applic
     public String convert(ILoggingEvent event) {
         if (SCHEMA_SPY_LOGGER.isDebugEnabled())
             return super.convert(event);
-        omittedStackTrace.set(true);
         if (Objects.nonNull(event.getThrowableProxy())) {
+            omittedStackTrace.set(true);
             return event.getThrowableProxy().getMessage() + CoreConstants.LINE_SEPARATOR;
         }
         return CoreConstants.EMPTY_STRING;
