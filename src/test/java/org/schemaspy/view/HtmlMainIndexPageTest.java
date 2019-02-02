@@ -50,4 +50,36 @@ public class HtmlMainIndexPageTest {
         assertThat(writer.toString()).contains("<p>normal <em>emp</em> <strong>strong</strong></p>");
     }
 
+    @Test
+    public void noRowsTrue_RemovesRowsColumn() {
+        HtmlConfig htmlConfig = mock(HtmlConfig.class);
+        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
+        when(htmlConfig.isNumRowsEnabled()).thenReturn(false);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsTrue", htmlConfig);
+        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, null);
+        StringWriter writer = new StringWriter();
+        Database database = mock(Database.class);
+        when(database.getSchema()).thenReturn(new Schema("schema"));
+        when(database.getCatalog()).thenReturn(new Catalog("catalog"));
+        htmlMainIndexPage.write(database, Collections.emptyList(), Collections.emptyList(), writer);
+
+        assertThat(writer.toString()).doesNotContain("<th align=\"right\" valign=\"bottom\">Rows</th>");
+    }
+
+    @Test
+    public void noRowsFalse_HasRowsColumn() {
+        HtmlConfig htmlConfig = mock(HtmlConfig.class);
+        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
+        when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsFalse", htmlConfig);
+        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, null);
+        StringWriter writer = new StringWriter();
+        Database database = mock(Database.class);
+        when(database.getSchema()).thenReturn(new Schema("schema"));
+        when(database.getCatalog()).thenReturn(new Catalog("catalog"));
+        htmlMainIndexPage.write(database, Collections.emptyList(), Collections.emptyList(), writer);
+
+        assertThat(writer.toString()).contains("<th align=\"right\" valign=\"bottom\">Rows</th>");
+    }
+
 }

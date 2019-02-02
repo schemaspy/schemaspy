@@ -148,7 +148,9 @@
                                         <th align="right" valign="bottom">Children</th>
                                         <th align="right" valign="bottom">Parents</th>
                                         <th align="right" valign="bottom">Columns</th>
+                                        {{#displayNumRows}}
                                         <th align="right" valign="bottom">Rows</th>
+                                        {{/displayNumRows}}
                                         <th align="right" valign="bottom">Type</th>
                                         <th class="toggle">Comments</th>
                                     </tr>
@@ -160,7 +162,9 @@
                                         <td class="detail" align="right">{{table.maxChildren}}</td>
                                         <td class="detail" align="right">{{table.maxParents}}</td>
                                         <td class="detail" align="right">{{table.columns.size}}</td>
+                                        {{#displayNumRows}}
                                         <td class="detail" align="right">{{table.numRows}}</td>
+                                        {{/displayNumRows}}
                                         <td class="detail" align="right">{{table.type}}</td>
                                         <td class="comment detail" style="display: table-cell;">{{{comments}}}</td>
                                     </tr>

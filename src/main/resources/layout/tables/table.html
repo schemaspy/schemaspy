@@ -1,6 +1,6 @@
 <!-- Content Header (Page header) -->
                 <section class="content-header">
-                    <h1>{{table.name}}</h1><br />
+                    <h1>{{table.name}}</h1>{{#displayNumRows}}<p><span id="recordNumber">{{table.numRows}}</span> rows</p>{{/displayNumRows}}<br />
                     {{#comments}}
                     <div class="box box-primary">
                         <div class="box-header with-border">
@@ -77,7 +77,6 @@
                                 {{/columns}}
                                 </tbody>
                             </table>
-                            <p title='{{table.columns.size}} columns'>Table contained <span id="recordNumber">{{table.numRows}}</span> rows</p>
                         </div>
                     </div>
                     {{^indexes.isEmpty}}
