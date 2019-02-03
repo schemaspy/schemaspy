@@ -1298,7 +1298,9 @@ public final class Config implements HtmlConfig, GraphvizConfig {
             }
         }
         if (expandedArgs.indexOf("-configFile") < 0) {
-            loadProperties(DEFAULT_PROPERTIES_FILE);
+            if (fileExists(DEFAULT_PROPERTIES_FILE)) {
+                loadProperties(DEFAULT_PROPERTIES_FILE);
+            }
         } else {
             loadProperties(expandedArgs.get(expandedArgs.indexOf("-configFile") + 1));
         }
@@ -1323,19 +1325,24 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     }
 
     private void loadProperties(String path) {
-        if (Paths.get(path).toFile().exists()) {
+        if (fileExists(path)) {
             try (Stream<String> lineStream = Files.lines(Paths.get(path))) {
                 String content = lineStream
                         .map(l -> l.replace("\\", "\\\\"))
                         .map(Config::rtrim)
                     .collect(Collectors.joining(System.lineSeparator()));
                 this.schemaspyProperties.load(new StringReader(content));
+                LOGGER.info("Loaded configuration from {}", path);
             } catch (IOException e) {
-                LOGGER.info("Failed to load properties", e);
+                LOGGER.warn("Failed to load configuration from '{}", path, e);
             }
         } else {
-            LOGGER.info("Configuration file not found");
+            LOGGER.warn("Configuration file '{}' not found", path);
         }
+    }
+
+    private static boolean fileExists(String path) {
+        return Paths.get(path).toFile().exists();
     }
 
     private static String rtrim(String s) {
