@@ -18,7 +18,6 @@
  */
 package org.schemaspy.view;
 
-import com.sun.nio.file.ExtendedOpenOption;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -30,6 +30,7 @@ public class XmlOutputDiff {
 
     public static Diff diffXmlOutput(Builder actually, Builder expected) {
         return DiffBuilder.compare(expected)
+                .normalizeWhitespace()
                 .withTest(actually)
                 .withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, new IgnoreUsingXPath("/database[1]/@type")))
                 .build();
