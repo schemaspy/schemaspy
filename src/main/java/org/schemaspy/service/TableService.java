@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by rkasa on 2016-12-05.
@@ -117,7 +118,7 @@ public class TableService {
                 String columnName = rsMeta.getColumnName(i);
                 TableColumn column = getColumn(table, columnName);
                 if (Objects.isNull(column)) {
-                    throw new InconsistencyException("Column information from DatabaseMetaData differs from ResultSetMetaData, expected to find column named: "+ columnName);
+                    throw new InconsistencyException("Column information from DatabaseMetaData differs from ResultSetMetaData, expected to find column named: '"+ columnName + "' in " + listColumns(table));
                 }
                 column.setIsAutoUpdated(rsMeta.isAutoIncrement(i));
             }
@@ -132,6 +133,10 @@ public class TableService {
                 initColumnAutoUpdate(db, table, true);
             }
         }
+    }
+
+    private String listColumns(Table table) {
+        return table.getColumns().stream().map(TableColumn::getName).collect(Collectors.joining("','", "['", "']"));
     }
 
     private static TableColumn getColumn(Table table, String columnName) {
