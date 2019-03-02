@@ -32,11 +32,9 @@ RUN adduser java -h / -D && \
     curl -JLO http://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/$JTDS_VERSION/jtds-$JTDS_VERSION.jar && \
     mkdir /drivers && \
     mkdir /output && \
-    mkdir /config && \
     chown -R java /drivers_inc && \
     chown -R java /drivers && \
     chown -R java /output && \
-    chown -R java /config && \
     apk del curl
 
 
@@ -46,6 +44,6 @@ ADD docker/entrypoint.sh /
 USER java
 WORKDIR /
 
-VOLUME /drivers /output /config
+VOLUME /drivers /output
 
 ENTRYPOINT ["/entrypoint.sh"]
