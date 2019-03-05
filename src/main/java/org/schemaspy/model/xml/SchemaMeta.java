@@ -58,12 +58,13 @@ import java.util.List;
  * @author Nils Petzaell
  */
 public class SchemaMeta {
-    private final List<TableMeta> tables = new ArrayList<TableMeta>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final List<TableMeta> tables = new ArrayList<>();
     private final String comments;
     private final File metaFile;
-    private final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public SchemaMeta(String xmlMeta, String dbName, String schema) throws InvalidConfigurationException {
+    public SchemaMeta(String xmlMeta, String dbName, String schema) {
         File meta = new File(xmlMeta);
         if (meta.isDirectory()) {
             String filename = (schema == null ? dbName : schema) + ".meta.xml";
@@ -72,7 +73,7 @@ public class SchemaMeta {
             if (!meta.exists()) {
                 if (Config.getInstance().isOneOfMultipleSchemas()) {
                     // don't force all of the "one of many" schemas to have metafiles
-                    LOGGER.info("Meta directory \"{}\" should contain a file named \"{}" + '\"', xmlMeta, filename);
+                    LOGGER.info("Meta directory \"{}\" should contain a file named \"{}\"", xmlMeta, filename);
                     comments = null;
                     metaFile = null;
                     return;
@@ -132,18 +133,25 @@ public class SchemaMeta {
 
         // create a Validator instance, which can be used to validate an instance document
         Validator validator = schema.newValidator();
+        validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        validator.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 
         // validate the DOM tree
         validator.validate(new DOMSource(document));
     }
 
-    private Document parse(File file) throws InvalidConfigurationException {
+    private Document parse(File file) {
         DocumentBuilder docBuilder;
         Document doc;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         factory.setIgnoringElementContentWhitespace(true);
         factory.setIgnoringComments(true);
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (ParserConfigurationException e) {
+            LOGGER.warn("Failed to enable secure processing for DocumentBuilderFactory", e);
+        }
 
         try {
             docBuilder = factory.newDocumentBuilder();

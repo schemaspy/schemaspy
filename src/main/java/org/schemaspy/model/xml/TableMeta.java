@@ -45,7 +45,7 @@ import java.util.Objects;
 public class TableMeta {
     private final String name;
     private final String comments;
-    private final List<TableColumnMeta> columns = new ArrayList<TableColumnMeta>();
+    private final List<TableColumnMeta> columns = new ArrayList<>();
     private final String remoteCatalog;
     private final String remoteSchema;
 

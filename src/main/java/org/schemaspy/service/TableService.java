@@ -641,7 +641,7 @@ public class TableService {
         TableIndex index = table.getIndex(indexName);
 
         if (index == null) {
-            index = new TableIndex(rs);
+            index = new TableIndex(indexName, !rs.getBoolean("NON_UNIQUE"));
 
             table.getIndexesMap().put(index.getName(), index);
         }
