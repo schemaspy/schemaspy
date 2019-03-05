@@ -74,6 +74,11 @@ public class XmlProducerUsingDOM implements XmlProducer {
         }
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (ParserConfigurationException e) {
+            LOGGER.warn("Failed to set secure processing for DocumentBuilderFactory", e);
+        }
         DocumentBuilder builder;
         try {
             builder = factory.newDocumentBuilder();
