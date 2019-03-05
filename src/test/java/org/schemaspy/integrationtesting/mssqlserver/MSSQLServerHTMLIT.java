@@ -118,6 +118,6 @@ public class MSSQLServerHTMLIT {
                 .hasProducedValidOutput(
                         Paths.get("target","mssqlhtml"),
                         Paths.get("src","test","resources","integrationTesting","mssqlserver","expecting","mssqlserverhtmlit")
-                );
+                ).assertAll();
     }
 }

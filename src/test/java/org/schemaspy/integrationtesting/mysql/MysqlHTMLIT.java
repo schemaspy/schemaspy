@@ -118,6 +118,6 @@ public class MysqlHTMLIT {
                 .hasProducedValidOutput(
                         Paths.get("target","mysqlhtml"),
                         Paths.get("src","test","resources","integrationTesting","mysql","expecting","mysqlhtml")
-                        );
+                        ).assertAll();
     }
 }
