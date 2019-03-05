@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2004 - 2011 John Currier
  * Copyright (C) 2017 Thomas Traude
+ * Copyright (C) 2019 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -20,12 +21,15 @@
  */
 package org.schemaspy.model;
 
+import org.schemaspy.service.helper.RemoteTableIdentifier;
+
 /**
  * A table that's outside of the default schema but is referenced
  * by or references a table in the default schema.
  *
  * @author John Currier
  * @author Thomas Traude
+ * @author Nils Petzaell
  */
 public class RemoteTable extends Table {
 
@@ -40,6 +44,17 @@ public class RemoteTable extends Table {
      */
     public RemoteTable(Database db, String catalog, String schema, String name, String baseContainer) {
         super(db, catalog, schema, name, null);
+        this.baseContainer = baseContainer;
+    }
+
+    public RemoteTable(Database db, RemoteTableIdentifier remoteTableIdentifier, String baseContainer) {
+        super(
+                db,
+                remoteTableIdentifier.getCatalogName(),
+                remoteTableIdentifier.getSchemaName(),
+                remoteTableIdentifier.getTableName(),
+                null
+        );
         this.baseContainer = baseContainer;
     }
 

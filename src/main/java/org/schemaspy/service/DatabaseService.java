@@ -28,6 +28,7 @@ import org.schemaspy.model.*;
 import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.model.xml.TableMeta;
 import org.schemaspy.service.helper.BasicTableMeta;
+import org.schemaspy.service.helper.RemoteTableIdentifier;
 import org.schemaspy.util.DurationFormatter;
 import org.schemaspy.validator.NameValidator;
 import org.slf4j.Logger;
@@ -265,7 +266,7 @@ public class DatabaseService {
 
             if (tableMeta.getRemoteSchema() != null || tableMeta.getRemoteCatalog() != null) {
                 // will add it if it doesn't already exist
-                table = tableService.addRemoteTable(db, tableMeta.getRemoteCatalog(), tableMeta.getRemoteSchema(), tableMeta.getName(), db.getSchema().getName(), true);
+                table = tableService.addLogicalRemoteTable(db, RemoteTableIdentifier.from(tableMeta), db.getSchema().getName());
             } else {
                 table = db.getLocals().get(tableMeta.getName());
 

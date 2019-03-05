@@ -23,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.Config;
 import org.schemaspy.model.*;
+import org.schemaspy.service.helper.RemoteTableIdentifier;
 import org.schemaspy.testing.ConfigRule;
 import org.schemaspy.testing.LoggingRule;
 
@@ -93,7 +94,7 @@ public class TableServiceConnectForeignKeysTest {
 
         when(sqlService.getDatabaseMetaData()).thenReturn(databaseMetaData);
 
-        LogicalRemoteTable remoteParent = new LogicalRemoteTable(database, "parent", "parent", "parent", "tst");
+        LogicalRemoteTable remoteParent = new LogicalRemoteTable(database, new RemoteTableIdentifier("parent", "parent", "parent"), "tst");
         TableColumn parent = new TableColumn(remoteParent);
         parent.setName("parent");
         remoteParent.getColumnsMap().put(parent.getName(), parent);
