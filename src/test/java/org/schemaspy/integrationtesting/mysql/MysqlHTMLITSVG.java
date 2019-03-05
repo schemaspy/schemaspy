@@ -19,6 +19,7 @@
 package org.schemaspy.integrationtesting.mysql;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -118,10 +119,12 @@ public class MysqlHTMLITSVG {
 
     @Test
     public void producesSameContent() throws IOException {
-        HtmlOutputValidator
+        SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
                         Paths.get(outputPath.toString()),
                         Paths.get("src","test","resources","integrationTesting","mysql","expecting","mysqlhtmlsvg")
-                ).assertAll();
+                );
+        softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
+        softAssertions.assertAll();
     }
 }
