@@ -122,6 +122,6 @@ public class MysqlHTMLITSVG {
                 .hasProducedValidOutput(
                         Paths.get(outputPath.toString()),
                         Paths.get("src","test","resources","integrationTesting","mysql","expecting","mysqlhtmlsvg")
-                );
+                ).assertAll();
     }
 }

@@ -55,7 +55,7 @@ public class HtmlOutputValidator {
         return a.compareTo(e);
     };
 
-    public static void hasProducedValidOutput(Path actualPath, Path expectedPath) throws IOException {
+    public static SoftAssertions hasProducedValidOutput(Path actualPath, Path expectedPath) throws IOException {
 
         List<Path> actualPaths;
         try (Stream<Path> pathStream = Files.find(actualPath, 5, (p, a) -> a.isRegularFile())) {
@@ -77,15 +77,15 @@ public class HtmlOutputValidator {
                 softAssertions.fail("Missing expectation for %s", actualPath.relativize(actual).toString());
             }
         }
-        softAssertions.assertAll();
+        return softAssertions;
     }
 
-    public static void hasSameContent(Path actualFile, Path expectedFile) throws IOException {
+    public static SoftAssertions hasSameContent(Path actualFile, Path expectedFile) throws IOException {
         SoftAssertions softAssertions = new SilentSoftAssertions();
         List<String> actualLines = Files.readAllLines(actualFile, StandardCharsets.UTF_8);
         List<String> expectedLines = Files.readAllLines(expectedFile, StandardCharsets.UTF_8);
         softAssertions.assertThat(actualLines).as("%s doesn't have the expected number of lines: %s", actualFile.toString(), expectedLines.size()).hasSameSizeAs(expectedLines);
         softAssertions.assertThat(actualLines).usingElementComparator(htmlComparator).as("%s isn't as expected", actualFile.toString()).containsAll(expectedLines);
-        softAssertions.assertAll();
+        return softAssertions;
     }
 }

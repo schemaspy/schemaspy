@@ -90,7 +90,7 @@ public class MysqlMultiSchemaIT {
                 .hasSameContent(
                         Paths.get("target", "mysqlmultischema","index.html"),
                         Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema", "index.html")
-                );
+                ).assertAll();
     }
 
     @Test
@@ -99,6 +99,6 @@ public class MysqlMultiSchemaIT {
                 .hasProducedValidOutput(
                         Paths.get("target", "mysqlmultischema","htmlit"),
                         Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema", "htmlit")
-                );
+                ).assertAll();
     }
 }
