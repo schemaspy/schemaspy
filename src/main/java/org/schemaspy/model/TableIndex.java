@@ -22,8 +22,6 @@
  */
 package org.schemaspy.model;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -37,17 +35,9 @@ public class TableIndex implements Comparable<TableIndex> {
     private final boolean isUnique;
     private Object id;
     private boolean isPrimary;
-    private final List<TableColumn> columns = new ArrayList<TableColumn>();
-    private final List<Boolean> columnsAscending = new ArrayList<Boolean>(); // for whether colums are ascending order
+    private final List<TableColumn> columns = new ArrayList<>();
+    private final List<Boolean> columnsAscending = new ArrayList<>(); // for whether colums are ascending order
 
-    /**
-     * @param rs
-     * @throws java.sql.SQLException
-     */
-    public TableIndex(ResultSet rs) throws SQLException {
-        this(rs.getString("INDEX_NAME"),!rs.getBoolean("NON_UNIQUE"));
-
-    }
     public TableIndex(String name, boolean unique) {
         this.name = name;
         this.isUnique = unique;
@@ -147,7 +137,7 @@ public class TableIndex implements Comparable<TableIndex> {
     }
 
     /**
-     * @param object
+     * @param other
      * @return
      */
     @Override

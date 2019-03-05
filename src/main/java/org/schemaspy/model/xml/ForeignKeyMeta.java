@@ -40,7 +40,7 @@ public class ForeignKeyMeta {
     private final String columnName;
     private final String remoteCatalog;
     private final String remoteSchema;
-    private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public ForeignKeyMeta(Node foreignKeyNode) {
         NamedNodeMap attribs = foreignKeyNode.getAttributes();

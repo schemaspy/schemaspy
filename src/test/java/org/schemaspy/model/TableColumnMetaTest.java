@@ -35,7 +35,7 @@ public class TableColumnMetaTest {
 
     @Test
     public void nullableShouldBeTrue() throws Exception {
-        Element itemElement = initaliseElement();
+        Element itemElement = initialiseElement();
         itemElement.setAttribute("nullable", "true");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
 
@@ -45,7 +45,7 @@ public class TableColumnMetaTest {
 
     @Test
     public void autoUpdatedShouldBeTrue() throws Exception {
-        Element itemElement = initaliseElement();
+        Element itemElement = initialiseElement();
         itemElement.setAttribute("autoUpdated", "true");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
 
@@ -54,7 +54,7 @@ public class TableColumnMetaTest {
 
     @Test
     public void primaryShouldBeTrue() throws Exception {
-        Element itemElement = initaliseElement();
+        Element itemElement = initialiseElement();
         itemElement.setAttribute("primaryKey", "true");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
 
@@ -64,7 +64,7 @@ public class TableColumnMetaTest {
 
     @Test
     public void shouldDisableImpliedKeys() throws Exception {
-        Element itemElement = initaliseElement();
+        Element itemElement = initialiseElement();
         itemElement.setAttribute("disableImpliedKeys", "all");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
 
@@ -92,7 +92,7 @@ public class TableColumnMetaTest {
 
     @Test
     public void shouldDisableDiagramAssociations() throws Exception {
-        Element itemElement = initaliseElement();
+        Element itemElement = initialiseElement();
         itemElement.setAttribute("disableDiagramAssociations", "all");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
 
@@ -113,7 +113,7 @@ public class TableColumnMetaTest {
     }
 
 
-    private Element initaliseElement() throws ParserConfigurationException {
+    private Element initialiseElement() throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = factory.newDocumentBuilder();
         Document document = documentBuilder.newDocument();
