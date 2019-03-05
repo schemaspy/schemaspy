@@ -19,6 +19,7 @@
 package org.schemaspy.integrationtesting.mysql;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -86,19 +87,23 @@ public class MysqlMultiSchemaIT {
 
     @Test
     public void producesSameContentForIndex() throws IOException {
-        HtmlOutputValidator
+        SoftAssertions softAssertions = HtmlOutputValidator
                 .hasSameContent(
                         Paths.get("target", "mysqlmultischema","index.html"),
                         Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema", "index.html")
-                ).assertAll();
+                );
+        softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
+        softAssertions.assertAll();
     }
 
     @Test
     public void producesSameContentForSchema() throws IOException {
-        HtmlOutputValidator
+        SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
                         Paths.get("target", "mysqlmultischema","htmlit"),
                         Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema", "htmlit")
-                ).assertAll();
+                );
+        softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
+        softAssertions.assertAll();
     }
 }

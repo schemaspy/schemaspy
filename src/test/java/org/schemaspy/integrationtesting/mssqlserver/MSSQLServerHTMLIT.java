@@ -20,6 +20,7 @@
 package org.schemaspy.integrationtesting.mssqlserver;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -114,10 +115,12 @@ public class MSSQLServerHTMLIT {
 
     @Test
     public void producesSameContent() throws IOException {
-        HtmlOutputValidator
+        SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
                         Paths.get("target","mssqlhtml"),
                         Paths.get("src","test","resources","integrationTesting","mssqlserver","expecting","mssqlserverhtmlit")
-                ).assertAll();
+                );
+        softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
+        softAssertions.assertAll();
     }
 }
