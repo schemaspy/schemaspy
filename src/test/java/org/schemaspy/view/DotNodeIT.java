@@ -38,6 +38,7 @@ import java.util.Collections;
 
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -66,7 +67,8 @@ public class DotNodeIT {
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
         dotFormatter.writeOrphan(table, printWriter, "test");
-        diagramFactory.generateOrphanDiagram(dotFile,"illegalTableName");
+        assertThatCode(() -> diagramFactory.generateOrphanDiagram(dotFile,"illegalTableName"))
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -84,7 +86,8 @@ public class DotNodeIT {
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
         dotFormatter.writeOrphan(table, printWriter, "test");
-        diagramFactory.generateOrphanDiagram(dotFile,"illegalColumnName");
+        assertThatCode(() -> diagramFactory.generateOrphanDiagram(dotFile,"illegalColumnName"))
+                .doesNotThrowAnyException();
     }
 
 }
