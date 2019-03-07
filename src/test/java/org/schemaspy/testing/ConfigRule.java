@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2019 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -18,20 +18,26 @@
  */
 package org.schemaspy.testing;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+import org.schemaspy.Config;
 
-/**
- * @author Nils Petzaell
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface Logger {
+public class ConfigRule implements TestRule {
 
-    Class<?> value();
-    String level() default "INFO";
-    String pattern() default "%m";
+    @Override
+    public Statement apply(Statement base, Description description) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                new Config();
+                try {
+                    base.evaluate();
+                } finally {
+                    new Config();
+                }
+            }
+        };
+    }
 
 }
