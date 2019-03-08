@@ -16,11 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.model;
+package org.schemaspy.model.xml;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.schemaspy.model.xml.TableColumnMeta;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
