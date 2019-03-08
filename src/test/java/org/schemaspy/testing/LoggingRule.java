@@ -18,6 +18,7 @@
  */
 package org.schemaspy.testing;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.OutputStreamAppender;
 import org.junit.rules.TestRule;
@@ -38,6 +39,7 @@ public class LoggingRule implements TestRule {
     private Logger config;
 
     private ch.qos.logback.classic.Logger logger;
+    private Level preLevel;
     private OutputStreamAppender outputStreamAppender = new OutputStreamAppender();
     private PatternLayoutEncoder patternLayoutEncoder = new PatternLayoutEncoder();
     private ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -75,6 +77,8 @@ public class LoggingRule implements TestRule {
 
     private void before() {
         logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(config.value());
+        preLevel = logger.getLevel();
+        logger.setLevel(Level.toLevel(config.level(), preLevel));
         patternLayoutEncoder.setPattern(config.pattern());
         patternLayoutEncoder.setContext(logger.getLoggerContext());
         outputStreamAppender.setEncoder(patternLayoutEncoder);
@@ -90,5 +94,6 @@ public class LoggingRule implements TestRule {
         patternLayoutEncoder.stop();
         logger.detachAppender(outputStreamAppender);
         logger.setAdditive(true);
+        logger.setLevel(preLevel);
     }
 }

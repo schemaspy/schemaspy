@@ -540,7 +540,7 @@ public class TableService {
                              */
                             /* TODO: This sort of code suggest that too much is happening in the constructor.
                              * Should either be a factory or constructed by a method of the holding object.
-                             * Or opertations preformed in the constructor should be exposed.
+                             * Or operations preformed in the constructor should be exposed.
                              */
                             @SuppressWarnings("unused")
                             ForeignKeyConstraint unused = new ForeignKeyConstraint(parentColumn, col) {
