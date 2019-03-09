@@ -49,6 +49,7 @@ public class Database {
     private final Map<String, Table> remoteTables = new CaseInsensitiveMap<>(); // key: schema.tableName
     private final Map<String, Table> locals = new CombinedMap(tables, views);
     private final Map<String, Routine> routines = new CaseInsensitiveMap<>();
+    private final Map<String, Trigger> triggers = new CaseInsensitiveMap<>();
     private final ZonedDateTime connectTime = ZonedDateTime.now();
 
     public Database(
@@ -119,6 +120,14 @@ public class Database {
 
     public Map<String, Routine> getRoutinesMap() {
         return routines;
+    }
+
+    public Collection<Trigger> getTriggers() {
+        return triggers.values();
+    }
+
+    public Map<String, Trigger> getTriggersMap() {
+        return triggers;
     }
 
     /**

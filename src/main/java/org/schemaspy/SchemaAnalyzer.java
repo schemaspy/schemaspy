@@ -73,6 +73,7 @@ import java.util.stream.Collectors;
  * @author Thomas Traude
  * @author Nils Petzaell
  * @author Daniel Watt
+ * @author Ben Hartwich
  */
 public class SchemaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -404,6 +405,18 @@ public class SchemaAnalyzer {
         for (Routine routine : db.getRoutines()) {
             try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines").resolve(routine.getName() + DOT_HTML).toFile())) {
                 htmlRoutinePage.write(routine, writer);
+            }
+        }
+
+        HtmlTriggersPage htmlTriggersPage = new HtmlTriggersPage(mustacheCompiler);
+        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("triggers.html").toFile())) {
+            htmlTriggersPage.write(db.getTriggers(), writer);
+        }
+
+        HtmlTriggerPage htmlTriggerPage = new HtmlTriggerPage(mustacheCompiler);
+        for (Trigger trigger : db.getTriggers()) {
+            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("triggers").resolve(trigger.getName() + DOT_HTML).toFile())) {
+                htmlTriggerPage.write(trigger, writer);
             }
         }
 

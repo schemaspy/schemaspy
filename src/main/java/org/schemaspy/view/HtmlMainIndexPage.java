@@ -78,6 +78,7 @@ public class HtmlMainIndexPage {
         long constraintsAmount = DbAnalyzer.getForeignKeyConstraints(tables).size();
         long routinesAmount = database.getRoutines().size();
         long anomaliesAmount = getAllAnomaliesAmount(tables, impliedConstraints);
+        long triggersAmount = database.getTriggers().size();
 
         PageData pageData = new PageData.Builder()
                 .templateName("main.html")
@@ -88,6 +89,7 @@ public class HtmlMainIndexPage {
                 .addToScope("constraintsAmount", constraintsAmount)
                 .addToScope("routinesAmount", routinesAmount)
                 .addToScope("anomaliesAmount", anomaliesAmount)
+                .addToScope("triggersAmount", triggersAmount)
                 .addToScope("tables", mustacheTables)
                 .addToScope("database", database)
                 .addToScope("description", Markdown.toHtml(description, ""))

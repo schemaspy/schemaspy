@@ -28,75 +28,102 @@
                 <section class="content">
                     <div class="row">
                         <div class="col-md-2 col-sm-4 col-xs-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-aqua"><i class="fa fa-table"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">TABLES</span>
-                                    <span class="info-box-number">{{tablesAmount}}</span>
+                            <a href="#tables" title="All of the tables in the schema">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-aqua"><i class="fa fa-table"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">TABLES</span>
+                                        <span class="info-box-number">{{tablesAmount}}</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
                                 </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
+                                <!-- /.info-box -->
+                            </a>
                         </div>
                         <!-- /.col -->
                         <div class="col-md-2 col-sm-4 col-xs-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-teal"><i class="fa fa-table"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">VIEWS</span>
-                                    <span class="info-box-number">{{viewsAmount}}</span>
+                            <a href="#tables" title="All of the views in the schema">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-teal"><i class="fa fa-table"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">VIEWS</span>
+                                        <span class="info-box-number">{{viewsAmount}}</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
                                 </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
+                                <!-- /.info-box -->
+                            </a>
                         </div>
                         <!-- /.col -->
                         <div class="col-md-2 col-sm-4 col-xs-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-green"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">COLUMNS</span>
-                                    <span class="info-box-number">{{columnsAmount}}</span>
+                            <a href="columns.html" title="All of the columns in the schema">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-green"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">COLUMNS</span>
+                                        <span class="info-box-number">{{columnsAmount}}</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
                                 </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
+                                <!-- /.info-box -->
+                            </a>
                         </div>
                         <!-- /.col -->
                         <div class="col-md-2 col-sm-4 col-xs-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-yellow"><i class="ion ion-key"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Constraints</span>
-                                    <span class="info-box-number">{{constraintsAmount}}</span>
+                            <a href="constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-yellow"><i class="ion ion-key"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Constraints</span>
+                                        <span class="info-box-number">{{constraintsAmount}}</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
                                 </div>
-                                <!-- /.info-box-content -->
-                            </div>
+                            </a>
                             <!-- /.info-box -->
                         </div>
                         <!-- /.col -->
+                    </div>
+                    <div class="row">
                         <div class="col-md-2 col-sm-4 col-xs-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-red-active"><i class="fa fa-question" aria-hidden="true"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Anomalies</span>
-                                    <span class="info-box-number">{{anomaliesAmount}}</span>
+                            <a href="triggers.html" title="All of the triggers in the schema">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-blue"><i class="ion ion-flash"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">TRIGGERS</span>
+                                        <span class="info-box-number">{{triggersAmount}}</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
                                 </div>
-                                <!-- /.info-box-content -->
-                            </div>
+                            </a>
                             <!-- /.info-box -->
+                        </div>
+                        <div class="col-md-2 col-sm-4 col-xs-12">
+                            <a href="anomalies.html" title="Things that might not be quite right">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-red-active"><i class="fa fa-question" aria-hidden="true"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Anomalies</span>
+                                        <span class="info-box-number">{{anomaliesAmount}}</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
+                            </a>
                         </div>
                         <!-- /.col -->
                         <div class="col-md-2 col-sm-4 col-xs-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-navy"><i class="fa fa-file-code-o" aria-hidden="true"></i></span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Routines</span>
-                                    <span class="info-box-number">{{routinesAmount}}</span>
+                            <a href="routines.html" title="Procedures and functions">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-navy"><i class="fa fa-file-code-o" aria-hidden="true"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Routines</span>
+                                        <span class="info-box-number">{{routinesAmount}}</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
                                 </div>
-                                <!-- /.info-box-content -->
-                            </div>
-                            <!-- /.info-box -->
+                                <!-- /.info-box -->
+                            </a>
                         </div>
                         <!-- /.col -->
                     </div>
@@ -136,7 +163,7 @@
                     {{/schema.comment}}
                     {{/schema}}
                     <div class="box box-primary">
-                        <div class="box-header with-border">
+                        <div id="tables" class="box-header with-border">
                             <h3 class="box-title">Tables</h3>
                             <span class="label label-primary pull-right"><i class="fa fa-database fa-2x"></i></span>
                         </div><!-- /.box-header -->
