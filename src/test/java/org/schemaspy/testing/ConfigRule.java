@@ -30,11 +30,11 @@ public class ConfigRule implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                new Config();
+                Config.setInstance(null);
                 try {
                     base.evaluate();
                 } finally {
-                    new Config();
+                    Config.setInstance(null);
                 }
             }
         };
