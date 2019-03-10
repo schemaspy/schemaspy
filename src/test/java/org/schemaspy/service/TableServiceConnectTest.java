@@ -25,6 +25,7 @@ import org.schemaspy.model.*;
 import org.schemaspy.model.xml.ForeignKeyMeta;
 import org.schemaspy.model.xml.TableColumnMeta;
 import org.schemaspy.model.xml.TableMeta;
+import org.schemaspy.service.helper.RemoteTableIdentifier;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
 
@@ -116,7 +117,7 @@ public class TableServiceConnectTest {
         childColumn.setName("child");
         table.getColumnsMap().put(childColumn.getName(), childColumn);
 
-        LogicalRemoteTable logicalRemoteTable = new LogicalRemoteTable(database, "other", "other", "parent", "tst");
+        LogicalRemoteTable logicalRemoteTable = new LogicalRemoteTable(database, new RemoteTableIdentifier("other", "other", "parent"), "tst");
         TableColumn parentColumn = new TableColumn(logicalRemoteTable);
         parentColumn.setName("parent");
         logicalRemoteTable.getColumnsMap().put(parentColumn.getName(), parentColumn);

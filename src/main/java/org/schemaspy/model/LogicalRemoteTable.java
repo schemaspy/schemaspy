@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2004 - 2011 John Currier
+ * Copyright (C) 2019 Nils Petzaell
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
@@ -19,25 +20,24 @@
  */
 package org.schemaspy.model;
 
-import java.sql.SQLException;
+import org.schemaspy.service.helper.RemoteTableIdentifier;
 
 /**
  * A remote table (exists in another schema (logically or physically))
  * that was created via XML metadata.
  *
  * @author John Currier
+ * @author Nils Petzaell
  */
 public class LogicalRemoteTable extends RemoteTable {
-    /**
-     * @param db
-     * @param catalog
-     * @param schema
-     * @param name
-     * @param baseSchema
-     * @throws SQLException
-     */
-    public LogicalRemoteTable(Database db, String catalog, String schema, String name, String baseSchema) throws SQLException {
-        super(db, catalog, schema, name, baseSchema);
+
+    public LogicalRemoteTable(
+            Database database,
+            RemoteTableIdentifier remoteTableIdentifier,
+            String baseSchema) {
+        super(database,
+                remoteTableIdentifier,
+                baseSchema);
     }
 
     /**

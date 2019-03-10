@@ -23,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.Config;
 import org.schemaspy.model.*;
+import org.schemaspy.service.helper.ImportForeignKey;
 import org.schemaspy.testing.ConfigRule;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
@@ -61,19 +62,39 @@ public class TableServiceAddForeignKeyTest {
         table = new Table(database, database.getCatalog().getName(), database.getSchema().getName(), "mainTable", "mainTable");
         database.getTablesMap().put(table.getName(), table);
     }
-
+    
     @Test
     @Logger(value = TableService.class, level = "debug")
     public void excludingTable() throws SQLException {
         Config.getInstance().setTableExclusions("excludeMePlease");
-        tableService.addForeignKey(database, null, "notNull", null, "CAT", "S", "excludeMePlease", "aColumn", 0,0, new HashMap<>());
+        ImportForeignKey foreignKey = new ImportForeignKey.Builder()
+                .withFkName("notNull")
+                .withFkColumnName(null)
+                .withPkTableCat("CAT")
+                .withPkTableSchema("S")
+                .withPkTableName("excludeMePlease")
+                .withPkColumnName("aColumn")
+                .withUpdateRule(0)
+                .withDeleteRule(0)
+                .build();
+        tableService.addForeignKey(database, null, foreignKey, new HashMap<>());
         assertThat(loggingRule.getLog()).contains("Ignoring CAT.S.excludeMePlease referenced by FK notNull");
     }
 
     @Test
     @Logger(TableService.class)
     public void addsForeignKeyIfMissing() throws SQLException {
-        tableService.addForeignKey(database, table, "newFK", "fkColumn", "pkCat", "pkSchema","pkTable", "pkColumn",0,0, database.getTablesMap());
+        ImportForeignKey foreignKey = new ImportForeignKey.Builder()
+                .withFkName("newFK")
+                .withFkColumnName("fkColumn")
+                .withPkTableCat("pkCat")
+                .withPkTableSchema("pkSchema")
+                .withPkTableName("pkTable")
+                .withPkColumnName("pkColumn")
+                .withUpdateRule(0)
+                .withDeleteRule(0)
+                .build();
+        tableService.addForeignKey(database, table, foreignKey, database.getTablesMap());
         assertThat(table.getForeignKeysMap().get("newFK")).isNotNull();
         assertThat(table.getForeignKeysMap().get("newFK").getName()).isEqualTo("newFK");
         assertThat(loggingRule.getLog()).contains("Couldn't add FK 'newFK' to table 'mainTable' - Column 'fkColumn' doesn't exist");
@@ -83,7 +104,17 @@ public class TableServiceAddForeignKeyTest {
     @Logger(TableService.class)
     public void usesExistingForeignKeyIfExists() throws SQLException {
         table.getForeignKeysMap().put("existingFK", new ForeignKeyConstraint(table, "existingFK", 1,1));
-        tableService.addForeignKey(database, table, "existingFK", "fkColumn", "pkCat", "pkSchema", "pkTable", "pkColumn", 0,0, new HashMap<>());
+        ImportForeignKey foreignKey = new ImportForeignKey.Builder()
+                .withFkName("existingFK")
+                .withFkColumnName("fkColumn")
+                .withPkTableCat("pkCat")
+                .withPkTableSchema("pkSchema")
+                .withPkTableName("pkTable")
+                .withPkColumnName("pkColumn")
+                .withUpdateRule(0)
+                .withDeleteRule(0)
+                .build();
+        tableService.addForeignKey(database, table, foreignKey, new HashMap<>());
         assertThat(table.getForeignKeysMap().get("existingFK").getUpdateRule()).isEqualTo(1);
         assertThat(table.getForeignKeysMap().get("existingFK").getDeleteRule()).isEqualTo(1);
         assertThat(loggingRule.getLog()).contains("Couldn't add FK 'existingFK' to table 'mainTable' - Column 'fkColumn' doesn't exist");
@@ -102,7 +133,17 @@ public class TableServiceAddForeignKeyTest {
         childColumn.setId(0);
         childColumn.setName("childColumn");
         table.getColumnsMap().put(childColumn.getName(), childColumn);
-        tableService.addForeignKey(database, table, "withChild", "childColumn", "other", "other","parent", "parent",0,0, database.getTablesMap());
+        ImportForeignKey foreignKey = new ImportForeignKey.Builder()
+                .withFkName("withChild")
+                .withFkColumnName("childColumn")
+                .withPkTableCat("other")
+                .withPkTableSchema("other")
+                .withPkTableName("parent")
+                .withPkColumnName("parent")
+                .withUpdateRule(0)
+                .withDeleteRule(0)
+                .build();
+        tableService.addForeignKey(database, table, foreignKey, database.getTablesMap());
         String log = loggingRule.getLog();
         assertThat(log).contains("Adding remote table other.other.parent");
         assertThat(log).contains("Couldn't add FK 'withChild' to table 'mainTable' - Column 'parent' doesn't exist in table 'parent'");
@@ -134,7 +175,17 @@ public class TableServiceAddForeignKeyTest {
         assertThat(remoteTable.getMaxChildren()).isEqualTo(0);
         assertThat(remoteTable.getMaxParents()).isEqualTo(0);
 
-        tableService.addForeignKey(database, table, "withChild", "childColumn", "other", "other","parent", "parent",0,0, database.getTablesMap());
+        ImportForeignKey foreignKey = new ImportForeignKey.Builder()
+                .withFkName("withChild")
+                .withFkColumnName("childColumn")
+                .withPkTableCat("other")
+                .withPkTableSchema("other")
+                .withPkTableName("parent")
+                .withPkColumnName("parent")
+                .withUpdateRule(0)
+                .withDeleteRule(0)
+                .build();
+        tableService.addForeignKey(database, table, foreignKey, database.getTablesMap());
 
         assertThat(childColumn.getChildren().size()).isEqualTo(0);
         assertThat(childColumn.getParents().size()).isEqualTo(1);

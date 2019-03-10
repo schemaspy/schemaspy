@@ -28,6 +28,9 @@ import org.schemaspy.model.*;
 import org.schemaspy.model.xml.ForeignKeyMeta;
 import org.schemaspy.model.xml.TableColumnMeta;
 import org.schemaspy.model.xml.TableMeta;
+import org.schemaspy.service.helper.ExportForeignKey;
+import org.schemaspy.service.helper.ImportForeignKey;
+import org.schemaspy.service.helper.RemoteTableIdentifier;
 import org.schemaspy.util.Markdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +40,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by rkasa on 2016-12-05.
@@ -221,27 +226,16 @@ public class TableService {
 
         try (ResultSet rs = sqlService.getDatabaseMetaData().getImportedKeys(table.getCatalog(), table.getSchema(), table.getName())) {
             // get our foreign keys that reference other tables' primary keys
-            ArrayList<ForeignKey> importedKeys = new ArrayList<>();
+            ArrayList<ImportForeignKey> importedKeys = new ArrayList<>();
 
             while (rs.next()) {
-                ForeignKey key = new ForeignKey();
-                key.setFK_NAME(rs.getString("FK_NAME"));
-                key.setFKCOLUMN_NAME(rs.getString("FKCOLUMN_NAME"));
-                key.setPKTABLE_CAT(rs.getString("PKTABLE_CAT"));
-                key.setPKTABLE_SCHEM(rs.getString("PKTABLE_SCHEM"));
-                key.setPKTABLE_NAME(rs.getString("PKTABLE_NAME"));
-                key.setPKCOLUMN_NAME(rs.getString("PKCOLUMN_NAME"));
-                key.setUPDATE_RULE(rs.getInt("UPDATE_RULE"));
-                key.setDELETE_RULE(rs.getInt("DELETE_RULE"));
-                importedKeys.add(key);
+                importedKeys.add(new ImportForeignKey.Builder()
+                        .fromImportKeysResultSet(rs)
+                        .build());
             }
 
-            for(ForeignKey importedKey : importedKeys) {
-                addForeignKey(db, table, importedKey.getFK_NAME(), importedKey.getFKCOLUMN_NAME(),
-                        importedKey.getPKTABLE_CAT(), importedKey.getPKTABLE_SCHEM(),
-                        importedKey.getPKTABLE_NAME(), importedKey.getPKCOLUMN_NAME(),
-                        importedKey.getUPDATE_RULE(), importedKey.getDELETE_RULE(),
-                        tables);
+            for(ImportForeignKey importedKey : importedKeys) {
+                addForeignKey(db, table, importedKey, tables);
             }
         } catch (SQLException sqlex) {
             LOGGER.warn("Failed to getImportedKeys", sqlex);
@@ -255,28 +249,28 @@ public class TableService {
                 // get the foreign keys that reference our primary keys
                 // note that this can take an insane amount of time on Oracle (i.e. 30 secs per call)
 
-                ArrayList<ForeignKey> exportedKeys = new ArrayList<>();
+                ArrayList<ExportForeignKey> exportedKeys = new ArrayList<>();
 
                 while (rs.next()) {
-                    ForeignKey key = new ForeignKey();
-                    key.setFKTABLE_CAT(rs.getString("FKTABLE_CAT"));
-                    key.setFKTABLE_SCHEM(rs.getString("FKTABLE_SCHEM"));
-                    key.setFKTABLE_NAME(rs.getString("FKTABLE_NAME"));
-                    exportedKeys.add(key);
+                    exportedKeys.add(new ExportForeignKey.Builder()
+                            .fromExportedKeysResultSet(rs)
+                            .build());
                 }
 
-                for(ForeignKey exportedKey : exportedKeys) {
-                    String otherCatalog = exportedKey.getFKTABLE_CAT();
-                    String otherSchema = exportedKey.getFKTABLE_SCHEM();
-                    if (!String.valueOf(table.getSchema()).equals(String.valueOf(otherSchema)) ||
-                            !String.valueOf(table.getCatalog()).equals(String.valueOf(otherCatalog))) {
-                        addRemoteTable(db, otherCatalog, otherSchema, exportedKey.getFKTABLE_NAME(), table.getSchema(), false);
+                for(ExportForeignKey exportedKey : exportedKeys) {
+                    if (isRemote(table, exportedKey)) {
+                        addRemoteTable(db, RemoteTableIdentifier.from(exportedKey), table.getSchema());
                     }
                 }
             } catch (SQLException sqlex) {
                 LOGGER.warn("Failed to getExportedKeys", sqlex);
             }
         }
+    }
+
+    private static boolean isRemote(Table table, ExportForeignKey foreignKey) {
+        return !String.valueOf(table.getCatalog()).equals(String.valueOf(foreignKey.getFkTableCat())) ||
+                !String.valueOf(table.getSchema()).equals(String.valueOf(foreignKey.getFkTableSchema()));
     }
 
     /**
@@ -290,16 +284,11 @@ public class TableService {
             // get remote table's FKs that reference PKs in our schema
 
             while (rs.next()) {
-                String otherSchema = rs.getString("PKTABLE_SCHEM");
-                String otherCatalog = rs.getString("PKTABLE_CAT");
+                ImportForeignKey foreignKey = new ImportForeignKey.Builder().fromImportKeysResultSet(rs).build();
 
                 // if it points back to our schema then use it
-                if (remoteTable.getBaseContainer().equals(otherSchema) || remoteTable.getBaseContainer().equals(otherCatalog)) {
-                    addForeignKey(db, remoteTable, rs.getString("FK_NAME"), rs.getString("FKCOLUMN_NAME"),
-                            otherCatalog, otherSchema,
-                            rs.getString("PKTABLE_NAME"), rs.getString("PKCOLUMN_NAME"),
-                            rs.getInt("UPDATE_RULE"), rs.getInt("DELETE_RULE"),
-                            tables);
+                if (remoteTable.getBaseContainer().equals(foreignKey.getPkTableSchema()) || remoteTable.getBaseContainer().equals(foreignKey.getPkTableCat())) {
+                    addForeignKey(db, remoteTable, foreignKey, tables);
                 }
             }
         } catch (SQLException sqlExc) {
@@ -314,73 +303,80 @@ public class TableService {
         }
     }
 
-    /**
-     * rs ResultSet from {@link DatabaseMetaData#getImportedKeys(String, String, String)}
-     * rs.getString("FK_NAME");
-     * rs.getString("FKCOLUMN_NAME");
-     * rs.getString("PKTABLE_CAT");
-     * rs.getString("PKTABLE_SCHEM");
-     * rs.getString("PKTABLE_NAME");
-     * rs.getString("PKCOLUMN_NAME");
-     * @param tables Map
-     * @param db
-     * @throws SQLException
-     */
-    protected void addForeignKey(Database db, Table table, String fkName, String fkColName,
-                                 String pkCatalog, String pkSchema, String pkTableName, String pkColName,
-                                 int updateRule, int deleteRule,
+    protected void addForeignKey(Database db, Table table, ImportForeignKey foreignKey,
                                  Map<String, Table> tables) throws SQLException {
-        if (fkName == null)
+        if (Objects.isNull(foreignKey.getFkName())) {
             return;
+        }
 
         Pattern include = Config.getInstance().getTableInclusions();
         Pattern exclude = Config.getInstance().getTableExclusions();
 
-        if (!include.matcher(pkTableName).matches() || exclude.matcher(pkTableName).matches()) {
-            LOGGER.debug("Ignoring {} referenced by FK {}", Table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName), fkName);
+        if (!include.matcher(foreignKey.getPkTableName()).matches() || exclude.matcher(foreignKey.getPkTableName()).matches()) {
+            LOGGER.debug("Ignoring {} referenced by FK {}", Table.getFullName(
+                    db.getName(),
+                    foreignKey.getPkTableCat(),
+                    foreignKey.getPkTableSchema(),
+                    foreignKey.getPkTableName()
+            ), foreignKey.getFkName());
             return;
         }
 
-        ForeignKeyConstraint foreignKey = table.getForeignKeysMap().get(fkName);
-        if (foreignKey == null) {
-            foreignKey = new ForeignKeyConstraint(table, fkName, updateRule, deleteRule);
+        ForeignKeyConstraint foreignKeyConstraint = Optional
+                .ofNullable(table.getForeignKeysMap().get(foreignKey.getFkName()))
+                .orElseGet(() -> {
+                    ForeignKeyConstraint fkc = new ForeignKeyConstraint(
+                            table,
+                            foreignKey.getFkName(),
+                            foreignKey.getUpdateRule(),
+                            foreignKey.getDeleteRule()
+                    );
+                    table.getForeignKeysMap().put(foreignKey.getFkName(), fkc);
+                    return fkc;
+                });
 
-            table.getForeignKeysMap().put(fkName, foreignKey);
-        }
-
-        TableColumn childColumn = table.getColumn(fkColName);
+        TableColumn childColumn = table.getColumn(foreignKey.getFkColumnName());
         if (childColumn != null) {
-            foreignKey.addChildColumn(childColumn);
+            foreignKeyConstraint.addChildColumn(childColumn);
 
-            Table parentTable = tables.get(pkTableName);
+            Table parentTable = tables.get(foreignKey.getPkTableName());
 
-            String parentContainer = pkSchema != null ? pkSchema : pkCatalog != null ? pkCatalog : db.getName();
+            String parentContainer = Stream.of(foreignKey.getPkTableSchema(), foreignKey.getPkTableCat(), db.getName())
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .get();
             String childContainer = table instanceof RemoteTable ? ((RemoteTable) table).getBaseContainer() : table.getContainer();
 
             // if named table doesn't exist in this schema
             // or exists here but really referencing same named table in another schema
             if (parentTable == null || !childContainer.equals(parentContainer)) {
-                LOGGER.debug("Adding remote table {}", Table.getFullName(db.getName(), pkCatalog, pkSchema, pkTableName));
-                parentTable = addRemoteTable(db, pkCatalog, pkSchema, pkTableName, table.getContainer(), false);
+                LOGGER.debug("Adding remote table {}", Table.getFullName(
+                        db.getName(),
+                        foreignKey.getPkTableCat(),
+                        foreignKey.getPkTableSchema(),
+                        foreignKey.getPkTableName()
+                ));
+                parentTable = addRemoteTable(db, RemoteTableIdentifier.from(foreignKey), table.getContainer());
             }
 
             if (parentTable != null) {
-                TableColumn parentColumn = parentTable.getColumn(pkColName);
+                TableColumn parentColumn = parentTable.getColumn(foreignKey.getPkColumnName());
                 if (parentColumn != null) {
-                    foreignKey.addParentColumn(parentColumn);
+                    foreignKeyConstraint.addParentColumn(parentColumn);
 
-                    childColumn.addParent(parentColumn, foreignKey);
-                    parentColumn.addChild(childColumn, foreignKey);
+                    childColumn.addParent(parentColumn, foreignKeyConstraint);
+                    parentColumn.addChild(childColumn, foreignKeyConstraint);
                 } else {
-                    LOGGER.warn("Couldn't add FK '{}' to table '{}' - Column '{}' doesn't exist in table '{}'", foreignKey.getName(), table.getName(), pkColName, parentTable);
+                    LOGGER.warn("Couldn't add FK '{}' to table '{}' - Column '{}' doesn't exist in table '{}'", foreignKeyConstraint.getName(), table.getName(), foreignKey.getPkColumnName(), parentTable);
                 }
             } else {
-                LOGGER.warn("Couldn't add FK '{}' to table '{}' - Unknown Referenced Table '{}'", foreignKey.getName(), table.getName(), pkTableName);
+                LOGGER.warn("Couldn't add FK '{}' to table '{}' - Unknown Referenced Table '{}'", foreignKeyConstraint.getName(), table.getName(), foreignKey.getPkTableName());
             }
         } else {
-            LOGGER.warn("Couldn't add FK '{}' to table '{}' - Column '{}' doesn't exist", foreignKey.getName(), table.getName(), fkColName);
+            LOGGER.warn("Couldn't add FK '{}' to table '{}' - Column '{}' doesn't exist", foreignKeyConstraint.getName(), table.getName(), foreignKey.getFkColumnName());
         }
     }
+
 
     protected long fetchNumRows(Database db, Table table, String clause, boolean forceQuotes) throws SQLException {
         StringBuilder sql = new StringBuilder("select ");
@@ -478,16 +474,28 @@ public class TableService {
         }
     }
 
-    public Table addRemoteTable(Database db, String remoteCatalog, String remoteSchema, String remoteTableName, String baseContainer, boolean logical) throws SQLException {
-        String fullName = db.getRemoteTableKey(remoteCatalog, remoteSchema, remoteTableName);
+    public Table addRemoteTable(Database db, RemoteTableIdentifier remoteTableIdentifier, String schema) throws SQLException {
+        return addRemoteTable(db, remoteTableIdentifier, schema, false);
+    }
+
+    public Table addLogicalRemoteTable(Database db, RemoteTableIdentifier remoteTableIdentifier, String schema) throws SQLException {
+        return addRemoteTable(db, remoteTableIdentifier, schema, true);
+    }
+
+    private Table addRemoteTable(Database db, RemoteTableIdentifier remoteTableIdentifier, String baseContainer, boolean logical) throws SQLException {
+        String fullName = db.getRemoteTableKey(
+                remoteTableIdentifier.getCatalogName(),
+                remoteTableIdentifier.getSchemaName(),
+                remoteTableIdentifier.getTableName()
+        );
         RemoteTable remoteTable = (RemoteTable)db.getRemoteTablesMap().get(fullName);
         if (remoteTable == null) {
             LOGGER.debug("Creating remote table {}", fullName);
 
             if (logical)
-                remoteTable = new LogicalRemoteTable(db, remoteCatalog, remoteSchema, remoteTableName, baseContainer);
+                remoteTable = new LogicalRemoteTable(db, remoteTableIdentifier, baseContainer);
             else {
-                remoteTable = new RemoteTable(db, remoteCatalog, remoteSchema, remoteTableName, baseContainer);
+                remoteTable = new RemoteTable(db, remoteTableIdentifier, baseContainer);
                 this.initColumns(db, remoteTable);
             }
 
@@ -519,7 +527,7 @@ public class TableService {
                     if (fk.getRemoteCatalog() != null || fk.getRemoteSchema() != null) {
                         try {
                             // adds if doesn't exist
-                            parent = addRemoteTable(db, fk.getRemoteCatalog(), fk.getRemoteSchema(), fk.getTableName(), table.getContainer(), true);
+                            parent = addLogicalRemoteTable(db, RemoteTableIdentifier.from(fk), table.getContainer());
                         } catch (SQLException exc) {
                             parent = null;
                             LOGGER.debug("Failed to addRemoteTable '{}.{}.{}'", fk.getRemoteCatalog(), fk.getRemoteSchema(), fk.getTableName(), exc);
