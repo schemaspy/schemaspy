@@ -43,7 +43,7 @@ It can contain wast amount of properties so we will break it down.
 The Properties-file can contain instructions.
 
 extends
-    ``extends`` which does what i means, it allows one to override or add
+    ``extends`` which does what it means, it allows one to override or add
     properties to an existing databaseType (by specifying a parent/base)
 
     **As an example**::
