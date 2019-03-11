@@ -119,7 +119,7 @@ public class MustacheSummaryDiagramFactory {
         File realLargeDot = summaryDir.resolve(FILE_PREFIX + ".real.large.dot").toFile();
         try (PrintWriter out = Writers.newPrintWriter(realLargeDot)) {
             dotProducer.writeRealRelationships(database, tables, false, showDetailedTables, stats, out, outputDir);
-            MustacheTableDiagram realLargeDiagram = mustacheDiagramFactory.generateSummaryDiagram("Large", realLargeDot, FILE_PREFIX + ".real.compact");
+            MustacheTableDiagram realLargeDiagram = mustacheDiagramFactory.generateSummaryDiagram("Large", realLargeDot, FILE_PREFIX + ".real.large");
             diagrams.add(realLargeDiagram);
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + realLargeDot.toString(), ioexception));
