@@ -30,10 +30,13 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.db.CatalogResolver;
-import org.schemaspy.db.SchemaResolver;
+import org.schemaspy.input.dbms.CatalogResolver;
+import org.schemaspy.input.dbms.DbDriverLoader;
+import org.schemaspy.input.dbms.SchemaResolver;
+import org.schemaspy.input.dbms.service.DatabaseService;
+import org.schemaspy.input.dbms.service.SqlService;
+import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.model.*;
-import org.schemaspy.model.xml.SchemaMeta;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.diagram.DiagramFactory;
@@ -41,9 +44,8 @@ import org.schemaspy.output.diagram.graphviz.GraphvizDot;
 import org.schemaspy.output.diagram.vizjs.VizJSDot;
 import org.schemaspy.output.html.mustache.diagrams.*;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
-import org.schemaspy.service.DatabaseService;
-import org.schemaspy.service.SqlService;
 import org.schemaspy.util.ManifestUtils;
+import org.schemaspy.util.Markdown;
 import org.schemaspy.util.ResourceWriter;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.*;
@@ -312,6 +314,8 @@ public class SchemaAnalyzer {
         LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/graphing summary");
 
+        markDownRegistryPages(tables);
+
         prepareLayoutFiles(outputDir);
         DiagramFactory diagramFactory;
         if (useVizJS) {
@@ -424,6 +428,15 @@ public class SchemaAnalyzer {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
             }
         }
+    }
+
+    private static void markDownRegistryPages(Collection<Table> tables) {
+        tables.stream()
+                .filter(table -> !table.isLogical())
+                .forEach( table -> {
+                    String tablePath = "tables/" + table.getName() + ".html";
+                    Markdown.registryPage(table.getName(), tablePath);
+                });
     }
 
     /**
