@@ -24,6 +24,8 @@ package org.schemaspy.input.dbms.service;
 
 import org.schemaspy.Config;
 import org.schemaspy.model.Database;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Objects;
+
+import static org.schemaspy.input.dbms.service.ColumnLabel.*;
 
 /**
  * Created by rkasa on 2016-12-10.
@@ -46,15 +50,24 @@ import java.util.Objects;
  * @author Nils Petzaell
  */
 public class ViewService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final ColumnService columnService;
 
     private int deprecatedNagCounter = 0;
 
-    public ViewService(SqlService sqlService) {
+    public ViewService(SqlService sqlService, ColumnService columnService) {
         this.sqlService = Objects.requireNonNull(sqlService);
+        this.columnService = Objects.requireNonNull(columnService);
+    }
+
+    public void gatherViewsDetails(Database database, View view) throws SQLException {
+        columnService.gatherColumns(view);
+        if (Objects.isNull(view.getViewDefinition())) {
+            gatherViewDefinition(database, view);
+        }
+        database.getViewsMap().put(view.getName(), view);
     }
 
     /**
@@ -63,15 +76,15 @@ public class ViewService {
      * @return
      * @throws SQLException
      */
-    public String fetchViewDefinition(Database db, View view) throws SQLException {
+    private void gatherViewDefinition(Database db, View view) throws SQLException {
         String selectViewSql = Config.getInstance().getDbProperties().getProperty("selectViewSql");
         if (selectViewSql == null) {
-            return null;
+            return;
         }
 
         try (PreparedStatement stmt = sqlService.prepareStatement(selectViewSql, db, view.getName());
             ResultSet resultSet = stmt.executeQuery()) {
-            return getViewDefinitionFromResultSet(resultSet);
+            view.setViewDefinition(getViewDefinitionFromResultSet(resultSet));
         } catch (SQLException sqlException) {
             LOGGER.error(selectViewSql);
             throw sqlException;
@@ -112,5 +125,64 @@ public class ViewService {
             viewDefinition.append(resultSet.getString("text"));
         }
         return viewDefinition.toString();
+    }
+
+    /**
+     * Initializes view comments.
+     *
+     * @throws SQLException
+     */
+    public void gatherViewComments(Config config, Database db) {
+        String sql = config.getDbProperties().getProperty("selectViewCommentsSql");
+        if (sql != null) {
+
+            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
+                 ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+                    String viewName = rs.getString("view_name");
+                    if (viewName == null)
+                        viewName = rs.getString(TABLE_NAME);
+                    Table view = db.getViewsMap().get(viewName);
+
+                    if (view != null)
+                        view.setComments(rs.getString("comments"));
+                }
+            } catch (SQLException sqlException) {
+                // don't die just because this failed
+                LOGGER.warn("Failed to retrieve view comments using SQL '{}'", sql, sqlException);
+            }
+        }
+    }
+
+    /**
+     * Initializes view column comments.
+     *
+     * @throws SQLException
+     */
+    public void gatherViewColumnComments(Config config, Database db) {
+        String sql = config.getDbProperties().getProperty("selectViewColumnCommentsSql");
+        if (sql != null) {
+
+            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
+                 ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+                    String viewName = rs.getString("view_name");
+                    if (viewName == null)
+                        viewName = rs.getString(TABLE_NAME);
+                    Table view = db.getViewsMap().get(viewName);
+
+                    if (view != null) {
+                        TableColumn column = view.getColumn(rs.getString(COLUMN_NAME));
+                        if (column != null)
+                            column.setComments(rs.getString(COMMENTS));
+                    }
+                }
+            } catch (SQLException sqlException) {
+                // don't die just because this failed
+                LOGGER.warn("Failed to retrieve view column comments usign SQL '{}'", sql, sqlException);
+            }
+        }
     }
 }

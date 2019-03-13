@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.service.helper;
+package org.schemaspy.input.dbms.service.helper;
 
 import org.schemaspy.input.dbms.xml.ForeignKeyMeta;
 import org.schemaspy.input.dbms.xml.TableMeta;

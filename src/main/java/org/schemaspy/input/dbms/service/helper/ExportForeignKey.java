@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Foobar. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.service.helper;
+package org.schemaspy.input.dbms.service.helper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

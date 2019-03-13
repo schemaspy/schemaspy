@@ -24,25 +24,28 @@
 package org.schemaspy.input.dbms.service;
 
 import org.schemaspy.Config;
+import org.schemaspy.input.dbms.service.helper.ExportForeignKey;
+import org.schemaspy.input.dbms.service.helper.ImportForeignKey;
+import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 import org.schemaspy.input.dbms.xml.ForeignKeyMeta;
 import org.schemaspy.input.dbms.xml.TableColumnMeta;
 import org.schemaspy.input.dbms.xml.TableMeta;
 import org.schemaspy.model.*;
-import org.schemaspy.service.helper.ExportForeignKey;
-import org.schemaspy.service.helper.ImportForeignKey;
-import org.schemaspy.service.helper.RemoteTableIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.schemaspy.input.dbms.service.ColumnLabel.*;
 
 /**
  * Created by rkasa on 2016-12-05.
@@ -60,155 +63,18 @@ public class TableService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
+    private final ColumnService columnService;
+    private final IndexService indexService;
 
-    public TableService(SqlService sqlService) {
+    public TableService(SqlService sqlService, ColumnService columnService, IndexService indexService) {
         this.sqlService = Objects.requireNonNull(sqlService);
+        this.columnService = Objects.requireNonNull(columnService);
+        this.indexService = Objects.requireNonNull(indexService);
     }
 
-    public void gatheringTableDetails(Database db, Table table) throws SQLException {
-        initColumns(db, table);
-        initIndexes(db, table);
-        initPrimaryKeys(table);
-    }
-
-    /**
-     * @throws SQLException
-     */
-    private void initColumns(Database db, Table table) throws SQLException {
-
-
-        synchronized (Table.class) {
-            try (ResultSet rs = sqlService.getDatabaseMetaData().getColumns(table.getCatalog(), table.getSchema(), table.getName(), "%")) {
-                while (rs.next())
-                    addColumn(table, rs);
-            } catch (SQLException exc) {
-                if (!table.isLogical()) {
-                    throw new ColumnInitializationFailure(table, exc);
-                }
-            }
-        }
-
-        initColumnAutoUpdate(db, table, false);
-    }
-
-    /**
-     * @param forceQuotes
-     * @throws SQLException
-     */
-    private void initColumnAutoUpdate(Database db, Table table, boolean forceQuotes) {
-
-        if (table.isView() || table.isRemote())
-            return;
-
-        // we've got to get a result set with all the columns in it
-        // so we can ask if the columns are auto updated
-        // Ugh!!!  Should have been in DatabaseMetaData instead!!!
-        StringBuilder sql = new StringBuilder("select * from ");
-        sql.append(getSchemaOrCatalog(table, forceQuotes));
-
-        if (forceQuotes) {
-            sql.append(sqlService.quoteIdentifier(table.getName()));
-        } else
-            sql.append(sqlService.getQuotedIdentifier(table.getName()));
-
-        sql.append(" where 0 = 1");
-
-        try (PreparedStatement stmt = sqlService.getDatabaseMetaData().getConnection().prepareStatement(sql.toString());
-             ResultSet rs = stmt.executeQuery()) {
-
-            ResultSetMetaData rsMeta = rs.getMetaData();
-            for (int i = rsMeta.getColumnCount(); i > 0; --i) {
-                String columnName = rsMeta.getColumnName(i);
-                TableColumn column = getColumn(table, columnName);
-                if (Objects.isNull(column)) {
-                    throw new InconsistencyException("Column information from DatabaseMetaData differs from ResultSetMetaData, expected to find column named: '"+ columnName + "' in " + listColumns(table));
-                }
-                column.setIsAutoUpdated(rsMeta.isAutoIncrement(i));
-            }
-        } catch (SQLException exc) {
-            if (forceQuotes) {
-                if (!table.isLogical()) {
-                    // don't completely choke just because we couldn't do this....
-                    LOGGER.warn("Failed to determine auto increment status: {}", exc);
-                    LOGGER.warn("SQL: {}", sql);
-                }
-            } else {
-                initColumnAutoUpdate(db, table, true);
-            }
-        }
-    }
-
-    private String listColumns(Table table) {
-        return table.getColumns().stream().map(TableColumn::getName).collect(Collectors.joining("','", "['", "']"));
-    }
-
-    private static TableColumn getColumn(Table table, String columnName) {
-        TableColumn column = table.getColumn(columnName);
-        if (Objects.isNull(column)) {
-            if (columnName.startsWith(table.getName())) {
-                column = table.getColumn(columnName.substring(table.getName().length() + 1 ));
-            } else if(columnName.startsWith(table.getFullName())) {
-                column = table.getColumn(columnName.substring(table.getFullName().length() + 1 ));
-            }
-        }
-        return column;
-    }
-
-    /**
-     * @param rs - from {@link DatabaseMetaData#getColumns(String, String, String, String)}
-     * @throws SQLException
-     */
-    protected void addColumn(Table table, ResultSet rs) throws SQLException {
-        String columnName = rs.getString("COLUMN_NAME");
-
-        if (columnName == null)
-            return;
-
-        if (table.getColumn(columnName) == null) {
-            TableColumn column = initColumn(table, rs);
-            table.getColumnsMap().put(column.getName(), column);
-        }
-    }
-
-    private static TableColumn initColumn(Table table, ResultSet rs) throws SQLException {
-        TableColumn column = new TableColumn(table);
-        // names and types are typically reused *many* times in a database,
-        // so keep a single instance of each distinct one
-        // (thanks to Mike Barnes for the suggestion)
-        String tmp = rs.getString("COLUMN_NAME");
-        column.setName(tmp == null ? null : tmp.intern());
-        tmp = rs.getString("TYPE_NAME");
-        column.setTypeName(tmp == null ? "unknown" : tmp.intern());
-        column.setType(rs.getInt("DATA_TYPE"));
-
-        column.setDecimalDigits(rs.getInt("DECIMAL_DIGITS"));
-        Number bufLength = (Number)rs.getObject("BUFFER_LENGTH");
-        if (bufLength != null && bufLength.shortValue() > 0)
-            column.setLength(bufLength.shortValue());
-        else
-            column.setLength(rs.getInt("COLUMN_SIZE"));
-
-        StringBuilder buf = new StringBuilder();
-        buf.append(column.getLength());
-        if (column.getDecimalDigits() > 0) {
-            buf.append(',');
-            buf.append(column.getDecimalDigits());
-        }
-        column.setDetailedSize(buf.toString());
-
-        column.setNullable(rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable);
-        column.setDefaultValue(rs.getString("COLUMN_DEF"));
-        column.setComments(rs.getString("REMARKS"));
-        column.setId(rs.getInt("ORDINAL_POSITION") - 1);
-
-        Pattern excludeIndirectColumns = Config.getInstance().getIndirectColumnExclusions();
-        Pattern excludeColumns = Config.getInstance().getColumnExclusions();
-
-        column.setAllExcluded(column.matches(excludeColumns));
-        column.setExcluded(column.isAllExcluded() || column.matches(excludeIndirectColumns));
-        LOGGER.trace("Excluding column {}.{}: matches {}:{} {}:{}", column.getTable(), column.getName(), excludeColumns, column.isAllExcluded(), excludeIndirectColumns, column.matches(excludeIndirectColumns));
-
-        return column;
+    public void gatheringTableDetails(Database database, Table table) throws SQLException {
+        columnService.gatherColumns(table);
+        indexService.gatherIndexes(database, table);
     }
 
     /**
@@ -342,7 +208,7 @@ public class TableService {
             String parentContainer = Stream.of(foreignKey.getPkTableSchema(), foreignKey.getPkTableCat(), db.getName())
                     .filter(Objects::nonNull)
                     .findFirst()
-                    .get();
+                    .orElse(null);
             String childContainer = table instanceof RemoteTable ? ((RemoteTable) table).getBaseContainer() : table.getContainer();
 
             // if named table doesn't exist in this schema
@@ -494,7 +360,7 @@ public class TableService {
                 remoteTable = new LogicalRemoteTable(db, remoteTableIdentifier, baseContainer);
             else {
                 remoteTable = new RemoteTable(db, remoteTableIdentifier, baseContainer);
-                this.initColumns(db, remoteTable);
+                columnService.gatherColumns(remoteTable);
             }
 
             LOGGER.debug("Adding remote table {}", fullName);
@@ -572,137 +438,79 @@ public class TableService {
         }
     }
 
-    /**
-     * Initialize index information
-     *
-     * @throws SQLException
-     */
-    private void initIndexes(Database db, Table table) throws SQLException {
-        if (table.isView() || table.isRemote())
-            return;
+    public void gatherTableIds(Config config, Database db) throws SQLException {
+        String sql = config.getDbProperties().getProperty("selectTableIdsSql");
+        if (sql != null) {
 
-        // first try to initialize using the index query spec'd in the .properties
-        // do this first because some DB's (e.g. Oracle) do 'bad' things with getIndexInfo()
-        // (they try to do a DDL analyze command that has some bad side-effects)
-        if (initIndexes(db, table, Config.getInstance().getDbProperties().getProperty("selectIndexesSql")))
-            return;
+            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
+                 ResultSet rs = stmt.executeQuery()) {
 
-        // couldn't, so try the old fashioned approach
-
-
-        try (ResultSet rs = sqlService.getDatabaseMetaData().getIndexInfo(table.getCatalog(), table.getSchema(), table.getName(), false, true)){
-
-            while (rs.next()) {
-                if (isIndexRow(rs))
-                    addIndex(table, rs);
-            }
-        } catch (SQLException exc) {
-            if (!table.isLogical())
-                LOGGER.warn("Unable to extract index info for table '{}' in schema '{}': {}", table.getName(), table.getContainer(), exc);
-        }
-    }
-
-    //This is to handle a problem with informix and lvarchar Issue 215. It's been reported to IBM.
-    //According to DatabaseMetaData.getIndexInfo() ORDINAL_POSITION is zero when type is tableIndexStatistic.
-    //Problem with informix is that lvarchar is reported back as TYPE = tableIndexOther and ORDINAL_POSITION = 0.
-    private static boolean isIndexRow(ResultSet rs) throws SQLException {
-        return rs.getShort("TYPE") != DatabaseMetaData.tableIndexStatistic && rs.getShort("ORDINAL_POSITION") > 0;
-    }
-
-    /**
-     * Try to initialize index information based on the specified SQL
-     *
-     * @return boolean <code>true</code> if it worked, otherwise <code>false</code>
-     */
-    private boolean initIndexes(Database db, Table table, String selectIndexesSql) {
-        if (selectIndexesSql == null)
-            return false;
-
-
-        try (PreparedStatement stmt = sqlService.prepareStatement(selectIndexesSql, db, table.getName());
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                if (rs.getShort("TYPE") != DatabaseMetaData.tableIndexStatistic)
-                    addIndex(table, rs);
-            }
-        } catch (SQLException sqlException) {
-            LOGGER.warn("Failed to query index information with SQL: {}", selectIndexesSql, sqlException);
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param rs
-     * @throws SQLException
-     */
-    private static void addIndex(Table table, ResultSet rs) throws SQLException {
-        String indexName = rs.getString("INDEX_NAME");
-
-        if (indexName == null)
-            return;
-
-        TableIndex index = table.getIndex(indexName);
-
-        if (index == null) {
-            index = new TableIndex(indexName, !rs.getBoolean("NON_UNIQUE"));
-
-            table.getIndexesMap().put(index.getName(), index);
-        }
-
-        index.addColumn(table.getColumn(rs.getString("COLUMN_NAME")), rs.getString("ASC_OR_DESC"));
-    }
-
-    /**
-     *
-     * @throws SQLException
-     */
-    private void initPrimaryKeys(Table table) throws SQLException {
-
-        LOGGER.debug("Querying primary keys for {}", table.getFullName());
-        try (ResultSet rs = sqlService.getDatabaseMetaData().getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName())){
-            while (rs.next())
-                addPrimaryKeyColumn(table, rs);
-        } catch (SQLException exc) {
-            if (!table.isLogical()) {
-                throw exc;
+                while (rs.next()) {
+                    String tableName = rs.getString(TABLE_NAME);
+                    Table table = db.getLocals().get(tableName);
+                    if (table != null)
+                        table.setId(rs.getObject("table_id"));
+                }
+            } catch (SQLException sqlException) {
+                LOGGER.warn("Failed to fetch table ids using SQL '{}'", sql, sqlException);
             }
         }
     }
 
     /**
-     * @param rs
+     * Initializes table comments.
+     * If the SQL also returns view comments then they're plugged into the
+     * appropriate views.
+     *
      * @throws SQLException
      */
-    private static void addPrimaryKeyColumn(Table table, ResultSet rs) throws SQLException {
-        String pkName = rs.getString("PK_NAME");
-        if (pkName == null)
-            return;
+    public void gatherTableComments(Config config, Database db) {
+        String sql = config.getDbProperties().getProperty("selectTableCommentsSql");
+        if (sql != null) {
 
-        TableIndex index = table.getIndex(pkName);
-        if (index != null) {
-            index.setIsPrimaryKey(true);
-        }
+            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
+                 ResultSet rs = stmt.executeQuery()) {
 
-        String columnName = rs.getString("COLUMN_NAME");
-
-        TableColumn tableColumn = table.getColumn(columnName);
-        if (Objects.nonNull(tableColumn)) {
-            table.setPrimaryColumn(tableColumn);
-        } else {
-            LOGGER.error(
-                    "Found PrimaryKey index '{}' with column '{}.{}.{}.{}'" +
-                    ", but was unable to find column in table '{}'",
-                    pkName,
-                    rs.getString("TABLE_CAT"),
-                    rs.getString("TABLE_SCHEM"),
-                    rs.getString("TABLE_NAME"),
-                    columnName,
-                    table.getFullName()
-            );
+                while (rs.next()) {
+                    String tableName = rs.getString(TABLE_NAME);
+                    Table table = db.getLocals().get(tableName);
+                    if (table != null)
+                        table.setComments(rs.getString("comments"));
+                }
+            } catch (SQLException sqlException) {
+                // don't die just because this failed
+                LOGGER.warn("Failed to retrieve table comments using SQL '{}'", sql, sqlException);
+            }
         }
     }
 
+    /**
+     * Initializes table column comments.
+     * If the SQL also returns view column comments then they're plugged into the
+     * appropriate views.
+     *
+     * @throws SQLException
+     */
+    public void gatherTableColumnComments(Config config, Database db) {
+        String sql = config.getDbProperties().getProperty("selectColumnCommentsSql");
+        if (sql != null) {
+
+            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
+                 ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+                    String tableName = rs.getString(TABLE_NAME);
+                    Table table = db.getLocals().get(tableName);
+                    if (table != null) {
+                        TableColumn column = table.getColumn(rs.getString(COLUMN_NAME));
+                        if (column != null)
+                            column.setComments(rs.getString(COMMENTS));
+                    }
+                }
+            } catch (SQLException sqlException) {
+                // don't die just because this failed
+                LOGGER.warn("Failed to retrieve column comments using SQL '{}'", sql, sqlException);
+            }
+        }
+    }
 }

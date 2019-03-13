@@ -21,11 +21,11 @@ package org.schemaspy.input.dbms.service;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 import org.schemaspy.input.dbms.xml.ForeignKeyMeta;
 import org.schemaspy.input.dbms.xml.TableColumnMeta;
 import org.schemaspy.input.dbms.xml.TableMeta;
 import org.schemaspy.model.*;
-import org.schemaspy.service.helper.RemoteTableIdentifier;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
 
@@ -46,7 +46,11 @@ public class TableServiceConnectTest {
 
     private SqlService sqlService = mock(SqlService.class);
 
-    private TableService tableService = new TableService(sqlService);
+    private ColumnService columnService = new ColumnService(sqlService);
+
+    private IndexService indexService = new IndexService(sqlService);
+
+    private TableService tableService = new TableService(sqlService, columnService, indexService);
 
     private DbmsMeta dbmsMeta = mock(DbmsMeta.class);
 

@@ -114,7 +114,7 @@ public class MysqlSchemaLeakageIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
         this.database = database;
     }
 

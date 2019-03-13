@@ -61,14 +61,15 @@ public class DatabaseServiceTest {
     @Logger(DatabaseService.class)
     public void databaseServicePrintsInformationWhenConnectionTablesWillTakeMoreThan30MinutesAndExportedKeysIsEnabled() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Config config = new Config("-something","thisThing");
+        SqlService sqlService = mock(SqlService.class);
         TableService tableService = mock(TableService.class);
         doAnswer(invocation -> {
             currentTime = currentTime.plus(31, ChronoUnit.MINUTES);
             return null;
         }).when(tableService).connectForeignKeys(any(),any(),anyMap());
         ViewService viewService = mock(ViewService.class);
-        SqlService sqlService = mock(SqlService.class);
-        DatabaseService databaseService = new DatabaseService(clock, tableService, viewService, sqlService);
+        RoutineService routineService = mock(RoutineService.class);
+        DatabaseService databaseService = new DatabaseService(clock, sqlService, tableService, viewService, routineService);
         List<Table> tablesList = new ArrayList<>();
         tablesList.add(mock(Table.class));
         tablesList.add(mock(Table.class));
@@ -89,14 +90,15 @@ public class DatabaseServiceTest {
     @Logger(DatabaseService.class)
     public void databaseServiceDoesNotPrintInformationWhenConnectionTablesWillTakeMoreThan30MinutesAndExportedKeysIsDisabled() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Config config = new Config("-noexportedkeys");
+        SqlService sqlService = mock(SqlService.class);
         TableService tableService = mock(TableService.class);
         doAnswer(invocation -> {
             currentTime = currentTime.plus(31, ChronoUnit.MINUTES);
             return null;
         }).when(tableService).connectForeignKeys(any(),any(),anyMap());
         ViewService viewService = mock(ViewService.class);
-        SqlService sqlService = mock(SqlService.class);
-        DatabaseService databaseService = new DatabaseService(clock, tableService, viewService, sqlService);
+        RoutineService routineService = mock(RoutineService.class);
+        DatabaseService databaseService = new DatabaseService(clock, sqlService, tableService, viewService, routineService);
         List<Table> tablesList = new ArrayList<>();
         tablesList.add(mock(Table.class));
         tablesList.add(mock(Table.class));
@@ -117,14 +119,15 @@ public class DatabaseServiceTest {
     @Logger(DatabaseService.class)
     public void databaseServiceDoesNotPrintInformationWhenConnectionTablesWillTakeLessThan30Minutes() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Config config = new Config("-something","thisThing");
+        SqlService sqlService = mock(SqlService.class);
         TableService tableService = mock(TableService.class);
         doAnswer(invocation -> {
             currentTime = currentTime.plus(1, ChronoUnit.MINUTES);
             return null;
         }).when(tableService).connectForeignKeys(any(),any(),anyMap());
         ViewService viewService = mock(ViewService.class);
-        SqlService sqlService = mock(SqlService.class);
-        DatabaseService databaseService = new DatabaseService(clock, tableService, viewService, sqlService);
+        RoutineService routineService = mock(RoutineService.class);
+        DatabaseService databaseService = new DatabaseService(clock, sqlService, tableService, viewService, routineService);
         List<Table> tablesList = new ArrayList<>();
         tablesList.add(mock(Table.class));
         tablesList.add(mock(Table.class));

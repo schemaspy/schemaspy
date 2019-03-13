@@ -45,8 +45,7 @@ public class View extends Table {
                 String name, String remarks, String viewDefinition) {
         super(db, catalog, schema, name, remarks);
 
-        if (viewDefinition != null && viewDefinition.trim().length() > 0)
-            this.viewDefinition = viewDefinition;
+        setViewDefinition(viewDefinition);
     }
 
     /**
@@ -63,6 +62,7 @@ public class View extends Table {
     }
 
     public void setViewDefinition(String viewDefinition) {
-        this.viewDefinition = viewDefinition;
+        if (viewDefinition != null && viewDefinition.trim().length() > 0)
+            this.viewDefinition = viewDefinition;
     }
 }

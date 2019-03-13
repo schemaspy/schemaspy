@@ -34,16 +34,16 @@ import static org.mockito.Mockito.when;
 /**
  * @author Nils Petzaell
  */
-public class TableServiceIsIndexRowTest {
+public class IndexServiceIsIndexRowTest {
 
     private SqlService sqlService = mock(SqlService.class);
 
-    private TableService tableService = new TableService(sqlService);
+    private IndexService indexService = new IndexService(sqlService);
 
     private Supplier<Method> isIndexRowMethod = () -> {
         Method m = null;
         try {
-            m = TableService.class.getDeclaredMethod("isIndexRow", ResultSet.class);
+            m = IndexService.class.getDeclaredMethod("isIndexRow", ResultSet.class);
             m.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -54,7 +54,7 @@ public class TableServiceIsIndexRowTest {
     };
 
     private boolean isIndexRow(ResultSet rs) throws InvocationTargetException, IllegalAccessException {
-        return (Boolean)isIndexRowMethod.get().invoke(tableService, rs);
+        return (Boolean)isIndexRowMethod.get().invoke(indexService, rs);
     }
 
     private ResultSet newResultSet(short type, int ordinal) throws SQLException {

@@ -241,7 +241,7 @@ public class SchemaAnalyzer {
             // create our representation of the database
             //
             Database db = new Database(dbmsMeta, dbName, catalog, schema);
-            databaseService.gatheringSchemaDetails(config, db, schemaMeta, progressListener);
+            databaseService.gatherSchemaDetails(config, db, schemaMeta, progressListener);
 
 
             Collection<Table> tables = new ArrayList<>(db.getTables());
