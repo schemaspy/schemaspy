@@ -41,6 +41,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.Optional.ofNullable;
+
 /**
  * Created by rkasa on 2016-12-10.
  *
@@ -185,6 +187,26 @@ public class SqlService {
 
     public PreparedStatement prepareStatement(String sqlQuery) throws SQLException {
         return connection.prepareStatement(sqlQuery);
+    }
+
+    public String getQualifiedTableName(String catalog, String schema, String tableName, boolean forceQuotes) {
+        String schemaOrCatalog = getSchemaOrCatalog(ofNullable(schema).orElse(catalog), forceQuotes);
+        if (forceQuotes) {
+            return schemaOrCatalog + quoteIdentifier(tableName);
+        } else {
+            return schemaOrCatalog + getQuotedIdentifier(tableName);
+        }
+    }
+
+    private String getSchemaOrCatalog(String schemaOrCatalog, boolean forceQuotes) {
+        if (Objects.isNull(schemaOrCatalog)) {
+            return "";
+        }
+        if (forceQuotes) {
+            return quoteIdentifier(schemaOrCatalog) + ".";
+        } else {
+            return getQuotedIdentifier(schemaOrCatalog) + ".";
+        }
     }
 
     /**

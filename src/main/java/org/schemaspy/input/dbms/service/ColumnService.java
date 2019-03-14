@@ -129,12 +129,12 @@ public class ColumnService {
         // so we can ask if the columns are auto updated
         // Ugh!!!  Should have been in DatabaseMetaData instead!!!
         StringBuilder sql = new StringBuilder("select * from ");
-        sql.append(getSchemaOrCatalog(table, forceQuotes));
-
-        if (forceQuotes) {
-            sql.append(sqlService.quoteIdentifier(table.getName()));
-        } else
-            sql.append(sqlService.getQuotedIdentifier(table.getName()));
+        sql.append(sqlService.getQualifiedTableName(
+                table.getCatalog(),
+                table.getSchema(),
+                table.getName(),
+                forceQuotes)
+        );
 
         sql.append(" where 0 = 1");
 
@@ -160,23 +160,6 @@ public class ColumnService {
             } else {
                 initColumnAutoUpdate(table, true);
             }
-        }
-    }
-
-    private String getSchemaOrCatalog(Table table, boolean forceQuotes) {
-        String schemaOrCatalog = null;
-        if (table.getSchema() != null) {
-            schemaOrCatalog = table.getSchema();
-        } else if (table.getCatalog() != null) {
-            schemaOrCatalog = table.getCatalog();
-        }
-        if (schemaOrCatalog == null) {
-            return "";
-        }
-        if (forceQuotes) {
-            return sqlService.quoteIdentifier(schemaOrCatalog) + ".";
-        } else {
-            return sqlService.getQuotedIdentifier(schemaOrCatalog) + ".";
         }
     }
 

@@ -41,10 +41,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static java.util.Optional.ofNullable;
 import static org.schemaspy.input.dbms.service.ColumnLabel.*;
 
 /**
@@ -169,25 +169,11 @@ public class TableService {
 
     protected void addForeignKey(Database db, Table table, ImportForeignKey foreignKey,
                                  Map<String, Table> tables) throws SQLException {
-        if (Objects.isNull(foreignKey.getFkName())) {
+        if (Objects.isNull(foreignKey.getFkName()) || shouldExclude(db.getName(), foreignKey)) {
             return;
         }
 
-        Pattern include = Config.getInstance().getTableInclusions();
-        Pattern exclude = Config.getInstance().getTableExclusions();
-
-        if (!include.matcher(foreignKey.getPkTableName()).matches() || exclude.matcher(foreignKey.getPkTableName()).matches()) {
-            LOGGER.debug("Ignoring {} referenced by FK {}", Table.getFullName(
-                    db.getName(),
-                    foreignKey.getPkTableCat(),
-                    foreignKey.getPkTableSchema(),
-                    foreignKey.getPkTableName()
-            ), foreignKey.getFkName());
-            return;
-        }
-
-        ForeignKeyConstraint foreignKeyConstraint = Optional
-                .ofNullable(table.getForeignKeysMap().get(foreignKey.getFkName()))
+        ForeignKeyConstraint foreignKeyConstraint = ofNullable(table.getForeignKeysMap().get(foreignKey.getFkName()))
                 .orElseGet(() -> {
                     ForeignKeyConstraint fkc = new ForeignKeyConstraint(
                             table,
@@ -223,68 +209,36 @@ public class TableService {
                 parentTable = addRemoteTable(db, RemoteTableIdentifier.from(foreignKey), table.getContainer());
             }
 
-            if (parentTable != null) {
-                TableColumn parentColumn = parentTable.getColumn(foreignKey.getPkColumnName());
-                if (parentColumn != null) {
-                    foreignKeyConstraint.addParentColumn(parentColumn);
+            TableColumn parentColumn = parentTable.getColumn(foreignKey.getPkColumnName());
+            if (parentColumn != null) {
+                foreignKeyConstraint.addParentColumn(parentColumn);
 
-                    childColumn.addParent(parentColumn, foreignKeyConstraint);
-                    parentColumn.addChild(childColumn, foreignKeyConstraint);
-                } else {
-                    LOGGER.warn("Couldn't add FK '{}' to table '{}' - Column '{}' doesn't exist in table '{}'", foreignKeyConstraint.getName(), table.getName(), foreignKey.getPkColumnName(), parentTable);
-                }
+                childColumn.addParent(parentColumn, foreignKeyConstraint);
+                parentColumn.addChild(childColumn, foreignKeyConstraint);
             } else {
-                LOGGER.warn("Couldn't add FK '{}' to table '{}' - Unknown Referenced Table '{}'", foreignKeyConstraint.getName(), table.getName(), foreignKey.getPkTableName());
+                LOGGER.warn("Couldn't add FK '{}' to table '{}' - Column '{}' doesn't exist in table '{}'", foreignKeyConstraint.getName(), table.getName(), foreignKey.getPkColumnName(), parentTable);
             }
         } else {
             LOGGER.warn("Couldn't add FK '{}' to table '{}' - Column '{}' doesn't exist", foreignKeyConstraint.getName(), table.getName(), foreignKey.getFkColumnName());
         }
     }
 
+    private boolean shouldExclude(String databaseName, ImportForeignKey foreignKey) {
+        Pattern include = Config.getInstance().getTableInclusions();
+        Pattern exclude = Config.getInstance().getTableExclusions();
 
-    protected long fetchNumRows(Database db, Table table, String clause, boolean forceQuotes) throws SQLException {
-        StringBuilder sql = new StringBuilder("select ");
-        sql.append(clause);
-        sql.append(" from ");
-        sql.append(getSchemaOrCatalog(table, forceQuotes));
-
-        if (forceQuotes) {
-            sql.append(sqlService.quoteIdentifier(table.getName()));
-        } else
-            sql.append(sqlService.getQuotedIdentifier(table.getName()));
-
-        LOGGER.trace("Fetch number of rows using sql: '{}'",sql);
-        try (PreparedStatement stmt = sqlService.prepareStatement(sql.toString());
-             ResultSet rs = stmt.executeQuery()) {
-
-            if (rs.next()) {
-                return rs.getLong(1);
-            }
-            return -1;
-        } catch (SQLException exc) {
-            if (forceQuotes) // we tried with and w/o quotes...fail this attempt
-                throw exc;
-
-            return fetchNumRows(db, table, clause, true);
+        if (!include.matcher(foreignKey.getPkTableName()).matches() || exclude.matcher(foreignKey.getPkTableName()).matches()) {
+            LOGGER.debug("Ignoring {} referenced by FK {}", Table.getFullName(
+                    databaseName,
+                    foreignKey.getPkTableCat(),
+                    foreignKey.getPkTableSchema(),
+                    foreignKey.getPkTableName()
+            ), foreignKey.getFkName());
+            return true;
         }
+        return false;
     }
 
-    private String getSchemaOrCatalog(Table table, boolean forceQuotes) {
-        String schemaOrCatalog = null;
-        if (table.getSchema() != null) {
-            schemaOrCatalog = table.getSchema();
-        } else if (table.getCatalog() != null) {
-            schemaOrCatalog = table.getCatalog();
-        }
-        if (schemaOrCatalog == null) {
-            return "";
-        }
-        if (forceQuotes) {
-            return sqlService.quoteIdentifier(schemaOrCatalog) + ".";
-        } else {
-            return sqlService.getQuotedIdentifier(schemaOrCatalog) + ".";
-        }
-    }
 
     /**
      * Fetch the number of rows contained in this table.
@@ -303,13 +257,8 @@ public class TableService {
 
         String sql = Config.getInstance().getDbProperties().getProperty("selectRowCountSql");
         if (sql != null) {
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, table.getName());
-                 ResultSet rs = stmt.executeQuery()) {
-
-                if (rs.next()) {
-                    return rs.getLong("row_count");
-                }
+            try {
+                return fetchNumRows(db, table, sql);
             } catch (SQLException sqlException) {
                 // don't die just because this failed
                 originalFailure = sqlException;
@@ -335,6 +284,44 @@ public class TableService {
                 }
                 return -1;
             }
+        }
+    }
+
+    private long fetchNumRows(Database database, Table table, String sql) throws SQLException {
+        try (PreparedStatement stmt = sqlService.prepareStatement(sql, database, table.getName());
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getLong("row_count");
+            } else {
+                throw new SQLException("Empty ResultSet");
+            }
+        }
+    }
+
+    protected long fetchNumRows(Database db, Table table, String clause, boolean forceQuotes) throws SQLException {
+        StringBuilder sql = new StringBuilder("select ");
+        sql.append(clause);
+        sql.append(" from ");
+        sql.append(sqlService.getQualifiedTableName(
+                table.getCatalog(),
+                table.getSchema(),
+                table.getName(),
+                forceQuotes)
+        );
+
+        LOGGER.trace("Fetch number of rows using sql: '{}'",sql);
+        try (PreparedStatement stmt = sqlService.prepareStatement(sql.toString());
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+            return -1;
+        } catch (SQLException exc) {
+            if (forceQuotes) // we tried with and w/o quotes...fail this attempt
+                throw exc;
+
+            return fetchNumRows(db, table, clause, true);
         }
     }
 

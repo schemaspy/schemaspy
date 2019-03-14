@@ -434,7 +434,7 @@ public class SchemaAnalyzer {
         tables.stream()
                 .filter(table -> !table.isLogical())
                 .forEach( table -> {
-                    String tablePath = "tables/" + table.getName() + ".html";
+                    String tablePath = "tables/" + table.getName() + DOT_HTML;
                     Markdown.registryPage(table.getName(), tablePath);
                 });
     }
