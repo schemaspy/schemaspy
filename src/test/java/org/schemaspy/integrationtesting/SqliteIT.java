@@ -19,7 +19,6 @@
 package org.schemaspy.integrationtesting;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -87,7 +86,7 @@ public class SqliteIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
         this.database = database;
     }
 
@@ -97,7 +96,6 @@ public class SqliteIT {
     }
 
     @Test
-    @Ignore
     public void databaseTablePlaylistsContainsPrimaryKey() {
         assertThat(database.getTablesMap().get("playlists").getPrimaryColumns().size()).isGreaterThanOrEqualTo(1);
     }

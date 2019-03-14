@@ -22,8 +22,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.Config;
+import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 import org.schemaspy.model.*;
-import org.schemaspy.service.helper.RemoteTableIdentifier;
 import org.schemaspy.testing.ConfigRule;
 import org.schemaspy.testing.LoggingRule;
 
@@ -45,6 +45,10 @@ public class TableServiceConnectForeignKeysTest {
 
     private SqlService sqlService;
 
+    private ColumnService columnService;
+
+    private IndexService indexService;
+
     private TableService tableService;
 
     private DbmsMeta dbmsMeta = mock(DbmsMeta.class);
@@ -59,7 +63,9 @@ public class TableServiceConnectForeignKeysTest {
     @Before
     public void setup() {
         sqlService = mock(SqlService.class);
-        tableService = new TableService(sqlService);
+        columnService = new ColumnService(sqlService);
+        indexService = new IndexService(sqlService);
+        tableService = new TableService(sqlService, columnService, indexService);
         database = new Database(dbmsMeta, "tableServiceTest","connectFK", "tst");
         table = new Table(database, database.getCatalog().getName(), database.getSchema().getName(), "mainTable", "mainTable");
         database.getTablesMap().put(table.getName(), table);

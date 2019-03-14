@@ -20,7 +20,7 @@
  */
 package org.schemaspy.model;
 
-import org.schemaspy.service.helper.RemoteTableIdentifier;
+import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 
 /**
  * A remote table (exists in another schema (logically or physically))

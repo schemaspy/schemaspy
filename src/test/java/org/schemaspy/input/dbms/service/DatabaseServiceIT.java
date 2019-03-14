@@ -94,7 +94,7 @@ public class DatabaseServiceIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
         assertThat(database.getTables()).hasSize(1);
     }

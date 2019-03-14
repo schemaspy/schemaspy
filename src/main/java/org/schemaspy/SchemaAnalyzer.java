@@ -241,7 +241,7 @@ public class SchemaAnalyzer {
             // create our representation of the database
             //
             Database db = new Database(dbmsMeta, dbName, catalog, schema);
-            databaseService.gatheringSchemaDetails(config, db, schemaMeta, progressListener);
+            databaseService.gatherSchemaDetails(config, db, schemaMeta, progressListener);
 
 
             Collection<Table> tables = new ArrayList<>(db.getTables());
@@ -434,7 +434,7 @@ public class SchemaAnalyzer {
         tables.stream()
                 .filter(table -> !table.isLogical())
                 .forEach( table -> {
-                    String tablePath = "tables/" + table.getName() + ".html";
+                    String tablePath = "tables/" + table.getName() + DOT_HTML;
                     Markdown.registryPage(table.getName(), tablePath);
                 });
     }

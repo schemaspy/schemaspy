@@ -21,7 +21,7 @@
  */
 package org.schemaspy.model;
 
-import org.schemaspy.service.helper.RemoteTableIdentifier;
+import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 
 /**
  * A table that's outside of the default schema but is referenced

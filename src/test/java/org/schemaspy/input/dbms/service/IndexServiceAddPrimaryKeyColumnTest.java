@@ -37,19 +37,19 @@ import static org.mockito.Mockito.*;
 /**
  * @author Nils Petzaell
  */
-public class TableServiceAddPrimaryKeyColumnTest {
+public class IndexServiceAddPrimaryKeyColumnTest {
 
     @Rule
     public LoggingRule loggingRule = new LoggingRule();
 
     private SqlService sqlService = mock(SqlService.class);
 
-    private TableService tableService = new TableService(sqlService);
+    private IndexService indexService = new IndexService(sqlService);
 
     private Supplier<Method> addPrimaryKeyColumnMethod = () -> {
         Method m = null;
         try {
-            m = TableService.class.getDeclaredMethod("addPrimaryKeyColumn", Table.class, ResultSet.class);
+            m = IndexService.class.getDeclaredMethod("addPrimaryKeyColumn", Table.class, ResultSet.class);
             m.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -60,7 +60,7 @@ public class TableServiceAddPrimaryKeyColumnTest {
     };
 
     private void addPrimaryKeyColumn(Table table, ResultSet rs) throws InvocationTargetException, IllegalAccessException {
-        addPrimaryKeyColumnMethod.get().invoke(tableService, table, rs);
+        addPrimaryKeyColumnMethod.get().invoke(indexService, table, rs);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class TableServiceAddPrimaryKeyColumnTest {
     }
 
     @Test
-    @Logger(TableService.class)
+    @Logger(IndexService.class)
     public void addNonExistingTableColumn() throws SQLException, InvocationTargetException, IllegalAccessException {
         Table table = mock(Table.class);
         when(table.getFullName()).thenReturn("cat.schema.table");

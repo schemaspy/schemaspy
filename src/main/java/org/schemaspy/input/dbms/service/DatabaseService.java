@@ -25,10 +25,10 @@ package org.schemaspy.input.dbms.service;
 
 import org.schemaspy.Config;
 import org.schemaspy.input.dbms.service.helper.BasicTableMeta;
+import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.input.dbms.xml.TableMeta;
 import org.schemaspy.model.*;
-import org.schemaspy.service.helper.RemoteTableIdentifier;
 import org.schemaspy.validator.NameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static org.schemaspy.input.dbms.service.ColumnLabel.*;
+import static org.schemaspy.input.dbms.service.ColumnLabel.COLUMN_NAME;
+import static org.schemaspy.input.dbms.service.ColumnLabel.TABLE_NAME;
 /**
  * Created by rkasa on 2016-12-10.
  * @author John Currier
@@ -60,22 +61,24 @@ public class DatabaseService {
 
     private final Clock clock;
 
-    private final TableService tableService;
-
-    private final ViewService viewService;
-
     private final SqlService sqlService;
+
+    private final TableService tableService;
+    private final ViewService viewService;
+    private final RoutineService routineService;
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public DatabaseService(Clock clock, TableService tableService, ViewService viewService, SqlService sqlService) {
+    public DatabaseService(Clock clock, SqlService sqlService, TableService tableService, ViewService viewService, RoutineService routineService) {
         this.clock = Objects.requireNonNull(clock);
+        this.sqlService = Objects.requireNonNull(sqlService);
         this.tableService = Objects.requireNonNull(tableService);
         this.viewService = Objects.requireNonNull(viewService);
-        this.sqlService = Objects.requireNonNull(sqlService);
+        this.routineService = Objects.requireNonNull(routineService);
     }
 
-    public void gatheringSchemaDetails(Config config, Database db, SchemaMeta schemaMeta, ProgressListener listener) throws SQLException {
+    public void gatherSchemaDetails(Config config, Database db, SchemaMeta schemaMeta, ProgressListener listener) throws SQLException {
         LOGGER.info("Gathering schema details");
 
         listener.startedGatheringDetails();
@@ -90,15 +93,14 @@ public class DatabaseService {
         initSchemas(db);
 
         initCheckConstraints(config, db);
-        initTableIds(config, db);
+        tableService.gatherTableIds(config, db);
         initIndexIds(config, db);
-        initTableComments(config, db);
-        initTableColumnComments(config, db);
-        initViewComments(config, db);
-        initViewColumnComments(config, db);
+        tableService.gatherTableComments(config, db);
+        tableService.gatherTableColumnComments(config, db);
+        viewService.gatherViewComments(config, db);
+        viewService.gatherViewColumnComments(config, db);
         initColumnTypes(config, db);
-        initRoutines(config, db);
-        initRoutineParameters(config, db);
+        routineService.gatherRoutines(config, db);
 
         listener.startedConnectingTables();
 
@@ -118,7 +120,6 @@ public class DatabaseService {
                     }
                 } catch (SQLException sqlException) {
                     LOGGER.error("Failed to retrieve comment for catalog '{}' using SQL '{}'", db.getCatalog().getName(), sql, sqlException);
-                    throw sqlException;
                 }
             }
     }
@@ -135,7 +136,6 @@ public class DatabaseService {
                   }
               } catch (SQLException sqlException) {
                   LOGGER.error("Failed to retrieve comment for schema '{}' using SQL '{}'", db.getSchema().getName(), sql, sqlException);
-                  throw sqlException;
               }
           }
     }
@@ -205,16 +205,8 @@ public class DatabaseService {
             if (validator.isValid(entry.getName(), entry.getType())) {
                 View view = new View(db, entry.getCatalog(), entry.getSchema(), entry.getName(),
                         entry.getRemarks(), entry.getViewDefinition());
-
-                tableService.gatheringTableDetails(db, view);
-
-                if (entry.getViewDefinition() == null) {
-                    view.setViewDefinition(viewService.fetchViewDefinition(db, view));
-                }
-
-                db.getViewsMap().put(view.getName(), view);
+                viewService.gatherViewsDetails(db, view);
                 listener.gatheringDetailsProgressed(view);
-
                 LOGGER.debug("Found details of view {}", view.getName());
             }
         }
@@ -390,7 +382,7 @@ public class DatabaseService {
                     } finally {
                         synchronized (threads) {
                             threads.remove(this);
-                            threads.notify();
+                            threads.notifyAll();
                         }
                     }
                 }
@@ -402,6 +394,7 @@ public class DatabaseService {
                     try {
                         threads.wait();
                     } catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
                     }
                 }
 
@@ -430,6 +423,7 @@ public class DatabaseService {
                 try {
                     thread.join();
                 } catch (InterruptedException exc) {
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -565,26 +559,6 @@ public class DatabaseService {
         }
     }
 
-    private void initTableIds(Config config, Database db) throws SQLException {
-        String sql = config.getDbProperties().getProperty("selectTableIdsSql");
-        if (sql != null) {
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    String tableName = rs.getString(TABLE_NAME);
-                    Table table = db.getLocals().get(tableName);
-                    if (table != null)
-                        table.setId(rs.getObject("table_id"));
-                }
-            } catch (SQLException sqlException) {
-                LOGGER.warn("Failed to fetch table ids using SQL '{}'", sql, sqlException);
-                throw sqlException;
-            }
-        }
-    }
-
     private void initIndexIds(Config config, Database db) throws SQLException {
         String sql = config.getDbProperties().getProperty("selectIndexIdsSql");
         if (sql != null) {
@@ -603,190 +577,7 @@ public class DatabaseService {
                 }
             } catch (SQLException sqlException) {
                 LOGGER.warn("Failed to fetch index ids using SQL '{}'", sql, sqlException);
-                throw sqlException;
             }
         }
     }
-
-    /**
-     * Initializes table comments.
-     * If the SQL also returns view comments then they're plugged into the
-     * appropriate views.
-     *
-     * @throws SQLException
-     */
-    private void initTableComments(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectTableCommentsSql");
-        if (sql != null) {
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    String tableName = rs.getString(TABLE_NAME);
-                    Table table = db.getLocals().get(tableName);
-                    if (table != null)
-                        table.setComments(rs.getString("comments"));
-                }
-            } catch (SQLException sqlException) {
-                // don't die just because this failed
-                LOGGER.warn("Failed to retrieve table comments using SQL '{}'", sql, sqlException);
-            }
-        }
-    }
-
-    /**
-     * Initializes view comments.
-     *
-     * @throws SQLException
-     */
-    private void initViewComments(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectViewCommentsSql");
-        if (sql != null) {
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    String viewName = rs.getString("view_name");
-                    if (viewName == null)
-                        viewName = rs.getString(TABLE_NAME);
-                    Table view = db.getViewsMap().get(viewName);
-
-                    if (view != null)
-                        view.setComments(rs.getString("comments"));
-                }
-            } catch (SQLException sqlException) {
-                // don't die just because this failed
-                LOGGER.warn("Failed to retrieve view comments using SQL '{}'", sql, sqlException);
-            }
-        }
-    }
-
-    /**
-     * Initializes table column comments.
-     * If the SQL also returns view column comments then they're plugged into the
-     * appropriate views.
-     *
-     * @throws SQLException
-     */
-    private void initTableColumnComments(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectColumnCommentsSql");
-        if (sql != null) {
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    String tableName = rs.getString(TABLE_NAME);
-                    Table table = db.getLocals().get(tableName);
-                    if (table != null) {
-                        TableColumn column = table.getColumn(rs.getString(COLUMN_NAME));
-                        if (column != null)
-                            column.setComments(rs.getString(COMMENTS));
-                    }
-                }
-            } catch (SQLException sqlException) {
-                // don't die just because this failed
-                LOGGER.warn("Failed to retrieve column comments using SQL '{}'", sql, sqlException);
-            }
-        }
-    }
-
-    /**
-     * Initializes view column comments.
-     *
-     * @throws SQLException
-     */
-    private void initViewColumnComments(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectViewColumnCommentsSql");
-        if (sql != null) {
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    String viewName = rs.getString("view_name");
-                    if (viewName == null)
-                        viewName = rs.getString(TABLE_NAME);
-                    Table view = db.getViewsMap().get(viewName);
-
-                    if (view != null) {
-                        TableColumn column = view.getColumn(rs.getString(COLUMN_NAME));
-                        if (column != null)
-                            column.setComments(rs.getString(COMMENTS));
-                    }
-                }
-            } catch (SQLException sqlException) {
-                // don't die just because this failed
-                LOGGER.warn("Failed to retrieve view column comments usign SQL '{}'", sql, sqlException);
-            }
-        }
-    }
-
-    /**
-     * Initializes stored procedures / functions.
-     *
-     * @throws SQLException
-     */
-    private void initRoutines(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectRoutinesSql");
-
-        if (sql != null) {
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    String routineName = rs.getString("routine_name");
-                    String routineType = rs.getString("routine_type");
-                    String returnType = rs.getString("dtd_identifier");
-                    String definitionLanguage = rs.getString("routine_body");
-                    String definition = rs.getString("routine_definition");
-                    String dataAccess = rs.getString("sql_data_access");
-                    String securityType = rs.getString("security_type");
-                    boolean deterministic = rs.getBoolean("is_deterministic");
-                    String comment = getOptionalString(rs, "routine_comment");
-
-                    Routine routine = new Routine(routineName, routineType,
-                            returnType, definitionLanguage, definition,
-                            deterministic, dataAccess, securityType, comment);
-                    db.getRoutinesMap().put(routineName, routine);
-                }
-            } catch (SQLException sqlException) {
-                // don't die just because this failed
-                LOGGER.warn("Failed to retrieve stored procedure/function details using sql '{}'", sql, sqlException);
-            }
-        }
-    }
-
-    private void initRoutineParameters(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectRoutineParametersSql");
-
-        if (sql != null) {
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    String routineName = rs.getString("specific_name");
-
-                    Routine routine = db.getRoutinesMap().get(routineName);
-                    if (routine != null) {
-                        String paramName = rs.getString("parameter_name");
-                        String type = rs.getString("dtd_identifier");
-                        String mode = rs.getString("parameter_mode");
-
-                        RoutineParameter param = new RoutineParameter(paramName, type, mode);
-                        routine.addParameter(param);
-                    }
-
-                }
-            } catch (SQLException sqlException) {
-                // don't die just because this failed
-                LOGGER.warn("Failed to retrieve stored procedure/function details using SQL '{}'", sql, sqlException);
-            }
-        }
-    }
-
 }

@@ -22,8 +22,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.Config;
+import org.schemaspy.input.dbms.service.helper.ImportForeignKey;
 import org.schemaspy.model.*;
-import org.schemaspy.service.helper.ImportForeignKey;
 import org.schemaspy.testing.ConfigRule;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
@@ -48,7 +48,11 @@ public class TableServiceAddForeignKeyTest {
 
     private SqlService sqlService = mock(SqlService.class);
 
-    private TableService tableService = new TableService(sqlService);
+    private ColumnService columnService = new ColumnService(sqlService);
+
+    private IndexService indexService = new IndexService(sqlService);
+
+    private TableService tableService = new TableService(sqlService, columnService, indexService);
 
     private DbmsMeta dbmsMeta = mock(DbmsMeta.class);
 
