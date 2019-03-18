@@ -33,6 +33,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
+import static java.util.Optional.ofNullable;
+
 public class IndexService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -154,18 +156,11 @@ public class IndexService {
      */
     private static void addPrimaryKeyColumn(Table table, ResultSet rs) throws SQLException {
         String pkName = rs.getString("PK_NAME");
-        if (Objects.nonNull(pkName)) {
-            TableIndex index = table.getIndex(pkName);
-            if (index != null) {
-                index.setIsPrimaryKey(true);
-            }
-        }
-
         String columnName = rs.getString("COLUMN_NAME");
-
         TableColumn tableColumn = table.getColumn(columnName);
         if (Objects.nonNull(tableColumn)) {
             table.setPrimaryColumn(tableColumn);
+            updateIndex(pkName, table, tableColumn);
         } else {
             LOGGER.error(
                     "Found PrimaryKey index '{}' with column '{}.{}.{}.{}'" +
@@ -177,6 +172,29 @@ public class IndexService {
                     columnName,
                     table.getFullName()
             );
+        }
+    }
+
+    private static void updateIndex(String pkName, Table table, TableColumn tableColumn) {
+        if (Objects.nonNull(pkName)) {
+            TableIndex tableIndex = table.getIndex(pkName);
+            if(Objects.nonNull(tableIndex)) {
+                tableIndex.setIsPrimaryKey(true);
+            } else {
+                LOGGER.warn("Found PK for table '{}' with index name '{}', but index hasn't been found", table.getName(), pkName);
+            }
+        } else {
+            String syntheticName = table.getName() + "_s_pk";
+            TableIndex tableIndex = ofNullable(table.getIndex(syntheticName)).orElseGet(
+                    () -> {
+                        LOGGER.info("Found PK without index name created index '{}' for table '{}'", syntheticName, table.getName());
+                        TableIndex syntheticTableIndex = new TableIndex(syntheticName, true);
+                        table.getIndexesMap().put(syntheticTableIndex.getName(), syntheticTableIndex);
+                        return syntheticTableIndex;
+                    });
+            tableIndex.addColumn(tableColumn, null);
+            tableIndex.setIsPrimaryKey(true);
+            LOGGER.info("Found PK without index name, added column '{}' to index '{}' in table '{}'", tableColumn.getName(), syntheticName, table.getName());
         }
     }
 }
