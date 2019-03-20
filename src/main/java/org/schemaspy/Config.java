@@ -27,7 +27,7 @@ package org.schemaspy;
 
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.db.config.PropertiesResolver;
+import org.schemaspy.input.dbms.config.PropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.util.DbSpecificConfig;

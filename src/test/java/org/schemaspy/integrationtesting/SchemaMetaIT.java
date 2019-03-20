@@ -28,12 +28,12 @@ import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.input.dbms.service.DatabaseService;
+import org.schemaspy.input.dbms.service.SqlService;
+import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.xml.SchemaMeta;
-import org.schemaspy.service.DatabaseService;
-import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.H2MemoryRule;
 import org.schemaspy.view.DotFormatter;
 import org.schemaspy.view.WriteStats;
@@ -117,7 +117,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/nullTableComment.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
@@ -126,7 +126,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
+        databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTables().size()).isGreaterThan(0);
         assertThat(database.getSchema().getComment()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
@@ -148,7 +148,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/noTableComment.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
@@ -157,7 +157,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
+        databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTables().size()).isGreaterThan(0);
         assertThat(database.getTablesMap().get("ACCOUNT").getColumn("accountId").getComments()).isNull();
@@ -175,7 +175,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, schemaMeta, progressListener);
+        databaseService.gatherSchemaDetails(config, database, schemaMeta, progressListener);
 
         assertThat(database.getTables().size()).isGreaterThan(0);
         assertThat(database.getSchema().getComment()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
@@ -191,7 +191,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
@@ -200,7 +200,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
+        databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getRemoteTables().size()).isLessThan(databaseWithSchemaMeta.getRemoteTables().size());
         assertThat(database.getRemoteTablesMap().get("other.other.CONTRACT")).isNull();
@@ -215,7 +215,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
@@ -224,7 +224,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
+        databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTablesMap().get("ACCOUNT").getNumChildren())
                 .isLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getNumChildren());
@@ -238,7 +238,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addColumn.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
@@ -247,7 +247,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
+        databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTablesMap().get("ACCOUNT").getColumns().size())
                 .isLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumns().size());
@@ -261,7 +261,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableImpliedOnAgent.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
@@ -270,7 +270,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
+        databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
         DbAnalyzer.getImpliedConstraints(database.getTables());
         DbAnalyzer.getImpliedConstraints(databaseWithSchemaMeta.getTables());
@@ -287,7 +287,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addFKInsteadOfImplied.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
@@ -296,7 +296,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
+        databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTablesMap().get("ACCOUNT").getNumChildren())
                 .isLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getNumChildren());
@@ -310,7 +310,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableDiagramAssociations.xml","SchemaMetaIT", schema);
         Database databaseWithSchemaMeta = new Database(
@@ -319,7 +319,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        databaseService.gatheringSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
+        databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
         StringWriter withoutSchemaMetaOutput = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(withoutSchemaMetaOutput)) {

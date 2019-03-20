@@ -29,9 +29,9 @@ import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.input.dbms.service.DatabaseService;
+import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.*;
-import org.schemaspy.service.DatabaseService;
-import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -108,7 +108,7 @@ public class InformixIndexIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
         this.database = database;
     }
 

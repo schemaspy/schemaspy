@@ -51,23 +51,23 @@ public class StackTraceOmitterIT {
 
     @Test
     @DirtiesContext
-    @Logger(value = SchemaSpyRunner.class, pattern = "%clr(%-5level) - %msg%n%debugEx")
+    @Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
     public void noStacktraceWhenLoggingIsOf() {
         schemaSpyRunner.run(new String[] {"-sso","-o","target/somefolder", "-t", "doesnt-exist"});
         String log = loggingRule.getLog();
         assertThat(log).isNotEmpty();
-        assertThat(log).doesNotContain("Caused by: org.schemaspy.db.config.ResourceNotFoundException");
+        assertThat(log).doesNotContain("Caused by:");
     }
 
     @Test
     @DirtiesContext
-    @Logger(value = SchemaSpyRunner.class, pattern = "%clr(%-5level) - %msg%n%debugEx")
+    @Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
     public void stacktraceWhenLoggingIsOn() {
         try {
             schemaSpyRunner.run(new String[]{"-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug"});
             String log = loggingRule.getLog();
             assertThat(log).isNotEmpty();
-            assertThat(log).contains("Caused by: org.schemaspy.db.config.ResourceNotFoundException");
+            assertThat(log).contains("Caused by:");
         } finally {
             loggingSystem.setLogLevel("org.schemaspy", LogLevel.INFO);
         }

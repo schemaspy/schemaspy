@@ -19,10 +19,7 @@
 package org.schemaspy;
 
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.service.DatabaseService;
-import org.schemaspy.service.SqlService;
-import org.schemaspy.service.TableService;
-import org.schemaspy.service.ViewService;
+import org.schemaspy.input.dbms.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,18 +42,33 @@ public class WiringConfiguration {
     }
 
     @Bean
-    public TableService tableService(SqlService sqlService) {
-        return new TableService(sqlService);
+    public ColumnService columnService(SqlService sqlService) {
+        return new ColumnService(sqlService);
     }
 
     @Bean
-    public ViewService viewService(SqlService sqlService) {
-        return new ViewService(sqlService);
+    public IndexService indexService(SqlService sqlService){
+        return new IndexService(sqlService);
     }
 
     @Bean
-    public DatabaseService databaseService(Clock clock, TableService tableService, ViewService viewService, SqlService sqlService) {
-        return new DatabaseService(clock, tableService, viewService, sqlService);
+    public TableService tableService(SqlService sqlService, ColumnService columnService, IndexService indexService) {
+        return new TableService(sqlService, columnService, indexService);
+    }
+
+    @Bean
+    public ViewService viewService(SqlService sqlService, ColumnService columnService) {
+        return new ViewService(sqlService, columnService);
+    }
+
+    @Bean
+    public RoutineService routineService(SqlService sqlService) {
+        return new RoutineService(sqlService);
+    }
+
+    @Bean
+    public DatabaseService databaseService(Clock clock, SqlService sqlService, TableService tableService, ViewService viewService, RoutineService routineService) {
+        return new DatabaseService(clock, sqlService, tableService, viewService, routineService);
     }
 
     @Bean

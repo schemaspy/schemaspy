@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.Config;
 import org.schemaspy.SchemaAnalyzer;
-import org.schemaspy.model.ConnectionFailure;
+import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -29,12 +29,12 @@ import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.input.dbms.service.DatabaseService;
+import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
-import org.schemaspy.service.DatabaseService;
-import org.schemaspy.service.SqlService;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -113,7 +113,7 @@ public class OracleIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        databaseService.gatheringSchemaDetails(config, database, null, progressListener);
+        databaseService.gatherSchemaDetails(config, database, null, progressListener);
         this.database = database;
     }
 

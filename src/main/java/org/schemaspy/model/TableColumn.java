@@ -22,7 +22,7 @@
  */
 package org.schemaspy.model;
 
-import org.schemaspy.model.xml.TableColumnMeta;
+import org.schemaspy.input.dbms.xml.TableColumnMeta;
 
 import java.sql.DatabaseMetaData;
 import java.util.*;
