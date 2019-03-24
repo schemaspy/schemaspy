@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Types;
 import java.util.regex.Pattern;
 
 import static org.schemaspy.output.xml.dom.XmlConstants.*;
@@ -40,6 +41,7 @@ import static org.schemaspy.output.xml.dom.XmlConstants.*;
  * @author Nils Petzaell
  */
 public class XmlColumnFormatter {
+    private static final int DEFAULT_JDBC_TYPE_CODE = Types.VARCHAR;
 
     // valid chars came from http://www.w3.org/TR/REC-xml/#charsets
     // and attempting to match 0x10000-0x10FFFF with the \p Unicode escapes
@@ -74,6 +76,9 @@ public class XmlColumnFormatter {
         DOMUtil.appendAttribute(columnNode, "id", String.valueOf(column.getId()));
         DOMUtil.appendAttribute(columnNode, "name", column.getName());
         DOMUtil.appendAttribute(columnNode, "type", column.getTypeName());
+        DOMUtil.appendAttribute(columnNode, "typeCode", String.valueOf(column.getType() == null ?
+                DEFAULT_JDBC_TYPE_CODE : column.getType()));
+        DOMUtil.appendAttribute(columnNode, "defaultValue", String.valueOf(column.getDefaultValue()));
         DOMUtil.appendAttribute(columnNode, "size", String.valueOf(column.getLength()));
         DOMUtil.appendAttribute(columnNode, "digits", String.valueOf(column.getDecimalDigits()));
         DOMUtil.appendAttribute(columnNode, "nullable", String.valueOf(column.isNullable()));

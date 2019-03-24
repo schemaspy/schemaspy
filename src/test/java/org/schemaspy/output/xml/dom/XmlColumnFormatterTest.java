@@ -33,6 +33,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import java.sql.Types;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,10 +46,10 @@ public class XmlColumnFormatterTest {
     @Test
     public void appendColumn() throws ParserConfigurationException, TransformerException {
         String expected ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><table>\n" +
-                "   <column autoUpdated=\"true\" digits=\"0\" id=\"0\" name=\"main\" nullable=\"false\" remarks=\"\" size=\"10\" type=\"int\">\n" +
+                "   <column autoUpdated=\"true\" digits=\"0\" id=\"0\" name=\"main\" nullable=\"false\" remarks=\"\" size=\"10\" type=\"int\" typeCode=\"4\" defaultValue=\"1\">\n" +
                 "      <child catalog=\"catalog\" column=\"child\" implied=\"false\" onDeleteCascade=\"false\" schema=\"schema\" table=\"childTable\"/>\n" +
                 "   </column>\n" +
-                "   <column autoUpdated=\"false\" digits=\"0\" id=\"1\" name=\"fromParent\" nullable=\"false\" remarks=\"\" size=\"10\" type=\"int\">\n" +
+                "   <column autoUpdated=\"false\" digits=\"0\" id=\"1\" name=\"fromParent\" nullable=\"false\" remarks=\"\" size=\"10\" type=\"int\" typeCode=\"4\" defaultValue=\"2\">\n" +
                 "      <parent catalog=\"catalog\" column=\"parent\" implied=\"false\" onDeleteCascade=\"false\" schema=\"schema\" table=\"parentTable\"/>\n" +
                 "   </column>\n" +
                 "</table>";
@@ -62,6 +64,8 @@ public class XmlColumnFormatterTest {
         mainTableColumn.setName("main");
         mainTableColumn.setLength(10);
         mainTableColumn.setTypeName("int");
+        mainTableColumn.setType(Types.INTEGER);
+        mainTableColumn.setDefaultValue(1);
         mainTableColumn.setNullable(false);
         mainTableColumn.setIsAutoUpdated(true);
         TableColumn mainFromTableColumn = new TableColumn(mainTable);
@@ -69,6 +73,8 @@ public class XmlColumnFormatterTest {
         mainFromTableColumn.setName("fromParent");
         mainFromTableColumn.setLength(10);
         mainFromTableColumn.setTypeName("int");
+        mainFromTableColumn.setType(Types.INTEGER);
+        mainFromTableColumn.setDefaultValue(2);
         mainFromTableColumn.setNullable(false);
         mainFromTableColumn.setIsAutoUpdated(false);
 
