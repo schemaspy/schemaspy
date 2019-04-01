@@ -30,23 +30,7 @@
                     </div>
                 </section>
                 <script>
-                    var tableData = [
-                        {{#columns}}
-                        {
-                            "tableName":"{{column.table.name}}",
-                            "tableType":"{{column.table.type}}",
-                            "keyClass":"{{keyClass}}",
-                            "keyTitle":"{{keyTitle}}",
-                            "name":"{{{keyIcon}}}{{column.name}}",
-                            "type":"{{column.typeName}}",
-                            "length":"{{column.length}}",
-                            "nullable":"{{nullable}}",
-                            "autoUpdated":"{{autoUpdated}}",
-                            "defaultValue":"{{defaultValue}}",
-                            "comments":"{{{comments}}}"
-                        },
-                        {{/columns}}
-                        ];
+                    var tableData = {{{tableData}}};
                     var config = {
                         pagination: {{paginationEnabled}}
                     };
