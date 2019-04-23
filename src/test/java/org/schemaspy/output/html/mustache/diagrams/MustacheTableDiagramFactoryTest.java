@@ -25,7 +25,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.stubbing.Answer;
 import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.Table;
-import org.schemaspy.view.DotFormatter;
+import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.view.MustacheTableDiagram;
 import org.schemaspy.view.WriteStats;
 

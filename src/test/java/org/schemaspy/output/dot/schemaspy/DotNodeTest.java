@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.view;
+package org.schemaspy.output.dot.schemaspy;
 
 import org.junit.Test;
 import org.schemaspy.Config;
@@ -28,7 +28,7 @@ import org.schemaspy.output.dot.DotConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.schemaspy.view.DotNode.DotNodeConfig;
+import static org.schemaspy.output.dot.schemaspy.DotNode.DotNodeConfig;
 
 /**
  * @author Nils Petzaell

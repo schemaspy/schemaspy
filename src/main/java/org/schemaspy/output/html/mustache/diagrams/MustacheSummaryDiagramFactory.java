@@ -25,8 +25,8 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.diagram.DiagramException;
+import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
-import org.schemaspy.view.DotFormatter;
 import org.schemaspy.view.MustacheTableDiagram;
 import org.schemaspy.view.WriteStats;
 

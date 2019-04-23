@@ -43,6 +43,7 @@ import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.graphviz.GraphvizDot;
 import org.schemaspy.output.diagram.vizjs.VizJSDot;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.output.html.mustache.diagrams.*;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.util.ManifestUtils;

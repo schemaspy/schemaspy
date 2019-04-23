@@ -20,8 +20,8 @@ package org.schemaspy.output.html.mustache.diagrams;
 
 import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
+import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
-import org.schemaspy.view.DotFormatter;
 import org.schemaspy.view.MustacheTableDiagram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

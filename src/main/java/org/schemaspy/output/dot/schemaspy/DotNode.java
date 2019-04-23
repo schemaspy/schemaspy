@@ -21,13 +21,14 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.schemaspy.view;
+package org.schemaspy.output.dot.schemaspy;
 
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.util.Html;
+import org.schemaspy.view.StyleSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
