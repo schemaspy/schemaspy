@@ -22,6 +22,8 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.schemaspy.Config;
+import org.schemaspy.DotConfigUsingConfig;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.diagram.DiagramFactory;
@@ -47,26 +49,32 @@ public class DotNodeIT {
     @ClassRule
     public static TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private static DotFormatter dotFormatter = DotFormatter.getInstance();
+    private static DotFormatter dotFormatter =
+            new DotFormatter(
+                    new DotConfigUsingConfig(
+                            Config.getInstance(),
+                            false));
     private static DiagramFactory diagramFactory;
+
+    private static File orphansDir;
 
     @BeforeClass
     public static void setup() throws IOException {
         GraphvizConfig graphvizConfig = mock(GraphvizConfig.class);
         when(graphvizConfig.isHighQuality()).thenReturn(true);
         when(graphvizConfig.getImageFormat()).thenReturn("png");
-        diagramFactory = new DiagramFactory(new GraphvizDot(graphvizConfig), temporaryFolder.newFolder());
+        orphansDir = temporaryFolder.getRoot().toPath().resolve("diagrams").resolve("orphans").toFile();
+        diagramFactory = new DiagramFactory(new GraphvizDot(graphvizConfig), temporaryFolder.getRoot());
     }
 
     @Test
     public void illegalCharInTableName() throws IOException {
         Table table = mock(Table.class);
         when(table.getName()).thenReturn("<>&");
-
-        File dotFile = temporaryFolder.newFile("dotFileTableName");
+        File dotFile = new File(orphansDir, "dotFileColumnName");
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
-        dotFormatter.writeOrphan(table, printWriter, "test");
+        dotFormatter.writeOrphan(table, printWriter);
         assertThatCode(() -> diagramFactory.generateOrphanDiagram(dotFile,"illegalTableName"))
                 .doesNotThrowAnyException();
     }
@@ -82,10 +90,10 @@ public class DotNodeIT {
         when(table.getName()).thenReturn("a");
         when(table.getColumns()).thenReturn(Collections.singletonList(tableColumn));
 
-        File dotFile = temporaryFolder.newFile("dotFileColumnName");
+        File dotFile = new File(orphansDir, "dotFileColumnName");
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
-        dotFormatter.writeOrphan(table, printWriter, "test");
+        dotFormatter.writeOrphan(table, printWriter);
         assertThatCode(() -> diagramFactory.generateOrphanDiagram(dotFile,"illegalColumnName"))
                 .doesNotThrowAnyException();
     }

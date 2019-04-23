@@ -19,12 +19,16 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.Config;
+import org.schemaspy.DotConfigUsingConfig;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.LogicalTable;
 import org.schemaspy.model.Table;
+import org.schemaspy.output.dot.DotConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.schemaspy.view.DotNode.DotNodeConfig;
 
 /**
  * @author Nils Petzaell
@@ -35,7 +39,8 @@ public class DotNodeTest {
     public void escapeHtml() {
         Database database = mock(Database.class);
         Table table = new LogicalTable(database, "catalog", "schema", "<table>", "comment");
-        DotNode dotNode = new DotNode(table,"", "output");
+        DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
+        DotNode dotNode = new DotNode(table,"", new DotNodeConfig(true, true), dotConfig);
         assertThat(dotNode.toString()).contains("tooltip=\"&lt;table&gt;");
     }
 
@@ -43,7 +48,8 @@ public class DotNodeTest {
     public void urlEncodeLink() {
         Database database = mock(Database.class);
         Table table = new LogicalTable(database, "catalog", "schema", "a table", "comment");
-        DotNode dotNode = new DotNode(table,"", "output");
+        DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
+        DotNode dotNode = new DotNode(table,"", new DotNodeConfig(true, true), dotConfig);
         assertThat(dotNode.toString()).contains("URL=\"a%20table.html\"");
     }
 }

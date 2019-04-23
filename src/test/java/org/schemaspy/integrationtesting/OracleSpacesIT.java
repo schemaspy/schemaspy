@@ -74,7 +74,7 @@ public class OracleSpacesIT {
     private static Database database;
 
     public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer("wnameless/oracle-xe-11g"))
+            new JdbcContainerRule<>(() -> new OracleContainer("christophesurmont/oracle-xe-11g"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitScript("integrationTesting/oracleSpacesIT/dbScripts/spaces_in_table_names.sql");

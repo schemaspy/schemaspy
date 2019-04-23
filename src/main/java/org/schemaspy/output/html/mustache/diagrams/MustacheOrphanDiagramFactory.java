@@ -45,13 +45,11 @@ public class MustacheOrphanDiagramFactory {
 
     private final DotFormatter dotProducer;
     private final MustacheDiagramFactory mustacheDiagramFactory;
-    private final File outputDir;
     private final Path orphanDir;
 
     public MustacheOrphanDiagramFactory(DotFormatter dotProducer, MustacheDiagramFactory mustacheDiagramFactory, File outputDir) {
         this.dotProducer = dotProducer;
         this.mustacheDiagramFactory = mustacheDiagramFactory;
-        this.outputDir = outputDir;
         orphanDir = outputDir.toPath().resolve("diagrams").resolve("orphans");
     }
 
@@ -78,7 +76,7 @@ public class MustacheOrphanDiagramFactory {
             File dotFile = orphanDir.resolve(dotBaseFilespec + ".1degree.dot").toFile();
 
             try (PrintWriter dotOut = Writers.newPrintWriter(dotFile)) {
-                dotProducer.writeOrphan(table, dotOut, outputDir.toString());
+                dotProducer.writeOrphan(table, dotOut);
                 mustacheTableDiagrams.add(mustacheDiagramFactory.generateOrphanDiagram(dotBaseFilespec, dotFile, dotBaseFilespec + ".1degree"));
             } catch (IOException e) {
                 LOGGER.error("Failed to produce dot: {}", dotFile, e);

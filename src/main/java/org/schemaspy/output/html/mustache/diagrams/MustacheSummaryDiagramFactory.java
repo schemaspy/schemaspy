@@ -51,14 +51,12 @@ public class MustacheSummaryDiagramFactory {
     private final DotFormatter dotProducer;
     private final MustacheDiagramFactory mustacheDiagramFactory;
     private final ImpliedConstraintsFinder impliedConstraintsFinder;
-    private final File outputDir;
     private final Path summaryDir;
 
     public MustacheSummaryDiagramFactory(DotFormatter dotProducer, MustacheDiagramFactory mustacheDiagramFactory, ImpliedConstraintsFinder impliedConstraintsFinder, File outputDir) {
         this.dotProducer = dotProducer;
         this.mustacheDiagramFactory = mustacheDiagramFactory;
         this.impliedConstraintsFinder = impliedConstraintsFinder;
-        this.outputDir = outputDir;
         this.summaryDir = outputDir.toPath().resolve("diagrams").resolve("summary");
     }
 
@@ -77,7 +75,7 @@ public class MustacheSummaryDiagramFactory {
         WriteStats stats = new WriteStats(tables);
         File realCompactDot = summaryDir.resolve(FILE_PREFIX + ".real.compact.dot").toFile();
         try (PrintWriter out = Writers.newPrintWriter(realCompactDot)) {
-            dotProducer.writeRealRelationships(database, tables, true, showDetailedTables, stats, out, outputDir);
+            dotProducer.writeRealRelationships(database, tables, true, showDetailedTables, stats, out);
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + realCompactDot.toString(), ioexception));
         }
@@ -118,7 +116,7 @@ public class MustacheSummaryDiagramFactory {
     private void generateRealLarge(Database database, Collection<Table> tables, boolean showDetailedTables, List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions, WriteStats stats) {
         File realLargeDot = summaryDir.resolve(FILE_PREFIX + ".real.large.dot").toFile();
         try (PrintWriter out = Writers.newPrintWriter(realLargeDot)) {
-            dotProducer.writeRealRelationships(database, tables, false, showDetailedTables, stats, out, outputDir);
+            dotProducer.writeRealRelationships(database, tables, false, showDetailedTables, stats, out);
             MustacheTableDiagram realLargeDiagram = mustacheDiagramFactory.generateSummaryDiagram("Large", realLargeDot, FILE_PREFIX + ".real.large");
             diagrams.add(realLargeDiagram);
         } catch (IOException ioexception) {
@@ -131,7 +129,7 @@ public class MustacheSummaryDiagramFactory {
     private void generateImpliedCompact(Database database, Collection<Table> tables, boolean showDetailedTables, List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions, WriteStats stats) {
         File impliedCompactDot = summaryDir.resolve(FILE_PREFIX + ".implied.compact.dot").toFile();
         try (PrintWriter out = Writers.newPrintWriter(impliedCompactDot)) {
-            dotProducer.writeAllRelationships(database, tables, true, showDetailedTables, stats, out, outputDir);
+            dotProducer.writeAllRelationships(database, tables, true, showDetailedTables, stats, out);
             MustacheTableDiagram impliedCompactDiagram = mustacheDiagramFactory.generateSummaryDiagram("Compact Implied", impliedCompactDot, FILE_PREFIX + ".implied.compact");
             impliedCompactDiagram.setIsImplied(true);
             diagrams.add(impliedCompactDiagram);
@@ -145,7 +143,7 @@ public class MustacheSummaryDiagramFactory {
     private void generateImpliedLarge(Database database, Collection<Table> tables, boolean showDetailedTables, List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions, WriteStats stats) {
         File impliedLargeDot = summaryDir.resolve(FILE_PREFIX + ".implied.large.dot").toFile();
         try (PrintWriter out = Writers.newPrintWriter(impliedLargeDot)) {
-            dotProducer.writeAllRelationships(database, tables, false, showDetailedTables, stats, out, outputDir);
+            dotProducer.writeAllRelationships(database, tables, false, showDetailedTables, stats, out);
             MustacheTableDiagram impliedLargeDiagram = mustacheDiagramFactory.generateSummaryDiagram("Large Implied", impliedLargeDot, FILE_PREFIX + ".implied.large");
             impliedLargeDiagram.setIsImplied(true);
             diagrams.add(impliedLargeDiagram);

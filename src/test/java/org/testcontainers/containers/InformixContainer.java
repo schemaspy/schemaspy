@@ -39,7 +39,7 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
     static final Integer INFORMIX_PORT = 9088;
 
     public InformixContainer(){
-        this(IMAGE + ":latest");
+        this(IMAGE + ":12.10.FC9W1DE");
     }
 
     public InformixContainer(final String dockerImageName) {

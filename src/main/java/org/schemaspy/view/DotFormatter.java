@@ -25,9 +25,9 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
+import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.view.DotNode.DotNodeConfig;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -39,39 +39,36 @@ import java.util.*;
  * @author Nils Petzaell
  */
 public class DotFormatter {
-    private static DotFormatter instance = new DotFormatter();
-    private final int fontSize = Config.getInstance().getFontSize();
+
+    private final DotConfig dotConfig;
 
     /**
      * Singleton - prevent creation
      */
-    private DotFormatter() {
-    }
-
-    public static DotFormatter getInstance() {
-        return instance;
+    public DotFormatter(DotConfig dotConfig) {
+        this.dotConfig = dotConfig;
     }
 
     /**
      * Write real relationships (excluding implied) associated with the given table.<p>
      * Returns a set of the implied constraints that could have been included but weren't.
      */
-    public Set<ForeignKeyConstraint> writeRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot, File outputDir) {
-        return writeRelationships(table, twoDegreesOfSeparation, stats, false, dot, outputDir);
+    public Set<ForeignKeyConstraint> writeRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
+        return writeRelationships(table, twoDegreesOfSeparation, stats, false, dot);
     }
 
     /**
      * Write implied relationships associated with the given table
      */
-    public void writeAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot, File outputDir) {
-        writeRelationships(table, twoDegreesOfSeparation, stats, true, dot, outputDir);
+    public void writeAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
+        writeRelationships(table, twoDegreesOfSeparation, stats, true, dot);
     }
 
     /**
      * Write relationships associated with the given table.<p>
      * Returns a set of the implied constraints that could have been included but weren't.
      */
-    private Set<ForeignKeyConstraint> writeRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, boolean includeImplied, PrintWriter dot, File outputDir) {
+    private Set<ForeignKeyConstraint> writeRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, boolean includeImplied, PrintWriter dot) {
         Set<Table> tablesWritten = new HashSet<>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
@@ -92,7 +89,7 @@ public class DotFormatter {
             if (!tablesWritten.add(relatedTable))
                 continue; // already written
 
-            nodes.put(relatedTable, new DotNode(relatedTable, "", outputDir.toString(), new DotNodeConfig(false, false)));
+            nodes.put(relatedTable, new DotNode(relatedTable, "", new DotNodeConfig(false, false), dotConfig));
             connectors.addAll(finder.getRelatedConnectors(relatedTable, table, true, includeImplied));
         }
 
@@ -116,7 +113,7 @@ public class DotFormatter {
                         continue; // already written
 
                     allCousinConnectors.addAll(finder.getRelatedConnectors(cousin, relatedTable, false, includeImplied));
-                    nodes.put(cousin, new DotNode(cousin, false, "", outputDir.toString()));
+                    nodes.put(cousin, new DotNode(cousin, "", new DotNodeConfig(), dotConfig));
                 }
 
                 allCousins.addAll(cousins);
@@ -154,7 +151,7 @@ public class DotFormatter {
         }
 
         // include the table itself
-        nodes.put(table, new DotNode(table, "", outputDir.toString()));
+        nodes.put(table, new DotNode(table, "", new DotNodeConfig(true, true), dotConfig));
 
         connectors.addAll(allCousinConnectors);
         for (DotConnector connector : connectors) {
@@ -238,12 +235,12 @@ public class DotFormatter {
         dot.println("    nodesep=\"0.18\"");
         dot.println("    ranksep=\"0.46\"");
         dot.println("    fontname=\"" + Config.getInstance().getFont() + "\"");
-        dot.println("    fontsize=\"" + fontSize + "\"");
+        dot.println("    fontsize=\"" + dotConfig.getFontSize() + "\"");
         dot.println("    ration=\"compress\"");
         dot.println("  ];");
         dot.println("  node [");
         dot.println("    fontname=\"" + Config.getInstance().getFont() + "\"");
-        dot.println("    fontsize=\"" + fontSize + "\"");
+        dot.println("    fontsize=\"" + dotConfig.getFontSize() + "\"");
         dot.println("    shape=\"plaintext\"");
         dot.println("  ];");
         dot.println("  edge [");
@@ -251,18 +248,18 @@ public class DotFormatter {
         dot.println("  ];");
 }
 
-    public void writeRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot, File outputDir) {
-        writeRelationships(db, tables, compact, showColumns, false, stats, dot, outputDir);
+    public void writeRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
+        writeRelationships(db, tables, compact, showColumns, false, stats, dot);
     }
 
     /**
      * Returns <code>true</code> if it wrote any implied relationships
      */
-    public boolean writeAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot, File outputDir) {
-        return writeRelationships(db, tables, compact, showColumns, true, stats, dot, outputDir);
+    public boolean writeAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
+        return writeRelationships(db, tables, compact, showColumns, true, stats, dot);
     }
 
-    private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, PrintWriter dot, File outputDir) {
+    private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, PrintWriter dot) {
         DotConnectorFinder finder = DotConnectorFinder.getInstance();
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
         boolean wroteImplied = false;
@@ -285,12 +282,12 @@ public class DotFormatter {
 
         for (Table table : tables) {
             if (!table.isOrphan(includeImplied)) {
-                nodes.put(table, new DotNode(table, "tables/", outputDir.toString(), nodeConfig));
+                nodes.put(table, new DotNode(table, "tables/", nodeConfig, dotConfig));
             }
         }
 
         for (Table table : db.getRemoteTables()) {
-            nodes.put(table, new DotNode(table, "tables/", outputDir.toString(), nodeConfig));
+            nodes.put(table, new DotNode(table, "tables/", nodeConfig, dotConfig));
         }
 
         Set<DotConnector> connectors = new TreeSet<>();
@@ -327,10 +324,10 @@ public class DotFormatter {
         }
     }
 
-    public void writeOrphan(Table table, PrintWriter dot, String outputDir) {
+    public void writeOrphan(Table table, PrintWriter dot) {
         writeHeader(table.getName(), false, dot);
         DotNodeConfig nodeConfig = new DotNodeConfig(true, true);
-        dot.println(new DotNode(table, "tables/", outputDir, nodeConfig).toString());
+        dot.println(new DotNode(table, "tables/", nodeConfig, dotConfig).toString());
         dot.println("}");
         dot.flush();
     }

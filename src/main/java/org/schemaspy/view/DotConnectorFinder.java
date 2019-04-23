@@ -51,7 +51,7 @@ public class DotConnectorFinder {
      * @return Set of <code>dot</code> relationships (as {@link DotConnector}s)
      */
     public Set<DotConnector> getRelatedConnectors(Table table, boolean includeImplied) {
-        Set<DotConnector> relationships = new HashSet<DotConnector>();
+        Set<DotConnector> relationships = new HashSet<>();
 
         for (TableColumn column : table.getColumns()) {
             relationships.addAll(getRelatedConnectors(column, null, false, includeImplied));
@@ -69,7 +69,7 @@ public class DotConnectorFinder {
      * @return Set of <code>dot</code> relationships (as {@link DotConnector}s)
      */
     public Set<DotConnector> getRelatedConnectors(Table table1, Table table2, boolean includeExcluded, boolean includeImplied) {
-        Set<DotConnector> relationships = new HashSet<DotConnector>();
+        Set<DotConnector> relationships = new HashSet<>();
 
         for (TableColumn column : table1.getColumns()) {
             relationships.addAll(getRelatedConnectors(column, table2, includeExcluded, includeImplied));
@@ -89,7 +89,7 @@ public class DotConnectorFinder {
      * @return Set of <code>dot</code> relationships (as {@link DotConnector}s)
      */
     private Set<DotConnector> getRelatedConnectors(TableColumn column, Table targetTable, boolean includeExcluded, boolean includeImplied) {
-        Set<DotConnector> relatedConnectors = new HashSet<DotConnector>();
+        Set<DotConnector> relatedConnectors = new HashSet<>();
         if (!includeExcluded && column.isExcluded())
             return relatedConnectors;
 

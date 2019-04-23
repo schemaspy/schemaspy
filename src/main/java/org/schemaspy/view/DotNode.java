@@ -23,10 +23,10 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
+import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.util.Html;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,48 +60,33 @@ public class DotNode {
     private static final String INDENT_6 = "      ";
 
     private final Table table;
-    private final DotNodeConfig config;
     private final String path;
-    private final String outputDir;
+    private final DotNodeConfig config;
+    private final DotConfig dotConfig;
     private final Set<TableColumn> excludedColumns = new HashSet<>();
     private final String lineSeparator = System.getProperty("line.separator");
-    private final boolean displayNumRows = Config.getInstance().isNumRowsEnabled();
     private final String columnSpan;
 
-    /**
-     * Create a DotNode that is a focal point of a diagram.
-     * That is, all of its columns are displayed in addition to the details
-     * of those columns.
-     *
-     * @param table Table
-     * @param path  String
-     */
-    public DotNode(Table table, String path, String outputDir) {
-        this(table, path, outputDir, new DotNodeConfig(true, true));
-    }
+    private boolean showImpliedRelationships;
 
-    public DotNode(Table table, String path, String outputDir, DotNodeConfig config) {
+    public DotNode(Table table, String path, DotNodeConfig config, DotConfig dotConfig) {
         this.table = table;
-        this.path = path + (table.isRemote() ? ("../../" + table.getContainer() + "/tables/") : "");
-        this.outputDir = outputDir;
         this.config = config;
+        this.dotConfig = dotConfig;
+        this.path = createPath(path);
         this.columnSpan = config.showColumnDetails ? "COLSPAN=\"2\" " : "COLSPAN=\"3\" ";
     }
 
-    /**
-     * Create a DotNode and specify whether it displays its columns.
-     * The details of the optional columns (e.g. type, size) are not displayed.
-     *
-     * @param table       Table
-     * @param showColumns boolean
-     * @param path        String
-     */
-    public DotNode(Table table, boolean showColumns, String path, String outputDir) {
-        this(table, path, outputDir, showColumns ? new DotNodeConfig(true, false) : new DotNodeConfig());
+    private String createPath(String path) {
+        if (dotConfig.useRelativeLinks()) {
+            return (table.isRemote() ? "../../../" + table.getContainer() : "../..") + "/tables/";
+        }
+        return (table.isRemote() ? ("../" + table.getContainer() + "/tables/") : path);
+
     }
 
     public void setShowImplied(boolean showImplied) {
-        config.showImpliedRelationships = showImplied;
+        showImpliedRelationships = showImplied;
     }
 
     public Table getTable() {
@@ -141,7 +126,7 @@ public class DotNode {
         }
 
         buf.append("    </TABLE>>" + lineSeparator);
-        if (!table.isRemote() || Config.getInstance().isOneOfMultipleSchemas()) {
+        if (!table.isRemote() || dotConfig.isOneOfMultipleSchemas()) {
             buf.append("    URL=\"" + path + urlEncodeLink(tableName) + ".html\"" + lineSeparator);
             buf.append("    target=\"_top\"" + lineSeparator);
         }
@@ -193,11 +178,11 @@ public class DotNode {
         return maxWidth;
     }
 
-    private static int getTextWidth(String text) {
+    private int getTextWidth(String text) {
         AffineTransform affinetransform = new AffineTransform();
         FontRenderContext frc = new FontRenderContext(affinetransform, true, true);
-        int fontSize = Config.getInstance().getFontSize() + 1;
-        Font font = new Font(Config.getInstance().getFont(), Font.BOLD, fontSize);
+        int fontSize = dotConfig.getFontSize() + 1;
+        Font font = new Font(dotConfig.getFont(), Font.BOLD, fontSize);
         return (int) (font.getStringBounds(text, frc).getWidth());
     }
 
@@ -214,9 +199,9 @@ public class DotNode {
         buf.append("<TR ALIGN=\"LEFT\">");
         buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"15\" HEIGHT=\"16\">");
         if (column.isPrimary()) {
-            buf.append("<IMG SRC=\"" + outputDir + "/images/primaryKeys.png\"/>");
+            buf.append("<IMG SRC=\"../../images/primaryKeys.png\"/>");
         } else if (column.isForeignKey()) {
-            buf.append("<IMG SRC=\"" + outputDir + "/images/foreignKeys.png\"/>");
+            buf.append("<IMG SRC=\"../../images/foreignKeys.png\"/>");
         }
         buf.append(Html.TD_END);
         buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxWidth + "\" HEIGHT=\"16\">");
@@ -243,7 +228,7 @@ public class DotNode {
         StringBuilder buf = new StringBuilder();
         buf.append(INDENT_6 + Html.TR_START);
         buf.append("<TD ALIGN=\"LEFT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
-        int numParents = config.showImpliedRelationships ? table.getNumParents() : table.getNumNonImpliedParents();
+        int numParents = showImpliedRelationships ? table.getNumParents() : table.getNumNonImpliedParents();
         if (numParents > 0 || config.showColumnDetails)
             buf.append("&lt; " + numParents);
         else
@@ -252,7 +237,7 @@ public class DotNode {
         buf.append(Html.TD_END);
         buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
         final long numRows = table.getNumRows();
-        if (displayNumRows && numRows >= 0) {
+        if (dotConfig.isNumRowsEnabled() && numRows >= 0) {
             buf.append(NumberFormat.getInstance().format(numRows));
             buf.append(" row");
             if (numRows != 1)
@@ -263,7 +248,7 @@ public class DotNode {
         buf.append(Html.TD_END);
 
         buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
-        int numChildren = config.showImpliedRelationships ? table.getNumChildren() : table.getNumNonImpliedChildren();
+        int numChildren = showImpliedRelationships ? table.getNumChildren() : table.getNumNonImpliedChildren();
         if (numChildren > 0 || config.showColumnDetails)
             buf.append(numChildren + " &gt;");
         else
@@ -293,15 +278,14 @@ public class DotNode {
 
     public static class DotNodeConfig {
         private final boolean showColumns;
-        private boolean showTrivialColumns;
+        private final boolean showTrivialColumns;
         private final boolean showColumnDetails;
-        private boolean showImpliedRelationships;
 
         /**
          * Nothing but table name and counts are displayed
          */
         public DotNodeConfig() {
-            showColumns = showTrivialColumns = showColumnDetails = showImpliedRelationships = false;
+            showColumns = showTrivialColumns = showColumnDetails = false;
         }
 
         public DotNodeConfig(boolean showTrivialColumns, boolean showColumnDetails) {
