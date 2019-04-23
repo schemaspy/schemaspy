@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.view;
+package org.schemaspy.output.dot.schemaspy;
 
 import org.junit.Test;
 

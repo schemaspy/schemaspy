@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Nils Petzaell
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -16,12 +16,19 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.util;
+package org.schemaspy.output.dot.schemaspy;
 
-/**
- * @author Nils Petzaell
- */
-public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String message) {
-    }
+public class StyleSheetConst {
+
+    public static final String START_COMMENT = "/*";
+    public static final String END_COMMENT = "*/";
+
+    public static final String BACKGROUND = "background";
+    public static final String BACKGROUND_COLOR = "background-color";
+
+    public static final String COLOR = "color";
+
+    private StyleSheetConst() {}
+
+
 }

@@ -20,14 +20,12 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.DotNode.DotNodeConfig;
-import org.schemaspy.view.StyleSheet;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -223,7 +221,7 @@ public class DotFormatter {
     private void writeHeader(String diagramName, boolean showLabel, PrintWriter dot) {
         dot.println("digraph \"" + diagramName + "\" {");
         dot.println("  graph [");
-        boolean rankdirbug = Config.getInstance().isRankDirBugEnabled();
+        boolean rankdirbug = dotConfig.isRankDirBugEnabled();
         if (!rankdirbug)
             dot.println("    rankdir=\"RL\"");
         dot.println("    bgcolor=\"" + StyleSheet.getInstance().getBodyBackground() + "\"");
@@ -236,12 +234,12 @@ public class DotFormatter {
         }
         dot.println("    nodesep=\"0.18\"");
         dot.println("    ranksep=\"0.46\"");
-        dot.println("    fontname=\"" + Config.getInstance().getFont() + "\"");
+        dot.println("    fontname=\"" + dotConfig.getFont() + "\"");
         dot.println("    fontsize=\"" + dotConfig.getFontSize() + "\"");
         dot.println("    ration=\"compress\"");
         dot.println("  ];");
         dot.println("  node [");
-        dot.println("    fontname=\"" + Config.getInstance().getFont() + "\"");
+        dot.println("    fontname=\"" + dotConfig.getFont() + "\"");
         dot.println("    fontsize=\"" + dotConfig.getFontSize() + "\"");
         dot.println("    shape=\"plaintext\"");
         dot.println("  ];");
