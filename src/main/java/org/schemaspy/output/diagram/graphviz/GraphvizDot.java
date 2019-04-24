@@ -198,8 +198,8 @@ public class GraphvizDot implements DiagramProducer {
         String[] dotCommand = new String[]{
                 getExe(),
                 "-T" + getDiagramFormat() + effectiveRenderer,
-                dotFile.toString(),
-                "-o" + diagramFile,
+                dotFile.getName(),
+                "-o" + diagramFile.getName(),
                 //"-v", //Enable verbose mode
                 "-Tcmapx"
         };
@@ -208,7 +208,7 @@ public class GraphvizDot implements DiagramProducer {
         LOGGER.debug(commandLine);
 
         try {
-            Process process = Runtime.getRuntime().exec(dotCommand);
+            Process process = Runtime.getRuntime().exec(dotCommand, null, dotFile.getParentFile());
             new ProcessOutputReader(commandLine, process.getErrorStream()).start();
             try (BufferedReader mapReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;

@@ -20,8 +20,8 @@ package org.schemaspy.output.html.mustache.diagrams;
 
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
+import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
-import org.schemaspy.view.DotFormatter;
 import org.schemaspy.view.MustacheTableDiagram;
 import org.schemaspy.view.WriteStats;
 
@@ -40,13 +40,11 @@ public class MustacheTableDiagramFactory {
 
     private final DotFormatter dotProducer;
     private final MustacheDiagramFactory mustacheDiagramFactory;
-    private final File outputDir;
     private final File tableDir;
 
     public MustacheTableDiagramFactory(DotFormatter dotProducer, MustacheDiagramFactory mustacheDiagramFactory, File outputDir) {
         this.dotProducer = dotProducer;
         this.mustacheDiagramFactory = mustacheDiagramFactory;
-        this.outputDir = outputDir;
         this.tableDir = outputDir.toPath().resolve("diagrams").resolve("tables").toFile();
         tableDir.mkdirs();
     }
@@ -71,7 +69,7 @@ public class MustacheTableDiagramFactory {
 
             WriteStats oneStats = new WriteStats(stats);
             try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
-                dotProducer.writeRealRelationships(table, false, oneStats, dotOut, outputDir);
+                dotProducer.writeRealRelationships(table, false, oneStats, dotOut);
             }
             MustacheTableDiagram oneDiagram = mustacheDiagramFactory.generateTableDiagram("One", oneDegreeDotFile, table.getName() + ".1degree");
             oneDiagram.setActive(true);
@@ -79,7 +77,7 @@ public class MustacheTableDiagramFactory {
 
             WriteStats twoStats = new WriteStats(stats);
             try (PrintWriter dotOut = Writers.newPrintWriter(twoDegreesDotFile)) {
-                impliedConstraints = dotProducer.writeRealRelationships(table, true, twoStats, dotOut, outputDir);
+                impliedConstraints = dotProducer.writeRealRelationships(table, true, twoStats, dotOut);
             }
 
             if (sameWritten(oneStats, twoStats)) {
@@ -91,14 +89,14 @@ public class MustacheTableDiagramFactory {
             if (!impliedConstraints.isEmpty()) {
                 WriteStats oneImplied = new WriteStats(stats);
                 try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
-                    dotProducer.writeAllRelationships(table, false, oneImplied, dotOut, outputDir);
+                    dotProducer.writeAllRelationships(table, false, oneImplied, dotOut);
                 }
                 MustacheTableDiagram oneImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("One implied", oneImpliedDotFile, table.getName() + ".implied1degrees");
                 oneImpliedDiagram.setIsImplied(true);
                 diagrams.add(oneImpliedDiagram);
                 WriteStats twoImplied = new WriteStats(stats);
                 try (PrintWriter dotOut = Writers.newPrintWriter(twoImpliedDotFile)) {
-                    dotProducer.writeAllRelationships(table, true, twoImplied, dotOut, outputDir);
+                    dotProducer.writeAllRelationships(table, true, twoImplied, dotOut);
                 }
                 if (sameWritten(oneImplied, twoImplied)) {
                     Files.deleteIfExists(twoImpliedDotFile.toPath());
