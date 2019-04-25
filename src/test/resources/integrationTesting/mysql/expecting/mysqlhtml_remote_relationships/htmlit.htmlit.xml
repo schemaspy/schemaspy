@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="htmlit" schema="htmlit" type="MySQL - 5.7.25">
+   <tables>
+      <table catalog="htmlit" name="group" numRows="0" remarks="Groups" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="groupId" nullable="false" remarks="" size="10" type="INT">
+            <child catalog="htmlit" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="user"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="16" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="VARCHAR"/>
+         <primaryKey column="groupId" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="groupId"/>
+         </index>
+         <index name="name_unique" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table catalog="htmlit" name="user" numRows="0" remarks="Users of the system" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="userId" nullable="false" remarks="" size="10" type="INT">
+            <child catalog="logins" column="userid" foreignKey="Defined in XML" implied="false" onDeleteCascade="false" schema="logins" table="sessions"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="groupId" nullable="false" remarks="FK to groups omitted, implied relationship" size="10" type="INT">
+            <parent catalog="htmlit" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="group"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="UserName" size="16" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="email" nullable="false" remarks="" size="40" type="VARCHAR">
+            <parent catalog="newsletters" column="email" foreignKey="Defined in XML" implied="false" onDeleteCascade="false" schema="newsletters" table="releases"/>
+         </column>
+         <primaryKey column="userId" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="userId"/>
+         </index>
+         <index name="email_unique" unique="true">
+            <column ascending="true" name="email"/>
+         </index>
+      </table>
+      <table catalog="htmlit" name="userAndGroup" numRows="0" remarks="" type="VIEW" viewSql="select `u`.`name` AS `UserName`,`g`.`name` AS `GroupName` from (`htmlit`.`user` `u` left join `htmlit`.`group` `g` on((`u`.`groupId` = `g`.`groupId`)))">
+         <column autoUpdated="false" digits="0" id="0" name="UserName" nullable="false" remarks="UserName" size="16" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="1" name="GroupName" nullable="true" remarks="" size="16" type="VARCHAR"/>
+      </table>
+   </tables>
+   <routines>
+      <routine dataAccess="CONTAINS SQL" deterministic="false" name="no_det" returnType="char(50)" securityType="DEFINER" type="FUNCTION">
+         <comment/>
+         <definition language="SQL"/>
+      </routine>
+      <routine dataAccess="CONTAINS SQL" deterministic="true" name="yes_det" returnType="char(50)" securityType="DEFINER" type="FUNCTION">
+         <comment><![CDATA[is deterministic]]></comment>
+         <definition language="SQL"><![CDATA[RETURN CONCAT('Hello, ',s,'!')]]></definition>
+      </routine>
+   </routines>
+</database>

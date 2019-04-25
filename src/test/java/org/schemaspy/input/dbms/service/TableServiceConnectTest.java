@@ -95,9 +95,8 @@ public class TableServiceConnectTest {
 
         tableService.connect(database, table, tableMeta ,database.getLocals());
 
-        //To preserve behaviour even if bad
         assertThat(database.getRemoteTablesMap().get("other.other.parent")).isNotNull();
-        assertThat(loggingRule.getLog()).contains("Undefined column 'parent.parent' referenced by 'mainTable.child' in XML metadata");
+        assertThat(database.getRemoteTablesMap().get("other.other.parent").getColumn("parent")).isNotNull();
     }
 
     @Test
