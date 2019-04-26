@@ -379,6 +379,7 @@ public class TableService {
                         try {
                             // adds if doesn't exist
                             parent = addLogicalRemoteTable(db, RemoteTableIdentifier.from(fk), table.getContainer());
+                            addColumnIfMissing(parent, fk.getColumnName());
                         } catch (SQLException exc) {
                             parent = null;
                             LOGGER.debug("Failed to addRemoteTable '{}.{}.{}'", fk.getRemoteCatalog(), fk.getRemoteSchema(), fk.getTableName(), exc);
@@ -422,6 +423,14 @@ public class TableService {
             } else {
                 LOGGER.warn("Undefined column '{}.{}' in XML metadata", table.getName(), colMeta.getName());
             }
+        }
+    }
+
+    private void addColumnIfMissing(Table parent, String columnName) {
+        if (!parent.getColumnsMap().containsKey(columnName)) {
+            TableColumn tableColumn = new TableColumn(parent);
+            tableColumn.setName(columnName);
+            parent.getColumnsMap().put(columnName, tableColumn);
         }
     }
 
