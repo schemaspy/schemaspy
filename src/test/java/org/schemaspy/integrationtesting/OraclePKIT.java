@@ -34,7 +34,7 @@ import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
+import org.schemaspy.model.TableIndex;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -75,7 +75,7 @@ public class OraclePKIT {
     public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
 
     public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer("wnameless/oracle-xe-11g"))
+            new JdbcContainerRule<>(() -> new OracleContainer("christophesurmont/oracle-xe-11g"))
             .assumeDockerIsPresent()
             .withAssumptions(assumeDriverIsPresent())
             .withInitScript("integrationTesting/oracle/dbScripts/pklogging.sql");
@@ -118,23 +118,15 @@ public class OraclePKIT {
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTest() {
-        Table table = getTable("TEST");
+    public void databaseShouldHaveTable() {
+        Table table = getTable("GIWSDURATIONHISTORY");
         assertThat(table).isNotNull();
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
-        Table table = getTable("TEST");
-        TableColumn column = table.getColumn("NAME");
-        assertThat(column).isNotNull();
-    }
-
-    @Test
-    public void databaseShouldBePopulatedWithTableTestAndHaveColumnNameWithComment() {
-        Table table = getTable("TEST");
-        TableColumn column = table.getColumn("NAME");
-        assertThat(column.getComments()).isEqualToIgnoringCase("the name");
+    public void tableShouldHavePKIndex() {
+        Table table = getTable("GIWSDURATIONHISTORY");
+        assertThat(table.getIndexes().stream().filter(TableIndex::isPrimaryKey).count()).isEqualTo(1);
     }
 
     private Table getTable(String tableName) {
