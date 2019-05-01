@@ -74,9 +74,8 @@ public class VizJSDot implements DiagramProducer {
     }
 
     protected String toSvg(final String dotSource, int jsEngineMemorySize) {
-        String fixed = fixPathsAndUrls(dotSource);
         try {
-            scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("dotSource", fixed);
+            scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE).put("dotSource", dotSource);
             return (String) scriptEngine.eval("Viz(dotSource,options = { totalMemory: "+jsEngineMemorySize
                     +" , images: [" +
                     "{ path: \"../../images/foreignKeys.png\"" + ICON_SIZE + " }," +
@@ -85,11 +84,4 @@ public class VizJSDot implements DiagramProducer {
             throw new IllegalArgumentException(e);
         }
     }
-
-    private String fixPathsAndUrls(final String dotSource) {
-        String fixedImage = dotSource.replaceAll("(<IMG SRC=\\\").*(images.*)(\\\"/>)","$1../../$2$3");
-        String addedTableIfMissing = fixedImage.replaceAll("(URL=\")([^tables])(.*)(\")","$1tables/$2$3$4");
-        return addedTableIfMissing.replaceAll("(URL=\")(.*)(\")","$1../../$2$3");
-    }
-
 }

@@ -33,7 +33,8 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         MysqlHTMLIT.class,
-        MysqlHTMLITSVG.class,
+        MysqlHTMLGvSvgIT.class,
+        MysqlHTMLVizJsIT.class,
         MysqlKeyWordTableIT.class,
         MysqlMultiSchemaIT.class,
         MysqlRoutinesIT.class,

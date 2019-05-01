@@ -10,7 +10,7 @@ import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
-import org.schemaspy.view.DotFormatter;
+import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.view.MustacheTableDiagram;
 import org.schemaspy.view.WriteStats;
 
@@ -27,9 +27,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 public class MustacheSummaryDiagramFactoryTest {
@@ -78,8 +76,7 @@ public class MustacheSummaryDiagramFactoryTest {
                         anyBoolean(),
                         anyBoolean(),
                         any(WriteStats.class),
-                        any(PrintWriter.class),
-                        any(File.class));
+                        any(PrintWriter.class));
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
@@ -109,10 +106,9 @@ public class MustacheSummaryDiagramFactoryTest {
                         anyBoolean(),
                         anyBoolean(),
                         any(WriteStats.class),
-                        any(PrintWriter.class),
-                        any(File.class));
+                        any(PrintWriter.class));
 
-        when(dotProducer.writeAllRelationships(any(Database.class), any(Collection.class), anyBoolean(), anyBoolean(), any(WriteStats.class), any(PrintWriter.class), any(File.class))).thenReturn(true);
+        when(dotProducer.writeAllRelationships(any(Database.class), any(Collection.class), anyBoolean(), anyBoolean(), any(WriteStats.class), any(PrintWriter.class))).thenReturn(true);
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());

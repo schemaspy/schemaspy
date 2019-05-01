@@ -42,6 +42,8 @@ import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.graphviz.GraphvizDot;
 import org.schemaspy.output.diagram.vizjs.VizJSDot;
+import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.output.html.mustache.diagrams.*;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.util.ManifestUtils;
@@ -341,8 +343,8 @@ public class SchemaAnalyzer {
         // we get a relationships ER diagram
         if (config.isRailsEnabled())
             DbAnalyzer.getRailsConstraints(db.getTablesMap());
-
-        DotFormatter dotProducer = DotFormatter.getInstance();
+        DotConfig dotConfig = new DotConfigUsingConfig(config, "svg".equalsIgnoreCase(diagramFactory.getDiagramFormat()));
+        DotFormatter dotProducer = new DotFormatter(dotConfig);
         MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(diagramFactory);
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, impliedConstraintsFinder, outputDir);

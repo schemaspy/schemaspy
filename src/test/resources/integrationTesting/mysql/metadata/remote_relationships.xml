@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schemaMeta xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemaspy.org/xsd/6/schemameta.xsd" >
+    <comments/>
+    <tables>
+        <!-- Remote table with reference to user.userid-->
+        <table name="sessions" remoteCatalog="logins" remoteSchema="logins">
+            <column name="sessionId" autoUpdated="true" primaryKey="true" type="INT"/>
+            <column name="userid" type="INT">
+                <foreignKey table="user" column="userId"/>
+            </column>
+        </table>
+        <!-- Reference from a table to a remote table -->
+        <table name="user">
+            <column name="email">
+                <foreignKey table="releases" column="email" remoteCatalog="newsletters" remoteSchema="newsletters" />
+            </column>
+        </table>
+    </tables>
+</schemaMeta>

@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
+import org.schemaspy.DotConfigUsingConfig;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -34,8 +35,8 @@ import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.ProgressListener;
+import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.testing.H2MemoryRule;
-import org.schemaspy.view.DotFormatter;
 import org.schemaspy.view.WriteStats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -321,13 +322,15 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
+        DotFormatter dotFormatter = new DotFormatter(new DotConfigUsingConfig(config, false));
+
         StringWriter withoutSchemaMetaOutput = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(withoutSchemaMetaOutput)) {
-            DotFormatter.getInstance().writeAllRelationships(database.getTablesMap().get("COMPANY"), false, new WriteStats(database.getTables()), printWriter, temporaryFolder.newFolder("withoutSchemaMeta"));
+            dotFormatter.writeAllRelationships(database.getTablesMap().get("COMPANY"), false, new WriteStats(database.getTables()), printWriter);
         }
         StringWriter withSchemaMetaOutput = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(withSchemaMetaOutput)){
-            DotFormatter.getInstance().writeAllRelationships(databaseWithSchemaMeta.getTablesMap().get("COMPANY"), false, new WriteStats(databaseWithSchemaMeta.getTables()), printWriter, temporaryFolder.newFolder("withSchemaMeta"));
+            dotFormatter.writeAllRelationships(databaseWithSchemaMeta.getTablesMap().get("COMPANY"), false, new WriteStats(databaseWithSchemaMeta.getTables()), printWriter);
         }
         assertThat(withoutSchemaMetaOutput.toString()).contains("\"COUNTRY\":\"COUNTRYID\"");
         assertThat(withSchemaMetaOutput.toString()).doesNotContain("\"COUNTRY\":\"COUNTRYID\"");

@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,10 +49,9 @@ public class GraphvizDot implements DiagramProducer {
     private final GraphvizVersion badGraphvizVersion = new GraphvizVersion("2.31");
     private final String lineSeparator = System.getProperty("line.separator");
     private String dotExe;
-    private final Set<String> validatedRenderers = Collections.synchronizedSet(new HashSet<String>());
-    private final Set<String> invalidatedRenderers = Collections.synchronizedSet(new HashSet<String>());
+    private final Set<String> validRenders = new HashSet<>();
 
-    private String effectiveRenderer;
+    private final String effectiveRenderer;
     private static final String CAIRO_RENDERER = ":cairo";
     private static final String GD_RENDERER = ":gd";
     private static final String EMPTY_RENDERER = "";
@@ -60,8 +59,8 @@ public class GraphvizDot implements DiagramProducer {
     public GraphvizDot(GraphvizConfig graphvizConfig) {
         this.graphvizConfig = graphvizConfig;
         this.graphvizVersion = initVersion();
-        this.effectiveRenderer = initRenderer();
-        validatedRenderers.add("");
+        initValidRenders();
+        effectiveRenderer = initRenderer();
     }
 
     private GraphvizVersion initVersion() {
@@ -92,35 +91,66 @@ public class GraphvizDot implements DiagramProducer {
         return new GraphvizVersion(versionText);
     }
 
-    private String initRenderer() {
-        if (isValid() && !supportsRenderer(graphvizConfig.getRenderer())) {
-            LOGGER.info("renderer '{}' is not supported by your graphvizVersion of dot", graphvizConfig.getRenderer());
+    private void initValidRenders() {
+        if (!isValid()) {
+            return;
         }
-        return graphvizConfig.getRenderer();
-    }
-
-    public String getImplementationDetails() {
-        return "Graphviz dot " + getGraphvizVersion().toString();
-    }
-
-    public boolean exists() {
-        return graphvizVersion.toString() != null;
-    }
-
-    public GraphvizVersion getGraphvizVersion() {
-        return graphvizVersion;
+        validRenders.add("");
+        Pattern rendererPattern = Pattern.compile(getDiagramFormat()+"(:[^\"][a-zA-Z]*)");
+        try {
+            String[] dotCommand = new String[]{
+                    getExe(),
+                    "-T" + getDiagramFormat() + ':'
+            };
+            Process process = Runtime.getRuntime().exec(dotCommand);
+            try (Scanner scanner = new Scanner(new InputStreamReader(process.getErrorStream()))){
+                while (scanner.hasNext(rendererPattern)) {
+                    validRenders.add(scanner.next(rendererPattern));
+                }
+            }
+            process.waitFor();
+        } catch (Exception exc) {
+            LOGGER.error("Error determining if a renderer is supported",exc);
+        }
     }
 
     public boolean isValid() {
         return exists() && (getGraphvizVersion().equals(supportedGraphvizVersion) || getGraphvizVersion().compareTo(badGraphvizVersion) > 0);
     }
 
-    public String getSupportedVersions() {
-        return "dot graphvizVersion " + supportedGraphvizVersion + " or versions greater than " + badGraphvizVersion;
+    public boolean exists() {
+        return graphvizVersion.toString() != null;
     }
 
-    public boolean supportsCenteredEastWestEdges() {
-        return getGraphvizVersion().compareTo(new GraphvizVersion("2.6")) >= 0;
+    /**
+     * Set the renderer to use for the -Tformat[:renderer[:formatter]] dot option as specified
+     * at <a href='http://www.graphviz.org/doc/info/command.html'>
+     * http://www.graphviz.org/doc/info/command.html</a> where "format" is specified by getFormat
+     * Note that the leading ":" is required while :formatter is optional.
+     *
+     * @return renderer
+     */
+    private String initRenderer() {
+        String possibleRenderer = graphvizConfig.getRenderer();
+        if (Objects.isNull(possibleRenderer) || !validRenders.contains(possibleRenderer)) {
+            if (validRenders.contains(CAIRO_RENDERER)) {
+                possibleRenderer = CAIRO_RENDERER;
+            } else if (validRenders.contains(GD_RENDERER)) {
+                possibleRenderer = GD_RENDERER;
+            } else {
+                possibleRenderer = EMPTY_RENDERER;
+            }
+        }
+        LOGGER.info("Graphviz rendered set to '{}'", possibleRenderer);
+        return possibleRenderer;
+    }
+
+    public String getImplementationDetails() {
+        return "Graphviz dot " + getGraphvizVersion().toString();
+    }
+
+    public GraphvizVersion getGraphvizVersion() {
+        return graphvizVersion;
     }
 
     /**
@@ -132,101 +162,6 @@ public class GraphvizDot implements DiagramProducer {
      */
     public String getDiagramFormat() {
         return Objects.isNull(graphvizConfig.getImageFormat()) ? "png": graphvizConfig.getImageFormat();
-    }
-
-    /**
-     * Returns true if the installed dot requires specifying :gd as a renderer.
-     * This was added when Win 2.15 came out because it defaulted to Cairo, which produces
-     * better quality output, but at a significant speed and size penalty.<p>
-     * <p>
-     * The intent of this property is to determine if it's ok to tack ":gd" to
-     * the format specifier.  Earlier versions didn't require it and didn't know
-     * about the option.
-     *
-     * @return
-     */
-    public boolean requiresGdRenderer() {
-        return getGraphvizVersion().compareTo(new GraphvizVersion("2.12")) >= 0 && supportsRenderer(GD_RENDERER);
-    }
-
-    /**
-     * Set the renderer to use for the -Tformat[:renderer[:formatter]] dot option as specified
-     * at <a href='http://www.graphviz.org/doc/info/command.html'>
-     * http://www.graphviz.org/doc/info/command.html</a> where "format" is specified by getFormat
-     * Note that the leading ":" is required while :formatter is optional.
-     *
-     * @return renderer
-     */
-    public String getRenderer() {
-        if (effectiveRenderer == null) {
-            setHighQuality(true);
-        }
-        if (supportsRenderer(effectiveRenderer)) {
-            return effectiveRenderer;
-        } else {
-            return requiresGdRenderer() ? GD_RENDERER : "";
-        }
-    }
-
-    /**
-     * If <code>true</code> then generate output of "higher quality".
-     * Note that the default is intended to be "higher quality",
-     * but various installations of Graphviz may have have different abilities.
-     * That is, some might not have the "lower quality" libraries and others might
-     * not have the "higher quality" libraries.
-     */
-    public void setHighQuality(boolean highQuality) {
-        if (highQuality && supportsRenderer(CAIRO_RENDERER)) {
-            effectiveRenderer = CAIRO_RENDERER;
-        } else if (supportsRenderer(GD_RENDERER)) {
-            effectiveRenderer = GD_RENDERER;
-        } else {
-            effectiveRenderer = EMPTY_RENDERER;
-        }
-    }
-
-    /**
-     * Returns <code>true</code> if the specified renderer is supported.
-     * See {@link #getRenderer()} for renderer details.
-     *
-     * @param renderer
-     * @return
-     */
-    private boolean supportsRenderer(@SuppressWarnings("hiding") String renderer) {
-        if (!exists())
-            return false;
-
-        if (validatedRenderers.contains(renderer))
-            return true;
-
-        if (invalidatedRenderers.contains(renderer))
-            return false;
-
-        try {
-            String[] dotCommand = new String[]{
-                    getExe(),
-                    "-T" + getDiagramFormat() + ':'
-            };
-            Process process = Runtime.getRuntime().exec(dotCommand);
-            BufferedReader errors = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            String line;
-            while ((line = errors.readLine()) != null) {
-                if (line.contains(getDiagramFormat() + renderer)) {
-                    validatedRenderers.add(renderer);
-                }
-            }
-            process.waitFor();
-        } catch (Exception exc) {
-            LOGGER.error("Error determining if a renderer is supported",exc);
-        }
-
-        if (!validatedRenderers.contains(renderer)) {
-            LOGGER.info("Failed to validate {} renderer '{}'.  Reverting to default renderer for {}.", getDiagramFormat(), renderer, getDiagramFormat());
-            invalidatedRenderers.add(renderer);
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -254,14 +189,17 @@ public class GraphvizDot implements DiagramProducer {
      * Using the specified .dot file generates an image returning the image's image map.
      */
     public String generateDiagram(File dotFile, File diagramFile) {
+        if (!isValid()) {
+            throw new DiagramException("Dot missing or invalid version");
+        }
         StringBuilder mapBuffer = new StringBuilder(1024);
 
         // this one is for executing.  it can (hopefully) deal with funky things in filenames.
         String[] dotCommand = new String[]{
                 getExe(),
-                "-T" + getDiagramFormat() + getRenderer(),
-                dotFile.toString(),
-                "-o" + diagramFile,
+                "-T" + getDiagramFormat() + effectiveRenderer,
+                dotFile.getName(),
+                "-o" + diagramFile.getName(),
                 //"-v", //Enable verbose mode
                 "-Tcmapx"
         };
@@ -270,7 +208,7 @@ public class GraphvizDot implements DiagramProducer {
         LOGGER.debug(commandLine);
 
         try {
-            Process process = Runtime.getRuntime().exec(dotCommand);
+            Process process = Runtime.getRuntime().exec(dotCommand, null, dotFile.getParentFile());
             new ProcessOutputReader(commandLine, process.getErrorStream()).start();
             try (BufferedReader mapReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
