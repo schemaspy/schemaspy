@@ -62,6 +62,7 @@ public class XmlProducerUsingDOM implements XmlProducer {
 
     private final XmlTableFormatter xmlTableFormatter = new XmlTableFormatter();
     private final XmlRoutineFormatter xmlRoutineFormatter = new XmlRoutineFormatter();
+    private final XmlSequenceFormatter xmlSequenceFormatter = new XmlSequenceFormatter();
 
     @Override
     public void generate(Database database, File outputDir) {
@@ -96,6 +97,7 @@ public class XmlProducerUsingDOM implements XmlProducer {
 
         xmlTableFormatter.appendTables(rootNode, tables);
         xmlRoutineFormatter.appendRoutines(rootNode, database.getRoutines());
+        xmlSequenceFormatter.appendSequences(rootNode, database.getSequences());
 
         String xmlName = database.getName();
 

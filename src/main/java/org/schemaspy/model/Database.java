@@ -50,6 +50,7 @@ public class Database {
     private final Map<String, Table> locals = new CombinedMap(tables, views);
     private final Map<String, Routine> routines = new CaseInsensitiveMap<>();
     private final ZonedDateTime connectTime = ZonedDateTime.now();
+    private final Map<String, Sequence> sequences = new CaseInsensitiveMap<>();
 
     public Database(
             DbmsMeta dbmsMeta,
@@ -119,6 +120,12 @@ public class Database {
 
     public Map<String, Routine> getRoutinesMap() {
         return routines;
+    }
+
+    public Collection<Sequence> getSequences(){ return sequences.values();}
+
+    public Map<String, Sequence> getSequencesMap() {
+        return sequences;
     }
 
     /**
