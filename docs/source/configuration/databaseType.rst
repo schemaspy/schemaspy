@@ -155,6 +155,8 @@ So additional columns are ok, but you might need to alias columns so that they a
         *Fetch views, expected columns:* |br| **view_name, view_catalog, view_schema, view_comment, view_definition**
     selectIndexesSql=
         *Fetch indexes, expected columns:* |br| **INDEX_NAME, TYPE, NON_UNIQUE, COLUMN_NAME, ASC_OR_DESC**
+    selectPrimaryKeysSql=
+        *Fetch table PKs, expected columns:* |br| **TABLE_CAT, TABLE_SCHEM, TABLE_NAME, COLUMN_NAME, KEY_SEQ, PK_NAME**
     selectRowCountSql=
         *Fetch row count for a table, expected columns:* |br| **row_count**
     selectColumnTypesSql=

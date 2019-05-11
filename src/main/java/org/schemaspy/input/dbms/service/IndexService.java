@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -47,7 +46,7 @@ public class IndexService {
 
     public void gatherIndexes(Database database, Table table) throws SQLException {
         initIndexes(database, table);
-        initPrimaryKeys(table);
+        initPrimaryKeys(database, table);
     }
 
     /**
@@ -56,27 +55,28 @@ public class IndexService {
      * @throws SQLException
      */
     private void initIndexes(Database db, Table table) throws SQLException {
-        if (table.isView() || table.isRemote())
+        if (table.isView() || table.isRemote()) {
             return;
+        }
 
         // first try to initialize using the index query spec'd in the .properties
         // do this first because some DB's (e.g. Oracle) do 'bad' things with getIndexInfo()
         // (they try to do a DDL analyze command that has some bad side-effects)
-        if (initIndexes(db, table, Config.getInstance().getDbProperties().getProperty("selectIndexesSql")))
+        if (initIndexes(db, table, Config.getInstance().getDbProperties().getProperty("selectIndexesSql"))) {
             return;
+        }
 
         // couldn't, so try the old fashioned approach
-
-
-        try (ResultSet rs = sqlService.getDatabaseMetaData().getIndexInfo(table.getCatalog(), table.getSchema(), table.getName(), false, true)){
-
+        try (ResultSet rs = sqlService.getDatabaseMetaData().getIndexInfo(table.getCatalog(), table.getSchema(), table.getName(), false, true)) {
             while (rs.next()) {
-                if (isIndexRow(rs))
+                if (isIndexRow(rs)) {
                     addIndex(table, rs);
+                }
             }
         } catch (SQLException exc) {
-            if (!table.isLogical())
+            if (!table.isLogical()) {
                 LOGGER.warn("Unable to extract index info for table '{}' in schema '{}': {}", table.getName(), table.getContainer(), exc);
+            }
         }
     }
 
@@ -93,16 +93,15 @@ public class IndexService {
      * @return boolean <code>true</code> if it worked, otherwise <code>false</code>
      */
     private boolean initIndexes(Database db, Table table, String selectIndexesSql) {
-        if (selectIndexesSql == null)
+        if (selectIndexesSql == null) {
             return false;
+        }
 
-
-        try (PreparedStatement stmt = sqlService.prepareStatement(selectIndexesSql, db, table.getName());
-             ResultSet rs = stmt.executeQuery()) {
-
+        try (ResultSet rs = sqlService.prepareStatement(selectIndexesSql, db, table.getName()).executeQuery()) {
             while (rs.next()) {
-                if (rs.getShort("TYPE") != DatabaseMetaData.tableIndexStatistic)
+                if (rs.getShort("TYPE") != DatabaseMetaData.tableIndexStatistic) {
                     addIndex(table, rs);
+                }
             }
         } catch (SQLException sqlException) {
             LOGGER.warn("Failed to query index information with SQL: {}", selectIndexesSql, sqlException);
@@ -119,14 +118,14 @@ public class IndexService {
     private static void addIndex(Table table, ResultSet rs) throws SQLException {
         String indexName = rs.getString("INDEX_NAME");
 
-        if (indexName == null)
+        if (indexName == null) {
             return;
+        }
 
         TableIndex index = table.getIndex(indexName);
 
         if (index == null) {
             index = new TableIndex(indexName, !rs.getBoolean("NON_UNIQUE"));
-
             table.getIndexesMap().put(index.getName(), index);
         }
 
@@ -137,17 +136,26 @@ public class IndexService {
      *
      * @throws SQLException
      */
-    private void initPrimaryKeys(Table table) throws SQLException {
+    private void initPrimaryKeys(Database database, Table table) throws SQLException {
 
         LOGGER.debug("Querying primary keys for {}", table.getFullName());
-        try (ResultSet rs = sqlService.getDatabaseMetaData().getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName())){
-            while (rs.next())
+        try (ResultSet rs = getPrimaryKeys(database, table)){
+            while (rs.next()) {
                 addPrimaryKeyColumn(table, rs);
+            }
         } catch (SQLException exc) {
             if (!table.isLogical()) {
                 throw exc;
             }
         }
+    }
+
+    private ResultSet getPrimaryKeys(Database database, Table table) throws SQLException {
+        String sql = Config.getInstance().getDbProperties().getProperty("selectPrimaryKeysSql");
+        if (Objects.nonNull(sql)) {
+            return sqlService.prepareStatement(sql, database, table.getName()).executeQuery();
+        }
+        return sqlService.getDatabaseMetaData().getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName());
     }
 
     /**
@@ -181,7 +189,7 @@ public class IndexService {
             if(Objects.nonNull(tableIndex)) {
                 tableIndex.setIsPrimaryKey(true);
             } else {
-                LOGGER.warn("Found PK for table '{}' with index name '{}', but index hasn't been found", table.getName(), pkName);
+                LOGGER.warn("Found PK for table '{}' with pk name '{}', but index hasn't been found", table.getName(), pkName);
             }
         } else {
             String syntheticName = table.getName() + "_s_pk";
@@ -194,7 +202,7 @@ public class IndexService {
                     });
             tableIndex.addColumn(tableColumn, null);
             tableIndex.setIsPrimaryKey(true);
-            LOGGER.info("Found PK without index name, added column '{}' to index '{}' in table '{}'", tableColumn.getName(), syntheticName, table.getName());
+            LOGGER.debug("Found PK without index name, added column '{}' to index '{}' in table '{}'", tableColumn.getName(), syntheticName, table.getName());
         }
     }
 }
