@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -96,8 +97,8 @@ public class IndexService {
         if (selectIndexesSql == null) {
             return false;
         }
-
-        try (ResultSet rs = sqlService.prepareStatement(selectIndexesSql, db, table.getName()).executeQuery()) {
+        try (PreparedStatement preparedStatement = sqlService.prepareStatement(selectIndexesSql, db, table.getName());
+             ResultSet rs = preparedStatement.executeQuery()) {
             while (rs.next()) {
                 if (rs.getShort("TYPE") != DatabaseMetaData.tableIndexStatistic) {
                     addIndex(table, rs);
@@ -107,7 +108,6 @@ public class IndexService {
             LOGGER.warn("Failed to query index information with SQL: {}", selectIndexesSql, sqlException);
             return false;
         }
-
         return true;
     }
 
@@ -137,11 +137,20 @@ public class IndexService {
      * @throws SQLException
      */
     private void initPrimaryKeys(Database database, Table table) throws SQLException {
-
         LOGGER.debug("Querying primary keys for {}", table.getFullName());
-        try (ResultSet rs = getPrimaryKeys(database, table)){
-            while (rs.next()) {
-                addPrimaryKeyColumn(table, rs);
+        String sql = Config.getInstance().getDbProperties().getProperty("selectPrimaryKeysSql");
+        try {
+            if (Objects.nonNull(sql)) {
+                try (PreparedStatement preparedStatement = sqlService.prepareStatement(sql, database, table.getName());
+                     ResultSet resultSet = preparedStatement.executeQuery()) {
+                        processPrimaryKeyResultSet(table, resultSet);
+                }
+            } else {
+                try (ResultSet resultSet = sqlService
+                        .getDatabaseMetaData()
+                        .getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName())) {
+                    processPrimaryKeyResultSet(table, resultSet);
+                }
             }
         } catch (SQLException exc) {
             if (!table.isLogical()) {
@@ -150,12 +159,10 @@ public class IndexService {
         }
     }
 
-    private ResultSet getPrimaryKeys(Database database, Table table) throws SQLException {
-        String sql = Config.getInstance().getDbProperties().getProperty("selectPrimaryKeysSql");
-        if (Objects.nonNull(sql)) {
-            return sqlService.prepareStatement(sql, database, table.getName()).executeQuery();
+    private void processPrimaryKeyResultSet(Table table, ResultSet resultSet) throws SQLException {
+        while (resultSet.next()) {
+            addPrimaryKeyColumn(table, resultSet);
         }
-        return sqlService.getDatabaseMetaData().getPrimaryKeys(table.getCatalog(), table.getSchema(), table.getName());
     }
 
     /**
