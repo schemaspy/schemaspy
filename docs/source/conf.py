@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SchemaSpy'
-copyright = u'2017, SchemaSpy Contributors'
+copyright = u'2019, SchemaSpy Contributors'
 author = u'SchemaSpy Contributors'
 
 # The version info for the project you're documenting, acts as replacement for
