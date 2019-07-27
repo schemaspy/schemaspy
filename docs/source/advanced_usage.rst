@@ -20,10 +20,11 @@ As an example running mysql with a new driver you'll get warning
 This can be omited by addind connection property ``useSSL=false``
 
 To add this connection property add following to commandline:
-``-connprops useSSL\\=false``
+``-connprops useSSL\=false``
 
-``-connprops`` can also take a properties file as argument but when escaping the = with double ``\`` it will use it as "useSSL=false"
-If key or value contains ``/`` it needs to be escaped with a single ``\``. Multiple pairs can be separated by ``;``
+``-connprops`` can also take a properties file as argument but when escaping the ``=`` with ``\`` it will use it as "useSSL=false".
+If key or value contains ``/`` it needs to be escaped with a single ``\``. Multiple pairs can be separated by ``;``.
+If using linux shell or git bash in windows the ``\`` also needs to be escaped with a ``\`` so for example it would look like ``useSSL\\=false``.
 
 
 Create your own DB type

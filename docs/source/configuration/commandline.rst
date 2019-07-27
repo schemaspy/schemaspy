@@ -45,7 +45,8 @@ Connecting
     Prompt for password, if you don't want to have password in command history.
 [-connprops filePathOrKeyValue]
     Either a properties-file with additional properties or a key/value list, pairs separated by ``;``
-    and key and value separated by ``\\=`` example ``-connprops key1\\=value1;key2\\=value2`` see also :ref:`started_connection_props`.
+    and key and value separated by ``\=`` example ``-connprops key1\=value1;key2\=value2`` see also :ref:`started_connection_props`.
+    In linux shells or git bash on windows the ``\`` also needs to be escaped so it should look like ``\\=``. |br|
     ConnectionProperties will always be populated with -u and -p if they exist.
 [-dp pathToDrivers]
     Looks for drivers here before looking in driverPath in [databaseType].properties.
