@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Nils Petzaell
+ * Copyright (C) 2018 AE Ibrahim
  *
  * This file is part of SchemaSpy.
  *

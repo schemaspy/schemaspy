@@ -95,9 +95,9 @@ public class XmlProducerUsingDOM implements XmlProducer {
             DOMUtil.appendAttribute(rootNode, "schema", database.getSchema().getName());
         DOMUtil.appendAttribute(rootNode, "type", database.getDatabaseProduct());
 
+        xmlSequenceFormatter.appendSequences(rootNode, database.getSequences());
         xmlTableFormatter.appendTables(rootNode, tables);
         xmlRoutineFormatter.appendRoutines(rootNode, database.getRoutines());
-        xmlSequenceFormatter.appendSequences(rootNode, database.getSequences());
 
         String xmlName = database.getName();
 
