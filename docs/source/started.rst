@@ -4,7 +4,7 @@ Get Started
 Configuration
 -------------
 
-Parameters can be specified in the comand line (described below) or you can predefine configuration in the file.
+Parameters can be specified in the command line (described below) or you can predefine configuration in the file.
 SchemaSpy will search configuration file in 
 ``<current-dir>/schemaspy.properties``
 To use an alternative configuration file run SchemaSpy with parameter: ``java -jar schemaspy.jar -configFile path/to/config.file``
