@@ -13,34 +13,35 @@ Share this library with friends on Twitter and everywhere else you can.
 > If you notice bug or have something not working please report an issue, we'll try to fix it as soon as possible.
 More documentation and features expected to be soon. Feel free to contribute.
 
-This is a new code repository for SchemaSpy tool initially created and maintained by John Currier.
-I'm personally believe that work on SchemaSpy should be continued and a lot of still existing issue should be resolved.
-Last released version of the SchemaSpy was two years ago, and I have plan to change this.
+This is a new code repository for SchemaSpy tool initially created and maintained [by John Currier](http://schemaspy.sourceforge.net/).
+I personally believe that work on SchemaSpy should be continued, and a lot of still existing issues should be resolved.
+Last released version of the SchemaSpy was in 2010, and I have a plan to change this.
 
-I would like to say thank you to John Currier for invent this database entity-relationship (ER) diagram generator.
+I would like to say thank you to John Currier for the invention of this database entity-relationship (ER) diagram generator.
 
-In next days I have plan to release new SchemaSpy version and concentrate to refactor and improve the solution.
+My plan is to release new SchemaSpy version and concentrate on refactoring and improving it.
+
 In new **SchemaSpy 6.0** version you will find:
 
 1. Absolutely new amazing look and feel generated content
 
 2. You can very easily change SchemaSpy theme because all of the logic was moved outside the Java code
 
-3. Speed of database generation was little improve
+3. Speed of database generation improved a little
 
-4. Generation of the html pages was changed from plain concatenaited text in Java code to Moustache engine
+4. Generation of the html pages was changed from plain concatenated text in Java code to Moustache engine
 
 5. In database comments you can use Markdown language what should improve user experience from reading your database documentation
 
 6. You can also easily create in database comments links to the tables and columns
 
-More detail will came in next days plus I have in plan to start working on all not resolved issues.
+More detail will came in next days plus I have plan to start working on all not resolved issues.
 
 ## Documentation
 
 If you need more info about how to use or install SchemaSpy please read the last documentation at Read the Docs.
 
-[Documentation](http://schemaspy.readthedocs.io/en/latest/)
+[Documentation](https://schemaspy.readthedocs.io/en/latest/)
 
 [Sample Output](http://schemaspy.org/sample/index.html)
 
