@@ -92,8 +92,7 @@ public class DbSpecificConfig {
      * Dump usage details associated with the associated type of database
      */
     public void dumpUsage() {
-        LOGGER.info(description);
-        LOGGER.info("Usage -t {}", dbType);
+        LOGGER.info("{} (-t {})", description, dbType);
         getOptions().stream().flatMap(option -> {
             if ("hostOptionalPort".equals(option.getName())) {
                 return Stream.of(
