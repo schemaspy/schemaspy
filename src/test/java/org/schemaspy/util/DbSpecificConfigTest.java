@@ -69,7 +69,7 @@ public class DbSpecificConfigTest {
     public void dumpUsageWithoutHostAndOptionalPort() {
         DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withoutHostAndOptionalPort", withoutHostAndOptionalPort);
         dbSpecificConfig.dumpUsage();
-        assertThat(loggingRule.getLog()).isEqualTo("MySQLUsage -t withoutHostAndOptionalPort   -host   \t\thost where database resides with optional port   -db   \t\tdatabase name   -socketFactory   \t\tClassName of socket factory which must be in your classpath   -socket   \t\tPath To Socket");
+        assertThat(loggingRule.getLog()).isEqualTo("MySQL (-t withoutHostAndOptionalPort)   -host   \t\thost where database resides with optional port   -db   \t\tdatabase name   -socketFactory   \t\tClassName of socket factory which must be in your classpath   -socket   \t\tPath To Socket");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class DbSpecificConfigTest {
     public void dumpUsageWithHostAndOptionalPort(){
         DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withHostAndOptionalPort", withHostAndOptionalPort);
         dbSpecificConfig.dumpUsage();
-        assertThat(loggingRule.getLog()).isEqualTo("MySQLUsage -t withHostAndOptionalPort   -host   \t\thost of database, may contain port   -port   \t\toptional port if not default   -db   \t\tdatabase name");
+        assertThat(loggingRule.getLog()).isEqualTo("MySQL (-t withHostAndOptionalPort)   -host   \t\thost of database, may contain port   -port   \t\toptional port if not default   -db   \t\tdatabase name");
     }
 
 }
