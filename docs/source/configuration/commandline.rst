@@ -61,7 +61,6 @@ Processing
     Filter using a specific catalog this is usually the root of the database and contains schemas.
 [-s schema]
     Database schema. This is optional if it's the same as user or isn't supported by your database.
-    Use -noschema if your database thinks it supports schemas but doesn't (e.g. older versions of Informix).
 [-schemas listOfSchemas]
     List of schemas to analyze, separated by space or ``,`` or ``'`` or ``"``
 [-all]
