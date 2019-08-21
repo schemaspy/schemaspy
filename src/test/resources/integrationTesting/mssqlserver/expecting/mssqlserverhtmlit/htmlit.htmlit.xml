@@ -2,12 +2,12 @@
 <database name="htmlit" schema="htmlit" type="Microsoft SQL Server - 14.00.3015">
    <tables>
       <table catalog="htmlit" name="group" numRows="0" remarks="Unicode: ộ" schema="htmlit" type="TABLE">
-         <column autoUpdated="true" digits="0" id="0" name="groupId" nullable="false" remarks="" size="4" type="int identity">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="groupId" nullable="false" remarks="" size="4" type="int identity" typeCode="4">
             <child catalog="htmlit" column="gid" foreignKey="FK_gid" implied="false" onDeleteCascade="false" schema="htmlit" table="group_resources"/>
             <child catalog="htmlit" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="htmlit" table="user"/>
          </column>
-         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="16" type="varchar"/>
-         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="varchar"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="varchar" typeCode="12"/>
          <primaryKey column="groupId" sequenceNumberInPK="1"/>
          <index name="PK_groupId" unique="true">
             <column ascending="true" name="groupId"/>
@@ -17,13 +17,13 @@
          </index>
       </table>
       <table catalog="htmlit" name="group_resources" numRows="0" remarks="" schema="htmlit" type="TABLE">
-         <column autoUpdated="false" digits="0" id="0" name="gid" nullable="false" remarks="" size="4" type="int">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="gid" nullable="false" remarks="" size="4" type="int" typeCode="4">
             <parent catalog="htmlit" column="groupId" foreignKey="FK_gid" implied="false" onDeleteCascade="false" schema="htmlit" table="group"/>
          </column>
-         <column autoUpdated="false" digits="0" id="1" name="rid" nullable="false" remarks="" size="4" type="int">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="rid" nullable="false" remarks="" size="4" type="int" typeCode="4">
             <parent catalog="htmlit" column="rid" foreignKey="FK_rid" implied="false" onDeleteCascade="false" schema="htmlit" table="resources"/>
          </column>
-         <column autoUpdated="false" defaultValue="('n')" digits="0" id="2" name="access" nullable="false" remarks="" size="2" type="varchar"/>
+         <column autoUpdated="false" defaultValue="('n')" digits="0" id="2" name="access" nullable="false" remarks="" size="2" type="varchar" typeCode="12"/>
          <primaryKey column="gid" sequenceNumberInPK="1"/>
          <primaryKey column="rid" sequenceNumberInPK="2"/>
          <index name="PK_gid_rid" unique="true">
@@ -33,11 +33,11 @@
          <checkConstraint constraint="([access]='rw' OR [access]='r' OR [access]='n')" name="CK_access_value"/>
       </table>
       <table catalog="htmlit" name="resources" numRows="0" remarks="" schema="htmlit" type="TABLE">
-         <column autoUpdated="false" digits="0" id="0" name="rid" nullable="false" remarks="" size="4" type="int">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="rid" nullable="false" remarks="" size="4" type="int" typeCode="4">
             <child catalog="htmlit" column="rid" foreignKey="FK_rid" implied="false" onDeleteCascade="false" schema="htmlit" table="group_resources"/>
          </column>
-         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="40" type="varchar"/>
-         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="varchar"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="" size="40" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="varchar" typeCode="12"/>
          <primaryKey column="rid" sequenceNumberInPK="1"/>
          <index name="PK_rid" unique="true">
             <column ascending="true" name="rid"/>
@@ -47,12 +47,12 @@
          </index>
       </table>
       <table catalog="htmlit" name="user" numRows="0" remarks="" schema="htmlit" type="TABLE">
-         <column autoUpdated="true" digits="0" id="0" name="userId" nullable="false" remarks="" size="4" type="int identity"/>
-         <column autoUpdated="false" digits="0" id="1" name="groupId" nullable="false" remarks="" size="4" type="int">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="userId" nullable="false" remarks="" size="4" type="int identity" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="groupId" nullable="false" remarks="" size="4" type="int" typeCode="4">
             <parent catalog="htmlit" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="htmlit" table="group"/>
          </column>
-         <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="" size="16" type="varchar"/>
-         <column autoUpdated="false" digits="0" id="3" name="email" nullable="false" remarks="" size="40" type="varchar"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="email" nullable="false" remarks="" size="40" type="varchar" typeCode="12"/>
          <primaryKey column="userId" sequenceNumberInPK="1"/>
          <index name="PK_userId" unique="true">
             <column ascending="true" name="userId"/>
@@ -62,8 +62,8 @@
          </index>
       </table>
       <table catalog="htmlit" name="userAndGroup" numRows="0" remarks="" schema="htmlit" type="VIEW" viewSql="CREATE VIEW htmlit.userAndGroup AS SELECT u.name AS UserName, g.name AS GroupName FROM [htmlit].[user] u JOIN [htmlit].[group] g ON u.groupId = g.groupId">
-         <column autoUpdated="false" digits="0" id="0" name="UserName" nullable="false" remarks="" size="16" type="varchar"/>
-         <column autoUpdated="false" digits="0" id="1" name="GroupName" nullable="false" remarks="" size="16" type="varchar"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="UserName" nullable="false" remarks="" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="GroupName" nullable="false" remarks="" size="16" type="varchar" typeCode="12"/>
       </table>
    </tables>
 </database>

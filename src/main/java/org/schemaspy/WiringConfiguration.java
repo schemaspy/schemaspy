@@ -67,8 +67,13 @@ public class WiringConfiguration {
     }
 
     @Bean
-    public DatabaseService databaseService(Clock clock, SqlService sqlService, TableService tableService, ViewService viewService, RoutineService routineService) {
-        return new DatabaseService(clock, sqlService, tableService, viewService, routineService);
+    public SequenceService sequencesService(SqlService sqlService) {
+        return new SequenceService(sqlService);
+    }
+
+    @Bean
+    public DatabaseService databaseService(Clock clock, SqlService sqlService, TableService tableService, ViewService viewService, RoutineService routineService, SequenceService sequenceService) {
+        return new DatabaseService(clock, sqlService, tableService, viewService, routineService, sequenceService);
     }
 
     @Bean
