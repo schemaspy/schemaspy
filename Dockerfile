@@ -1,4 +1,4 @@
-FROM openjdk:8u111-jre-alpine
+FROM openjdk:8u222-jre-alpine
 
 ENV LC_ALL=C
 
@@ -20,8 +20,7 @@ LABEL GIT_REVISION=$GIT_REVISION
 
 ADD docker/open-sans.tar.gz /usr/share/fonts/
 
-RUN adduser java -h / -D && \
-    set -x && \
+RUN set -x && \
     apk add --no-cache curl unzip graphviz fontconfig && \
     fc-cache -fv && \
     mkdir /drivers_inc && \
@@ -31,15 +30,12 @@ RUN adduser java -h / -D && \
     curl -JLO http://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/$POSTGRESQL_VERSION.jre7/postgresql-$POSTGRESQL_VERSION.jre7.jar && \
     curl -JLO http://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/$JTDS_VERSION/jtds-$JTDS_VERSION.jar && \
     mkdir /output && \
-    chown -R java /drivers_inc && \
-    chown -R java /output && \
     apk del curl
 
 
 ADD target/schema*.jar /usr/local/lib/schemaspy/
 ADD docker/schemaspy.sh /usr/local/bin/schemaspy
 
-USER java
 WORKDIR /
 
 ENV SCHEMASPY_DRIVERS=/drivers
