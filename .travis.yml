@@ -1,6 +1,6 @@
 language: java
-sudo: required
-install: true
+dist: xenial
+
 services:
   - docker
 jdk:
@@ -9,6 +9,10 @@ addons:
   apt:
     packages:
       - graphviz
+
+# skip default install command
+install: true
+
 script:
   - ./travis.sh
   - ./docker.sh build
