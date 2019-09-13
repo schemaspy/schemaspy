@@ -1,4 +1,4 @@
-FROM openjdk:8u222-jre-alpine
+FROM openjdk:8-jre-alpine
 
 ENV LC_ALL=C
 
