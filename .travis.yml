@@ -3,8 +3,6 @@ dist: xenial
 
 services:
   - docker
-jdk:
-  - oraclejdk8
 addons:
   apt:
     packages:
