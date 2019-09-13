@@ -382,7 +382,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.20</version>
+                <version>3.0.0-M3</version>
                 <configuration>
                     <classesDirectory>${project.build.directory}/${project.build.finalName}.jar.original</classesDirectory>
                     <additionalClasspathElements>
