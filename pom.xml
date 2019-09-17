@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <!-- list pom: mvn help:effective-pom -->
     <!-- jar:      mvn clean package -->
     <!-- sign:     mvn release:prepare release:perform -->
@@ -21,7 +19,7 @@
     <artifactId>schemaspy</artifactId>
     <packaging>jar</packaging>
     <name>SchemaSpy</name>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>6.1.0</version>
     <url>http://schemaspy.org</url>
     <description>SchemaSpy generates HTML and PNG-based entity relationship diagrams from JDBC-enabled databases.
     </description>
@@ -57,7 +55,8 @@
         <url>https://github.com/schemaspy/schemaspy</url>
         <connection>scm:git:git://github.com/schemaspy/schemaspy.git</connection>
         <developerConnection>scm:git:git@github.com:schemaspy/schemaspy.git</developerConnection>
-    </scm>
+      <tag>v6.1.0</tag>
+  </scm>
     <developers>
         <developer>
             <id>rafalkasa</id>
