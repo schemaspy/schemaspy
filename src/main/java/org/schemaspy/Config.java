@@ -181,7 +181,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * <p>
      * Useful for things like selecting a specific configuration in a UI.
      *
-     * @param config
+     * @param config existing och created config object
      */
     public static void setInstance(Config config) {
         instance = config;
@@ -204,7 +204,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Set the path to Graphviz so we can find dot to generate ER diagrams
      *
-     * @param graphvizDir
+     * @param graphvizDir string absolute path to graphviz dot executable
      */
     public void setGraphvizDir(String graphvizDir) {
         if (graphvizDir.endsWith("\""))
@@ -215,12 +215,12 @@ public final class Config implements HtmlConfig, GraphvizConfig {
 
     /**
      * Return the path to Graphviz (used to find the dot executable to run to
-     * generate ER diagrams).<p/>
-     * <p>
+     * generate ER diagrams).
+     *
      * Returns graphiz path or null
      * was not specified.
      *
-     * @return
+     * @return path to graphviz executable as supplied with -gv else null
      */
     public String getGraphvizDir() {
         if (graphvizDir == null) {
@@ -244,7 +244,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * matching the pattern <code>[schema].meta.xml</code>.
      * For databases that don't have schema substitute database for schema.
      *
-     * @param meta
+     * @param meta path to schemameta-file
      */
     public void setMeta(String meta) {
         this.meta = meta;
@@ -275,7 +275,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
 
     /**
      * @deprecated use {@link CommandLineArguments#getDatabaseType()}
-     * @return
+     * @return databaseType as supplied with -t if null returns "ora"
      */
     @Deprecated
     public String getDbType() {
@@ -307,7 +307,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
 
     /**
      * @deprecated use {@link CommandLineArguments#getSchema()}
-     * @return
+     * @return schema as supplied with -s
      */
     @Deprecated
     public String getSchema() {
@@ -353,7 +353,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * Required unless single sign-on is enabled
      * (see {@link #setSingleSignOn(boolean)}).
      *
-     * @return
+     * @return user as supplied with -u
      */
     public String getUser() {
         if (user == null) {
@@ -378,6 +378,8 @@ public final class Config implements HtmlConfig, GraphvizConfig {
 
     /**
      * @see #setSingleSignOn(boolean)
+     *
+     * @return true if single sign-on else false
      */
     public boolean isSingleSignOn() {
         if (singleSignOn == null)
@@ -389,15 +391,16 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Set the password used to connect to the database.
      *
-     * @param password
+     * @param password db user password
      */
     public void setPassword(String password) {
         this.password = password;
     }
 
     /**
-     * @return
      * @see #setPassword(String)
+     *
+     * @return get password as set by -p or with setPassword
      */
     public String getPassword() {
         if (password == null)
@@ -422,16 +425,18 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Set to <code>true</code> to prompt for the password
      *
-     * @param promptForPassword
+     * @param promptForPassword should we prompt for a password.
      */
     public void setPromptForPasswordEnabled(boolean promptForPassword) {
         this.promptForPassword = promptForPassword;
     }
 
     /**
-     * @return
      * @see #setPromptForPasswordEnabled(boolean)
+     *
+     * @return true if we should prompt for password
      */
+
     public boolean isPromptForPasswordEnabled() {
         if (promptForPassword == null) {
             promptForPassword = options.remove("-pfp");
@@ -471,9 +476,8 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * user (from -u) and password (from -p) will be passed in the
      * connection properties if specified.
      *
-     * @param propertiesFilename
-     * @throws FileNotFoundException
-     * @throws IOException
+     * @param propertiesFilename file to use for connection properties
+     * @throws IOException if we have problems reading the file
      */
     public void setConnectionPropertiesFile(String propertiesFilename) throws IOException {
         if (userConnectionProperties == null)
@@ -487,9 +491,8 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * by {@link #setConnectionPropertiesFile(String)}, the properties specified by
      * {@link #setConnectionProperties(String)} or not populated.
      *
-     * @return
-     * @throws FileNotFoundException
-     * @throws IOException
+     * @return connection properties to use when connecting
+     * @throws IOException if we a have problems reading the properties file if -connprops is a file
      */
     public Properties getConnectionProperties() throws IOException {
         if (userConnectionProperties == null) {
@@ -516,7 +519,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * This is an alternative form of passing connection properties than by file
      * (see {@link #setConnectionPropertiesFile(String)})
      *
-     * @param properties
+     * @param properties string with key\\=value pairs separated by ; of connection properties
      */
     public void setConnectionProperties(String properties) {
         userConnectionProperties = new Properties();
@@ -556,7 +559,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * <p>
      * Defaults to <code>"schemaSpy.css"</code>.
      *
-     * @param css
+     * @param css file path for custom css-file
      */
     public void setCss(String css) {
         this.css = css;
@@ -574,7 +577,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * The font to use within diagrams.  Modify the .css to specify HTML fonts.
      *
-     * @param font
+     * @param font font name to use
      */
     public void setFont(String font) {
         this.font = font;
@@ -594,21 +597,21 @@ public final class Config implements HtmlConfig, GraphvizConfig {
 
     /**
      * The font size to use within diagrams.  This is the size of the font used for
-     * 'large' (e.g. not 'compact') diagrams.<p>
-     * <p>
-     * Modify the .css to specify HTML font sizes.<p>
-     * <p>
+     * 'large' (e.g. not 'compact') diagrams.
+     *
+     * Modify the .css to specify HTML font sizes.
+     *
      * Defaults to 11.
      *
-     * @param fontSize
+     * @param fontSize set the size of the font, default 11.
      */
     public void setFontSize(int fontSize) {
         this.fontSize = fontSize;
     }
 
     /**
-     * @return
      * @see #setFontSize(int)
+     * @return the font size to use
      */
     public int getFontSize() {
         if (fontSize == null) {
@@ -630,7 +633,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Description of schema that gets display on main pages.
      *
-     * @param description
+     * @param description description to put into html report
      */
     public void setDescription(String description) {
         this.description = description;
@@ -649,7 +652,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Maximum number of threads to use when querying database metadata information.
      *
-     * @param maxDbThreads
+     * @param maxDbThreads change the number of threads used to fetch data from db
      */
     public void setMaxDbThreads(int maxDbThreads) {
         this.maxDbThreads = maxDbThreads;
@@ -689,7 +692,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Don't use this unless absolutely necessary as it screws up the layout
      *
-     * @param enabled
+     * @param enabled should we skip setting RIGHT to LEFT
      */
     public void setRankDirBugEnabled(boolean enabled) {
         rankDirBugEnabled = enabled;
@@ -714,14 +717,14 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * The columns that logically reference that <code>ID</code> are the singular
      * form of the table name suffixed with <code>_ID</code>.<p>
      *
-     * @param enabled
+     * @param enabled if we should use rails naming convention
      */
     public void setRailsEnabled(boolean enabled) {
         railsEnabled = enabled;
     }
 
     /**
-     * @return
+     * @return if we should use rails naming convention
      * @see #setRailsEnabled(boolean)
      */
     public boolean isRailsEnabled() {
@@ -737,14 +740,14 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * <p>
      * Defaults to <code>true</code> (enabled).
      *
-     * @param enabled
+     * @param enabled should we show number of rows
      */
     public void setNumRowsEnabled(boolean enabled) {
         numRowsEnabled = enabled;
     }
 
     /**
-     * @return
+     * @return if we should show number of rows
      * @see #setNumRowsEnabled(boolean)
      */
     public boolean isNumRowsEnabled() {
@@ -759,14 +762,14 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * <p>
      * Defaults to <code>true</code> (enabled).
      *
-     * @param enabled
+     * @param enabled should we process views
      */
     public void setViewsEnabled(boolean enabled) {
         viewsEnabled = enabled;
     }
 
     /**
-     * @return
+     * @return if we should process views
      * @see #setViewsEnabled(boolean)
      */
     public boolean isViewsEnabled() {
@@ -871,7 +874,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Set the tables to exclude as a regular expression
      *
-     * @param tableExclusions
+     * @param tableExclusions tables to exclude
      */
     public void setTableExclusions(String tableExclusions) {
         this.tableExclusions = Pattern.compile(tableExclusions);
@@ -880,7 +883,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Get the regex {@link Pattern} for which tables to exclude from the analysis.
      *
-     * @return
+     * @return table exclusions
      */
     public Pattern getTableExclusions() {
         if (tableExclusions == null) {
@@ -907,7 +910,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     }
 
     /**
-     * @return
+     * @return list of schemas to process
      */
     public List<String> getSchemas() {
         if (schemas == null) {
@@ -944,7 +947,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * Returns true if we're evaluating a bunch of schemas in one go and
      * at this point we're evaluating a specific schema.
      *
-     * @return boolean
+     * @return boolean if we are processing multiple schemas
      */
     @Override
     public boolean isOneOfMultipleSchemas() {
@@ -960,7 +963,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * When -all (evaluateAll) is specified then this is the regular
      * expression that determines which schemas to evaluate.
      *
-     * @param schemaSpec
+     * @param schemaSpec used to filter when -all is used (regex)
      */
     public void setSchemaSpec(String schemaSpec) {
         this.schemaSpec = schemaSpec;
@@ -987,7 +990,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     }
 
     /**
-     * @return
+     * @return rendere to use as specified by -renderer else null and graphviz default
      * @see #setRenderer(String)
      */
     public String getRenderer() {
@@ -1036,7 +1039,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * Returns <code>true</code> if the options indicate that the user wants
      * to see some help information.
      *
-     * @return
+     * @return should we show help information
      */
     public boolean isHelpRequired() {
         return helpRequired;
@@ -1049,7 +1052,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Returns the jar that we were loaded from
      *
-     * @return
+     * @return jar that we have been started from
      */
     public static String getLoadedFromJar() {
         String loadedFrom = Config.class.getProtectionDomain().getCodeSource().getLocation().getFile();
@@ -1073,7 +1076,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     }
 
     /**
-     * @return
+     * @return if we have orphan tables
      * @see #setHasOrphans(boolean)
      */
     public boolean hasOrphans() {
@@ -1088,7 +1091,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     }
 
     /**
-     * @return
+     * @return if we have found routines
      * @see #setHasRoutines(boolean)
      */
     public boolean hasRoutines() {
@@ -1100,14 +1103,14 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * <p>
      * Defaults to <code>true</code> (enabled).
      *
-     * @param enabled
+     * @param enabled if we should use pagination
      */
     public void setPaginationEnabled(boolean enabled) {
         paginationEnabled = enabled;
     }
 
     /**
-     * @return
+     * @return if pagination is enabled
      * @see #setPaginationEnabled(boolean)
      */
     @Override
@@ -1124,7 +1127,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * <p>
      * Defaults to <code>false</code> (enabled).
      *
-     * @param enabled
+     * @param enabled if we should add sibling libraries when -dp is specified
      * @deprecated replaced by -dp expanding folders
      */
     @Deprecated
@@ -1133,7 +1136,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     }
 
     /**
-     * @return
+     * @return if should are loading sibling libraries
      * @see #setLoadJDBCJarsEnabled(boolean)
      * @deprecated replaced by -dp expanding folders
      */
@@ -1164,8 +1167,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * Returns the database properties to use.
      * These should be determined by calling {@link #determineDbProperties(String)}.
      *
-     * @return
-     * @throws InvalidConfigurationException
+     * @return database specific properties
      */
     public Properties getDbProperties() {
         if (dbProperties == null) {
@@ -1177,9 +1179,8 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * Determines the database properties associated with the specified type.
      *
-     * @param type
-     * @return
-     * @throws IOException
+     * @param type database type that should be resolved
+     * @return resolved properties for database type
      * @throws InvalidConfigurationException if db properties are incorrectly formed
      */
     public Properties determineDbProperties(String type) {
@@ -1206,7 +1207,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * Options that are specific to a type of database.  E.g. things like <code>host</code>,
      * <code>port</code> or <code>db</code>, but <b>don't</b> have a setter in this class.
      *
-     * @param dbSpecificOptions
+     * @param dbSpecificOptions options related to database type
      */
     public void setDbSpecificOptions(Map<String, String> dbSpecificOptions) {
         this.dbSpecificOptions = dbSpecificOptions;
@@ -1223,8 +1224,8 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * 'Pull' the specified parameter from the collection of options. Returns
      * null if the parameter isn't in the list and removes it if it is.
      *
-     * @param paramId
-     * @return
+     * @param paramId argument name to fetch
+     * @return the value for paramId
      */
     private String pullParam(String paramId) {
         return pullParam(paramId, false, false);
@@ -1235,11 +1236,11 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     }
 
     /**
-     * @param paramId
-     * @param required
-     * @param dbTypeSpecific
-     * @return
-     * @throws MissingRequiredParameterException
+     * @param paramId argument name to fetch
+     * @param required if argument must be specified
+     * @param dbTypeSpecific if argument is database type specific
+     * @return value for argument
+     * @throws MissingRequiredParameterException if argument is required and not specified
      */
     private String pullParam(String paramId, boolean required, boolean dbTypeSpecific) {
         int paramIndex = options.indexOf(paramId);
