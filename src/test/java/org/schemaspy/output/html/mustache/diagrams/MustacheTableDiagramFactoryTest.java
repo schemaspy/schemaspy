@@ -49,6 +49,13 @@ public class MustacheTableDiagramFactoryTest {
         writeStats1.wroteTable(table1);
         return Collections.emptySet();
     };
+    private static final Answer FIRST_DOT_WITH_IMPLIED = invocation -> {
+        Table table1 = invocation.getArgument(0);
+        WriteStats writeStats1 = invocation.getArgument(2);
+        writeStats1.wroteTable(table1);
+        ImpliedForeignKeyConstraint impliedForeignKeyConstraint = mock(ImpliedForeignKeyConstraint.class);
+        return Collections.singleton(impliedForeignKeyConstraint);
+    };
     private static final Answer SECOND_DOT = invocation -> {
         Table table1 = invocation.getArgument(0);
         WriteStats writeStats1 = invocation.getArgument(2);
@@ -82,7 +89,7 @@ public class MustacheTableDiagramFactoryTest {
         when(tableNoRelationships.getMaxChildren()).thenReturn(0);
         when(tableNoRelationships.getMaxParents()).thenReturn(0);
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(null, null, temporaryFolder.newFolder("nodiagrams"));
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(null, null, temporaryFolder.newFolder("nodiagrams"), 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(tableNoRelationships, writeStats);
         assertThat(mustacheTableDiagramList).isEmpty();
     }
@@ -101,7 +108,7 @@ public class MustacheTableDiagramFactoryTest {
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).thenReturn(new MustacheTableDiagram());
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(1);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -121,7 +128,7 @@ public class MustacheTableDiagramFactoryTest {
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(2);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -152,7 +159,7 @@ public class MustacheTableDiagramFactoryTest {
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(3);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -185,7 +192,7 @@ public class MustacheTableDiagramFactoryTest {
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(4);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -194,6 +201,32 @@ public class MustacheTableDiagramFactoryTest {
         assertThat(mustacheTableDiagramList.get(2).isImplied()).isTrue();
         assertThat(mustacheTableDiagramList.get(3).getActive()).isNullOrEmpty();
         assertThat(mustacheTableDiagramList.get(3).isImplied()).isTrue();
+    }
+
+    @Test
+    public void fourDiagramsTwoIsImpliedOnly1stDegreeOfSeparation() throws IOException {
+        File outputDir = temporaryFolder.newFolder("fourdiagrams1degree");
+        WriteStats writeStats = new WriteStats(Collections.emptyList());
+
+        DotFormatter dotProducer = mock(DotFormatter.class);
+        when(dotProducer.writeRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
+                .then(FIRST_DOT_WITH_IMPLIED);
+        doAnswer(invocation -> {
+            FIRST_DOT.answer(invocation);
+            return null;
+        }).
+                when(dotProducer).writeAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+
+        MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
+        when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
+
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 1);
+        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
+        assertThat(mustacheTableDiagramList.size()).isEqualTo(2);
+        assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
+        assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
+        assertThat(mustacheTableDiagramList.get(1).getActive()).isNullOrEmpty();
+        assertThat(mustacheTableDiagramList.get(1).isImplied()).isTrue();
     }
 
 }

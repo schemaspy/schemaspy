@@ -133,4 +133,5 @@ Diagram related
     Exclude column(s) from diagrams where column(s) aren't directly referenced by focal table, defaults to nothing.
 [-vizjs]
     Use embedded viz.js instead of Graphviz. Useful when graphviz isn't installed. Memory is set to 64 MB, if you receive ther error "Cannot enlarge memory arrays" please report this to us.
-
+[-degree 1 or 2]
+    Limit the degree of separation (1 shows less, 2 is default), 1 is a good option for large databases with lots of relationships.

@@ -195,6 +195,16 @@ public class CommandLineArguments {
     )
     private boolean useVizJS;
 
+    @Parameter(
+            names = {
+                    "-degree", "schemaspy.degree"
+            },
+            descriptionKey = "degree",
+            required = false,
+            validateValueWith = DegreeOfSeparationValidator.class
+    )
+    private int degreeOfSeparation = 2;
+
     public boolean isHelpRequired() {
         return helpRequired;
     }
@@ -253,5 +263,9 @@ public class CommandLineArguments {
 
     public boolean useVizJS() {
         return useVizJS;
+    }
+
+    public int getDegreeOfSeparation() {
+        return degreeOfSeparation;
     }
 }

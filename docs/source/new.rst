@@ -28,6 +28,7 @@ What's new
 
 * Diagrams
     * Now has option to use embedded viz.js (no need for Graphviz) ``-vizjs``
+    * Limit the degree of separation in table diagrams. Allowed values are 1 or 2.
 
 * XML
     * Now includes routines

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -41,16 +42,19 @@ public class MustacheTableDiagramFactory {
     private final DotFormatter dotProducer;
     private final MustacheDiagramFactory mustacheDiagramFactory;
     private final File tableDir;
+    private final int degreeOfSeparation;
 
-    public MustacheTableDiagramFactory(DotFormatter dotProducer, MustacheDiagramFactory mustacheDiagramFactory, File outputDir) {
+    public MustacheTableDiagramFactory(DotFormatter dotProducer, MustacheDiagramFactory mustacheDiagramFactory, File outputDir, int degreeOfSeparation) {
         this.dotProducer = dotProducer;
         this.mustacheDiagramFactory = mustacheDiagramFactory;
         this.tableDir = outputDir.toPath().resolve("diagrams").resolve("tables").toFile();
         tableDir.mkdirs();
+        this.degreeOfSeparation = degreeOfSeparation;
     }
 
     public List<MustacheTableDiagram> generateTableDiagrams(Table table, WriteStats stats) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
+
         File oneDegreeDotFile = new File(tableDir, table.getName() + ".1degree.dot");
         File twoDegreesDotFile = new File(tableDir, table.getName() + ".2degrees.dot");
         File oneImpliedDotFile = new File(tableDir, table.getName() + ".implied1degrees.dot");
@@ -63,18 +67,21 @@ public class MustacheTableDiagramFactory {
         Files.deleteIfExists(oneImpliedDotFile.toPath());
         Files.deleteIfExists(twoImpliedDotFile.toPath());
 
+        if (hasNoRelationships(table)) {
+            return diagrams;
+        }
 
-        if (table.getMaxChildren() + table.getMaxParents() > 0) {
-            Set<ForeignKeyConstraint> impliedConstraints;
+        Set<ForeignKeyConstraint> impliedConstraints;
 
-            WriteStats oneStats = new WriteStats(stats);
-            try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
-                dotProducer.writeRealRelationships(table, false, oneStats, dotOut);
-            }
-            MustacheTableDiagram oneDiagram = mustacheDiagramFactory.generateTableDiagram("One", oneDegreeDotFile, table.getName() + ".1degree");
-            oneDiagram.setActive(true);
-            diagrams.add(oneDiagram);
+        WriteStats oneStats = new WriteStats(stats);
+        try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
+            impliedConstraints = dotProducer.writeRealRelationships(table, false, oneStats, dotOut);
+        }
+        MustacheTableDiagram oneDiagram = mustacheDiagramFactory.generateTableDiagram("One", oneDegreeDotFile, table.getName() + ".1degree");
+        oneDiagram.setActive(true);
+        diagrams.add(oneDiagram);
 
+        if (degreeOfSeparation == 2) {
             WriteStats twoStats = new WriteStats(stats);
             try (PrintWriter dotOut = Writers.newPrintWriter(twoDegreesDotFile)) {
                 impliedConstraints = dotProducer.writeRealRelationships(table, true, twoStats, dotOut);
@@ -85,15 +92,18 @@ public class MustacheTableDiagramFactory {
             } else {
                 diagrams.add(mustacheDiagramFactory.generateTableDiagram("Two degrees", twoDegreesDotFile, table.getName() + ".2degrees"));
             }
+        }
 
-            if (!impliedConstraints.isEmpty()) {
-                WriteStats oneImplied = new WriteStats(stats);
-                try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
-                    dotProducer.writeAllRelationships(table, false, oneImplied, dotOut);
-                }
-                MustacheTableDiagram oneImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("One implied", oneImpliedDotFile, table.getName() + ".implied1degrees");
-                oneImpliedDiagram.setIsImplied(true);
-                diagrams.add(oneImpliedDiagram);
+        if (notEmpty(impliedConstraints)) {
+            WriteStats oneImplied = new WriteStats(stats);
+            try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
+                dotProducer.writeAllRelationships(table, false, oneImplied, dotOut);
+            }
+            MustacheTableDiagram oneImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("One implied", oneImpliedDotFile, table.getName() + ".implied1degrees");
+            oneImpliedDiagram.setIsImplied(true);
+            diagrams.add(oneImpliedDiagram);
+
+            if (degreeOfSeparation == 2) {
                 WriteStats twoImplied = new WriteStats(stats);
                 try (PrintWriter dotOut = Writers.newPrintWriter(twoImpliedDotFile)) {
                     dotProducer.writeAllRelationships(table, true, twoImplied, dotOut);
@@ -105,11 +115,19 @@ public class MustacheTableDiagramFactory {
                     twoImpliedDiagram.setIsImplied(true);
                     diagrams.add(twoImpliedDiagram);
                 }
-                return diagrams;
             }
         }
 
+
         return diagrams;
+    }
+
+    private static boolean hasNoRelationships(Table table) {
+        return table.getMaxChildren() + table.getMaxParents() < 1;
+    }
+
+    private static boolean notEmpty(Collection<?> collection) {
+        return !collection.isEmpty();
     }
 
     private static boolean sameWritten(WriteStats first, WriteStats second) {
