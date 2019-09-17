@@ -47,16 +47,16 @@ If you need more info about how to use or install SchemaSpy please read the last
 
 [![alt tag](http://schemaspy.org/img/example_page.png)](http://schemaspy.org/sample/index.html)
 
-## SchemaSpy v6.0.0
-[Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.0.0)
+## SchemaSpy v6.1.0
+[Release Notes](https://github.com/schemaspy/schemaspy/releases/tag/v6.1.0)
 
-[Download](https://github.com/schemaspy/schemaspy/releases/download/v6.0.0/schemaspy-6.0.0.jar)
+[Download](https://github.com/schemaspy/schemaspy/releases/download/v6.1.0/schemaspy-6.1.0.jar)
 
 ## Latest Build
 
 To verify fixes and new features you can download our latest build.
 
-[schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.1.0-SNAPSHOT.jar)
+[schemaspy@latest](https://github.com/schemaspy/schemaspy/raw/gh-pages/schemaspy-6.1.1-SNAPSHOT.jar)
 
 ## Docker  
 
