@@ -1,4 +1,4 @@
 *
 !docker/open-sans.tar.gz
-!docker/entrypoint.sh
+!docker/schemaspy.sh
 !target/schema*.jar
