@@ -102,6 +102,7 @@ public class DotNode {
         String tableName = table.getName();
         // fully qualified table name (optionally prefixed with schema)
         String fqTableName = (table.isRemote() ? table.getContainer() + "." : "") + tableName;
+        int maxTitleWidth = getTitleMaxWidth(fqTableName);
         String colspanHeader = config.showColumnDetails ? "COLSPAN=\"4\" " : "COLSPAN=\"3\" ";
         String tableOrView = table.isView() ? "view" : "table";
 
@@ -112,7 +113,7 @@ public class DotNode {
         buf.append("<TD " + colspanHeader + " BGCOLOR=\"" + CSS.getTableHeadBackground() + "\">");
         buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\">");
         buf.append(Html.TR_START);
-        buf.append("<TD ALIGN=\"LEFT\"><B>" + escapeHtml(fqTableName) + "</B>" + Html.TD_END);
+        buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxTitleWidth + "\" HEIGHT=\"16\"><B>" + escapeHtml(fqTableName) +"</B>" + Html.TD_END);
         buf.append("<TD ALIGN=\"RIGHT\">[" + tableOrView + "]" + Html.TD_END);
         buf.append(Html.TR_END);
         buf.append("</TABLE>");
@@ -166,6 +167,11 @@ public class DotNode {
         return indexColumns;
     }
 
+    private int getTitleMaxWidth(String titleTable) {
+        int maxTitleWidth = getTextWidth(titleTable);
+        return maxTitleWidth;
+    }
+    
     private int getColumnMaxWidth() {
         int maxWidth = getTextWidth(table.getName());
         for (TableColumn column : table.getColumns()) {
