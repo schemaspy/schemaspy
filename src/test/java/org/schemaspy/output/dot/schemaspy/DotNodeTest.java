@@ -24,6 +24,7 @@ import org.schemaspy.DotConfigUsingConfig;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.LogicalTable;
 import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,5 +52,33 @@ public class DotNodeTest {
         DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
         DotNode dotNode = new DotNode(table,"", new DotNodeConfig(true, true), dotConfig);
         assertThat(dotNode.toString()).contains("URL=\"a%20table.html\"");
+    }
+
+    @Test
+    public void htmlEscapeShortType() {
+        Database database = mock(Database.class);
+        Table table = new LogicalTable(database, "catalog", "schema", "a table", "comment");
+        TableColumn tableColumn = new TableColumn(table);
+        tableColumn.setName("<A>");
+        tableColumn.setShortType("<T>");
+        tableColumn.setDetailedSize(null);
+        table.getColumnsMap().put("<A>", tableColumn);
+        DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
+        DotNode dotNode = new DotNode(table,"", new DotNodeConfig(true, true), dotConfig);
+        assertThat(dotNode.toString()).contains("<TD PORT=\"&lt;A&gt;.type\" ALIGN=\"LEFT\">&lt;t&gt;</TD>");
+    }
+
+    @Test
+    public void htmlEscapeDetailedSize() {
+        Database database = mock(Database.class);
+        Table table = new LogicalTable(database, "catalog", "schema", "a table", "comment");
+        TableColumn tableColumn = new TableColumn(table);
+        tableColumn.setName("<A>");
+        tableColumn.setShortType("<T>");
+        tableColumn.setDetailedSize("<D>");
+        table.getColumnsMap().put("<A>", tableColumn);
+        DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
+        DotNode dotNode = new DotNode(table,"", new DotNodeConfig(true, true), dotConfig);
+        assertThat(dotNode.toString()).contains("[&lt;D&gt;]");
     }
 }

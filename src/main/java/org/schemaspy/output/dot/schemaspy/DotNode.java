@@ -40,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -214,10 +215,13 @@ public class DotNode {
             buf.append("<TD PORT=\"");
             buf.append(escapeHtml(column.getName()));
             buf.append(".type\" ALIGN=\"LEFT\">");
-            buf.append(column.getShortTypeName().toLowerCase());
-            buf.append("[");
-            buf.append(column.getDetailedSize());
-            buf.append("]" + Html.TD_END);
+            buf.append(escapeHtml(column.getShortTypeName().toLowerCase()));
+            if (Objects.nonNull(column.getDetailedSize()) && !column.getDetailedSize().isEmpty()) {
+                buf.append("[");
+                buf.append(escapeHtml(column.getDetailedSize()));
+                buf.append("]");
+            }
+            buf.append(Html.TD_END);
         }
         buf.append(Html.TR_END + lineSeparator);
         return buf.toString();
