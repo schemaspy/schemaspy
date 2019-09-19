@@ -83,15 +83,22 @@ public class MustacheTableDiagramFactoryTest {
     }
 
     @Test
-    public void noDiagrams() throws IOException {
+    public void oneDiagrams() throws IOException {
         WriteStats writeStats = new WriteStats(Collections.emptyList());
         Table tableNoRelationships = mock(Table.class);
         when(tableNoRelationships.getMaxChildren()).thenReturn(0);
         when(tableNoRelationships.getMaxParents()).thenReturn(0);
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(null, null, temporaryFolder.newFolder("nodiagrams"), 2);
+        DotFormatter dotProducer = mock(DotFormatter.class);
+        when(dotProducer.writeRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
+                .then(FIRST_DOT);
+
+        MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
+        when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).thenReturn(new MustacheTableDiagram());
+
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, temporaryFolder.newFolder("orphan"), 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(tableNoRelationships, writeStats);
-        assertThat(mustacheTableDiagramList).isEmpty();
+        assertThat(mustacheTableDiagramList).hasSize(1);
     }
 
     @Test
@@ -106,7 +113,7 @@ public class MustacheTableDiagramFactoryTest {
                 .then(FIRST_DOT);
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
-        when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).thenReturn(new MustacheTableDiagram());
+        when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);

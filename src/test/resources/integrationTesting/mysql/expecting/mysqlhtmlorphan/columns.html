@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>htmlit Database</title>
+        <title>htmlorphanit Database</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -42,77 +42,112 @@
     <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
     <body class="hold-transition skin-blue layout-top-nav">
         <div class="wrapper">
+            <header class="main-header">
+                <nav class="navbar navbar-static-top">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a href="index.html" class="navbar-brand"><b>htmlorphanit</b> Database</a>
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li><a href="index.html">Tables <span class="sr-only">(current)</span></a></li>
+                                <li><a href="columns.html" title="All of the columns in the schema">Columns</a></li>
+                                <li><a href="constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">Constraints</a></li>
+                                <li><a href="relationships.html" title="Diagram of table relationships">Relationships</a></li>
+                                <li><a href="orphans.html" title="View of tables with neither parents nor children">Orphan&nbsp;Tables</a></li>
+                                <li><a href="anomalies.html" title="Things that might not be quite right">Anomalies</a></li>
+                                <li><a href="routines.html" title="Procedures and functions">Routines</a></li>
+                            </ul>
+                        </div>
+                        <!-- /.navbar-collapse -->
+                        <!-- Navbar Right Menu -->
+                    </div>
+                    <!-- /.container-fluid -->
+                </nav>
+            </header>
             <!-- Main content -->
             <!-- Full Width Column -->
             <div class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
-                    <div class="callout callout-info">
-                        <h4>SchemaSpy Analysis of htmlit</h4>
-                        <p>Generated on Mon Oct 29 23:31 CET 2018</p>
-                    </div>
+                    <h1>Columns</h1>
                 </section>
                 <!-- Main content -->
                 <section class="content">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">Database Properties</h3>
-                            <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
-                        </div><!-- /.box-header -->
+                            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                            <h3 class="box-title">Columns</h3>
+                        </div>
                         <div class="box-body">
-                            <p>Database Type: MySQL - 5.7.22</p>
-                        </div><!-- /.box-body -->
-                    </div>
-                    <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">7 Schemas</h3>
-                            <span class="label label-primary pull-right"><i class="fa fa-database fa-2x"></i></span>
-                        </div><!-- /.box-header -->
-                        <div class="box-body">
-                            <table id="database_objects" class="table table-bordered table-striped dataTable" role="grid">
-                                <thead>
+                            <table id="column_table" class="table table-bordered table-striped dataTable" role="grid">
+                                <thead align='left'>
                                     <tr>
-                                        <th valign="bottom">Schema</th>
-                                        <th valign="bottom">Comments</th>
+                                        <th>Table</th>
+                                        <th>Type</th>
+                                        <th>Column</th>
+                                        <th>Type</th>
+                                        <th>Size</th>
+                                        <th title='Are nulls allowed?'>Nullable</th>
+                                        <th title='Is column automatically updated?'>Auto</th>
+                                        <th title='Default value'>Default</th>
+                                        <th title='Comments' class="toggle"><span>Comments</span></th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="TEST 1/index.html">TEST 1</a></td>
-                                        <td class="comment detail" style="display: table-cell;"></td>
-                                    </tr>
-                                    <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="htmlit/index.html">htmlit</a></td>
-                                        <td class="comment detail" style="display: table-cell;"></td>
-                                    </tr>
-                                    <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="htmlorphanit/index.html">htmlorphanit</a></td>
-                                        <td class="comment detail" style="display: table-cell;"></td>
-                                    </tr>
-                                    <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="keywordtableit/index.html">keywordtableit</a></td>
-                                        <td class="comment detail" style="display: table-cell;"></td>
-                                    </tr>
-                                    <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="routinesit/index.html">routinesit</a></td>
-                                        <td class="comment detail" style="display: table-cell;"></td>
-                                    </tr>
-                                    <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="test/index.html">test</a></td>
-                                        <td class="comment detail" style="display: table-cell;"></td>
-                                    </tr>
-                                    <tr class="tbl even" valign="top">
-                                        <td class="detail"><a href="xmlit/index.html">xmlit</a></td>
-                                        <td class="comment detail" style="display: table-cell;"></td>
-                                    </tr>
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
-                        <!-- /.box-body -->
                     </div>
                 </section>
-                <!-- /.content -->
-
+                <script>
+                    var tableData = [
+    {
+        "tableName": "group",
+        "tableType": "Table",
+        "keyClass": "primaryKey",
+        "keyTitle": "Primary Key",
+        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>groupId",
+        "type": "INT",
+        "length": 10,
+        "nullable": "",
+        "autoUpdated": "√",
+        "defaultValue": "null",
+        "comments": ""
+    },
+    {
+        "tableName": "group",
+        "tableType": "Table",
+        "keyClass": "",
+        "keyTitle": "",
+        "name": "description",
+        "type": "VARCHAR",
+        "length": 80,
+        "nullable": "",
+        "autoUpdated": "",
+        "defaultValue": "null",
+        "comments": ""
+    },
+    {
+        "tableName": "group",
+        "tableType": "Table",
+        "keyClass": "indexedColumn",
+        "keyTitle": "Indexed",
+        "name": "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'><\/i>name",
+        "type": "VARCHAR",
+        "length": 16,
+        "nullable": "",
+        "autoUpdated": "",
+        "defaultValue": "null",
+        "comments": ""
+    }
+];
+                    var config = {
+                        pagination: true
+                    };
+                </script>
             </div>
             <!-- /.content-wrapper -->
             <footer class="main-footer">
@@ -159,7 +194,7 @@
         <script src="bower/codemirror/sql.js"></script>
         <!-- AdminLTE App -->
         <script src="bower/admin-lte/dist/js/app.min.js"></script>
-        <script src=""></script>
+        <script src="column.js"></script>
         <script src="schemaSpy.js"></script>
     </body>
 </html>

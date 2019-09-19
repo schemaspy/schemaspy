@@ -67,10 +67,6 @@ public class MustacheTableDiagramFactory {
         Files.deleteIfExists(oneImpliedDotFile.toPath());
         Files.deleteIfExists(twoImpliedDotFile.toPath());
 
-        if (hasNoRelationships(table)) {
-            return diagrams;
-        }
-
         Set<ForeignKeyConstraint> impliedConstraints;
 
         WriteStats oneStats = new WriteStats(stats);
@@ -120,10 +116,6 @@ public class MustacheTableDiagramFactory {
 
 
         return diagrams;
-    }
-
-    private static boolean hasNoRelationships(Table table) {
-        return table.getMaxChildren() + table.getMaxParents() < 1;
     }
 
     private static boolean notEmpty(Collection<?> collection) {
