@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="htmlorphanit" schema="htmlorphanit" type="MySQL - 5.7.25">
+   <tables>
+      <table catalog="htmlorphanit" name="group" numRows="0" remarks="Orphan Groups" type="TABLE">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="groupId" nullable="false" remarks="" size="10" type="INT" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="" size="16" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="VARCHAR" typeCode="12"/>
+         <primaryKey column="groupId" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="groupId"/>
+         </index>
+         <index name="name_unique" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+   </tables>
+</database>

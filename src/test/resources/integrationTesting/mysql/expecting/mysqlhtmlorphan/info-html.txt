@@ -1,0 +1,5 @@
+date=2019-09-19 22:10:11+0200
+os=Linux 4.4.0-148-generic
+schemaspy-version=IDE
+schemaspy-build=IDE
+diagramImplementation=Graphviz dot 2.38

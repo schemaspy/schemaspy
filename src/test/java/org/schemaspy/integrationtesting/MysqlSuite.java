@@ -41,7 +41,8 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
         MysqlSchemaLeakageIT.class,
         MysqlSpacesIT.class,
         MysqlSpacesNoDotsIT.class,
-        MysqlXMLIT.class
+        MysqlXMLIT.class,
+        MysqlHTMLOrphanIT.class
 })
 public class MysqlSuite {
 
