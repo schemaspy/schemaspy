@@ -104,8 +104,12 @@ public class GraphvizDot implements DiagramProducer {
             };
             Process process = Runtime.getRuntime().exec(dotCommand);
             try (Scanner scanner = new Scanner(new InputStreamReader(process.getErrorStream()))){
-                while (scanner.hasNext(rendererPattern)) {
-                    validRenders.add(scanner.next(rendererPattern));
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    Matcher m = rendererPattern.matcher(line);
+                    while (m.find()) {
+                        validRenders.add(m.group(1));
+                    }
                 }
             }
             process.waitFor();

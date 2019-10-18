@@ -1,2 +1,6 @@
 #!/usr/bin/env bash
-echo "dot - graphviz version 2.32.0 (20170621.2142)" >&2
+if [ "$1" == "-Tpng:" ]; then
+    echo "Format: "png:" not recognized. Use one of: png:cairo:cairo png:cairo:gd png:gd:gd" >&2
+else
+    echo "dot - graphviz version 2.32.0 (20170621.2142)" >&2
+fi

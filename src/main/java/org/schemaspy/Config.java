@@ -994,7 +994,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * @see #setRenderer(String)
      */
     public String getRenderer() {
-        if (renderer != null) {
+        if (renderer == null) {
             renderer = pullParam("-renderer");
         }
         return renderer;
