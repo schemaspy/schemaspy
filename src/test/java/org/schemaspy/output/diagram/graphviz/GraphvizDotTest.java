@@ -18,7 +18,13 @@
  */
 package org.schemaspy.output.diagram.graphviz;
 
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.schemaspy.Config;
+import org.schemaspy.testing.ConfigRule;
+import org.schemaspy.testing.Logger;
+import org.schemaspy.testing.LoggingRule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
@@ -34,8 +40,14 @@ import static org.mockito.Mockito.when;
  */
 public class GraphvizDotTest {
 
+    @Rule
+    public LoggingRule loggingRule = new LoggingRule();
+
+    @Rule
+    public ConfigRule configRule = new ConfigRule();
+
     @Test
-    public void version2_26_0() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public void version2_26_0() {
         assumeThat(System.getProperty("os.name"), is("Linux"));
         GraphvizConfig graphvizConfig = mock(GraphvizConfig.class);
         when(graphvizConfig.getGraphvizDir()).thenReturn(Paths.get("src/test/resources/dotFakes/2.26.0").toAbsolutePath().toString());
@@ -44,7 +56,7 @@ public class GraphvizDotTest {
     }
 
     @Test
-    public void version2_28_0() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public void version2_28_0() {
         assumeThat(System.getProperty("os.name"), is("Linux"));
         GraphvizConfig graphvizConfig = mock(GraphvizConfig.class);
         when(graphvizConfig.getGraphvizDir()).thenReturn(Paths.get("src/test/resources/dotFakes/2.28.0").toAbsolutePath().toString());
@@ -53,12 +65,21 @@ public class GraphvizDotTest {
     }
 
     @Test
-    public void version2_32_0() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public void version2_32_0() {
         assumeThat(System.getProperty("os.name"), is("Linux"));
         GraphvizConfig graphvizConfig = mock(GraphvizConfig.class);
         when(graphvizConfig.getGraphvizDir()).thenReturn(Paths.get("src/test/resources/dotFakes/2.32.0").toAbsolutePath().toString());
         GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
         assertThat(graphvizDot.isValid()).isTrue();
+    }
+
+    @Test
+    @Logger(GraphvizDot.class)
+    public void specifyRenderer() {
+        assumeThat(System.getProperty("os.name"), is("Linux"));
+        Config config = new Config("-gv", Paths.get("src/test/resources/dotFakes/2.32.0").toAbsolutePath().toString(), "-renderer", ":gd");
+        GraphvizDot graphvizDot = new GraphvizDot(config);
+        assertThat(loggingRule.getLog()).contains("gd");
     }
 
 }
