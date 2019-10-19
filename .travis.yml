@@ -11,7 +11,7 @@ addons:
       - graphviz
 script:
   - ./travis.sh
-  - ./docker.sh build
+  - ./docker.sh build snapshot
 cache:
   directories:
     - '$HOME/.m2/repository'

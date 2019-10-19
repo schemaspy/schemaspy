@@ -95,7 +95,6 @@ public class GraphvizDot implements DiagramProducer {
         if (!isValid()) {
             return;
         }
-        validRenders.add("");
         Pattern rendererPattern = Pattern.compile(getDiagramFormat()+"(:[^\"][a-zA-Z]*)");
         try {
             String[] dotCommand = new String[]{
@@ -114,7 +113,7 @@ public class GraphvizDot implements DiagramProducer {
             }
             process.waitFor();
         } catch (Exception exc) {
-            LOGGER.error("Error determining if a renderer is supported",exc);
+            LOGGER.error("Error determining available renders",exc);
         }
     }
 
@@ -137,6 +136,9 @@ public class GraphvizDot implements DiagramProducer {
     private String initRenderer() {
         String possibleRenderer = graphvizConfig.getRenderer();
         if (Objects.isNull(possibleRenderer) || !validRenders.contains(possibleRenderer)) {
+            if (Objects.nonNull(possibleRenderer) && !validRenders.contains(possibleRenderer)) {
+                LOGGER.warn("Specified renderer '{}' is not supported, available renders are {}", possibleRenderer, validRenders);
+            }
             if (validRenders.contains(CAIRO_RENDERER)) {
                 possibleRenderer = CAIRO_RENDERER;
             } else if (validRenders.contains(GD_RENDERER)) {
@@ -145,7 +147,7 @@ public class GraphvizDot implements DiagramProducer {
                 possibleRenderer = EMPTY_RENDERER;
             }
         }
-        LOGGER.info("Graphviz rendered set to '{}'", possibleRenderer);
+        LOGGER.info("Graphviz renderer set to '{}'", possibleRenderer);
         return possibleRenderer;
     }
 
