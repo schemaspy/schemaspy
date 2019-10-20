@@ -101,7 +101,9 @@
                                             {{#oneColumnTables}}
                                             <tr>
                                                 <td><a href='tables/{{name}}.html'>{{name}}</a></td>
-                                                <td>{{columns}}</td>
+                                                {{#columns}}
+                                                <td>{{name}}</td>
+                                                {{/columns}}
                                             </tr>
                                             {{/oneColumnTables}}
                                             {{^oneColumnTables}}
