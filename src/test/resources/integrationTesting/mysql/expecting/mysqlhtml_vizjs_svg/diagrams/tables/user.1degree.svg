@@ -17,7 +17,7 @@
 <polygon fill="#ffffff" stroke="transparent" points="8,-38.2 8,-172.2 146,-172.2 146,-38.2 8,-38.2"/>
 <polygon fill="#f5f5f5" stroke="transparent" points="10,-147.2 10,-170.2 144,-170.2 144,-147.2 10,-147.2"/>
 <polygon fill="none" stroke="#000000" points="10,-147.2 10,-170.2 144,-170.2 144,-147.2 10,-147.2"/>
-<text text-anchor="start" x="15" y="-156.3" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00" fill="#000000">user</text>
+<text text-anchor="start" x="15" y="-155.8" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00" fill="#000000">user</text>
 <text text-anchor="start" x="109.0437" y="-155.3" font-family="Helvetica,sans-Serif" font-size="11.00" fill="#000000">[table]</text>
 <polygon fill="none" stroke="#000000" points="10,-125.2 10,-147.2 83,-147.2 83,-125.2 10,-125.2"/>
 <image xlink:href="../../images/primaryKeys.png" width="11px" height="12px" preserveAspectRatio="xMinYMin meet" x="15" y="-142.2"/>
