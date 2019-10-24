@@ -69,19 +69,22 @@ public class DotNode {
 
     private boolean showImpliedRelationships;
 
-    public DotNode(Table table, String path, DotNodeConfig config, DotConfig dotConfig) {
+    public DotNode(Table table, boolean fromRoot, DotNodeConfig config, DotConfig dotConfig) {
         this.table = table;
         this.config = config;
         this.dotConfig = dotConfig;
-        this.path = createPath(path);
+        this.path = createPath(fromRoot);
         this.columnSpan = config.showColumnDetails ? "COLSPAN=\"2\" " : "COLSPAN=\"3\" ";
     }
 
-    private String createPath(String path) {
+    private String createPath(boolean fromRoot) {
         if (dotConfig.useRelativeLinks()) {
             return (table.isRemote() ? "../../../" + table.getContainer() : "../..") + "/tables/";
         }
-        return (table.isRemote() ? ("../" + table.getContainer() + "/tables/") : path);
+        if (fromRoot) {
+            return (table.isRemote() ? ("../" + table.getContainer() + "/tables/") : "tables/");
+        }
+        return (table.isRemote() ? ("../../" + table.getContainer() + "/tables/") : "");
 
     }
 
@@ -285,22 +288,4 @@ public class DotNode {
         }
     }
 
-    public static class DotNodeConfig {
-        private final boolean showColumns;
-        private final boolean showTrivialColumns;
-        private final boolean showColumnDetails;
-
-        /**
-         * Nothing but table name and counts are displayed
-         */
-        public DotNodeConfig() {
-            showColumns = showTrivialColumns = showColumnDetails = false;
-        }
-
-        public DotNodeConfig(boolean showTrivialColumns, boolean showColumnDetails) {
-            showColumns = true;
-            this.showTrivialColumns = showTrivialColumns;
-            this.showColumnDetails = showColumnDetails;
-        }
-    }
 }

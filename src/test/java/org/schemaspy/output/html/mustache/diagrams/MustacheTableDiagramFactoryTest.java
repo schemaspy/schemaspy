@@ -90,7 +90,7 @@ public class MustacheTableDiagramFactoryTest {
         when(tableNoRelationships.getMaxParents()).thenReturn(0);
 
         DotFormatter dotProducer = mock(DotFormatter.class);
-        when(dotProducer.writeRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
                 .then(FIRST_DOT);
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
@@ -107,9 +107,9 @@ public class MustacheTableDiagramFactoryTest {
         WriteStats writeStats = new WriteStats(Collections.emptyList());
 
         DotFormatter dotProducer = mock(DotFormatter.class);
-        when(dotProducer.writeRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
                 .then(FIRST_DOT);
-        when(dotProducer.writeRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class)))
                 .then(FIRST_DOT);
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
@@ -127,9 +127,9 @@ public class MustacheTableDiagramFactoryTest {
         WriteStats writeStats = new WriteStats(Collections.emptyList());
 
         DotFormatter dotProducer = mock(DotFormatter.class);
-        when(dotProducer.writeRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
                 .then(FIRST_DOT);
-        when(dotProducer.writeRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class)))
                 .then(SECOND_DOT);
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
@@ -148,20 +148,20 @@ public class MustacheTableDiagramFactoryTest {
         WriteStats writeStats = new WriteStats(Collections.emptyList());
 
         DotFormatter dotProducer = mock(DotFormatter.class);
-        when(dotProducer.writeRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
                 .then(FIRST_DOT);
-        when(dotProducer.writeRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class)))
                 .then(SECOND_DOT_WITH_IMPLIED);
         doAnswer(invocation -> {
             FIRST_DOT.answer(invocation);
             return null;
         }).
-        when(dotProducer).writeAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+        when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             FIRST_DOT.answer(invocation);
             return null;
         }).
-                when(dotProducer).writeAllRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
+                when(dotProducer).writeTableAllRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
@@ -181,20 +181,20 @@ public class MustacheTableDiagramFactoryTest {
         WriteStats writeStats = new WriteStats(Collections.emptyList());
 
         DotFormatter dotProducer = mock(DotFormatter.class);
-        when(dotProducer.writeRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
                 .then(FIRST_DOT);
-        when(dotProducer.writeRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class)))
                 .then(SECOND_DOT_WITH_IMPLIED);
         doAnswer(invocation -> {
             FIRST_DOT.answer(invocation);
             return null;
         }).
-                when(dotProducer).writeAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+                when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             SECOND_DOT.answer(invocation);
             return null;
         }).
-                when(dotProducer).writeAllRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
+                when(dotProducer).writeTableAllRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
@@ -216,13 +216,13 @@ public class MustacheTableDiagramFactoryTest {
         WriteStats writeStats = new WriteStats(Collections.emptyList());
 
         DotFormatter dotProducer = mock(DotFormatter.class);
-        when(dotProducer.writeRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
+        when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
                 .then(FIRST_DOT_WITH_IMPLIED);
         doAnswer(invocation -> {
             FIRST_DOT.answer(invocation);
             return null;
         }).
-                when(dotProducer).writeAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+                when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());

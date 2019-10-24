@@ -70,7 +70,7 @@ public class MustacheSummaryDiagramFactoryTest {
         DotFormatter dotProducer = mock(DotFormatter.class);
         doAnswer(UPDATE_WRITE_STATS)
                 .when(dotProducer)
-                .writeRealRelationships(
+                .writeSummaryRealRelationships(
                         any(Database.class),
                         any(Collection.class),
                         anyBoolean(),
@@ -100,7 +100,7 @@ public class MustacheSummaryDiagramFactoryTest {
         DotFormatter dotProducer = mock(DotFormatter.class);
         doAnswer(UPDATE_WRITE_STATS)
                 .when(dotProducer)
-                .writeRealRelationships(
+                .writeSummaryRealRelationships(
                         any(Database.class),
                         any(Collection.class),
                         anyBoolean(),
@@ -108,7 +108,7 @@ public class MustacheSummaryDiagramFactoryTest {
                         any(WriteStats.class),
                         any(PrintWriter.class));
 
-        when(dotProducer.writeAllRelationships(any(Database.class), any(Collection.class), anyBoolean(), anyBoolean(), any(WriteStats.class), any(PrintWriter.class))).thenReturn(true);
+        when(dotProducer.writeSummaryAllRelationships(any(Database.class), any(Collection.class), anyBoolean(), anyBoolean(), any(WriteStats.class), any(PrintWriter.class))).thenReturn(true);
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());

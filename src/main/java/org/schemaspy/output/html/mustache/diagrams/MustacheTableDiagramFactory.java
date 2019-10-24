@@ -71,7 +71,7 @@ public class MustacheTableDiagramFactory {
 
         WriteStats oneStats = new WriteStats(stats);
         try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
-            impliedConstraints = dotProducer.writeRealRelationships(table, false, oneStats, dotOut);
+            impliedConstraints = dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
         }
         MustacheTableDiagram oneDiagram = mustacheDiagramFactory.generateTableDiagram("One", oneDegreeDotFile, table.getName() + ".1degree");
         oneDiagram.setActive(true);
@@ -80,7 +80,7 @@ public class MustacheTableDiagramFactory {
         if (degreeOfSeparation == 2) {
             WriteStats twoStats = new WriteStats(stats);
             try (PrintWriter dotOut = Writers.newPrintWriter(twoDegreesDotFile)) {
-                impliedConstraints = dotProducer.writeRealRelationships(table, true, twoStats, dotOut);
+                impliedConstraints = dotProducer.writeTableRealRelationships(table, true, twoStats, dotOut);
             }
 
             if (sameWritten(oneStats, twoStats)) {
@@ -93,7 +93,7 @@ public class MustacheTableDiagramFactory {
         if (notEmpty(impliedConstraints)) {
             WriteStats oneImplied = new WriteStats(stats);
             try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
-                dotProducer.writeAllRelationships(table, false, oneImplied, dotOut);
+                dotProducer.writeTableAllRelationships(table, false, oneImplied, dotOut);
             }
             MustacheTableDiagram oneImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("One implied", oneImpliedDotFile, table.getName() + ".implied1degrees");
             oneImpliedDiagram.setIsImplied(true);
@@ -102,7 +102,7 @@ public class MustacheTableDiagramFactory {
             if (degreeOfSeparation == 2) {
                 WriteStats twoImplied = new WriteStats(stats);
                 try (PrintWriter dotOut = Writers.newPrintWriter(twoImpliedDotFile)) {
-                    dotProducer.writeAllRelationships(table, true, twoImplied, dotOut);
+                    dotProducer.writeTableAllRelationships(table, true, twoImplied, dotOut);
                 }
                 if (sameWritten(oneImplied, twoImplied)) {
                     Files.deleteIfExists(twoImpliedDotFile.toPath());
