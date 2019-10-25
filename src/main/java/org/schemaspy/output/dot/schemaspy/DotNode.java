@@ -4,6 +4,7 @@
  * Copyright (C) 2017 Wojciech Kasa
  * Copyright (C) 2017 Daniel Watt
  * Copyright (C) 2018 Nils Petzaell
+ * Copyright (C) 2019 Kamyab Nazari
  *
  * This file is a part of the SchemaSpy project (http://schemaspy.org).
  *
