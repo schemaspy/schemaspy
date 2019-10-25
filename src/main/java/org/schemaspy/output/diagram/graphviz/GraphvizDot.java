@@ -26,10 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -200,15 +197,20 @@ public class GraphvizDot implements DiagramProducer {
         }
         StringBuilder mapBuffer = new StringBuilder(1024);
 
+        ArrayList<String> dotCommands = new ArrayList<>();
+        dotCommands.add(getExe());
+        if ("svg".equalsIgnoreCase(getDiagramFormat())) {
+            dotCommands.add("-Tsvg");
+        } else {
+            dotCommands.add("-T" + getDiagramFormat() + effectiveRenderer);
+        }
+        dotCommands.add(dotFile.getName());
+        dotCommands.add("-o" + diagramFile.getName());
+        if (!"svg".equalsIgnoreCase(getDiagramFormat())) {
+            dotCommands.add("-Tcmapx");
+        }
         // this one is for executing.  it can (hopefully) deal with funky things in filenames.
-        String[] dotCommand = new String[]{
-                getExe(),
-                "-T" + getDiagramFormat() + effectiveRenderer,
-                dotFile.getName(),
-                "-o" + diagramFile.getName(),
-                //"-v", //Enable verbose mode
-                "-Tcmapx"
-        };
+        String[] dotCommand = dotCommands.toArray(new String[0]);
         // this one is for display purposes ONLY.
         String commandLine = getDisplayableCommand(dotCommand);
         LOGGER.debug(commandLine);

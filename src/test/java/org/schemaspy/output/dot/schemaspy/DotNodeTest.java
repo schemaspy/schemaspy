@@ -18,30 +18,31 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.Config;
 import org.schemaspy.DotConfigUsingConfig;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.LogicalTable;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
+import org.schemaspy.model.*;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.testing.ConfigRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.schemaspy.output.dot.schemaspy.DotNode.DotNodeConfig;
 
 /**
  * @author Nils Petzaell
  */
 public class DotNodeTest {
 
+    @Rule
+    public ConfigRule configRule = new ConfigRule();
+
     @Test
     public void escapeHtml() {
         Database database = mock(Database.class);
         Table table = new LogicalTable(database, "catalog", "schema", "<table>", "comment");
         DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
-        DotNode dotNode = new DotNode(table,"", new DotNodeConfig(true, true), dotConfig);
+        DotNode dotNode = new DotNode(table,false, new DotNodeConfig(true, true), dotConfig);
         assertThat(dotNode.toString()).contains("tooltip=\"&lt;table&gt;");
     }
 
@@ -50,7 +51,7 @@ public class DotNodeTest {
         Database database = mock(Database.class);
         Table table = new LogicalTable(database, "catalog", "schema", "a table", "comment");
         DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
-        DotNode dotNode = new DotNode(table,"", new DotNodeConfig(true, true), dotConfig);
+        DotNode dotNode = new DotNode(table,false, new DotNodeConfig(true, true), dotConfig);
         assertThat(dotNode.toString()).contains("URL=\"a%20table.html\"");
     }
 
@@ -64,7 +65,7 @@ public class DotNodeTest {
         tableColumn.setDetailedSize(null);
         table.getColumnsMap().put("<A>", tableColumn);
         DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
-        DotNode dotNode = new DotNode(table,"", new DotNodeConfig(true, true), dotConfig);
+        DotNode dotNode = new DotNode(table,false, new DotNodeConfig(true, true), dotConfig);
         assertThat(dotNode.toString()).contains("<TD PORT=\"&lt;A&gt;.type\" ALIGN=\"LEFT\">&lt;t&gt;</TD>");
     }
 
@@ -78,7 +79,27 @@ public class DotNodeTest {
         tableColumn.setDetailedSize("<D>");
         table.getColumnsMap().put("<A>", tableColumn);
         DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
-        DotNode dotNode = new DotNode(table,"", new DotNodeConfig(true, true), dotConfig);
+        DotNode dotNode = new DotNode(table,false, new DotNodeConfig(true, true), dotConfig);
         assertThat(dotNode.toString()).contains("[&lt;D&gt;]");
+    }
+
+    @Test
+    public void urlForRemoteInRootNonRelative() {
+        Database database = mock(Database.class);
+        Table table = new RemoteTable(database, "catalog", "schema", "a table", "remote");
+        DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
+        Config.getInstance().setOneOfMultipleSchemas(true);
+        DotNode dotNode = new DotNode(table,true, new DotNodeConfig(true, true), dotConfig);
+        assertThat(dotNode.toString()).contains("URL=\"../schema/tables/a%20table.html\"");
+    }
+
+    @Test
+    public void urlForRemoteNotInRootNonRelative() {
+        Database database = mock(Database.class);
+        Table table = new RemoteTable(database, "catalog", "schema", "a table", "remote");
+        DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
+        Config.getInstance().setOneOfMultipleSchemas(true);
+        DotNode dotNode = new DotNode(table,false, new DotNodeConfig(true, true), dotConfig);
+        assertThat(dotNode.toString()).contains("URL=\"../../schema/tables/a%20table.html\"");
     }
 }
