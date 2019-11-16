@@ -42,7 +42,7 @@ ADD docker/schemaspy.sh /usr/local/bin/schemaspy
 USER java
 WORKDIR /
 
-ENV DRIVERS=/drivers
-ENV OUTPUT=/output
+ENV SCHEMASPY_DRIVERS=/drivers
+ENV SCHEMASPY_OUTPUT=/output
 
 ENTRYPOINT ["/usr/local/bin/schemaspy"]
