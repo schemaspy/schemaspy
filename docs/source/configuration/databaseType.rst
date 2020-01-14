@@ -168,7 +168,7 @@ So additional columns are ok, but you might need to alias columns so that they a
     selectViewSql=
         *Fetch definition for a view, expected columns:* |br| **view_definition, text (text has been deprecated)**
     selectCheckConstraintsSql=
-        *Fetch check constraints for all tables, expected columns:* |br| **table_name, constraint_name**
+        *Fetch check constraints for all tables, expected columns:* |br| **table_name, constraint_name, text**
     selectTableIdsSql=
         *Fetch ids for all tables, expected columns:* |br| **table_name, table_id**
     selectIndexIdsSql=
