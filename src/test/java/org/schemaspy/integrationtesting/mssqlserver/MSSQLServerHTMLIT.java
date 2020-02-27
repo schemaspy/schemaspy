@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.containers.MSSQLContainer;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
 
@@ -61,13 +61,13 @@ public class MSSQLServerHTMLIT {
     private static URL expectedInsertionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/insertionOrder.txt");
 
     @ClassRule
-    public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
+    public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<>(
                     MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLServerContainer("microsoft/mssql-server-linux:2017-CU6"))
-                        .assumeDockerIsPresent()
-                        .withAssumptions(assumeDriverIsPresent())
-                    .   withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql")
+                    new JdbcContainerRule<>(() -> new MSSQLContainer("microsoft/mssql-server-linux:2017-CU6"))
+                            .assumeDockerIsPresent()
+                            .withAssumptions(assumeDriverIsPresent())
+                            .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql")
             );
 
     @Autowired
@@ -117,8 +117,8 @@ public class MSSQLServerHTMLIT {
     public void producesSameContent() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
-                        Paths.get("target","mssqlhtml"),
-                        Paths.get("src","test","resources","integrationTesting","mssqlserver","expecting","mssqlserverhtmlit")
+                        Paths.get("target", "mssqlhtml"),
+                        Paths.get("src", "test", "resources", "integrationTesting", "mssqlserver", "expecting", "mssqlserverhtmlit")
                 );
         softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
         softAssertions.assertAll();

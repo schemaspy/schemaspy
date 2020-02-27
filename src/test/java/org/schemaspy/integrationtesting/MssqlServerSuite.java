@@ -27,7 +27,7 @@ import org.schemaspy.integrationtesting.mssqlserver.MSSQLServerCommentsIT;
 import org.schemaspy.integrationtesting.mssqlserver.MSSQLServerHTMLIT;
 import org.schemaspy.integrationtesting.mssqlserver.MSSQLServerRemoteTablesIT;
 import org.schemaspy.testing.SQLScriptsRunner;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.containers.MSSQLContainer;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 
@@ -41,8 +41,8 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 public class MssqlServerSuite {
 
     @ClassRule
-    public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MSSQLServerContainer("microsoft/mssql-server-linux:2017-CU6"))
+    public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
+            new JdbcContainerRule<>(() -> new MSSQLContainer("microsoft/mssql-server-linux:2017-CU6"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitFunctions(new SQLScriptsRunner("integrationTesting/mssqlserver/dbScripts/"));
