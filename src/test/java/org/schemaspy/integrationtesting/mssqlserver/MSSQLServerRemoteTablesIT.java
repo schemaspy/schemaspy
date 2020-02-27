@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.containers.MSSQLContainer;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -71,10 +71,10 @@ public class MSSQLServerRemoteTablesIT {
     private static Database database;
 
     @ClassRule
-    public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
+    public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<>(
                     MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLServerContainer("microsoft/mssql-server-linux:2017-CU6"))
+                    new JdbcContainerRule<>(() -> new MSSQLContainer("microsoft/mssql-server-linux:2017-CU6"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_remote_tables.sql")

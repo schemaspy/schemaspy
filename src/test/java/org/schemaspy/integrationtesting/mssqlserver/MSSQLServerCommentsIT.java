@@ -39,7 +39,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.containers.MSSQLContainer;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -90,10 +90,10 @@ public class MSSQLServerCommentsIT {
     private static Database def_f;
 
     @ClassRule
-    public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
+    public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<>(
                     MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLServerContainer("microsoft/mssql-server-linux:2017-CU6"))
+                    new JdbcContainerRule<>(() -> new MSSQLContainer("microsoft/mssql-server-linux:2017-CU6"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_comments.sql")
@@ -102,42 +102,42 @@ public class MSSQLServerCommentsIT {
     @Before
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
         if (abc_dbo == null) {
-            abc_dbo = createDatabaseRepresentation("abc", "dbo");
+            abc_dbo = createDatabaseRepresentation("ABC", "dbo");
         }
         if (abc_a == null) {
-            abc_a = createDatabaseRepresentation("abc", "a");
+            abc_a = createDatabaseRepresentation("ABC", "A");
         }
         if (abc_b == null) {
-            abc_b = createDatabaseRepresentation("abc", "b");
+            abc_b = createDatabaseRepresentation("ABC", "B");
         }
         if (abc_c == null) {
-            abc_c = createDatabaseRepresentation("abc", "c");
+            abc_c = createDatabaseRepresentation("ABC", "C");
         }
 
         if (abc_test_dbo == null) {
-            abc_test_dbo = createDatabaseRepresentation("abc_test", "dbo");
+            abc_test_dbo = createDatabaseRepresentation("ABC_TEST", "dbo");
         }
         if (abc_test_a == null) {
-            abc_test_a = createDatabaseRepresentation("abc_test", "a");
+            abc_test_a = createDatabaseRepresentation("ABC_TEST", "A");
         }
         if (abc_test_b == null) {
-            abc_test_b = createDatabaseRepresentation("abc_test", "b");
+            abc_test_b = createDatabaseRepresentation("ABC_TEST", "B");
         }
         if (abc_test_c == null) {
-            abc_test_c = createDatabaseRepresentation("abc_test", "c");
+            abc_test_c = createDatabaseRepresentation("ABC_TEST", "C");
         }
 
         if (def_dbo == null) {
-            def_dbo = createDatabaseRepresentation("def", "dbo");
+            def_dbo = createDatabaseRepresentation("DEF", "dbo");
         }
         if (def_d == null) {
-            def_d = createDatabaseRepresentation("def", "d");
+            def_d = createDatabaseRepresentation("DEF", "D");
         }
         if (def_e == null) {
-            def_e = createDatabaseRepresentation("def", "e");
+            def_e = createDatabaseRepresentation("DEF", "E");
         }
         if (def_f == null) {
-            def_f = createDatabaseRepresentation("def", "f");
+            def_f = createDatabaseRepresentation("DEF", "F");
         }
     }
 

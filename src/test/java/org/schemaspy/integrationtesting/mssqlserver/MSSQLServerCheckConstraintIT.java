@@ -39,7 +39,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.containers.MSSQLContainer;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -72,13 +72,13 @@ public class MSSQLServerCheckConstraintIT {
     private static Database database;
 
     @ClassRule
-    public static JdbcContainerRule<MSSQLServerContainer> jdbcContainerRule =
+    public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<>(
                     MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLServerContainer("microsoft/mssql-server-linux:2017-CU6"))
-                        .assumeDockerIsPresent()
-                        .withAssumptions(assumeDriverIsPresent())
-                        .withInitScript("integrationTesting/mssqlserver/dbScripts/check_constraint.sql")
+                    new JdbcContainerRule<>(() -> new MSSQLContainer("microsoft/mssql-server-linux:2017-CU6"))
+                            .assumeDockerIsPresent()
+                            .withAssumptions(assumeDriverIsPresent())
+                            .withInitScript("integrationTesting/mssqlserver/dbScripts/check_constraint.sql")
             );
 
     @Before
