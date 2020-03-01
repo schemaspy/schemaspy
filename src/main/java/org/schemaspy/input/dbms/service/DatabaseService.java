@@ -519,6 +519,7 @@ public class DatabaseService {
 
     private void initCheckConstraints(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectCheckConstraintsSql");
+        boolean append = Boolean.parseBoolean(config.getDbProperties().getProperty("multirowdata", "false"));
         if (sql != null) {
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db,null);
                  ResultSet rs = stmt.executeQuery()) {
@@ -526,8 +527,13 @@ public class DatabaseService {
                 while (rs.next()) {
                     String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
-                    if (table != null)
-                        table.addCheckConstraint(rs.getString("constraint_name"), rs.getString("text"));
+                    if (table != null) {
+                        if (append) {
+                            table.getCheckConstraints().merge(rs.getString("constraint_name"), rs.getString("text"), (oldValue, newValue) -> oldValue + newValue);
+                        } else {
+                            table.getCheckConstraints().put(rs.getString("constraint_name"), rs.getString("text"));
+                        }
+                    }
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
