@@ -31,7 +31,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static java.util.Optional.ofNullable;
 
@@ -159,35 +162,30 @@ public class IndexService {
         }
     }
 
-    private void processPrimaryKeyResultSet(Table table, ResultSet resultSet) throws SQLException {
+    private void processPrimaryKeyResultSet(final Table table, final ResultSet resultSet) throws SQLException {
+        Set<PrimaryKeyColumn> primaryKeyColumns = new TreeSet<>(Comparator.comparingInt(p -> p.seqno));
         while (resultSet.next()) {
-            addPrimaryKeyColumn(table, resultSet);
+            primaryKeyColumns.add(new PrimaryKeyColumn(resultSet));
         }
-    }
+        primaryKeyColumns.forEach(primaryKeyColumn -> {
+            TableColumn tableColumn = table.getColumn(primaryKeyColumn.column);
+            if (Objects.nonNull(tableColumn)) {
+                table.setPrimaryColumn(tableColumn);
+                updateIndex(primaryKeyColumn.pk_name, table, tableColumn);
+            } else {
+                LOGGER.error(
+                        "Found PrimaryKey index '{}' with column '{}.{}.{}.{}'" +
+                                ", but was unable to find column in table '{}'",
+                        primaryKeyColumn.pk_name,
+                        primaryKeyColumn.catalog,
+                        primaryKeyColumn.schema,
+                        primaryKeyColumn.table,
+                        primaryKeyColumn.column,
+                        table.getFullName()
+                );
+            }
+        });
 
-    /**
-     * @param rs
-     * @throws SQLException
-     */
-    private static void addPrimaryKeyColumn(Table table, ResultSet rs) throws SQLException {
-        String pkName = rs.getString("PK_NAME");
-        String columnName = rs.getString("COLUMN_NAME");
-        TableColumn tableColumn = table.getColumn(columnName);
-        if (Objects.nonNull(tableColumn)) {
-            table.setPrimaryColumn(tableColumn);
-            updateIndex(pkName, table, tableColumn);
-        } else {
-            LOGGER.error(
-                    "Found PrimaryKey index '{}' with column '{}.{}.{}.{}'" +
-                            ", but was unable to find column in table '{}'",
-                    pkName,
-                    rs.getString("TABLE_CAT"),
-                    rs.getString("TABLE_SCHEM"),
-                    rs.getString("TABLE_NAME"),
-                    columnName,
-                    table.getFullName()
-            );
-        }
     }
 
     private static void updateIndex(String pkName, Table table, TableColumn tableColumn) {
@@ -196,7 +194,7 @@ public class IndexService {
             if(Objects.nonNull(tableIndex)) {
                 tableIndex.setIsPrimaryKey(true);
             } else {
-                LOGGER.warn("Found PK for table '{}' with pk name '{}', but index hasn't been found", table.getName(), pkName);
+                LOGGER.debug("Found PK for table '{}' with pk name '{}', but index hasn't been found", table.getName(), pkName);
             }
         } else {
             String syntheticName = table.getName() + "_s_pk";
@@ -210,6 +208,24 @@ public class IndexService {
             tableIndex.addColumn(tableColumn, null);
             tableIndex.setIsPrimaryKey(true);
             LOGGER.debug("Found PK without index name, added column '{}' to index '{}' in table '{}'", tableColumn.getName(), syntheticName, table.getName());
+        }
+    }
+
+    private class PrimaryKeyColumn {
+        public final String catalog;
+        public final String schema;
+        public final String table;
+        public final String column;
+        public final String pk_name;
+        public final int seqno;
+
+        public PrimaryKeyColumn(ResultSet resultSet) throws SQLException {
+            this.catalog = resultSet.getString("TABLE_CAT");
+            this.schema = resultSet.getString("TABLE_SCHEM");
+            this.table = resultSet.getString("TABLE_NAME");
+            this.column = resultSet.getString("COLUMN_NAME");;
+            this.pk_name = resultSet.getString("PK_NAME");
+            this.seqno = resultSet.getShort("KEY_SEQ");
         }
     }
 }
