@@ -59,8 +59,8 @@
          </column>
          <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="UserName" size="16" type="VARCHAR" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="email" nullable="false" remarks="" size="40" type="VARCHAR" typeCode="12"/>
-         <primaryKey column="gid" sequenceNumberInPK="1"/>
-         <primaryKey column="uid" sequenceNumberInPK="2"/>
+         <primaryKey column="uid" sequenceNumberInPK="1"/>
+         <primaryKey column="gid" sequenceNumberInPK="2"/>
          <index name="PRIMARY" unique="true">
             <column ascending="true" name="uid"/>
             <column ascending="true" name="gid"/>
