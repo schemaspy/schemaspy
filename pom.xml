@@ -475,7 +475,7 @@
                                 <goals>
                                     <goal>sonar</goal>
                                 </goals>
-                                <phase>post-integration-test</phase>
+                                <phase>verify</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -501,6 +501,7 @@
                                 <goals>
                                     <goal>report</goal>
                                 </goals>
+                                <phase>post-integration-test</phase>
                                 <configuration>
                                     <outputDirectory>${project.build.directory}/jacoco/unit</outputDirectory>
                                 </configuration>
@@ -510,6 +511,7 @@
                                 <goals>
                                     <goal>report-integration</goal>
                                 </goals>
+                                <phase>post-integration-test</phase>
                                 <configuration>
                                     <outputDirectory>${project.build.directory}/jacoco/integration</outputDirectory>
                                 </configuration>
