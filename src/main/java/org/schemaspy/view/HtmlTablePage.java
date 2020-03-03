@@ -60,7 +60,7 @@ public class HtmlTablePage {
     }
 
     public void write(Table table, List<MustacheTableDiagram> diagrams, Writer writer) {
-        Set<TableColumn> primaries = new HashSet<>(table.getPrimaryColumns());
+        Set<TableColumn> primaries = new LinkedHashSet<>(table.getPrimaryColumns());
         Set<TableColumn> indexes = new HashSet<>();
         Set<MustacheTableColumn> tableColumns = new LinkedHashSet<>();
         Set<MustacheTableIndex> indexedColumns = new LinkedHashSet<>();
