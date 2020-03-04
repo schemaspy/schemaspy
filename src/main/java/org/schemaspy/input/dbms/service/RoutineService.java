@@ -29,6 +29,7 @@ import java.lang.invoke.MethodHandles;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class RoutineService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -42,6 +43,20 @@ public class RoutineService {
     public void gatherRoutines(Config config, Database database) {
         initRoutines(config, database);
         initRoutineParameters(config, database);
+        database.getRoutinesMap().replaceAll((routineName, routine) -> {
+            Routine newRoutine = new Routine(
+                    routine.getName(),
+                    trim(routine.getType()),
+                    trim(routine.getReturnType()),
+                    trim(routine.getDefinitionLanguage()),
+                    trim(routine.getDefinition()),
+                    routine.isDeterministic(),
+                    trim(routine.getDataAccess()),
+                    trim(routine.getSecurityType()),
+                    trim(routine.getComment()));
+            routine.getParameters().forEach(newRoutine::addParameter);
+            return newRoutine;
+        });
     }
 
     /**
@@ -51,7 +66,7 @@ public class RoutineService {
      */
     private void initRoutines(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectRoutinesSql");
-
+        boolean append = Boolean.parseBoolean(config.getDbProperties().getProperty("multirowdata", "false"));
         if (sql != null) {
 
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
@@ -67,11 +82,16 @@ public class RoutineService {
                     String securityType = rs.getString("security_type");
                     boolean deterministic = rs.getBoolean("is_deterministic");
                     String comment = getOptionalString(rs, "routine_comment");
-
                     Routine routine = new Routine(routineName, routineType,
                             returnType, definitionLanguage, definition,
                             deterministic, dataAccess, securityType, comment);
-                    db.getRoutinesMap().put(routineName, routine);
+                    if (append) {
+                        db.getRoutinesMap().merge(routineName, routine, (oldRoutine, newRoutine) -> new Routine(oldRoutine.getName(), oldRoutine.getType(),
+                                oldRoutine.getReturnType(), oldRoutine.getDefinitionLanguage(), oldRoutine.getDefinition() + newRoutine.getDefinition(),
+                                oldRoutine.isDeterministic(), oldRoutine.getDataAccess(), oldRoutine.getSecurityType(), oldRoutine.getComment()));
+                    } else {
+                        db.getRoutinesMap().put(routineName, routine);
+                    }
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
@@ -93,9 +113,9 @@ public class RoutineService {
 
                     Routine routine = db.getRoutinesMap().get(routineName);
                     if (routine != null) {
-                        String paramName = rs.getString("parameter_name");
-                        String type = rs.getString("dtd_identifier");
-                        String mode = rs.getString("parameter_mode");
+                        String paramName = trim(rs.getString("parameter_name"));
+                        String type = trim(rs.getString("dtd_identifier"));
+                        String mode = trim(rs.getString("parameter_mode"));
 
                         RoutineParameter param = new RoutineParameter(paramName, type, mode);
                         routine.addParameter(param);
@@ -116,5 +136,12 @@ public class RoutineService {
             LOGGER.debug("Failed to get value for column '{}'", sqlException);
             return null;
         }
+    }
+
+    private static String trim(String string) {
+        if (Objects.isNull(string)) {
+            return null;
+        }
+        return string.trim();
     }
 }

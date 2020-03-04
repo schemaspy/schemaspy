@@ -22,6 +22,7 @@ package org.schemaspy.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * A {@link HashMap} implementation that uses {@link String}s as its keys
@@ -63,6 +64,11 @@ public class CaseInsensitiveMap<V> extends HashMap<String, V>
         for (Entry<? extends String, ? extends V> e : map.entrySet()) {
             put(e.getKey(), e.getValue());
         }
+    }
+
+    @Override
+    public V merge(String key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+        return super.merge(key.toUpperCase(), value, remappingFunction);
     }
 
     @Override
