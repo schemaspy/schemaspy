@@ -27,6 +27,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
+import org.schemaspy.testing.IgnoreNonPrintedInCData;
 import org.schemaspy.testing.IgnoreUsingXPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -103,7 +104,7 @@ public class InformixIndexXMLIT {
     public void verifyXML() {
         Diff d = DiffBuilder.compare(Input.fromURL(expectedXML))
                 .withTest(Input.fromFile("target/informix_xml/test.informix.xml"))
-                .withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, new IgnoreUsingXPath("/database[1]/@type")))
+                .withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, new IgnoreUsingXPath("/database[1]/@type"), new IgnoreNonPrintedInCData()))
                 .build();
         assertThat(d.getDifferences()).isEmpty();
     }

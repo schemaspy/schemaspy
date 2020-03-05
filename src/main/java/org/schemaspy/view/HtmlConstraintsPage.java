@@ -80,7 +80,7 @@ public class HtmlConstraintsPage {
                         .map(entry -> new MustacheCheckConstraint(
                                 table.getName(),
                                 entry.getKey(),
-                                entry.getValue())
+                                entry.getValue().trim())
                         )
                 ).collect(Collectors.toList());
     }
