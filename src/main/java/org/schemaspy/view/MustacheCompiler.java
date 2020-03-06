@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -58,6 +59,7 @@ public class MustacheCompiler {
         StringWriter result = new StringWriter();
 
         HashMap<String, Object> pageScope = new HashMap<>();
+        pageScope.put("toFileName", (Function<String,String>) name -> FileNameGenerator.generate(name));
         pageScope.put("databaseName", databaseName);
         pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());
         pageScope.put("displayNumRows", htmlConfig.isNumRowsEnabled());
