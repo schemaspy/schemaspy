@@ -33,4 +33,4 @@ Now the graphical representation of relationships is a fundamental feature of th
 SchemaSpy uses JDBC's database metadata extraction services to gather the majority of its information, but has to make vendor-specific SQL queries to gather some information such as the SQL associated with a view and the details of check constraints.
 The differences between vendors have been isolated to configuration files and are extremely limited. Almost all of the vendor-specific SQL is optional.
 
-SchemaSpy was mentioned in one of th  O'Reilly's book |java_power_tools|
+SchemaSpy was mentioned in one of the O'Reilly's book |java_power_tools|
