@@ -408,7 +408,7 @@ public class SchemaAnalyzer {
 
         HtmlRoutinePage htmlRoutinePage = new HtmlRoutinePage(mustacheCompiler);
         for (Routine routine : db.getRoutines()) {
-            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines").resolve(routine.getName() + DOT_HTML).toFile())) {
+            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines").resolve(FileNameGenerator.generate(routine.getName()) + DOT_HTML).toFile())) {
                 htmlRoutinePage.write(routine, writer);
             }
         }
