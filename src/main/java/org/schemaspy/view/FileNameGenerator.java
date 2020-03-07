@@ -22,12 +22,14 @@ public class FileNameGenerator {
 
     private FileNameGenerator() {}
 
-    public static String generate(String name) {
-        if (name.length() <= 40 ) {
+    public static String generate(final String original_name) {
+        String name = original_name.replaceAll("[^a-zA-Z0-9\\-_\\.]", "_");
+        if (name.length() <= 40 && original_name.equalsIgnoreCase(name)) {
             return name;
         } else {
-            String hashAsHex = Integer.toHexString(name.hashCode());
-            return name.substring(0, 39 - hashAsHex.length()) + "_" + hashAsHex;
+            String hashAsHex = Integer.toHexString(original_name.hashCode());
+            int targetLength = Math.min(39 - hashAsHex.length(), name.length());
+            return name.substring(0, targetLength) + "_" + hashAsHex;
         }
     }
 }

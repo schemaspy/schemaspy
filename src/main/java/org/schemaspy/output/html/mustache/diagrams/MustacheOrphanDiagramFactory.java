@@ -22,6 +22,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
+import org.schemaspy.view.FileNameGenerator;
 import org.schemaspy.view.MustacheTableDiagram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +72,7 @@ public class MustacheOrphanDiagramFactory {
 
         List<MustacheTableDiagram> mustacheTableDiagrams = new ArrayList<>();
         for(Table table : orphanTables) {
-            String dotBaseFilespec = table.getName();
+            String dotBaseFilespec = FileNameGenerator.generate(table.getName());
 
             File dotFile = orphanDir.resolve(dotBaseFilespec + ".1degree.dot").toFile();
 

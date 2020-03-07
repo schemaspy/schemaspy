@@ -28,6 +28,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.view.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +133,7 @@ public class DotNode {
 
         buf.append("    </TABLE>>" + lineSeparator);
         if (!table.isRemote() || dotConfig.isOneOfMultipleSchemas()) {
-            buf.append("    URL=\"" + path + urlEncodeLink(tableName) + ".html\"" + lineSeparator);
+            buf.append("    URL=\"" + path + urlEncodeLink(FileNameGenerator.generate(tableName)) + ".html\"" + lineSeparator);
             buf.append("    target=\"_top\"" + lineSeparator);
         }
         buf.append("    tooltip=\"" + escapeHtml(fqTableName) + "\"" + lineSeparator);

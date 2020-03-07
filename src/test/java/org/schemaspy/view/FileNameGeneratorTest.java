@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FileNameGeneratorTest {
 
     @Test
-    public void nameShorterOrEqaulTo40ReturnIt() {
+    public void nameShorterOrEqualTo40ReturnIt() {
         String name = "1234567890123456789012345678901234567890";
         String fileName = FileNameGenerator.generate(name);
         assertThat(fileName).isEqualToIgnoringCase(name);
@@ -43,5 +43,26 @@ public class FileNameGeneratorTest {
         String nameOne = "98765432109876543210987654321098765432109876543210";
         String nameTwo = "12345678901234567890123456789012345678901234567890";
         assertThat(FileNameGenerator.generate(nameOne)).isNotEqualToIgnoringCase(FileNameGenerator.generate(nameTwo));
+    }
+
+    @Test
+    public void willReplaceIllegalCharsWithUnderscoreAndAddHashAsHex() {
+        String name = "Test\tif/name/is#fixed or not";
+        String fileName = FileNameGenerator.generate(name);
+        assertThat(fileName).isEqualToIgnoringCase("Test_if_name_is_fixed_or_not_f9e4eeb2");
+    }
+
+    @Test
+    public void wontGenerateSameForSimilar() {
+        String nameOne = "Test\tif/name/is#fixed or not";
+        String nameTwo = "Test\tif\tname/is#fixed or not";
+        assertThat(FileNameGenerator.generate(nameOne)).isNotEqualToIgnoringCase(FileNameGenerator.generate(nameTwo));
+    }
+
+    @Test
+    public void withJapanese() {
+        String name = "こんにちは";
+        String fileName = FileNameGenerator.generate(name);
+        assertThat(fileName).isEqualToIgnoringCase("______bfca3f39");
     }
 }

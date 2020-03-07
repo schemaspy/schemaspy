@@ -426,7 +426,7 @@ public class SchemaAnalyzer {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table, results.getStats());
             progressListener.graphingDetailsProgressed(table);
             LOGGER.debug("Writing details of {}", table.getName());
-            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("tables").resolve(table.getName() + DOT_HTML).toFile())) {
+            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("tables").resolve(FileNameGenerator.generate(table.getName()) + DOT_HTML).toFile())) {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
             }
         }
@@ -436,7 +436,7 @@ public class SchemaAnalyzer {
         tables.stream()
                 .filter(table -> !table.isLogical())
                 .forEach( table -> {
-                    String tablePath = "tables/" + table.getName() + DOT_HTML;
+                    String tablePath = "tables/" + FileNameGenerator.generate(table.getName()) + DOT_HTML;
                     Markdown.registryPage(table.getName(), tablePath);
                 });
     }
