@@ -22,6 +22,7 @@ import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
+import org.schemaspy.view.FileNameGenerator;
 import org.schemaspy.view.MustacheTableDiagram;
 import org.schemaspy.view.WriteStats;
 
@@ -55,10 +56,12 @@ public class MustacheTableDiagramFactory {
     public List<MustacheTableDiagram> generateTableDiagrams(Table table, WriteStats stats) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
 
-        File oneDegreeDotFile = new File(tableDir, table.getName() + ".1degree.dot");
-        File twoDegreesDotFile = new File(tableDir, table.getName() + ".2degrees.dot");
-        File oneImpliedDotFile = new File(tableDir, table.getName() + ".implied1degrees.dot");
-        File twoImpliedDotFile = new File(tableDir, table.getName() + ".implied2degrees.dot");
+        String fileNameBase = FileNameGenerator.generate(table.getName());
+
+        File oneDegreeDotFile = new File(tableDir, fileNameBase + ".1degree.dot");
+        File twoDegreesDotFile = new File(tableDir, fileNameBase + ".2degrees.dot");
+        File oneImpliedDotFile = new File(tableDir, fileNameBase + ".implied1degrees.dot");
+        File twoImpliedDotFile = new File(tableDir, fileNameBase + ".implied2degrees.dot");
 
         // delete before we start because we'll use the existence of these files to determine
         // if they should be turned into pngs & presented
@@ -73,7 +76,7 @@ public class MustacheTableDiagramFactory {
         try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
             impliedConstraints = dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
         }
-        MustacheTableDiagram oneDiagram = mustacheDiagramFactory.generateTableDiagram("One", oneDegreeDotFile, table.getName() + ".1degree");
+        MustacheTableDiagram oneDiagram = mustacheDiagramFactory.generateTableDiagram("One", oneDegreeDotFile, fileNameBase + ".1degree");
         oneDiagram.setActive(true);
         diagrams.add(oneDiagram);
 
@@ -86,7 +89,7 @@ public class MustacheTableDiagramFactory {
             if (sameWritten(oneStats, twoStats)) {
                 Files.deleteIfExists(twoDegreesDotFile.toPath()); // no different than before, so don't show it
             } else {
-                diagrams.add(mustacheDiagramFactory.generateTableDiagram("Two degrees", twoDegreesDotFile, table.getName() + ".2degrees"));
+                diagrams.add(mustacheDiagramFactory.generateTableDiagram("Two degrees", twoDegreesDotFile, fileNameBase + ".2degrees"));
             }
         }
 
@@ -95,7 +98,7 @@ public class MustacheTableDiagramFactory {
             try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
                 dotProducer.writeTableAllRelationships(table, false, oneImplied, dotOut);
             }
-            MustacheTableDiagram oneImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("One implied", oneImpliedDotFile, table.getName() + ".implied1degrees");
+            MustacheTableDiagram oneImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("One implied", oneImpliedDotFile, fileNameBase + ".implied1degrees");
             oneImpliedDiagram.setIsImplied(true);
             diagrams.add(oneImpliedDiagram);
 
@@ -107,7 +110,7 @@ public class MustacheTableDiagramFactory {
                 if (sameWritten(oneImplied, twoImplied)) {
                     Files.deleteIfExists(twoImpliedDotFile.toPath());
                 } else {
-                    MustacheTableDiagram twoImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("Two implied", twoImpliedDotFile, table.getName() + ".implied2degrees");
+                    MustacheTableDiagram twoImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("Two implied", twoImpliedDotFile, fileNameBase + ".implied2degrees");
                     twoImpliedDiagram.setIsImplied(true);
                     diagrams.add(twoImpliedDiagram);
                 }

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="illegal" schema="illegal" type="MySQL - 5.7.25">
+   <tables>
+      <table catalog="illegal" name="us/er" numRows="0" remarks="Users of the system" type="TABLE">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="userId" nullable="false" remarks="" size="10" type="INT" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="groupId" nullable="false" remarks="FK to groups omitted, implied relationship" size="10" type="INT" typeCode="4">
+            <parent catalog="illegal" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="グループ"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="UserName" size="16" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="email" nullable="false" remarks="" size="40" type="VARCHAR" typeCode="12"/>
+         <primaryKey column="userId" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="userId"/>
+         </index>
+         <index name="email_unique" unique="true">
+            <column ascending="true" name="email"/>
+         </index>
+      </table>
+      <table catalog="illegal" name="userAndGroup" numRows="0" remarks="" type="VIEW" viewSql="select `u`.`name` AS `UserName`,`g`.`name` AS `GroupName` from (`illegal`.`us/er` `u` left join `illegal`.`グループ` `g` on((`u`.`groupId` = `g`.`groupId`)))">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="UserName" nullable="false" remarks="UserName" size="16" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="GroupName" nullable="true" remarks="" size="16" type="VARCHAR" typeCode="12"/>
+      </table>
+      <table catalog="illegal" name="グループ" numRows="0" remarks="Groups" type="TABLE">
+         <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="groupId" nullable="false" remarks="" size="10" type="INT" typeCode="4">
+            <child catalog="illegal" column="groupId" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="us/er"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="" size="16" type="VARCHAR" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="description" nullable="false" remarks="" size="80" type="VARCHAR" typeCode="12"/>
+         <primaryKey column="groupId" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="groupId"/>
+         </index>
+         <index name="name_unique" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+   </tables>
+   <routines>
+      <routine dataAccess="CONTAINS SQL" deterministic="false" name="いいえ_det" returnType="char(50)" securityType="DEFINER" type="FUNCTION">
+         <comment/>
+         <definition language="SQL"/>
+      </routine>
+      <routine dataAccess="CONTAINS SQL" deterministic="true" name="はい_det" returnType="char(50)" securityType="DEFINER" type="FUNCTION">
+         <comment><![CDATA[is deterministic]]></comment>
+         <definition language="SQL"><![CDATA[RETURN CONCAT('Hello, ',s,'!')]]></definition>
+      </routine>
+   </routines>
+</database>

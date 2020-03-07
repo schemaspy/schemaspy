@@ -52,7 +52,7 @@ public class DotNodeTest {
         Table table = new LogicalTable(database, "catalog", "schema", "a table", "comment");
         DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
         DotNode dotNode = new DotNode(table,false, new DotNodeConfig(true, true), dotConfig);
-        assertThat(dotNode.toString()).contains("URL=\"a%20table.html\"");
+        assertThat(dotNode.toString()).contains("URL=\"a_table_4867c34f.html\"");
     }
 
     @Test
@@ -90,7 +90,7 @@ public class DotNodeTest {
         DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
         Config.getInstance().setOneOfMultipleSchemas(true);
         DotNode dotNode = new DotNode(table,true, new DotNodeConfig(true, true), dotConfig);
-        assertThat(dotNode.toString()).contains("URL=\"../schema/tables/a%20table.html\"");
+        assertThat(dotNode.toString()).contains("URL=\"../schema/tables/a_table_4867c34f.html\"");
     }
 
     @Test
@@ -100,6 +100,6 @@ public class DotNodeTest {
         DotConfig dotConfig = new DotConfigUsingConfig(Config.getInstance(), false);
         Config.getInstance().setOneOfMultipleSchemas(true);
         DotNode dotNode = new DotNode(table,false, new DotNodeConfig(true, true), dotConfig);
-        assertThat(dotNode.toString()).contains("URL=\"../../schema/tables/a%20table.html\"");
+        assertThat(dotNode.toString()).contains("URL=\"../../schema/tables/a_table_4867c34f.html\"");
     }
 }

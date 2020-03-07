@@ -48,7 +48,7 @@ public class MysqlSuite {
 
     @ClassRule
     public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
+            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5").withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitFunctions(new SQLScriptsRunner("integrationTesting/mysql/dbScripts/"))

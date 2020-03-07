@@ -77,6 +77,7 @@ public class MustacheTableDiagramFactoryTest {
 
     @BeforeClass
     public static void setupTable() {
+        when(table.getName()).thenReturn("table");
         when(table.getMaxChildren()).thenReturn(1);
         when(table.getMaxParents()).thenReturn(1);
         when(table.isView()).thenReturn(false);
@@ -86,6 +87,7 @@ public class MustacheTableDiagramFactoryTest {
     public void oneDiagrams() throws IOException {
         WriteStats writeStats = new WriteStats(Collections.emptyList());
         Table tableNoRelationships = mock(Table.class);
+        when(tableNoRelationships.getName()).thenReturn("noRelationship");
         when(tableNoRelationships.getMaxChildren()).thenReturn(0);
         when(tableNoRelationships.getMaxParents()).thenReturn(0);
 

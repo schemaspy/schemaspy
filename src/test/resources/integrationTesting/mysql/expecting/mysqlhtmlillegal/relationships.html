@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>htmlit Database</title>
+        <title>illegal Database</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -46,7 +46,7 @@
                 <nav class="navbar navbar-static-top">
                     <div class="container">
                         <div class="navbar-header">
-                            <a href="index.html" class="navbar-brand"><b>htmlit</b> Database</a>
+                            <a href="index.html" class="navbar-brand"><b>illegal</b> Database</a>
                             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
                         </div>
 
@@ -73,168 +73,55 @@
             <div class="content-wrapper">
                 <!-- Content Header (Page header) -->
                 <section class="content-header">
-                    <h1>Columns</h1>
+                    <h1>All Relationships</h1>
                 </section>
                 <!-- Main content -->
                 <section class="content">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
-                            <h3 class="box-title">Columns</h3>
+                            <i class="fa fa-code-fork"></i>
+                            <h3 class="box-title">Diagrams</h3>
                         </div>
                         <div class="box-body">
-                            <table id="column_table" class="table table-bordered table-striped dataTable" role="grid">
-                                <thead align='left'>
-                                    <tr>
-                                        <th>Table</th>
-                                        <th>Type</th>
-                                        <th>Column</th>
-                                        <th>Type</th>
-                                        <th>Size</th>
-                                        <th title='Are nulls allowed?'>Nullable</th>
-                                        <th title='Is column automatically updated?'>Auto</th>
-                                        <th title='Default value'>Default</th>
-                                        <th title='Comments' class="toggle"><span>Comments</span></th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
+                            <div class="nav-tabs-custom">
+                                <!-- Tabs within a box -->
+                                <h5>By default only columns that are primary keys, foreign keys or indexes are shown.</h5>
+                                <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                                    <li class="active"><a href="#compactimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact Implied</a></li>
+                                    <li class=""><a href="#largeimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large Implied</a></li>
+                                </ul>
+                                <div class="tab-content no-padding">
+                                    <div class="chart tab-pane active" id="compactimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <div class="alert alert-warning alert-dismissible">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <h4><i class="icon fa fa-info-circle"></i> Implied Relationships</h4>
+                                            <p>No 'real' Foreign Key relationships were detected in the schema.<br />
+                                                Displayed relationships are implied by a column's name/type/size matching another table's primary key.</p>
+                                        </div>
+                                        <map id="compactImpliedRelationshipsDiagram" name="compactImpliedRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/us_er_6a5c1be.html" target="_top" title="us/er" alt="" coords="200,5,320,181">
+<area shape="rect" id="node2" href="tables/_____16df92d6.html" target="_top" title="グループ" alt="" coords="5,35,156,181">
+</map>
+                                        <a name='diagram'><img id="compactimpliedDegreeImg" src="diagrams/summary/relationships.implied.compact.png" usemap="#compactImpliedRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="largeimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <div class="alert alert-warning alert-dismissible">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <h4><i class="icon fa fa-info-circle"></i> Implied Relationships</h4>
+                                            <p>No 'real' Foreign Key relationships were detected in the schema.<br />
+                                                Displayed relationships are implied by a column's name/type/size matching another table's primary key.</p>
+                                        </div>
+                                        <map id="largeImpliedRelationshipsDiagram" name="largeImpliedRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/us_er_6a5c1be.html" target="_top" title="us/er" alt="" coords="200,5,320,187">
+<area shape="rect" id="node2" href="tables/_____16df92d6.html" target="_top" title="グループ" alt="" coords="5,35,156,187">
+</map>
+                                        <a name='diagram'><img id="largeimpliedDegreeImg" src="diagrams/summary/relationships.implied.large.png" usemap="#largeImpliedRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
                     </div>
                 </section>
-                <script>
-                    var tableData = [
-    {
-        "tableName": "user",
-        "tableFileName": "user",
-        "tableType": "Table",
-        "keyClass": "foreignKey",
-        "keyTitle": "Foreign Key",
-        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>groupId",
-        "type": "INT",
-        "length": 10,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": "<p>FK to groups omitted, implied relationship<\/p>"
-    },
-    {
-        "tableName": "user",
-        "tableFileName": "user",
-        "tableType": "Table",
-        "keyClass": "indexedColumn",
-        "keyTitle": "Indexed",
-        "name": "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'><\/i>email",
-        "type": "VARCHAR",
-        "length": 40,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
-        "tableName": "group",
-        "tableFileName": "group",
-        "tableType": "Table",
-        "keyClass": "indexedColumn",
-        "keyTitle": "Indexed",
-        "name": "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'><\/i>name",
-        "type": "VARCHAR",
-        "length": 16,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
-        "tableName": "userAndGroup",
-        "tableFileName": "userAndGroup",
-        "tableType": "View",
-        "keyClass": "",
-        "keyTitle": "",
-        "name": "UserName",
-        "type": "VARCHAR",
-        "length": 16,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": "<p>UserName<\/p>"
-    },
-    {
-        "tableName": "group",
-        "tableFileName": "group",
-        "tableType": "Table",
-        "keyClass": "",
-        "keyTitle": "",
-        "name": "description",
-        "type": "VARCHAR",
-        "length": 80,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
-        "tableName": "group",
-        "tableFileName": "group",
-        "tableType": "Table",
-        "keyClass": "primaryKey",
-        "keyTitle": "Primary Key",
-        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>groupId",
-        "type": "INT",
-        "length": 10,
-        "nullable": "",
-        "autoUpdated": "√",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
-        "tableName": "user",
-        "tableFileName": "user",
-        "tableType": "Table",
-        "keyClass": "primaryKey",
-        "keyTitle": "Primary Key",
-        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>userId",
-        "type": "INT",
-        "length": 10,
-        "nullable": "",
-        "autoUpdated": "√",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
-        "tableName": "user",
-        "tableFileName": "user",
-        "tableType": "Table",
-        "keyClass": "",
-        "keyTitle": "",
-        "name": "name",
-        "type": "VARCHAR",
-        "length": 16,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": "<p>UserName<\/p>"
-    },
-    {
-        "tableName": "userAndGroup",
-        "tableFileName": "userAndGroup",
-        "tableType": "View",
-        "keyClass": "",
-        "keyTitle": "",
-        "name": "GroupName",
-        "type": "VARCHAR",
-        "length": 16,
-        "nullable": "√",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": ""
-    }
-];
-                    var config = {
-                        pagination: true
-                    };
-                </script>
             </div>
             <!-- /.content-wrapper -->
             <footer class="main-footer">
@@ -281,7 +168,7 @@
         <script src="bower/codemirror/sql.js"></script>
         <!-- AdminLTE App -->
         <script src="bower/admin-lte/dist/js/app.min.js"></script>
-        <script src="column.js"></script>
+        <script src="relationships.js"></script>
         <script src="schemaSpy.js"></script>
     </body>
 </html>

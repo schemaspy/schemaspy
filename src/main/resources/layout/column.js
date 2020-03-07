@@ -33,7 +33,7 @@ $(document).ready(function() {
             {
                 targets: 0,
                 render: function ( data, type, row, meta ) {
-                    return '<a href="tables/'+data+'.html" target="_top">'+data+'</a>';
+                    return '<a href="tables/'+row.tableFileName+'.html" target="_top">'+data+'</a>';
                 }
             },
             {
