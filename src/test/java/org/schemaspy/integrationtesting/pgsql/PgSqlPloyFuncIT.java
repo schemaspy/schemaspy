@@ -32,6 +32,7 @@ import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.integrationtesting.PgSqlSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Routine;
 import org.schemaspy.testing.SQLScriptsRunner;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext
-public class PgSqlRoutinesIT {
+public class PgSqlPloyFuncIT {
 
     @Autowired
     private SqlService sqlService;
@@ -72,7 +73,7 @@ public class PgSqlRoutinesIT {
                     new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10.4"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/dvdrental.sql", "\n\n\n"))
+                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/polyfunc.sql", "\n\n\n"))
             );
 
     @Before
@@ -86,9 +87,9 @@ public class PgSqlRoutinesIT {
         String[] args = {
                 "-t", "pgsql",
                 "-db", "test",
-                "-s", "public",
+                "-s", "polyfunc",
                 "-cat", "%",
-                "-o", "target/integrationtesting/pgsqlroutines",
+                "-o", "target/integrationtesting/pgsqlpolyfunc",
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
@@ -114,17 +115,12 @@ public class PgSqlRoutinesIT {
     }
 
     @Test
-    public void databaseShouldHave8Routines() {
-        assertThat(database.getRoutines().size()).isEqualTo(10);
+    public void hasThreeFunctions() {
+        assertThat(database.getRoutines().size()).isEqualTo(3);
     }
 
     @Test
-    public void routinFilmInStockHasComment() {
-        assertThat(database.getRoutinesMap().get("film_in_stock(integer, integer)").getComment()).isEqualToIgnoringCase("Current stock");
-    }
-
-    @Test
-    public void routineFilmInStockHas3Parameters() {
-        assertThat(database.getRoutinesMap().get("film_in_stock(integer, integer)").getParameters().size()).isEqualTo(3);
+    public void validateAllThreeFunctionNames() {
+        assertThat(database.getRoutines()).extracting(Routine::getName).containsExactlyInAnyOrder("bar(bigint)", "foo(text)", "foo(bigint, text)");
     }
 }
