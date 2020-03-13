@@ -98,6 +98,10 @@ public class DbmsService {
             "| YEAR" +
             "| ZONE").split("[| ]"));
 
+    public static Set<String> getSql92Keywords() {
+        return Collections.unmodifiableSet(sql92Keywords);
+    }
+
     public DbmsMeta fetchDbmsMeta(DatabaseMetaData databaseMetaData) {
         DbmsMeta.Builder builder = new DbmsMeta.Builder();
 
