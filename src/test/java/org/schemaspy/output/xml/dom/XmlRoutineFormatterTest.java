@@ -20,6 +20,7 @@ package org.schemaspy.output.xml.dom;
 
 import org.junit.Test;
 import org.schemaspy.model.Routine;
+import org.schemaspy.model.RoutineParameter;
 import org.schemaspy.testing.XmlOutputDiff;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -45,6 +46,7 @@ public class XmlRoutineFormatterTest {
                 "      <routine dataAccess=\"MODIFIES\" deterministic=\"true\" name=\"noCommentNoDefinitionLanguageNoDefinition\" returnType=\"int\" securityType=\"INVOKER\" type=\"FUNCTION\">\n" +
                 "         <comment/>\n" +
                 "         <definition/>\n" +
+                "         <parameters/>\n" +
                 "      </routine>\n" +
                 "   </routines>\n" +
                 "</database>";
@@ -78,6 +80,7 @@ public class XmlRoutineFormatterTest {
                 "      <routine dataAccess=\"MODIFIES\" deterministic=\"true\" name=\"noCommentNoDefinitionLanguageNoDefinition\" returnType=\"int\" securityType=\"INVOKER\" type=\"FUNCTION\">\n" +
                 "         <comment/>\n" +
                 "         <definition><![CDATA[something < 10 else]]></definition>\n" +
+                "         <parameters/>\n" +
                 "      </routine>\n" +
                 "   </routines>\n" +
                 "</database>";
@@ -111,6 +114,7 @@ public class XmlRoutineFormatterTest {
                 "      <routine dataAccess=\"MODIFIES\" deterministic=\"true\" name=\"noCommentNoDefinitionLanguageNoDefinition\" returnType=\"int\" securityType=\"INVOKER\" type=\"FUNCTION\">\n" +
                 "         <comment/>\n" +
                 "         <definition language=\"SQL\"><![CDATA[something < 10 else]]></definition>\n" +
+                "         <parameters/>\n" +
                 "      </routine>\n" +
                 "   </routines>\n" +
                 "</database>";
@@ -144,6 +148,10 @@ public class XmlRoutineFormatterTest {
                 "      <routine dataAccess=\"MODIFIES\" deterministic=\"true\" name=\"noCommentNoDefinitionLanguageNoDefinition\" returnType=\"int\" securityType=\"INVOKER\" type=\"FUNCTION\">\n" +
                 "         <comment><![CDATA[<html>]]></comment>\n" +
                 "         <definition language=\"SQL\"><![CDATA[something < 10 else]]></definition>\n" +
+                "         <parameters>\n" +
+                "             <parameter name=\"myVar\" type=\"varchar\" mode=\"IN\"/>\n" +
+                "             <parameter type=\"varchar\" mode=\"OUT\"/>\n" +
+                "         </parameters>\n" +
                 "      </routine>\n" +
                 "   </routines>\n" +
                 "</database>";
@@ -151,17 +159,18 @@ public class XmlRoutineFormatterTest {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         Element element = doc.createElement("database");
         doc.appendChild(element);
-        Collection<Routine> routines = Collections.singletonList(
-                new Routine("noCommentNoDefinitionLanguageNoDefinition",
-                        "FUNCTION",
-                        "int",
-                        "SQL",
-                        "something < 10 else",
-                        true,
-                        "MODIFIES",
-                        "INVOKER",
-                        "<html>")
-        );
+        Routine routine = new Routine("noCommentNoDefinitionLanguageNoDefinition",
+                "FUNCTION",
+                "int",
+                "SQL",
+                "something < 10 else",
+                true,
+                "MODIFIES",
+                "INVOKER",
+                "<html>");
+        routine.addParameter(new RoutineParameter("myVar", "varchar", "IN"));
+        routine.addParameter(new RoutineParameter("", "varchar", "OUT"));
+        Collection<Routine> routines = Collections.singletonList(routine);
         xmlRoutineFormatter.appendRoutines(element, routines);
         Diff diff = XmlOutputDiff.diffXmlOutput(
                 Input.fromString(XmlHelp.toString(element)),
@@ -169,5 +178,4 @@ public class XmlRoutineFormatterTest {
         );
         assertThat(diff.getDifferences()).isEmpty();
     }
-
 }

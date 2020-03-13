@@ -39,10 +39,16 @@
       <routine dataAccess="CONTAINS SQL" deterministic="false" name="no_det" returnType="char(50)" securityType="DEFINER" type="FUNCTION">
          <comment/>
          <definition language="SQL"/>
+         <parameters>
+            <parameter mode="IN" name="s" type="char(20)"/>
+         </parameters>
       </routine>
       <routine dataAccess="CONTAINS SQL" deterministic="true" name="yes_det" returnType="char(50)" securityType="DEFINER" type="FUNCTION">
          <comment><![CDATA[is deterministic]]></comment>
          <definition language="SQL"><![CDATA[RETURN CONCAT('Hello, ',s,'!')]]></definition>
+         <parameters>
+            <parameter mode="IN" name="s" type="char(20)"/>
+         </parameters>
       </routine>
    </routines>
 </database>

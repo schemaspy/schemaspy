@@ -19,13 +19,11 @@
 package org.schemaspy.output.xml.dom;
 
 import org.schemaspy.model.Routine;
+import org.schemaspy.model.RoutineParameter;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.*;
 
 public class XmlRoutineFormatter {
 
@@ -64,6 +62,23 @@ public class XmlRoutineFormatter {
         if (notNullOrEmpty(routine.getDefinition())) {
             CDATASection definitionCDATA = routinesElement.getOwnerDocument().createCDATASection(routine.getDefinition());
             definitionElement.appendChild(definitionCDATA);
+        }
+        Element parametersElement = routineElement.getOwnerDocument().createElement("parameters");
+        routineElement.appendChild(parametersElement);
+        if (!routine.getParameters().isEmpty()) {
+            appendParameters(parametersElement, routine.getParameters());
+        }
+    }
+
+    private static void appendParameters(Element parametersElement, List<RoutineParameter> routineParameters) {
+        for (RoutineParameter parameter : routineParameters) {
+            Element parameterElement = parametersElement.getOwnerDocument().createElement("parameter");
+            parametersElement.appendChild(parameterElement);
+            if (notNullOrEmpty(parameter.getName())) {
+                DOMUtil.appendAttribute(parameterElement, "name", parameter.getName());
+            }
+            DOMUtil.appendAttribute(parameterElement, "type" , parameter.getType());
+            DOMUtil.appendAttribute(parameterElement, "mode" , parameter.getMode());
         }
     }
 
