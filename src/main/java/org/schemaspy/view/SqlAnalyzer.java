@@ -25,6 +25,7 @@ import org.schemaspy.model.View;
 import org.schemaspy.util.CaseInsensitiveMap;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  *
@@ -33,11 +34,22 @@ import java.util.*;
  * @author Nils Petzaell
  */
 public class SqlAnalyzer {
+    private static Set<Function<String,String>> quoters = new HashSet<>();
     private Set<String> keywords;
     private Map<String, Table> tablesByPossibleNames;
     private static final String TOKENS = " \t\n\r\f()<>|,";
 
-    public SqlAnalyzer(Set<String> keywords, Collection<Table> tables, Collection<View> views) {
+    {
+        quoters.add(s -> "'" + s + "'");
+        quoters.add(s -> "`" + s + "`");
+        quoters.add(s -> "\"" + s +"\"");
+        quoters.add(s -> "[" + s + "]");
+    }
+
+    public SqlAnalyzer(String identifierQuoteString, Set<String> keywords, Collection<Table> tables, Collection<View> views) {
+        if (Objects.nonNull(identifierQuoteString) && !identifierQuoteString.trim().isEmpty()) {
+            quoters.add(s -> identifierQuoteString + s + identifierQuoteString);
+        }
         this.keywords = keywords;
         tablesByPossibleNames = new CaseInsensitiveMap<>();
         tablesByPossibleNames.putAll(getTableMap(tables));
@@ -90,16 +102,14 @@ public class SqlAnalyzer {
             String container = t.getContainer();
 
             map.put(name, t);
-            map.put("`" + name + "`", t);
-            map.put("'" + name + "'", t);
-            map.put("\"" + name + "\"", t);
-            map.put(container + "." + name, t);
-            map.put("`" + container + "`.`" + name + "`", t);
-            map.put("'" + container + "'.'" + name + "'", t);
-            map.put("\"" + container + "\".\"" + name + "\"", t);
-            map.put("`" + container + '.' + name + "`", t);
-            map.put("'" + container + '.' + name + "'", t);
-            map.put("\"" + container + '.' + name + "\"", t);
+            //Table name quoted
+            quoters.forEach( f -> map.put(f.apply(name), t));
+            //With container and name quoted
+            quoters.forEach(f -> map.put(container + "." + f.apply(name), t));
+            //Container qouted and name quoted
+            quoters.forEach(f -> map.put(f.apply(container) + "." + f.apply(name), t));
+            //Container and name in quotes
+            quoters.forEach(f -> map.put(f.apply(container + "." + name), t));
         }
 
         return map;
