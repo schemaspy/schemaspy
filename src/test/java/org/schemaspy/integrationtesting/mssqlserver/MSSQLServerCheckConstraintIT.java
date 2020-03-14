@@ -50,6 +50,7 @@ import java.sql.SQLException;
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -75,7 +76,7 @@ public class MSSQLServerCheckConstraintIT {
     public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<>(
                     MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLContainer("microsoft/mssql-server-linux:2017-CU6"))
+                    new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitScript("integrationTesting/mssqlserver/dbScripts/check_constraint.sql")
@@ -90,7 +91,7 @@ public class MSSQLServerCheckConstraintIT {
 
     private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
         String[] args = {
-                "-t", "mssql08",
+                "-t", "mssql17",
                 "-db", "CheckConstraint",
                 "-s", "CheckConstraint",
                 "-cat", "CheckConstraint",

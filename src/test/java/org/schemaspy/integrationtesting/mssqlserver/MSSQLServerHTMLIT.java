@@ -47,6 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 
 /**
  * @author Nils Petzaell
@@ -64,7 +65,7 @@ public class MSSQLServerHTMLIT {
     public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<>(
                     MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLContainer("microsoft/mssql-server-linux:2017-CU6"))
+                    new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql")
@@ -79,7 +80,7 @@ public class MSSQLServerHTMLIT {
     public void generateHTML() throws Exception {
         if (shouldRun.get()) {
             String[] args = new String[]{
-                    "-t", "mssql08",
+                    "-t", "mssql17",
                     "-db", "htmlit",
                     "-s", "htmlit",
                     "-cat", "htmlit",

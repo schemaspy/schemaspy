@@ -40,9 +40,11 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 })
 public class MssqlServerSuite {
 
+    public static final String IMAGE_NAME = "mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-16.04";
+
     @ClassRule
     public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MSSQLContainer("microsoft/mssql-server-linux:2017-CU6"))
+            new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitFunctions(new SQLScriptsRunner("integrationTesting/mssqlserver/dbScripts/"));
