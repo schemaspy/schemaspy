@@ -49,6 +49,7 @@ import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.mockito.BDDMockito.given;
+import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 
 /**
  * @author Rafal Kasa
@@ -93,7 +94,7 @@ public class MSSQLServerCommentsIT {
     public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<>(
                     MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLContainer("microsoft/mssql-server-linux:2017-CU6"))
+                    new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_comments.sql")
@@ -143,7 +144,7 @@ public class MSSQLServerCommentsIT {
 
     private Database createDatabaseRepresentation(String db, String schema) throws SQLException, IOException, URISyntaxException {
         String[] args = {
-                "-t", "mssql08",
+                "-t", "mssql17",
                 "-db", db,
                 "-s", schema,
                 "-cat", "%",
