@@ -20,8 +20,6 @@
  */
 package org.schemaspy.model;
 
-import java.util.Objects;
-
 /**
  * Base class to indicate that there was problem with how SchemaSpy was configured / used.
  *
@@ -30,8 +28,8 @@ import java.util.Objects;
  */
 public class InvalidConfigurationException extends RuntimeException {
     private static final long serialVersionUID = 1L;
-    private String paramName;
-    private String paramValue = "";
+    private final String paramName;
+    private final String paramValue;
 
     /**
      * When a message is sufficient
@@ -40,6 +38,8 @@ public class InvalidConfigurationException extends RuntimeException {
      */
     public InvalidConfigurationException(String msg) {
         super(msg);
+        paramName = null;
+        paramValue = null;
     }
 
     /**
@@ -51,6 +51,14 @@ public class InvalidConfigurationException extends RuntimeException {
      */
     public InvalidConfigurationException(String msg, Throwable cause) {
         super(msg, cause);
+        paramName = null;
+        paramValue = null;
+    }
+
+    public InvalidConfigurationException(String msg, Throwable cause, String paramName, String paramValue) {
+        super(msg, cause);
+        this.paramName = paramName;
+        this.paramValue = paramValue;
     }
 
     /**
@@ -60,22 +68,20 @@ public class InvalidConfigurationException extends RuntimeException {
      */
     public InvalidConfigurationException(Throwable cause) {
         super(cause);
+        paramName = null;
+        paramValue = null;
     }
 
-    public InvalidConfigurationException setParamName(String paramName) {
+    public InvalidConfigurationException(Throwable cause, String paramName, String paramValue) {
+        super(cause);
         this.paramName = paramName;
-        return this;
+        this.paramValue = paramValue;
     }
 
     public String getParamName() {
         return paramName;
     }
 
-    public InvalidConfigurationException setParamValue(String paramValue) {
-        if (Objects.nonNull(paramValue))
-            this.paramValue = paramValue;
-        return this;
-    }
 
     public String getParamValue() {
         return paramValue;

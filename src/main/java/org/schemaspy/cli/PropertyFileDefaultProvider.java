@@ -23,10 +23,13 @@ package org.schemaspy.cli;
 import com.beust.jcommander.IDefaultProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.FileCopyUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -52,15 +55,14 @@ public class PropertyFileDefaultProvider implements IDefaultProvider {
     }
 
     private static Properties loadProperties(String path) {
-        try (Reader reader = new InputStreamReader(new FileInputStream(path), "UTF-8")){
+        try {
+            String contents = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
             Properties properties = new Properties();
-            String contents = FileCopyUtils.copyToString(reader);
             // Replace backslashes with double backslashes to escape windows path separator.
             // Example input: schemaspy.o=C:\tools\schemaspy\output
             properties.load(new StringReader(contents.replace("\\", "\\\\")));
             return properties;
         } catch (IOException e) {
-            LOGGER.error("File not found: {}", path, e);
             throw new IllegalArgumentException("Could not find or load properties file: " + path, e);
         }
     }

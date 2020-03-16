@@ -60,7 +60,7 @@ public class Table implements Comparable<Table> {
     private int maxChildren;
     private int maxParents;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Construct a table that knows everything about the database table's metadata
@@ -75,7 +75,7 @@ public class Table implements Comparable<Table> {
         this.db = db;
         this.catalog = catalog;
         this.schema = schema;
-        this.container = schema != null ? schema : catalog != null ? catalog : db.getName();
+        this.container = Optional.ofNullable(schema).orElse(Optional.ofNullable(catalog).orElse(db.getName()));
         this.name = name;
         this.fullName = getFullName(db.getName(), catalog, schema, name);
         LOGGER.debug("Creating {} {}", getClass().getSimpleName(), fullName);
@@ -547,18 +547,18 @@ public class Table implements Comparable<Table> {
      * @return
      */
     public ForeignKeyConstraint removeAForeignKeyConstraint() {
-        final List<TableColumn> columns = getColumns();
+        final List<TableColumn> sortedColumns = getColumns();
         int numParents = 0;
         int numChildren = 0;
         // remove either a child or parent, choosing which based on which has the
         // least number of foreign key associations (when either gets to zero then
         // the table can be pruned)
-        for (TableColumn column : columns) {
+        for (TableColumn column : sortedColumns) {
             numParents += column.getParents().size();
             numChildren += column.getChildren().size();
         }
 
-        for (TableColumn column : columns) {
+        for (TableColumn column : sortedColumns) {
             ForeignKeyConstraint constraint;
             if (numParents <= numChildren)
                 constraint = column.removeAParentFKConstraint();

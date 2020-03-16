@@ -23,7 +23,7 @@ import com.beust.jcommander.ParameterException;
 
 public class DegreeOfSeparationValidator implements IValueValidator<Integer> {
     @Override
-    public void validate(String name, Integer value) throws ParameterException {
+    public void validate(String name, Integer value) {
         if (value > 2 || value < 1 ) {
             throw new ParameterException("Illegal value for '"+name+"', allowed values are ['1','2']");
         }

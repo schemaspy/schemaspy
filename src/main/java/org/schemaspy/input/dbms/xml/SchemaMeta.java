@@ -170,7 +170,7 @@ public class SchemaMeta {
         try {
             validate(doc);
         } catch (SAXException | IOException exc) {
-            LOGGER.warn("Failed to validate {}: {}", file, exc);
+            LOGGER.warn("Failed to validate {}: {}", file, exc.getMessage(), exc);
         }
 
         return doc;

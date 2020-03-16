@@ -59,7 +59,7 @@ public class MustacheCompiler {
         StringWriter result = new StringWriter();
 
         HashMap<String, Object> pageScope = new HashMap<>();
-        pageScope.put("toFileName", (Function<String,String>) name -> FileNameGenerator.generate(name));
+        pageScope.put("toFileName", (Function<String,String>) FileNameGenerator::generate);
         pageScope.put("databaseName", databaseName);
         pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());
         pageScope.put("displayNumRows", htmlConfig.isNumRowsEnabled());

@@ -79,7 +79,7 @@ public class IndexService {
             }
         } catch (SQLException exc) {
             if (!table.isLogical()) {
-                LOGGER.warn("Unable to extract index info for table '{}' in schema '{}': {}", table.getName(), table.getContainer(), exc);
+                LOGGER.warn("Unable to extract index info for table '{}' in schema '{}': {}", table.getName(), table.getContainer(), exc.getMessage(), exc);
             }
         }
     }
@@ -171,12 +171,12 @@ public class IndexService {
             TableColumn tableColumn = table.getColumn(primaryKeyColumn.column);
             if (Objects.nonNull(tableColumn)) {
                 table.setPrimaryColumn(tableColumn);
-                updateIndex(primaryKeyColumn.pk_name, table, tableColumn);
+                updateIndex(primaryKeyColumn.name, table, tableColumn);
             } else {
                 LOGGER.error(
                         "Found PrimaryKey index '{}' with column '{}.{}.{}.{}'" +
                                 ", but was unable to find column in table '{}'",
-                        primaryKeyColumn.pk_name,
+                        primaryKeyColumn.name,
                         primaryKeyColumn.catalog,
                         primaryKeyColumn.schema,
                         primaryKeyColumn.table,
@@ -216,15 +216,15 @@ public class IndexService {
         public final String schema;
         public final String table;
         public final String column;
-        public final String pk_name;
+        public final String name;
         public final int seqno;
 
         public PrimaryKeyColumn(ResultSet resultSet) throws SQLException {
             this.catalog = resultSet.getString("TABLE_CAT");
             this.schema = resultSet.getString("TABLE_SCHEM");
             this.table = resultSet.getString("TABLE_NAME");
-            this.column = resultSet.getString("COLUMN_NAME");;
-            this.pk_name = resultSet.getString("PK_NAME");
+            this.column = resultSet.getString("COLUMN_NAME");
+            this.name = resultSet.getString("PK_NAME");
             this.seqno = resultSet.getShort("KEY_SEQ");
         }
     }

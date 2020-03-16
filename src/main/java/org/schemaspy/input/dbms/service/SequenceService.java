@@ -20,8 +20,6 @@ package org.schemaspy.input.dbms.service;
 
 import org.schemaspy.Config;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.Routine;
-import org.schemaspy.model.RoutineParameter;
 import org.schemaspy.model.Sequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +74,7 @@ public class SequenceService {
         try {
             return rs.getInt(columnName);
         } catch (SQLException sqlException) {
-            LOGGER.debug("Failed to get value for column '{}'", sqlException);
+            LOGGER.debug("Failed to get value for column '{}'", sqlException.getMessage(), sqlException);
             return defaultIfNotFound;
         }
     }

@@ -39,7 +39,7 @@ public class SqlAnalyzer {
     private Map<String, Table> tablesByPossibleNames;
     private static final String TOKENS = " \t\n\r\f()<>|,";
 
-    {
+    static {
         quoters.add(s -> "'" + s + "'");
         quoters.add(s -> "`" + s + "`");
         quoters.add(s -> "\"" + s +"\"");
