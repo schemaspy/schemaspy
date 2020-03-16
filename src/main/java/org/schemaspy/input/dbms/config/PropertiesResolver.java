@@ -64,9 +64,7 @@ public class PropertiesResolver {
             LOGGER.debug(resolutionInfo.getTrace());
             return props;
         } catch (ResourceNotFoundException rnfe) {
-            throw new InvalidConfigurationException("Unable to resolve databaseType: " + dbType, rnfe)
-                    .setParamName("-t")
-                    .setParamValue(dbType);
+            throw new InvalidConfigurationException("Unable to resolve databaseType: " + dbType, rnfe, "-t", dbType);
         }
     }
 

@@ -109,7 +109,7 @@ public class HtmlColumnsPage {
             map.set(jsonObject, new LinkedHashMap<>());
             map.setAccessible(false);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.debug("Failed to replace hashmap with linkedhashmap in JSONObject", e);
         }
         return jsonObject;
     }

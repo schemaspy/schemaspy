@@ -154,7 +154,7 @@ public class ColumnService {
             if (forceQuotes) {
                 if (!table.isLogical()) {
                     // don't completely choke just because we couldn't do this....
-                    LOGGER.warn("Failed to determine auto increment status: {}", exc);
+                    LOGGER.warn("Failed to determine auto increment status: {}", exc.getMessage(), exc);
                     LOGGER.warn("SQL: {}", sql);
                 }
             } else {

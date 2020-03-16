@@ -68,7 +68,7 @@ public class PropertiesFinder implements ResourceFinder {
             try {
                 return path.toUri().toURL();
             } catch (MalformedURLException e) {
-                LOGGER.debug("Couldn't convert existing file: {}", path.toString(), e);
+                LOGGER.debug("Couldn't convert existing file: {}", path, e);
                 return null;
             }
         }
@@ -93,7 +93,7 @@ public class PropertiesFinder implements ResourceFinder {
                 LOGGER.debug("Couldn't convert url to uri to file: {}", url, e);
                 return null;
             } catch (IOException e) {
-                LOGGER.error("Unable to create filesystem for url: {}", url.toString(), e);
+                LOGGER.error("Unable to create filesystem for url: {}", url, e);
             }
         }
         return null;

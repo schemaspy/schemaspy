@@ -45,12 +45,12 @@ import static java.sql.DatabaseMetaData.*;
 public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
     private final String name;
     private Table parentTable;
-    private final List<TableColumn> parentColumns = new ArrayList<TableColumn>();
+    private final List<TableColumn> parentColumns = new ArrayList<>();
     private final Table childTable;
-    private final List<TableColumn> childColumns = new ArrayList<TableColumn>();
+    private final List<TableColumn> childColumns = new ArrayList<>();
     private final int deleteRule;
     private final int updateRule;
-    private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Construct a foreign key for the specified child table.
@@ -366,14 +366,11 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
+        if (obj instanceof ForeignKeyConstraint) {
+            ForeignKeyConstraint other = (ForeignKeyConstraint)obj;
+            return parentTable == other.parentTable && childTable == other.childTable;
         }
-        if (this.childTable != ((ForeignKeyConstraint)obj).childTable) {
-            return false;
-        }
-
-        return this.parentTable == ((ForeignKeyConstraint) obj).parentTable;
+        return false;
     }
 
     @Override

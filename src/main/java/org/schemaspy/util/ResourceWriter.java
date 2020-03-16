@@ -92,7 +92,7 @@ public class ResourceWriter {
              * Iterate all entries in the jar file.
              */
             for (Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements();) {
-                JarEntry jarEntry = e.nextElement();
+                JarEntry jarEntry = e.nextElement(); //NOSONAR
                 String jarEntryName = jarEntry.getName();
 
                 /**

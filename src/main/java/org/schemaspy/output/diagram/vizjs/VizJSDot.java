@@ -29,6 +29,7 @@ import javax.script.ScriptException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class VizJSDot implements DiagramProducer {
 
@@ -44,7 +45,7 @@ public class VizJSDot implements DiagramProducer {
             }
             ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
             scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
-            scriptEngine.eval(IOUtils.toString(vizJs,"UTF-8"));
+            scriptEngine.eval(IOUtils.toString(vizJs, StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new IllegalArgumentException("viz.js", e);
         }
@@ -62,7 +63,7 @@ public class VizJSDot implements DiagramProducer {
 
     public String generateDiagram(File dotFile, File diagramFile) {
         try {
-            String dotSource = IOUtils.toString(dotFile.toURI().toURL(), "UTF-8");
+            String dotSource = IOUtils.toString(dotFile.toURI().toURL(), StandardCharsets.UTF_8);
             String svg = toSvg(dotSource, MB_64);
             try (FileWriter diagramWriter = new FileWriter(diagramFile)){
                 IOUtils.write(svg, diagramWriter);

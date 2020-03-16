@@ -862,9 +862,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
             try {
                 tableInclusions = Pattern.compile(strInclusions);
             } catch (PatternSyntaxException badPattern) {
-                throw new InvalidConfigurationException(badPattern)
-                        .setParamName("-i")
-                        .setParamValue(strInclusions);
+                throw new InvalidConfigurationException(badPattern, "-i", strInclusions);
             }
         }
 
@@ -896,9 +894,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
             try {
                 tableExclusions = Pattern.compile(strExclusions);
             } catch (PatternSyntaxException badPattern) {
-                throw new InvalidConfigurationException(badPattern)
-                        .setParamName("-I")
-                        .setParamValue(strExclusions);
+                throw new InvalidConfigurationException(badPattern, "-I", strExclusions);
             }
         }
 
@@ -1383,7 +1379,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
         try (JarInputStream jar = new JarInputStream(new FileInputStream(loadedFromJar))){
             JarEntry entry;
 
-            while ((entry = jar.getNextJarEntry()) != null) {
+            while ((entry = jar.getNextJarEntry()) != null) { //NOSONAR
                 Matcher dbTypeMatcher = DBTYPE_PATTERN.matcher(entry.getName());
                 if (dbTypeMatcher.find()) {
                     databaseTypes.add(dbTypeMatcher.group(1));

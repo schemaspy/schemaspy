@@ -60,6 +60,7 @@ public class DotNode {
     private static final StyleSheet CSS = StyleSheet.getInstance();
 
     private static final String INDENT_6 = "      ";
+    private static final String TABLES_PATH = "/tables/"; //NOSONAR
 
     private final Table table;
     private final String path;
@@ -81,12 +82,12 @@ public class DotNode {
 
     private String createPath(boolean fromRoot) {
         if (dotConfig.useRelativeLinks()) {
-            return (table.isRemote() ? "../../../" + table.getContainer() : "../..") + "/tables/";
+            return (table.isRemote() ? "../../../" + table.getContainer() : "../..") + TABLES_PATH;
         }
         if (fromRoot) {
-            return (table.isRemote() ? ("../" + table.getContainer() + "/tables/") : "tables/");
+            return (table.isRemote() ? ("../" + table.getContainer() + TABLES_PATH) : "tables/");
         }
-        return (table.isRemote() ? ("../../" + table.getContainer() + "/tables/") : "");
+        return (table.isRemote() ? ("../../" + table.getContainer() + TABLES_PATH) : "");
 
     }
 
@@ -174,8 +175,7 @@ public class DotNode {
     }
 
     private int getTitleMaxWidth(String titleTable) {
-        int maxTitleWidth = getTextWidth(titleTable);
-        return maxTitleWidth;
+        return getTextWidth(titleTable);
     }
     
     private int getColumnMaxWidth() {

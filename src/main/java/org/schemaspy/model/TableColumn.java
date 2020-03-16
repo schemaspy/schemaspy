@@ -413,13 +413,11 @@ public class TableColumn {
      * @return the removed {@link ForeignKeyConstraint}
      */
     public ForeignKeyConstraint removeAParentFKConstraint() {
-        for (TableColumn relatedColumn : parents.keySet()) {
-            ForeignKeyConstraint constraint = parents.remove(relatedColumn);
-            relatedColumn.removeChild(this);
-            return constraint;
-        }
-
-        return null;
+        return parents.entrySet().stream().findFirst().map(entry ->  {
+            parents.remove(entry.getKey());
+            entry.getKey().removeChild(this);
+            return entry.getValue();
+        }).orElse(null);
     }
 
     /**
@@ -428,13 +426,11 @@ public class TableColumn {
      * @return the removed constraint, or <code>null</code> if none were available to be removed
      */
     public ForeignKeyConstraint removeAChildFKConstraint() {
-        for (TableColumn relatedColumn : children.keySet()) {
-            ForeignKeyConstraint constraint = children.remove(relatedColumn);
-            relatedColumn.removeParent(this);
-            return constraint;
-        }
-
-        return null;
+        return children.entrySet().stream().findFirst().map(entry ->  {
+            children.remove(entry.getKey());
+            entry.getKey().removeParent(this);
+            return entry.getValue();
+        }).orElse(null);
     }
 
     /**

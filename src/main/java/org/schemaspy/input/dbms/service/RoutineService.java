@@ -133,7 +133,7 @@ public class RoutineService {
         try {
             return rs.getString(columnName);
         } catch (SQLException sqlException) {
-            LOGGER.debug("Failed to get value for column '{}'", sqlException);
+            LOGGER.debug("Failed to get value for column '{}'", sqlException.getMessage(), sqlException);
             return null;
         }
     }
