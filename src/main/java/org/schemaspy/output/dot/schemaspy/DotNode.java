@@ -82,12 +82,12 @@ public class DotNode {
 
     private String createPath(boolean fromRoot) {
         if (dotConfig.useRelativeLinks()) {
-            return (table.isRemote() ? "../../../" + table.getContainer() : "../..") + TABLES_PATH;
+            return (table.isRemote() ? "../../../" + FileNameGenerator.generate(table.getContainer()) : "../..") + TABLES_PATH;
         }
         if (fromRoot) {
-            return (table.isRemote() ? ("../" + table.getContainer() + TABLES_PATH) : "tables/");
+            return (table.isRemote() ? ("../" + FileNameGenerator.generate(table.getContainer()) + TABLES_PATH) : "tables/");
         }
-        return (table.isRemote() ? ("../../" + table.getContainer() + TABLES_PATH) : "");
+        return (table.isRemote() ? ("../../" + FileNameGenerator.generate(table.getContainer()) + TABLES_PATH) : "");
 
     }
 
