@@ -521,7 +521,7 @@ public class SchemaAnalyzer {
                 LOGGER.info("Schemas with tables/views visible to '{}':{}{}",
                         user,
                         System.lineSeparator(),
-                        populatedSchemas.stream().collect(Collectors.joining(System.lineSeparator())));
+                        populatedSchemas.stream().map(s -> String.format("'%s'", s)).collect(Collectors.joining(System.lineSeparator())));
             }
         }
     }
