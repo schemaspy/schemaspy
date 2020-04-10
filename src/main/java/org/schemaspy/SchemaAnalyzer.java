@@ -153,7 +153,7 @@ public class SchemaAnalyzer {
 
             LOGGER.info("Analyzing schemas: {}{}",
                     System.lineSeparator(),
-                    schemas.stream().collect(Collectors.joining(System.lineSeparator())));
+                    schemas.stream().map(s -> String.format("'%s'", s)).collect(Collectors.joining(System.lineSeparator())));
 
             String dbName = config.getDb();
             File outputDir = commandLineArguments.getOutputDirectory();
