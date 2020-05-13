@@ -20,7 +20,7 @@ General
 [-configFile filePath]
     Path to configFile to be used, default is to look for schemaspy.properties
 [-o outputDirectory]
-    Directory to write the generated HTML/graphs to
+    Directory to write the generated HTML\/graphs to
 
 Database related
 ----------------
@@ -94,7 +94,7 @@ Html report related
 [-nopages]
     Just list data as one long list instead of pages.
 [-rails]
-    Use Rails-based naming convention to find relationships between logical foreign keys and primary keys.
+    Use `Rails-based naming convention <https://gist.github.com/iangreenleaf/b206d09c587e8fc6399e#relations-in-models>`_ to find relationships between logical foreign keys and primary keys.
 [-template path]
     Path to custom mustache template/css directory, needs to contain full set of templates.
     Bundled templates can be found in jar '/layout' and can be extracted with jar tool or any zip capable tool.
