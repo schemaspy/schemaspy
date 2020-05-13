@@ -12,6 +12,7 @@ To use an alternative configuration file run SchemaSpy with parameter: ``java -j
 Config file example: ::
 
 	# type of database. Run with -dbhelp for details
+	# if mssql doesn't work: try mssql08 in combination with sqljdbc_7.2, this combination has been tested
 	schemaspy.t=mssql
 	# optional path to alternative jdbc drivers. 
 	schemaspy.dp=path/to/drivers
