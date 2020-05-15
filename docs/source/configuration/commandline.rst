@@ -82,8 +82,10 @@ Processing
 Additional data
 ~~~~~~~~~~~~~~~
 [-meta fileOrPath]
-    Single schema analysis file path to SchemaMeta-xml, when running ``-all`` or ``-schemas`` path to directory containing
-    SchemaMeta-xmls with pattern (DatabaseName|Schema).meta.xml
+    Single schema analysis file path to one (1) SchemaMeta-xml-file;
+    when running ``-all`` or ``-schemas`` it defines the path to directory containing one ore more SchemaMeta-xml-files with pattern (DatabaseName|Schema).meta.xml
+    
+    For example, if you want to add metadata for 2 different schemas you need 2 files in this path: schema1.meta.xml, schema2.meta.xml
 
 Html report related
 -------------------
