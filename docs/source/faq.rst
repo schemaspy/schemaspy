@@ -36,3 +36,11 @@ So install using brew ``brew install graphviz --with-librsvg --with-pango`` |br|
 Depending on OSX version |br|
 *Older than High Sierra*, add ``-renderer :quartz`` to the commandline |br|
 *High Sierra or newer*, add ``-renderer :cairo`` to the commandline |br|
+
+Markdown
+----
+
+Links to other objects in the documentation
+~~~~~~~~~
+`[xyz]` will be parsed as link to the table/view/routine `[xyz]` in the current schema
+not tested: `[abc].[xyz]` should link to object `[abc].[xyz]`
