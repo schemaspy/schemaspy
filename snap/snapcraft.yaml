@@ -1,0 +1,49 @@
+name: schemaspy
+version: '6.1.0'
+summary: |
+  Document your database simply and easily.
+description: |
+  SchemaSpy is generating your database to HTML documentation, including Entity Relationship diagrams.
+grade: stable
+confinement: strict
+base: core18
+
+parts:
+  schemaspy:
+    build-packages:
+      - default-jdk
+    stage-packages:
+      - default-jdk
+      # Be sure that fontconfig is installed to avoid 
+      # https://github.com/AdoptOpenJDK/openjdk-docker/issues/75
+      # and https://github.com/AdoptOpenJDK/openjdk-build/issues/693
+      - fontconfig
+      - fontconfig-config
+      - libfontconfig1
+    plugin: maven
+    source: https://github.com/schemaspy/schemaspy.git
+    source-tag: v6.1.0
+    source-type: git
+    maven-options:
+      - -DskipTests=true
+    build-environment:
+      - JAVA_HOME: '/usr/lib/jvm/default-java/'
+
+apps:
+  schemaspy:
+    # Use -vizjs to avoid installing graphviz and bumping into
+    # https://gitlab.com/graphviz/graphviz/-/issues/1414
+    # https://bugs.launchpad.net/ubuntu/+source/graphviz/+bug/1349026
+    command: java -jar $SNAP/jar/schemaspy-6.1.0.jar -vizjs
+    # Environment required in order to pick the correct fontconfig package 
+    # path: https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/1576303
+    # It also relates to https://github.com/AdoptOpenJDK/openjdk-docker/issues/75
+    # and https://github.com/AdoptOpenJDK/openjdk-build/issues/693
+    environment:
+      XDG_DATA_HOME: $SNAP/usr/share
+      FONTCONFIG_PATH: $SNAP/etc/fonts/conf.d
+      FONTCONFIG_FILE: $SNAP/etc/fonts/fonts.conf
+    plugs:
+      - home
+      - network
+      - network-bind
