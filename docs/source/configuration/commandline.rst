@@ -81,9 +81,9 @@ Processing
 
 Additional data
 ~~~~~~~~~~~~~~~
-[-meta fileOrPath]
-    Single schema analysis file path to SchemaMeta-xml, when running ``-all`` or ``-schemas`` path to directory containing
-    SchemaMeta-xmls with pattern (DatabaseName|Schema).meta.xml
+[-meta pathToFolder]
+    Augment the database by using :ref:`schemameta`. Specifying path to a folder containing files named [schema].meta.xml, if schema is not used it will look for [databaseName].meta.xml |br|
+    One file per schema.
 
 Html report related
 -------------------
