@@ -42,5 +42,4 @@ Markdown
 
 Links to other objects in the documentation
 ~~~~~~~~~
-`[xyz]` will be parsed as link to the table/view/routine `[xyz]` in the current schema
-not tested: `[abc].[xyz]` should link to object `[abc].[xyz]`
+`[xyz]` will be parsed as link to the table/view named `xyz` in the current schema
