@@ -38,8 +38,8 @@ Depending on OSX version |br|
 *High Sierra or newer*, add ``-renderer :cairo`` to the commandline |br|
 
 Markdown
-----
+--------
 
 Links to other objects in the documentation
-~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `[xyz]` will be parsed as link to the table/view named `xyz` in the current schema
