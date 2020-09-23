@@ -122,7 +122,7 @@ More precise the ability to add/replace comments. :ref:`schemameta-comment`
      <comments>Database comment</comments>
         <tables>
            <table name="ACCOUNT" comments="I've added comment that links using markdown to markdown documentation [markdown](https://daringfireball.net/projects/markdown/)" >
-               <column name="accountId" comments="And now the schemaspy avatar ![avatar](https://avatars3.githubusercontent.com/u/20635098?s=20&v=4 "SchemaSpy")" />
+               <column name="accountId" comments='And now the schemaspy avatar ![avatar](https://avatars3.githubusercontent.com/u/20635098?s=20&v=4 "SchemaSpy")' />
            </table>
         </tables>
    </schemaMeta>
