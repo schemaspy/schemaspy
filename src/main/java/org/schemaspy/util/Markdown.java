@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 public class Markdown {
 
     private static final DataHolder OPTIONS = PegdownOptionsAdapter.flexmarkOptions(true,
-            Extensions.ALL
+            Extensions.ALL ^ Extensions.HARDWRAPS
     );
 
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
@@ -74,7 +74,7 @@ public class Markdown {
         StringBuilder text = new StringBuilder(markdownText);
         String newLine = "\r\n";
 
-        Pattern p = Pattern.compile("\\[(.*?)\\]");
+        Pattern p = Pattern.compile("\\[(.*?)]");
         Matcher m = p.matcher(markdownText);
 
         List<String> links = new ArrayList<>();
