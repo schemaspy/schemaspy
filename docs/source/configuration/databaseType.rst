@@ -121,6 +121,8 @@ tableTypes=
     Which types should be considered tables, default is TABLE
 viewTypes=
     Which types should be considered views, default is VIEW
+multirowdata=
+    If rows with same keys/ids should have it's data appended to the first result, default is false
 
 .. _databaseType-sql:
 
@@ -167,6 +169,10 @@ So additional columns are ok, but you might need to alias columns so that they a
         *Fetch parameters for routines, expected columns:* |br| **specific_name, parameter_name, dtd_identifier, parameter_mode**
     selectViewSql=
         *Fetch definition for a view, expected columns:* |br| **view_definition, text (text has been deprecated)**
+    selectViewCommentsSql=
+        *Fetch comments for all views, expected columns:* |br| **view_name, comments**
+    selectViewColumnCommentsSql=
+        *Fetch column comments for all views, expected columns:* |br| **view_name|table_name, column_name, comments**
     selectCheckConstraintsSql=
         *Fetch check constraints for all tables, expected columns:* |br| **table_name, constraint_name, text**
     selectTableIdsSql=
@@ -177,3 +183,5 @@ So additional columns are ok, but you might need to alias columns so that they a
         *Fetch comments for all tables, expected columns:* |br| **table_name, comments**
     selectColumnCommentsSql=
         *Fetch comments for all columns, expected columns:* |br| **table_name, column_name, comments**
+    selectSequencesSql=
+        *Fetch all sequences from the database, expected columns:* |br| **sequence_name, start_value, increment** |br| **start_value** and **increment** defaults to 1 if missing
