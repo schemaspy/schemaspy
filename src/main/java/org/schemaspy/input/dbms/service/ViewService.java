@@ -73,8 +73,7 @@ public class ViewService {
     /**
      * Extract the SQL that describes this view from the database
      *
-     * @return
-     * @throws SQLException
+     * @throws SQLException if query fails
      */
     private void gatherViewDefinition(Database db, View view) throws SQLException {
         String selectViewSql = Config.getInstance().getDbProperties().getProperty("selectViewSql");
@@ -129,8 +128,6 @@ public class ViewService {
 
     /**
      * Initializes view comments.
-     *
-     * @throws SQLException
      */
     public void gatherViewComments(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectViewCommentsSql");
@@ -140,13 +137,13 @@ public class ViewService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String viewName = rs.getString("view_name");
+                    String viewName = rs.getString(VIEW_NAME);
                     if (viewName == null)
                         viewName = rs.getString(TABLE_NAME);
                     Table view = db.getViewsMap().get(viewName);
 
                     if (view != null)
-                        view.setComments(rs.getString("comments"));
+                        view.setComments(rs.getString(COMMENTS));
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
@@ -157,8 +154,6 @@ public class ViewService {
 
     /**
      * Initializes view column comments.
-     *
-     * @throws SQLException
      */
     public void gatherViewColumnComments(Config config, Database db) {
         String sql = config.getDbProperties().getProperty("selectViewColumnCommentsSql");
@@ -168,7 +163,7 @@ public class ViewService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String viewName = rs.getString("view_name");
+                    String viewName = rs.getString(VIEW_NAME);
                     if (viewName == null)
                         viewName = rs.getString(TABLE_NAME);
                     Table view = db.getViewsMap().get(viewName);
@@ -181,7 +176,7 @@ public class ViewService {
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
-                LOGGER.warn("Failed to retrieve view column comments usign SQL '{}'", sql, sqlException);
+                LOGGER.warn("Failed to retrieve view column comments using SQL '{}'", sql, sqlException);
             }
         }
     }
