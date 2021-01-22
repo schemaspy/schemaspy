@@ -89,14 +89,8 @@ public class ColumnService {
         tmp = rs.getString("TYPE_NAME");
         column.setTypeName(tmp == null ? "unknown" : tmp.intern());
         column.setType(rs.getInt("DATA_TYPE"));
-
+        column.setLength(rs.getInt("COLUMN_SIZE"));
         column.setDecimalDigits(rs.getInt("DECIMAL_DIGITS"));
-        Number bufLength = (Number)rs.getObject("BUFFER_LENGTH");
-        if (bufLength != null && bufLength.shortValue() > 0)
-            column.setLength(bufLength.shortValue());
-        else
-            column.setLength(rs.getInt("COLUMN_SIZE"));
-
         StringBuilder buf = new StringBuilder();
         buf.append(column.getLength());
         if (column.getDecimalDigits() > 0) {
