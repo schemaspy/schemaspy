@@ -11,7 +11,7 @@ Before you can use SchemaSpy you must have the following requirements available 
 * viz.js or Graphviz
 
 Java
-^^^^^^
+^^^^
 
 You will need to have a supported version of Java installed, which includes:
 
@@ -24,7 +24,8 @@ If you don't already have a proper version of Java installed, see `OpenJDK <http
 
 
 JDBC Driver
-^^^^^^
+^^^^^^^^^^^
+
 No JDBC drivers are included with the jar-distribution of SchemaSpy.
 
 In some case, a JDBC driver may already exist on your local system if your database happens to come with drivers. Otherwise, you will need to download one yourself.
@@ -53,15 +54,15 @@ You will need to tell SchemaSpy where to find the JDBC driver you require. For e
 
 If your JDBC .jar file is in a different directory, then the -dp parameter would need to specify the directory path to the file, like ``-dp /opt/some-directory/your-jdbc-driver-name.jar``. 
 
-See :ref:`_commandline` for more information and advanced cases, such if you need to load multiple driver files with ``-loadjars``.
+See :ref:`commandline` for more information and advanced situations.
 
 viz.js or Graphviz
-^^^^^^^^
+^^^^^^^^^^^^^^^^^^
 This is necessary to render graphical representations / images of the database relationships.
 
 SchemaSpy version 6.1.0 and higher now comes with viz.js, so you will not need to download anything unless you're using SchemaSpy version 6.0 or lower.
 
-For SchemaSpy version 6.1.0 or higher, simply include the ``-vizjs``  :ref:`_commandline` when executing the SchemaSpy command.
+For SchemaSpy version 6.1.0 or higher, simply include ``-vizjs`` as a command line argument when executing the SchemaSpy command.
 
 If you must use Schemaspy version 6.0 or less, then Graphviz will need to be installed as follows.
 
@@ -79,7 +80,7 @@ If you must use Schemaspy version 6.0 or less, then Graphviz will need to be ins
     Please read carefully the detailed instructions on how to `install Graphviz on your operating system <http://www.graphviz.org/download/>`_.
 
 SchemaSpy
-----------
+---------
 
 SchemaSpy is just a single executable jar-file (schemaspy-[version].jar), you can `download releases from the SchemaSpy website <http://schemaspy.org>`_ or the `GitHub releases page <https://github.com/schemaspy/schemaspy/releases>`_.
 
