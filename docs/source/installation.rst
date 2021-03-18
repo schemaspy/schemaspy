@@ -4,20 +4,67 @@ Installation
 Requirements
 ------------
 
-Before you can start using SchemaSpy you must have installed two things in your system environment.
+Before you can use SchemaSpy you must have the following requirements available on your local system.
 
-Java 8
-^^^^^^
+* Java
+* a JDBC driver file for your specific database engine 
+* viz.js or Graphviz
 
-Download instructions for all operating systems: `https://java.com/en/download/manual.jsp <https://java.com/en/download/manual.jsp>`_
+Java
+^^^^
 
-Optional
---------
+You will need to have a supported version of Java installed, which includes:
 
-Since version 6.1.0 Graphviz is no longer required. There is an embedded viz.js that can be used by adding command line argument ``vizjs``
+* Java version 8 or higher
+* OR OpenJDK 1.8 or higher - an open-source alternative
 
-Graphviz
-^^^^^^^^
+You can run ``java -version`` in a terminal to check the version of any currently installed Java.
+
+If you don't already have a proper version of Java installed, see `OpenJDK <https://openjdk.java.net/install/>`_ or `Oracle Java <https://www.oracle.com/java/technologies/javase-downloads.html>`_ for download and install instructions for your operating systems.
+
+
+JDBC Driver
+^^^^^^^^^^^
+
+No JDBC drivers are included with the jar-distribution of SchemaSpy.
+
+In some case, a JDBC driver may already exist on your local system if your database happens to come with drivers. Otherwise, you will need to download one yourself.
+
+If downloading a driver, you can usually find an approriate driver by searching the internet for "[name of your database] JDBC driver".
+
+Verify the driver you download is compatible with the version of database management system / engine that you are using. For instance, if you're using PostgreSQL 13 the JDBC driver will need to support PostgreSQL 13.
+
+Here is a list of where you might find drivers for common database management systems:
+
+* `DB2 <https://www.ibm.com/support/pages/db2-jdbc-driver-versions-and-downloads>`_
+* `Firebird <https://firebirdsql.org/en/jdbc-driver/>`_
+* `Impala <https://impala.apache.org/docs/build/html/topics/impala_jdbc.html>`_
+* `MySQL <https://www.mysql.com/products/connector/>`_
+* `MariaDB <https://downloads.mariadb.org/connector-java/>`_
+* `Netezza <https://www.ibm.com/support/knowledgecenter/SSULQD_7.2.1/com.ibm.nz.datacon.doc/c_datacon_installing_configuring_jdbc.html>`_
+* `Oracle <https://www.oracle.com/database/technologies/appdev/jdbc-downloads.html>`_
+* `PostgreSQL <https://jdbc.postgresql.org/download.html>`_
+* `Redshift <https://docs.aws.amazon.com/redshift/latest/mgmt/configuring-connections.html>`_
+* `SQLite <https://github.com/xerial/sqlite-jdbc>`_
+* `SQL Server <https://docs.microsoft.com/en-us/sql/connect/jdbc/download-microsoft-jdbc-driver-for-sql-server>`_
+* `Sybase <http://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.help.sqlanywhere.12.0.1/dbprogramming/jconnect-using-jdbxextra.html>`_
+* `Teradata <https://downloads.teradata.com/download/connectivity/jdbc-driver>`_
+
+You will need to tell SchemaSpy where to find the JDBC driver you require. For example, if you downloaded the Postgres JDBC file called postgresql-42.2.19.jar to the current directory the command would include the -dp parameter, like ``-dp postgresql-42.2.19.jar``. 
+
+If your JDBC .jar file is in a different directory, then the -dp parameter would need to specify the directory path to the file, like ``-dp /opt/some-directory/your-jdbc-driver-name.jar``. 
+
+See :ref:`commandline` for more information and advanced situations.
+
+viz.js or Graphviz
+^^^^^^^^^^^^^^^^^^
+This is necessary to render graphical representations / images of the database relationships.
+
+SchemaSpy version 6.1.0 and higher now comes with viz.js, so you will not need to download anything unless you're using SchemaSpy version 6.0 or lower.
+
+For SchemaSpy version 6.1.0 or higher, simply include ``-vizjs`` as a command line argument when executing the SchemaSpy command.
+
+If you must use Schemaspy version 6.0 or less, then Graphviz will need to be installed as follows.
 
 - Windows
     The easiest way to install Graphviz is to download the msi package from `http://www.graphviz.org/download/ <http://www.graphviz.org/download/>`_
@@ -30,12 +77,12 @@ Graphviz
             C:\Program Files (x86)\Graphviz2.38\bin        
 
 - Linux, Mac OS
-    Please read carefully the detailed instructions on how to install Graphviz on your os version `http://www.graphviz.org/download/ <http://www.graphviz.org/download/>`_.
+    Please read carefully the detailed instructions on how to `install Graphviz on your operating system <http://www.graphviz.org/download/>`_.
 
 SchemaSpy
-----------
+---------
 
-SchemaSpy is just a single executable jar-file (schemaspy-[version].jar), you can download releases from http://schemaspy.org or the github releases page https://github.com/schemaspy/schemaspy/releases
+SchemaSpy is just a single executable jar-file (schemaspy-[version].jar), you can `download releases from the SchemaSpy website <http://schemaspy.org>`_ or the `GitHub releases page <https://github.com/schemaspy/schemaspy/releases>`_.
 
 If you feel adventurous there is a link in the README.md for latest builds.
 
