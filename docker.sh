@@ -29,6 +29,16 @@ function deploy() {
     fi
 }
 
+function pullLogin() {
+    if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]] &&
+       [[ -n ${DOCKER_PULL_USER} ]] &&
+       [[ -n ${DOCKER_PULL_PASS} ]]; then
+        docker login -u ${DOCKER_PULL_USER} -p ${DOCKER_PULL_PASS}
+    else
+        echo "PR or Pull credentials missing"
+    fi
+}
+
 
 case "$1" in
     build)
@@ -36,6 +46,9 @@ case "$1" in
         ;;
     deploy)
         deploy
+        ;;
+    pullLogin)
+        pullLogin
         ;;
     *)
         echo "Bad argument: $1"

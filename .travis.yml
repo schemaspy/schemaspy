@@ -10,6 +10,7 @@ addons:
     packages:
       - graphviz
 script:
+  - ./docker.sh pullLogin
   - ./travis.sh
   - ./docker.sh build snapshot
 cache:
