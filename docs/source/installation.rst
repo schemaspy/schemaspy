@@ -64,7 +64,7 @@ SchemaSpy version 6.1.0 and higher now comes with viz.js, so you will not need t
 
 For SchemaSpy version 6.1.0 or higher, simply include ``-vizjs`` as a command line argument when executing the SchemaSpy command.
 
-NOTE: If you are using Java 15 or later, ``vis.js`` will not work! This is because Nashorn (JavaScript engine) was removed on Java 15. Hence, if you are on Java 15 or later, you need to install Graphviz manually as described below. Or you can switch to an earlier Java version if you would like to use ``vis.js``.
+NOTE: If you are using Java 15 or later, ``vis.js`` will not work! This is because Nashorn (JavaScript engine) was removed on Java 15. Hence, if you are on Java 15 or later, you need to install Graphviz manually as described below. Or, you can switch to an earlier Java version if you would like to use ``vis.js``.
 
 If you must use Schemaspy version 6.0 or less, then Graphviz will need to be installed as follows.
 
