@@ -459,8 +459,8 @@
         <profile>
             <id>sonar</id>
               <properties>
-                  <sonar.host.url>https://sonarcloud.io</sonar.host.url>
                   <sonar.organization>schemaspy</sonar.organization>
+                  <sonar.projectKey>org.schemaspy:schemaspy</sonar.projectKey>
                   <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/jacoco/unit/jacoco.xml,${project.build.directory}/jacoco/integration/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
             </properties>     
             <build>
@@ -468,7 +468,7 @@
                     <plugin>
                         <groupId>org.sonarsource.scanner.maven</groupId>
                         <artifactId>sonar-maven-plugin</artifactId>
-                        <version>3.7.0.1746</version>
+                        <version>3.8.0.2131</version>
                         <executions>
                             <execution>
                                 <id>default-sonar</id>
@@ -482,7 +482,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.0</version>
+                        <version>0.8.6</version>
                         <executions>
                             <execution>
                                 <id>default-prepare-agent</id>
@@ -548,7 +548,7 @@
                 <dependency>
                     <groupId>org.sonarsource.java</groupId>
                     <artifactId>sonar-jacoco-listeners</artifactId>
-                    <version>5.0.1.12818</version>
+                    <version>5.14.0.18788</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
