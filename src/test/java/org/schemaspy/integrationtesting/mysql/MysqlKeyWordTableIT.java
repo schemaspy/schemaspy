@@ -32,6 +32,7 @@ import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Table;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -76,6 +77,7 @@ public class MysqlKeyWordTableIT {
                     new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
+                            .withQueryString("?useSSL=false")
                             .withInitScript("integrationTesting/mysql/dbScripts/keywordtableit.sql")
                             .withInitUser("root", "test")
             );
@@ -109,11 +111,11 @@ public class MysqlKeyWordTableIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        MysqlKeyWordTableIT.database = database;
     }
 
     @Test
     public void hasATableNamedDistinct() {
-        assertThat(database.getTables()).extracting(t -> t.getName()).contains("DISTINCT");
+        assertThat(database.getTables()).extracting(Table::getName).contains("DISTINCT");
     }
 }

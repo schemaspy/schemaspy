@@ -75,6 +75,7 @@ public class MysqlSpacesNoDotsIT {
                     new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
+                            .withQueryString("?useSSL=false")
                             .withInitScript("integrationTesting/mysql/dbScripts/spacesnodotsit.sql")
                             .withInitUser("root", "test")
             );
@@ -86,7 +87,7 @@ public class MysqlSpacesNoDotsIT {
         }
     }
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "mysql",
                 "-db", "TEST 1",
@@ -108,7 +109,7 @@ public class MysqlSpacesNoDotsIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        MysqlSpacesNoDotsIT.database = database;
     }
 
     @Test

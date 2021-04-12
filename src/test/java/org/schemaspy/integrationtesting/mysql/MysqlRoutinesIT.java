@@ -74,6 +74,7 @@ public class MysqlRoutinesIT {
                     new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
+                            .withQueryString("?useSSL=false")
                             .withInitScript("integrationTesting/mysql/dbScripts/routinesit.sql")
                             .withInitUser("root", "test")
             );
@@ -107,7 +108,7 @@ public class MysqlRoutinesIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        MysqlRoutinesIT.database = database;
     }
 
     @Test
