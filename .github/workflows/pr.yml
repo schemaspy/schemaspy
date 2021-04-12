@@ -1,0 +1,37 @@
+name: Pull requests
+
+on:
+  pull_request:
+    branches:
+      - "main"
+      - "master"
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Install Graphviz
+        run: sudo apt-get install graphviz
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build, Test
+        run: >
+          ./mvnw
+          --batch-mode
+          --update-snapshots
+          --errors
+          --show-version
+          verify
