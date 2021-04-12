@@ -99,7 +99,8 @@ public class MysqlSchemaLeakageIT {
                 "-u", "testUser",
                 "-p", "password",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
+                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-connprops", "useSSL\\=false"
         };
         given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysql_schema_leakage"));
         given(arguments.getDatabaseType()).willReturn("mysql");

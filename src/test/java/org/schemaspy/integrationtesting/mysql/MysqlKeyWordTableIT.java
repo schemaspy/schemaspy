@@ -99,7 +99,8 @@ public class MysqlKeyWordTableIT {
                 "-p", "test",
                 "-cat", "%",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
+                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-connprops", "useSSL\\=false"
         };
         CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
