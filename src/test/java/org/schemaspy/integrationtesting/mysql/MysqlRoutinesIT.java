@@ -74,6 +74,7 @@ public class MysqlRoutinesIT {
                     new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
+                            .withQueryString("?useSSL=false")
                             .withInitScript("integrationTesting/mysql/dbScripts/routinesit.sql")
                             .withInitUser("root", "test")
             );
@@ -95,7 +96,8 @@ public class MysqlRoutinesIT {
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
+                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-connprops", "useSSL\\=false"
         };
         CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
@@ -107,7 +109,7 @@ public class MysqlRoutinesIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        MysqlRoutinesIT.database = database;
     }
 
     @Test

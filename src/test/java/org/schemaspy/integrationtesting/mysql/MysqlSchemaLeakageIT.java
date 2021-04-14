@@ -77,6 +77,7 @@ public class MysqlSchemaLeakageIT {
                     new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
+                            .withQueryString("?useSSL=false")
                             .withInitScript("integrationTesting/mysql/dbScripts/mysql_table_view_collision.sql")
                             .withInitUser("root", "test")
             );
@@ -88,7 +89,7 @@ public class MysqlSchemaLeakageIT {
         }
     }
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "mysql",
                 "-db", "schemaleak",
@@ -98,7 +99,8 @@ public class MysqlSchemaLeakageIT {
                 "-u", "testUser",
                 "-p", "password",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
+                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-connprops", "useSSL\\=false"
         };
         given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysql_schema_leakage"));
         given(arguments.getDatabaseType()).willReturn("mysql");
@@ -115,7 +117,7 @@ public class MysqlSchemaLeakageIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        MysqlSchemaLeakageIT.database = database;
     }
 
     @Test

@@ -111,7 +111,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.8.0</version>
+                <version>3.19.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -272,6 +272,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>21.1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ibm.informix</groupId>
+            <artifactId>informix-jdbc-complete</artifactId>
+            <version>4.50.4.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
             <version>2.3.0</version>
@@ -280,8 +292,13 @@
         <dependency>
             <groupId>nl.jqno.equalsverifier</groupId>
             <artifactId>equalsverifier</artifactId>
-            <version>2.4</version>
+            <version>3.5.5</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.2</version>
         </dependency>
     </dependencies>
     <build>
@@ -304,8 +321,28 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.5,)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -327,10 +364,13 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
+                    <propertiesEncoding>ISO-8859-1</propertiesEncoding>
                     <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>eot</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>otf</nonFilteredFileExtension>
                         <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
                         <nonFilteredFileExtension>woff</nonFilteredFileExtension>
                         <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
@@ -372,7 +412,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>3.2.0</version>
                 <configuration>
                     <doctitle>API for ${project.name} ${project.version}</doctitle>
                     <windowtitle>API for ${project.name} ${project.version}</windowtitle>
@@ -381,17 +421,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M3</version>
+                <version>3.0.0-M5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M3</version>
+                <version>3.0.0-M5</version>
                 <configuration>
                     <classesDirectory>${project.build.directory}/${project.build.finalName}.jar.original</classesDirectory>
-                    <additionalClasspathElements>
-                        <additionalClasspathElement>${basedir}/ext-lib/*</additionalClasspathElement>
-                    </additionalClasspathElements>
                     <useManifestOnlyJar>false</useManifestOnlyJar>
                     <includes>
                         <include>**/*IT.java</include>
@@ -405,6 +442,7 @@
                     <systemPropertyVariables>
                         <pomImplementationVersion>${project.version}</pomImplementationVersion>
                         <pomImplementationBuild>${buildNumber}</pomImplementationBuild>
+                        <oracle.jdbc.timezoneAsRegion>false</oracle.jdbc.timezoneAsRegion>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>
@@ -419,7 +457,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>3.0.0-M1</version>
                 <configuration>
                     <arguments>-Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true</arguments>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
@@ -442,7 +480,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

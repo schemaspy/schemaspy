@@ -56,6 +56,7 @@ public class MysqlMultiSchemaIT {
                     new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
+                            .withQueryString("?useSSL=false")
                             .withInitFunctions(new SQLScriptsRunner("integrationTesting/mysql/dbScripts/"))
                             .withInitUser("root", "test")
             );
@@ -73,7 +74,7 @@ public class MysqlMultiSchemaIT {
                     "-db", "htmlit",
                     "-all",
                     "-schemaSpec", "(?!^mysql$|^performance_schema$|^information_schema$).*",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
+                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),

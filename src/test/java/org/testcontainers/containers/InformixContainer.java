@@ -53,7 +53,7 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
 
     @Override
     public String getJdbcUrl() {
-        return "jdbc:informix-sqli://"+ getContainerIpAddress() + ":" + getMappedPort(INFORMIX_PORT)+ "/sysmaster:INFORMIXSERVER=dev";
+        return "jdbc:informix-sqli://"+ getContainerIpAddress() + ":" + getJdbcPort()+ "/sysmaster:INFORMIXSERVER=dev";
     }
 
     @Override
@@ -67,6 +67,11 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
     }
 
     public Integer getJdbcPort(){
+        try {
+            getMappedPort(INFORMIX_PORT);
+        } catch (IllegalArgumentException iae) {
+            updateContainerInfo();
+        }
         return getMappedPort(INFORMIX_PORT);
     }
 
@@ -103,18 +108,13 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
     }
 
     private void updateContainerInfo() {
-        Field field = null;
         try {
-            field = GenericContainer.class.getDeclaredField("containerInfo");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        field.setAccessible(true);
-        try {
+            Field field = GenericContainer.class.getDeclaredField("containerInfo");
+            field.setAccessible(true);
             field.set(this, dockerClient.inspectContainerCmd(containerId).exec());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            field.setAccessible(false);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            LOGGER.error("Failed to update container info", e);
         }
-        field.setAccessible(false);
     }
 }
