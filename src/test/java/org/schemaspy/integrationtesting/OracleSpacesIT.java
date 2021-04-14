@@ -32,6 +32,7 @@ import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Table;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -93,7 +94,7 @@ public class OracleSpacesIT {
         }
     }
 
-    private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "orathin",
                 "-db", jdbcContainerRule.getContainer().getSid(),
@@ -120,11 +121,11 @@ public class OracleSpacesIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        OracleSpacesIT.database = database;
     }
 
     @Test
     public void databaseShouldHaveTableWithSpaces() {
-        assertThat(database.getTables()).extracting(t -> t.getName()).contains("test 1.0");
+        assertThat(database.getTables()).extracting(Table::getName).contains("test 1.0");
     }
 }

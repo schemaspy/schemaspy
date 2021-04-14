@@ -92,7 +92,7 @@ public class OraclePKIT {
         }
     }
 
-    private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "orathin",
                 "-db", jdbcContainerRule.getContainer().getSid(),
@@ -114,7 +114,7 @@ public class OraclePKIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        OraclePKIT.database = database;
     }
 
     @Test

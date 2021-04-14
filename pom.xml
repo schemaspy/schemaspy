@@ -272,6 +272,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>21.1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ibm.informix</groupId>
+            <artifactId>informix-jdbc-complete</artifactId>
+            <version>4.50.4.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
             <version>2.3.0</version>
@@ -282,6 +294,11 @@
             <artifactId>equalsverifier</artifactId>
             <version>3.5.5</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.2</version>
         </dependency>
     </dependencies>
     <build>
@@ -412,9 +429,6 @@
                 <version>3.0.0-M5</version>
                 <configuration>
                     <classesDirectory>${project.build.directory}/${project.build.finalName}.jar.original</classesDirectory>
-                    <additionalClasspathElements>
-                        <additionalClasspathElement>${basedir}/ext-lib/*</additionalClasspathElement>
-                    </additionalClasspathElements>
                     <useManifestOnlyJar>false</useManifestOnlyJar>
                     <includes>
                         <include>**/*IT.java</include>
@@ -428,6 +442,7 @@
                     <systemPropertyVariables>
                         <pomImplementationVersion>${project.version}</pomImplementationVersion>
                         <pomImplementationBuild>${buildNumber}</pomImplementationBuild>
+                        <oracle.jdbc.timezoneAsRegion>false</oracle.jdbc.timezoneAsRegion>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>
