@@ -24,6 +24,8 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.relationship.ImpliedRelationships;
+import org.schemaspy.output.dot.schemaspy.relationship.RealRelationships;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -43,7 +45,6 @@ public class DotFormatter {
     private final DotFormat dotFormat;
 
     private final DotSummaryFormatter dotSummaryFormatter;
-    private final DotTableFormatter dotTableFormatter;
     private final DotOrphanFormatter dotOrphanFormatter;
 
     /**
@@ -53,7 +54,6 @@ public class DotFormatter {
         this.dotConfig = dotConfig;
         this.dotFormat = new DotFormat(dotConfig);
         this.dotSummaryFormatter = new DotSummaryFormatter(dotFormat, dotConfig);
-        this.dotTableFormatter = new DotTableFormatter(dotFormat, dotConfig);
         this.dotOrphanFormatter = new DotOrphanFormatter(dotFormat, dotConfig);
     }
 
@@ -66,11 +66,11 @@ public class DotFormatter {
     }
 
     public Set<ForeignKeyConstraint> writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
-        return dotTableFormatter.writeTableRealRelationships(table, twoDegreesOfSeparation, stats, dot);
+        return new RealRelationships(dotFormat, dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
 
     public void writeTableAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
-        dotTableFormatter.writeTableAllRelationships(table, twoDegreesOfSeparation, stats, dot);
+        new ImpliedRelationships(dotFormat, dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
 
     public void writeOrphan(Table table, PrintWriter dot) {
