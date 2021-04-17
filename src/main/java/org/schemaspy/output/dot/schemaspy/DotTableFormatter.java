@@ -24,6 +24,7 @@ import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -36,29 +37,43 @@ import java.util.*;
  * @author Rafal Kasa
  * @author Nils Petzaell
  */
-public class DotTableFormatter {
+public class DotTableFormatter implements Relationships {
 
     private final DotFormat dotFormat;
     private final DotConfig dotConfig;
+    private final Table table;
+    private final boolean twoDegreesOfSeparation;
+    private final WriteStats stats;
+    private final boolean includeImplied;
+    private final PrintWriter dot;
 
-    public DotTableFormatter(DotFormat dotFormat, DotConfig dotConfig) {
+    public DotTableFormatter(
+        final DotFormat dotFormat,
+        final DotConfig dotConfig,
+        final Table table,
+        final boolean twoDegreesOfSeparation,
+        final WriteStats stats,
+        final boolean includeImplied,
+        final PrintWriter dot
+    ) {
         this.dotFormat = dotFormat;
         this.dotConfig = dotConfig;
+        this.table = table;
+        this.twoDegreesOfSeparation = twoDegreesOfSeparation;
+        this.stats = stats;
+        this.includeImplied = includeImplied;
+        this.dot = dot;
     }
 
-    /**
-     * Write real relationships (excluding implied) associated with the given table.<p>
-     * Returns a set of the implied constraints that could have been included but weren't.
-     */
-    public Set<ForeignKeyConstraint> writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
-        return writeTableRelationships(table, twoDegreesOfSeparation, stats, false, dot);
-    }
-
-    /**
-     * Write implied relationships associated with the given table
-     */
-    public void writeTableAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
-        writeTableRelationships(table, twoDegreesOfSeparation, stats, true, dot);
+    @Override
+    public Set<ForeignKeyConstraint> write() {
+        return writeTableRelationships(
+            this.table,
+            this.twoDegreesOfSeparation,
+            this.stats,
+            this.includeImplied,
+            this.dot
+        );
     }
 
     /**
