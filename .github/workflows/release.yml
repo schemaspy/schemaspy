@@ -1,0 +1,101 @@
+name: Release SchemaSpy
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Version to release [n.n.n]'
+        required: true
+      next_development_version:
+        description: 'Next development version [n.n.n]'
+        required: true
+
+jobs:
+  release:
+    if: ${{ github.repository_owner == 'schemaspy' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Inputs
+        run: '[[ $RELEASE_VERSION =~ $VERSION_PATTERN ]] && [[ $NEXT_VERSION =~ $VERSION_PATTERN ]]'
+        env:
+          RELEASE_VERSION: ${{ github.event.inputs.release_version }}
+          NEXT_VERSION: ${{ github.event.inputs.next_development_version }}
+          VERSION_PATTERN: '^[0-9]+\.[0-9]+\.[0-9]+$'
+      - uses: actions/checkout@v3
+        if: success()
+        with:
+          fetch-depth: 0
+      - name: Setup JDK 11
+        if: success()
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 11
+          cache: 'maven'
+      - name: Install Graphviz
+        if: success()
+        run: sudo apt-get install graphviz
+      - name: Cache SonarCloud packages
+        if: success()
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Create/Update draft
+        if: success()
+        uses: npetzall/release-ready-action@20fb399661f83887d8e7b6e8b62b78757975bfcc
+        id: drafting
+        with:
+          draft-tag: "v${{ github.event.inputs.release_version }}"
+          template: "./.github/release-ready/release_note.dot"
+      - name: Setup git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "action@github.com"
+      - name: Maven release
+        if: success()
+        run: >
+          ./mvnw
+          --batch-mode
+          --errors
+          --show-version
+          -P coverage
+          -P sonar
+          -Dsonar.host.url=https://sonarcloud.io
+          release:prepare
+          -DreleaseVersion=${{ github.event.inputs.release_version }}
+          -DdevelopmentVersion=${{ github.event.inputs.next_development_version }}-SNAPSHOT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Upload Release Asset
+        if: success()
+        id: upload-release-asset
+        uses: npetzall/upload-release-asset@906b7264ab0ec25bb79ed107db4bfcc4a7ca3121
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.drafting.outputs.upload-url }}
+          asset_path: ./target/schemaspy-${{ github.event.inputs.release_version }}-app.jar
+          asset_name: schemaspy-${{ github.event.inputs.release_version }}.jar
+          asset_content_type: application/java-archive
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build docker image
+        if: success()
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            "${{ github.repository }}:${{ github.event.inputs.release_version }}"
+            "${{ github.repository }}:latest"
+          build-args: |
+            GIT_BRANCH=${{ github.ref_name }}
+            GIT_REVISION=${{ github.sha }}
