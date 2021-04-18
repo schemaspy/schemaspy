@@ -1,0 +1,7 @@
+Changes in {{=nextVersion}} {{? currentVersion }}since {{=currentVersion}} {{?}}
+
+Features:{{ for(var feat of changes.filter(function(change) { return change.header.type === 'feat' })) { }}
+* {{? feat.header.scope }}{{=feat.header.scope}}: {{?}}{{=feat.header.message}}{{ } }}
+
+Fixes:{{ for (var fix of changes.filter(function(change) { return change.header.type === 'fix'})) { }}
+* {{? fix.header.scope }}{{=fix.header.scope}}: {{?}}{{=fix.header.message}}{{ } }}
