@@ -1,10 +1,10 @@
 Installation
 =====================================
 
-Requirements
+Prequisites
 ------------
 
-Before you can use SchemaSpy you must have the following requirements available on your local system.
+Before you can use SchemaSpy you must have the following prerequisites available on your local system.
 
 * Java
 * a JDBC driver file for your specific database engine 
@@ -50,9 +50,9 @@ Here is a list of where you might find drivers for common database management sy
 * `Sybase <http://infocenter.sybase.com/help/index.jsp?topic=/com.sybase.help.sqlanywhere.12.0.1/dbprogramming/jconnect-using-jdbxextra.html>`_
 * `Teradata <https://downloads.teradata.com/download/connectivity/jdbc-driver>`_
 
-You will need to tell SchemaSpy where to find the JDBC driver you require. For example, if you downloaded the Postgres JDBC file called postgresql-42.2.19.jar to the current directory the command would include the -dp parameter, like ``-dp postgresql-42.2.19.jar``. 
+You will need to tell SchemaSpy where to find the JDBC driver you require. For example, if you downloaded the Postgres JDBC file called postgresql-42.2.19.jar to the current directory the command would include the -dp argument, like ``-dp postgresql-42.2.19.jar``. 
 
-If your JDBC .jar file is in a different directory, then the -dp parameter would need to specify the directory path to the file, like ``-dp /opt/some-directory/your-jdbc-driver-name.jar``. 
+If your JDBC .jar file is in a different directory, then the -dp argument would need to specify the directory path to the file, like ``-dp /opt/some-directory/your-jdbc-driver-name.jar``. 
 
 See :ref:`commandline` for more information and advanced situations.
 
@@ -81,11 +81,23 @@ If you must use Schemaspy version 6.0 or less, then Graphviz will need to be ins
 - Linux, Mac OS
     Please read carefully the detailed instructions on how to `install Graphviz on your operating system <http://www.graphviz.org/download/>`_.
 
-SchemaSpy
----------
+Download SchemaSpy
+------------------
 
-SchemaSpy is just a single executable jar-file (schemaspy-[version].jar), you can `download releases from the SchemaSpy website <http://schemaspy.org>`_ or the `GitHub releases page <https://github.com/schemaspy/schemaspy/releases>`_.
+SchemaSpy can be downloaded as a stand-alone, executable .jar file or Docker image.
 
-If you feel adventurous there is a link in the README.md for latest builds.
+Executable .jar File
+^^^^^^^^^^^^^^^^^^^^
 
-When you have your jar-file head on over to Get Started
+Download the latest stable executable .jar file (ex. schemaspy-[version].jar) from the `SchemaSpy website <http://schemaspy.org>`_ or `GitHub releases page <https://github.com/schemaspy/schemaspy/releases>`_.
+
+For special cases, like testing a recent bug fix or feature, we also make a `bleeding-edge build file <https://github.com/schemaspy/schemaspy#latest-build>`_ available. The bleeding-edge build may not be stable and should only be used for testing.
+
+Proceed to the :ref:`get-started` section to learn how to configure and run the downloaded SchemaSpy executable.
+
+Docker Image
+^^^^^^^^^^^^
+
+The latest `Docker <https://docs.docker.com/get-docker/>`_ image of SchemaSpy can be downloaded using `docker pull schemaspy/schemaspy`.
+
+Documentation and run commands can be found on the `SchemaSpy Docker Hub page <https://hub.docker.com/r/schemaspy/schemaspy/`_.
