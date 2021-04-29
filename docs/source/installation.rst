@@ -1,8 +1,8 @@
 Installation
 =====================================
 
-Prequisites
-------------
+Prerequisites
+-------------
 
 Before you can use SchemaSpy you must have the following prerequisites available on your local system.
 
@@ -89,7 +89,7 @@ Executable .jar File
 
 Download the latest stable executable .jar file (ex. schemaspy-[version].jar) from the `SchemaSpy website <http://schemaspy.org>`_ or `GitHub releases page <https://github.com/schemaspy/schemaspy/releases>`_.
 
-For special cases, like testing a recent bug fix or feature, we also make a `bleeding-edge build file <https://github.com/schemaspy/schemaspy#latest-build>`_ available. The bleeding-edge build may not be stable and should only be used for testing.
+For special cases, like testing a recent `bug fix or feature <https://github.com/schemaspy/schemaspy/issues>`_, we also make a `bleeding-edge build file <https://github.com/schemaspy/schemaspy#latest-build>`_ available. The bleeding-edge build may not be stable and should only be used for testing.
 
 Proceed to the :ref:`get-started` section to learn how to configure and run the downloaded SchemaSpy executable.
 
@@ -98,4 +98,4 @@ Docker Image
 
 The latest `Docker <https://docs.docker.com/get-docker/>`_ image of SchemaSpy can be downloaded using `docker pull schemaspy/schemaspy`.
 
-Documentation and run commands can be found on the `SchemaSpy Docker Hub page <https://hub.docker.com/r/schemaspy/schemaspy/`_.
+Docker documentation and run commands can be found on the `SchemaSpy Docker Hub page <https://hub.docker.com/r/schemaspy/schemaspy/>`_.
