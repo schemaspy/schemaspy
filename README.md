@@ -7,10 +7,10 @@
 [![Gitter](https://badges.gitter.im/schemaspy/schemaspy.svg)](https://gitter.im/schemaspy/schemaspy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Docker Pulls](https://img.shields.io/docker/pulls/schemaspy/schemaspy.svg)](https://hub.docker.com/r/schemaspy/schemaspy/)
 
-> Please support a project by simply putting a Github star. 
+> Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
-> If you notice bug or have something not working please report an issue, we'll try to fix it as soon as possible.
+> If you notice a bug or have something not working, please report an issue, we'll try to fix it as soon as possible.
 More documentation and features expected to be soon. Feel free to contribute.
 
 This is a new code repository for SchemaSpy tool initially created and maintained [by John Currier](http://schemaspy.sourceforge.net/).
