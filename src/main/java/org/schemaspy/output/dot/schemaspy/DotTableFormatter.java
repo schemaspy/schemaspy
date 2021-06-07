@@ -67,20 +67,14 @@ public class DotTableFormatter implements Relationships {
 
     @Override
     public Set<ForeignKeyConstraint> write() {
-        return writeTableRelationships(
-            this.table,
-            this.twoDegreesOfSeparation,
-            this.stats,
-            this.includeImplied,
-            this.dot
-        );
+        return writeTableRelationships();
     }
 
     /**
      * Write relationships associated with the given table.<p>
      * Returns a set of the implied constraints that could have been included but weren't.
      */
-    private Set<ForeignKeyConstraint> writeTableRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, boolean includeImplied, PrintWriter dot) {
+    private Set<ForeignKeyConstraint> writeTableRelationships() {
         Set<Table> tablesWritten = new HashSet<>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
