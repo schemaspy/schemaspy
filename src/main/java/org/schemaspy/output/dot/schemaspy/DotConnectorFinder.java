@@ -32,16 +32,8 @@ import java.util.Set;
  * @author John Currier
  */
 public class DotConnectorFinder {
-    private static DotConnectorFinder instance = new DotConnectorFinder();
 
-    /**
-     * Singleton - prevent creation
-     */
-    private DotConnectorFinder() {
-    }
-
-    public static DotConnectorFinder getInstance() {
-        return instance;
+    public DotConnectorFinder() {
     }
 
     /**

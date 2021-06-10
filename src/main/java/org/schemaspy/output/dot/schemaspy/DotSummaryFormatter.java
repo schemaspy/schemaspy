@@ -58,7 +58,7 @@ public class DotSummaryFormatter {
     }
 
     private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, PrintWriter dot) {
-        DotConnectorFinder finder = DotConnectorFinder.getInstance();
+        DotConnectorFinder finder = new DotConnectorFinder();
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
         boolean wroteImplied = false;
 
