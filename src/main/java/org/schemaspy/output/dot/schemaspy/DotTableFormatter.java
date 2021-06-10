@@ -78,7 +78,7 @@ public class DotTableFormatter implements Relationships {
         Set<Table> tablesWritten = new HashSet<>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
-        DotConnectorFinder finder = DotConnectorFinder.getInstance();
+        DotConnectorFinder finder = new DotConnectorFinder();
 
         String diagramName = (twoDegreesOfSeparation ? "twoDegreesRelationshipsDiagram" : "oneDegreeRelationshipsDiagram") + (includeImplied ? "Implied" : "");
         dotFormat.writeHeader(diagramName, true, dot);
