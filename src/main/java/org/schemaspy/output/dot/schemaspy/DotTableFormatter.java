@@ -24,6 +24,10 @@ import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.name.Degree;
+import org.schemaspy.output.dot.schemaspy.name.EmptyName;
+import org.schemaspy.output.dot.schemaspy.name.Implied;
+import org.schemaspy.output.dot.schemaspy.name.Name;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
 import org.schemaspy.view.WriteStats;
 
@@ -80,8 +84,15 @@ public class DotTableFormatter implements Relationships {
 
         DotConnectorFinder finder = new DotConnectorFinder();
 
-        String diagramName = (twoDegreesOfSeparation ? "twoDegreesRelationshipsDiagram" : "oneDegreeRelationshipsDiagram") + (includeImplied ? "Implied" : "");
-        dotFormat.writeHeader(diagramName, true, dot);
+        Name diagramName = new Degree(
+            twoDegreesOfSeparation,
+            new Implied(
+                includeImplied,
+                new EmptyName()
+            )
+        );
+
+        dotFormat.writeHeader(diagramName.value(), true, dot);
 
         Set<Table> relatedTables = getTableImmediateRelatives(table, true, includeImplied, skippedImpliedConstraints);
 
