@@ -101,21 +101,8 @@ public class DotTableFormatter implements Relationships {
 
         Map<Table, DotNode> nodes = new TreeMap<>();
 
-        // write immediate relatives first
-        for (Table relatedTable : relatedTables) {
-            if (!tablesWritten.add(relatedTable))
-                continue; // already written
-
-            nodes.put(relatedTable, new DotNode(relatedTable, false, new DotNodeConfig(false, false), dotConfig));
-            connectors.addAll(finder.getRelatedConnectors(relatedTable, table, true, includeImplied));
-        }
-
-        // connect the edges that go directly to the target table
-        // so they go to the target table's type column instead
-        for (DotConnector connector : connectors) {
-            if (connector.pointsTo(table))
-                connector.connectToParentDetails();
-        }
+        // Immediate relatives should be written first
+        writeImmediateRelatives(relatedTables, tablesWritten, nodes, connectors, finder);
 
         Set<Table> allCousins = new HashSet<>();
         Set<DotConnector> allCousinConnectors = new TreeSet<>();
@@ -241,6 +228,30 @@ public class DotTableFormatter implements Relationships {
             if (node != null) {
                 node.excludeColumn(column);
             }
+        }
+    }
+
+    private void writeImmediateRelatives(
+        Set<Table> relatedTables,
+        Set<Table> tablesWritten,
+        Map<Table, DotNode> nodes,
+        Set<DotConnector> connectors,
+        DotConnectorFinder finder
+    ) {
+        for (Table relatedTable : relatedTables) {
+            if (!tablesWritten.contains(relatedTable)) {
+                DotNodeConfig nodeConfigurations = new DotNodeConfig(false, false);
+                DotNode node = new DotNode(relatedTable, false, nodeConfigurations, dotConfig);
+                nodes.put(relatedTable, node);
+                connectors.addAll(finder.getRelatedConnectors(relatedTable, table, true, includeImplied));
+            }
+        }
+
+        // connect the edges that go directly to the target table
+        // so they go to the target table's type column instead
+        for (DotConnector connector : connectors) {
+            if (connector.pointsTo(table))
+                connector.connectToParentDetails();
         }
     }
 }
