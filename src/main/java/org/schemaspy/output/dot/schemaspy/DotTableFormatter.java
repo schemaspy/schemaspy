@@ -184,12 +184,18 @@ public class DotTableFormatter implements Relationships {
         Set<TableColumn> relatedColumns = new HashSet<>();
 
         for (TableColumn column : table.getColumns()) {
-            if (column.isAllExcluded() || (!includeExcluded && column.isExcluded())) {
+            if (column.isAllExcluded()) {
+                continue;
+            }
+            if (!includeExcluded && column.isExcluded()) {
                 continue;
             }
 
             for (TableColumn childColumn : column.getChildren()) {
-                if (childColumn.isAllExcluded() || (!includeExcluded && childColumn.isExcluded())) {
+                if (childColumn.isAllExcluded()) {
+                    continue;
+                }
+                if(!includeExcluded && childColumn.isExcluded()) {
                     continue;
                 }
 
@@ -201,7 +207,10 @@ public class DotTableFormatter implements Relationships {
             }
 
             for (TableColumn parentColumn : column.getParents()) {
-                if (parentColumn.isAllExcluded() || (!includeExcluded && parentColumn.isExcluded())) {
+                if (parentColumn.isAllExcluded()) {
+                    continue;
+                }
+                if (!includeExcluded && parentColumn.isExcluded()) {
                     continue;
                 }
 
