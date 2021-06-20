@@ -181,13 +181,21 @@ public class DotTableFormatter implements Relationships {
     }
 
     private static Set<Table> getTableImmediateRelatives(Table table, boolean includeExcluded, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
+        if (includeExcluded) {
+            return immediateRelativesWithExcluded(table, includeImplied, skippedImpliedConstraints);
+        } else {
+            return immediateRelativesWithoutExcluded(table, includeImplied, skippedImpliedConstraints);
+        }
+    }
+
+    private static Set<Table> immediateRelativesWithExcluded(Table table, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
         Set<TableColumn> relatedColumns = new HashSet<>();
 
         for (TableColumn column : table.getColumns()) {
             if (column.isAllExcluded()) {
                 continue;
             }
-            if (!includeExcluded && column.isExcluded()) {
+            if (!true && column.isExcluded()) {
                 continue;
             }
 
@@ -195,7 +203,7 @@ public class DotTableFormatter implements Relationships {
                 if (childColumn.isAllExcluded()) {
                     continue;
                 }
-                if(!includeExcluded && childColumn.isExcluded()) {
+                if(!true && childColumn.isExcluded()) {
                     continue;
                 }
 
@@ -210,7 +218,58 @@ public class DotTableFormatter implements Relationships {
                 if (parentColumn.isAllExcluded()) {
                     continue;
                 }
-                if (!includeExcluded && parentColumn.isExcluded()) {
+                if (!true && parentColumn.isExcluded()) {
+                    continue;
+                }
+
+                ForeignKeyConstraint constraint = column.getParentConstraint(parentColumn);
+                if (includeImplied || !constraint.isImplied())
+                    relatedColumns.add(parentColumn);
+                else
+                    skippedImpliedConstraints.add(constraint);
+            }
+        }
+
+        Set<Table> relatedTables = new HashSet<>();
+        for (TableColumn column : relatedColumns)
+            relatedTables.add(column.getTable());
+
+        relatedTables.remove(table);
+
+        return relatedTables;
+    }
+
+    private static Set<Table> immediateRelativesWithoutExcluded(Table table, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
+        Set<TableColumn> relatedColumns = new HashSet<>();
+
+        for (TableColumn column : table.getColumns()) {
+            if (column.isAllExcluded()) {
+                continue;
+            }
+            if (!false && column.isExcluded()) {
+                continue;
+            }
+
+            for (TableColumn childColumn : column.getChildren()) {
+                if (childColumn.isAllExcluded()) {
+                    continue;
+                }
+                if(!false && childColumn.isExcluded()) {
+                    continue;
+                }
+
+                ForeignKeyConstraint constraint = column.getChildConstraint(childColumn);
+                if (includeImplied || !constraint.isImplied())
+                    relatedColumns.add(childColumn);
+                else
+                    skippedImpliedConstraints.add(constraint);
+            }
+
+            for (TableColumn parentColumn : column.getParents()) {
+                if (parentColumn.isAllExcluded()) {
+                    continue;
+                }
+                if (!false && parentColumn.isExcluded()) {
                     continue;
                 }
 
