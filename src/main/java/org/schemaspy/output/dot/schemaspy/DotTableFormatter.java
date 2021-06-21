@@ -29,6 +29,8 @@ import org.schemaspy.output.dot.schemaspy.name.EmptyName;
 import org.schemaspy.output.dot.schemaspy.name.Implied;
 import org.schemaspy.output.dot.schemaspy.name.Name;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
+import org.schemaspy.output.dot.schemaspy.relatives.Include;
+import org.schemaspy.output.dot.schemaspy.relatives.Verdict;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -191,34 +193,26 @@ public class DotTableFormatter implements Relationships {
     private static Set<Table> immediateRelativesWithExcluded(Table table, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
         Set<TableColumn> relatedColumns = new HashSet<>();
 
-        for (TableColumn column : table.getColumns()) {
-            if (column.isAllExcluded()) {
-                continue;
-            }
+        Include include = new Include(table);
 
-            for (TableColumn childColumn : column.getChildren()) {
-                if (childColumn.isAllExcluded()) {
-                    continue;
-                }
+        for (Verdict verdict: include.children()) {
+            TableColumn column = verdict.column();
+            TableColumn relative = verdict.relative();
+            ForeignKeyConstraint constraint = column.getChildConstraint(relative);
+            if (includeImplied || !constraint.isImplied())
+                relatedColumns.add(relative);
+            else
+                skippedImpliedConstraints.add(constraint);
+        }
 
-                ForeignKeyConstraint constraint = column.getChildConstraint(childColumn);
-                if (includeImplied || !constraint.isImplied())
-                    relatedColumns.add(childColumn);
-                else
-                    skippedImpliedConstraints.add(constraint);
-            }
-
-            for (TableColumn parentColumn : column.getParents()) {
-                if (parentColumn.isAllExcluded()) {
-                    continue;
-                }
-
-                ForeignKeyConstraint constraint = column.getParentConstraint(parentColumn);
-                if (includeImplied || !constraint.isImplied())
-                    relatedColumns.add(parentColumn);
-                else
-                    skippedImpliedConstraints.add(constraint);
-            }
+        for (Verdict verdict: include.parents()) {
+            TableColumn column = verdict.column();
+            TableColumn relative = verdict.relative();
+            ForeignKeyConstraint constraint = column.getParentConstraint(relative);
+            if (includeImplied || !constraint.isImplied())
+                relatedColumns.add(relative);
+            else
+                skippedImpliedConstraints.add(constraint);
         }
 
         Set<Table> relatedTables = new HashSet<>();
