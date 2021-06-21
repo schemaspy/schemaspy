@@ -195,15 +195,9 @@ public class DotTableFormatter implements Relationships {
             if (column.isAllExcluded()) {
                 continue;
             }
-            if (!true && column.isExcluded()) {
-                continue;
-            }
 
             for (TableColumn childColumn : column.getChildren()) {
                 if (childColumn.isAllExcluded()) {
-                    continue;
-                }
-                if(!true && childColumn.isExcluded()) {
                     continue;
                 }
 
@@ -216,9 +210,6 @@ public class DotTableFormatter implements Relationships {
 
             for (TableColumn parentColumn : column.getParents()) {
                 if (parentColumn.isAllExcluded()) {
-                    continue;
-                }
-                if (!true && parentColumn.isExcluded()) {
                     continue;
                 }
 
@@ -246,7 +237,7 @@ public class DotTableFormatter implements Relationships {
             if (column.isAllExcluded()) {
                 continue;
             }
-            if (!false && column.isExcluded()) {
+            if (column.isExcluded()) {
                 continue;
             }
 
@@ -254,7 +245,7 @@ public class DotTableFormatter implements Relationships {
                 if (childColumn.isAllExcluded()) {
                     continue;
                 }
-                if(!false && childColumn.isExcluded()) {
+                if(childColumn.isExcluded()) {
                     continue;
                 }
 
@@ -269,7 +260,7 @@ public class DotTableFormatter implements Relationships {
                 if (parentColumn.isAllExcluded()) {
                     continue;
                 }
-                if (!false && parentColumn.isExcluded()) {
+                if (parentColumn.isExcluded()) {
                     continue;
                 }
 
