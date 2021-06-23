@@ -30,6 +30,7 @@ import org.schemaspy.output.dot.schemaspy.name.Implied;
 import org.schemaspy.output.dot.schemaspy.name.Name;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
 import org.schemaspy.output.dot.schemaspy.relatives.Exclude;
+import org.schemaspy.output.dot.schemaspy.relatives.ExclusionFilter;
 import org.schemaspy.output.dot.schemaspy.relatives.Include;
 import org.schemaspy.output.dot.schemaspy.relatives.Verdict;
 import org.schemaspy.view.WriteStats;
@@ -184,19 +185,11 @@ public class DotTableFormatter implements Relationships {
     }
 
     private static Set<Table> getTableImmediateRelatives(Table table, boolean includeExcluded, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
-        if (includeExcluded) {
-            return immediateRelativesWithExcluded(table, includeImplied, skippedImpliedConstraints);
-        } else {
-            return immediateRelativesWithoutExcluded(table, includeImplied, skippedImpliedConstraints);
-        }
-    }
+        ExclusionFilter filter = includeExcluded ? new Include(table) : new Exclude(table);
 
-    private static Set<Table> immediateRelativesWithExcluded(Table table, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
         Set<TableColumn> relatedColumns = new HashSet<>();
 
-        Include include = new Include(table);
-
-        for (Verdict verdict: include.children()) {
+        for (Verdict verdict: filter.children()) {
             TableColumn column = verdict.column();
             TableColumn relative = verdict.relative();
             ForeignKeyConstraint constraint = column.getChildConstraint(relative);
@@ -206,41 +199,7 @@ public class DotTableFormatter implements Relationships {
                 skippedImpliedConstraints.add(constraint);
         }
 
-        for (Verdict verdict: include.parents()) {
-            TableColumn column = verdict.column();
-            TableColumn relative = verdict.relative();
-            ForeignKeyConstraint constraint = column.getParentConstraint(relative);
-            if (includeImplied || !constraint.isImplied())
-                relatedColumns.add(relative);
-            else
-                skippedImpliedConstraints.add(constraint);
-        }
-
-        Set<Table> relatedTables = new HashSet<>();
-        for (TableColumn column : relatedColumns)
-            relatedTables.add(column.getTable());
-
-        relatedTables.remove(table);
-
-        return relatedTables;
-    }
-
-    private static Set<Table> immediateRelativesWithoutExcluded(Table table, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
-        Set<TableColumn> relatedColumns = new HashSet<>();
-
-        Exclude include = new Exclude(table);
-
-        for (Verdict verdict: include.children()) {
-            TableColumn column = verdict.column();
-            TableColumn relative = verdict.relative();
-            ForeignKeyConstraint constraint = column.getChildConstraint(relative);
-            if (includeImplied || !constraint.isImplied())
-                relatedColumns.add(relative);
-            else
-                skippedImpliedConstraints.add(constraint);
-        }
-
-        for (Verdict verdict: include.parents()) {
+        for (Verdict verdict: filter.parents()) {
             TableColumn column = verdict.column();
             TableColumn relative = verdict.relative();
             ForeignKeyConstraint constraint = column.getParentConstraint(relative);
