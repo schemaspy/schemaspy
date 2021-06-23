@@ -5,7 +5,7 @@ import java.util.Set;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 
-public final class Exclude {
+public final class Exclude implements ExclusionFilter {
 
     private final Table table;
 
