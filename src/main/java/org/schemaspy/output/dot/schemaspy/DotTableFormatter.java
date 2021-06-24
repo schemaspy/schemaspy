@@ -29,9 +29,13 @@ import org.schemaspy.output.dot.schemaspy.name.EmptyName;
 import org.schemaspy.output.dot.schemaspy.name.Implied;
 import org.schemaspy.output.dot.schemaspy.name.Name;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
+import org.schemaspy.output.dot.schemaspy.relatives.AllExcluded;
+import org.schemaspy.output.dot.schemaspy.relatives.Columns;
 import org.schemaspy.output.dot.schemaspy.relatives.Exclude;
+import org.schemaspy.output.dot.schemaspy.relatives.Excluded;
 import org.schemaspy.output.dot.schemaspy.relatives.ExclusionFilter;
 import org.schemaspy.output.dot.schemaspy.relatives.Include;
+import org.schemaspy.output.dot.schemaspy.relatives.Simple;
 import org.schemaspy.output.dot.schemaspy.relatives.Verdict;
 import org.schemaspy.view.WriteStats;
 
@@ -185,7 +189,13 @@ public class DotTableFormatter implements Relationships {
     }
 
     private static Set<Table> getTableImmediateRelatives(Table table, boolean includeExcluded, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
-        ExclusionFilter filter = includeExcluded ? new Include(table) : new Exclude(table);
+
+        Columns columns = new AllExcluded(new Simple(table.getColumns()));
+        if (!includeExcluded) {
+            columns = new Excluded(columns);
+        }
+
+        ExclusionFilter filter = includeExcluded ? new Include(columns) : new Exclude(columns);
 
         Set<TableColumn> relatedColumns = new HashSet<>();
 
