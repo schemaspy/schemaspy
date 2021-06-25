@@ -1,21 +1,21 @@
-package org.schemaspy.output.dot.schemaspy.relatives;
+package org.schemaspy.output.dot.schemaspy.columnsfilter;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 import org.schemaspy.model.TableColumn;
 
-public class AllExcluded implements Columns {
+public final class Excluded implements Columns {
 
     private final Columns origin;
 
-    public AllExcluded(Columns origin) {
+    public Excluded(final Columns origin) {
         this.origin = origin;
     }
 
     @Override
     public Collection<TableColumn> value() {
         return this.origin.value().stream()
-            .filter(column -> !column.isAllExcluded())
+            .filter(column -> !column.isExcluded())
             .collect(Collectors.toList());
     }
 }
