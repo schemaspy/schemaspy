@@ -1,14 +1,13 @@
-package org.schemaspy.output.dot.schemaspy.relatives;
+package org.schemaspy.output.dot.schemaspy.columnsfilter;
 
 import java.util.Collection;
-import java.util.List;
 import org.schemaspy.model.TableColumn;
 
 public class Simple implements Columns {
 
-    private final List<TableColumn> origin;
+    private final Collection<TableColumn> origin;
 
-    public Simple(List<TableColumn> origin) {
+    public Simple(Collection<TableColumn> origin) {
         this.origin = origin;
     }
 

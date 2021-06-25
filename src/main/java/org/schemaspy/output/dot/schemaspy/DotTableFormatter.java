@@ -29,14 +29,10 @@ import org.schemaspy.output.dot.schemaspy.name.EmptyName;
 import org.schemaspy.output.dot.schemaspy.name.Implied;
 import org.schemaspy.output.dot.schemaspy.name.Name;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
-import org.schemaspy.output.dot.schemaspy.relatives.AllExcluded;
-import org.schemaspy.output.dot.schemaspy.relatives.Columns;
-import org.schemaspy.output.dot.schemaspy.relatives.Exclude;
-import org.schemaspy.output.dot.schemaspy.relatives.Excluded;
-import org.schemaspy.output.dot.schemaspy.relatives.ExclusionFilter;
-import org.schemaspy.output.dot.schemaspy.relatives.Include;
-import org.schemaspy.output.dot.schemaspy.relatives.Simple;
-import org.schemaspy.output.dot.schemaspy.relatives.Verdict;
+import org.schemaspy.output.dot.schemaspy.columnsfilter.AllExcluded;
+import org.schemaspy.output.dot.schemaspy.columnsfilter.Columns;
+import org.schemaspy.output.dot.schemaspy.columnsfilter.Excluded;
+import org.schemaspy.output.dot.schemaspy.columnsfilter.Simple;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -195,28 +191,35 @@ public class DotTableFormatter implements Relationships {
             columns = new Excluded(columns);
         }
 
-        ExclusionFilter filter = includeExcluded ? new Include(columns) : new Exclude(columns);
-
         Set<TableColumn> relatedColumns = new HashSet<>();
 
-        for (Verdict verdict: filter.children()) {
-            TableColumn column = verdict.column();
-            TableColumn relative = verdict.relative();
-            ForeignKeyConstraint constraint = column.getChildConstraint(relative);
-            if (includeImplied || !constraint.isImplied())
-                relatedColumns.add(relative);
-            else
-                skippedImpliedConstraints.add(constraint);
+        for (TableColumn column : columns.value()) {
+            Columns children = new AllExcluded(new Simple(column.getChildren()));
+            if (includeExcluded) {
+                children = new Excluded(children);
+            }
+
+            for (TableColumn childColumn : children.value()) {
+                ForeignKeyConstraint constraint = column.getChildConstraint(childColumn);
+                if (includeImplied || !constraint.isImplied())
+                    relatedColumns.add(childColumn);
+                else
+                    skippedImpliedConstraints.add(constraint);
+            }
         }
 
-        for (Verdict verdict: filter.parents()) {
-            TableColumn column = verdict.column();
-            TableColumn relative = verdict.relative();
-            ForeignKeyConstraint constraint = column.getParentConstraint(relative);
-            if (includeImplied || !constraint.isImplied())
-                relatedColumns.add(relative);
-            else
-                skippedImpliedConstraints.add(constraint);
+        for (TableColumn column : columns.value()) {
+            Columns parents = new AllExcluded(new Simple(column.getParents()));
+            if (includeExcluded) {
+                parents = new Excluded(parents);
+            }
+            for (TableColumn parentColumn : parents.value()) {
+                ForeignKeyConstraint constraint = column.getParentConstraint(parentColumn);
+                if (includeImplied || !constraint.isImplied())
+                    relatedColumns.add(parentColumn);
+                else
+                    skippedImpliedConstraints.add(constraint);
+            }
         }
 
         Set<Table> relatedTables = new HashSet<>();

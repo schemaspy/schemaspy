@@ -1,4 +1,4 @@
-package org.schemaspy.output.dot.schemaspy.relatives;
+package org.schemaspy.output.dot.schemaspy.columnsfilter;
 
 import java.util.Collection;
 import org.schemaspy.model.TableColumn;
