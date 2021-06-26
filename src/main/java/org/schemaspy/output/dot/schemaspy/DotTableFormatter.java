@@ -24,15 +24,15 @@ import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Default;
+import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
+import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Included;
 import org.schemaspy.output.dot.schemaspy.name.Degree;
 import org.schemaspy.output.dot.schemaspy.name.EmptyName;
 import org.schemaspy.output.dot.schemaspy.name.Implied;
 import org.schemaspy.output.dot.schemaspy.name.Name;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
-import org.schemaspy.output.dot.schemaspy.columnsfilter.AllExcluded;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.Columns;
-import org.schemaspy.output.dot.schemaspy.columnsfilter.Excluded;
-import org.schemaspy.output.dot.schemaspy.columnsfilter.Simple;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -186,18 +186,17 @@ public class DotTableFormatter implements Relationships {
 
     private static Set<Table> getTableImmediateRelatives(Table table, boolean includeExcluded, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
 
-        Columns columns = new AllExcluded(new Simple(table.getColumns()));
-        if (!includeExcluded) {
-            columns = new Excluded(columns);
+        Factory factory = new Default(table);
+        if (includeExcluded) {
+            factory = new Included(factory);
         }
+
+        Columns columns = factory.columns();
 
         Set<TableColumn> relatedColumns = new HashSet<>();
 
         for (TableColumn column : columns.value()) {
-            Columns children = new AllExcluded(new Simple(column.getChildren()));
-            if (includeExcluded) {
-                children = new Excluded(children);
-            }
+            Columns children = factory.children(column);
 
             for (TableColumn childColumn : children.value()) {
                 ForeignKeyConstraint constraint = column.getChildConstraint(childColumn);
@@ -209,10 +208,8 @@ public class DotTableFormatter implements Relationships {
         }
 
         for (TableColumn column : columns.value()) {
-            Columns parents = new AllExcluded(new Simple(column.getParents()));
-            if (includeExcluded) {
-                parents = new Excluded(parents);
-            }
+            Columns parents = factory.parents(column);
+
             for (TableColumn parentColumn : parents.value()) {
                 ForeignKeyConstraint constraint = column.getParentConstraint(parentColumn);
                 if (includeImplied || !constraint.isImplied())
