@@ -185,14 +185,15 @@ public class DotTableFormatter implements Relationships {
     }
 
     private static Set<Table> getTableImmediateRelatives(Table table, boolean includeExcluded, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
-
         Factory factory = new Default(table);
         if (includeExcluded) {
             factory = new Included(factory);
         }
+        return getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
+    }
 
+    private static Set<Table> getTableImmediateRelatives(Table table, Factory factory, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
         Columns columns = factory.columns();
-
         Set<TableColumn> relatedColumns = new HashSet<>();
 
         for (TableColumn column : columns.value()) {
