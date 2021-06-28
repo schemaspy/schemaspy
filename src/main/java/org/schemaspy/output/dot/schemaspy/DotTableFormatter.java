@@ -98,7 +98,8 @@ public class DotTableFormatter implements Relationships {
 
         dotFormat.writeHeader(diagramName.value(), true, dot);
 
-        Set<Table> relatedTables = getTableImmediateRelatives(table, true, includeImplied, skippedImpliedConstraints);
+        Factory factory = getFactory(table, true);
+        Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
 
         Set<DotConnector> connectors = new TreeSet<>(finder.getRelatedConnectors(table, includeImplied));
         tablesWritten.add(table);
@@ -114,7 +115,8 @@ public class DotTableFormatter implements Relationships {
         // next write 'cousins' (2nd degree of separation)
         if (twoDegreesOfSeparation) {
             for (Table relatedTable : relatedTables) {
-                Set<Table> cousins = getTableImmediateRelatives(relatedTable, false, includeImplied, skippedImpliedConstraints);
+                Factory cousinsFactory = getFactory(relatedTable, false);
+                Set<Table> cousins = getTableImmediateRelatives(relatedTable, cousinsFactory, includeImplied, skippedImpliedConstraints);
 
                 for (Table cousin : cousins) {
                     if (!tablesWritten.add(cousin))
@@ -184,12 +186,12 @@ public class DotTableFormatter implements Relationships {
         return skippedImpliedConstraints;
     }
 
-    private static Set<Table> getTableImmediateRelatives(Table table, boolean includeExcluded, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
+    private static Factory getFactory(Table table, boolean includeExcluded) {
         Factory factory = new Default(table);
         if (includeExcluded) {
             factory = new Included(factory);
         }
-        return getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
+        return factory;
     }
 
     private static Set<Table> getTableImmediateRelatives(Table table, Factory factory, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
