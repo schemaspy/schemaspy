@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.integrationtesting;
+package org.schemaspy.integrationtesting.h2;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -29,6 +29,7 @@ import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Table;
 import org.schemaspy.testing.H2MemoryRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -51,7 +52,7 @@ import static org.mockito.BDDMockito.given;
 public class H2ViewIT {
 
     @ClassRule
-    public static H2MemoryRule h2MemoryRule = new H2MemoryRule("h2view").addSqlScript("src/test/resources/integrationTesting/h2ViewIT/dbScripts/2tables1view.sql");
+    public static H2MemoryRule h2MemoryRule = new H2MemoryRule("h2view").addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/2tables1view.sql");
 
     @Autowired
     private SqlService sqlService;
@@ -100,7 +101,7 @@ public class H2ViewIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        H2ViewIT.database = database;
     }
 
     @Test
@@ -111,7 +112,7 @@ public class H2ViewIT {
 
     @Test
     public void viewShouldExist() {
-        assertThat(database.getViews()).extracting(v -> v.getName()).contains("THE_VIEW");
+        assertThat(database.getViews()).extracting(Table::getName).contains("THE_VIEW");
         assertThat(database.getViewsMap().get("THE_VIEW").getViewDefinition()).isNotBlank();
     }
 }

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.testcontainer;
+package org.schemaspy.integrationtesting.oracle;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
@@ -74,11 +74,12 @@ public class OracleIT {
 
     public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
 
+    @SuppressWarnings("unchecked")
     public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
             new JdbcContainerRule<>(() -> new OracleContainer("christophesurmont/oracle-xe-11g"))
             .assumeDockerIsPresent()
             .withAssumptions(assumeDriverIsPresent())
-            .withInitScript("integrationTesting/dbScripts/oracle.sql");
+            .withInitScript("integrationTesting/oracle/dbScripts/oracle.sql");
 
     @ClassRule
     public static final TestRule chain = RuleChain

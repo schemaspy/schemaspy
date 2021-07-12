@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.testcontainer;
+package org.schemaspy.integrationtesting.informix;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
@@ -31,11 +31,8 @@ import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.Table;
+import org.schemaspy.model.*;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
-import org.schemaspy.testing.SQLScriptsRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -44,6 +41,7 @@ import org.testcontainers.containers.InformixContainer;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.function.Supplier;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext
-public class InformixRoutinesIT {
+public class InformixIndexIT {
     @Autowired
     private SqlService sqlService;
 
@@ -71,11 +69,12 @@ public class InformixRoutinesIT {
 
     public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
 
-    public static JdbcContainerRule<InformixContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new InformixContainer())
+    @SuppressWarnings("unchecked")
+    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
+            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withInitFunctions(new SQLScriptsRunner("integrationTesting/informixIndexXMLIT/dbScripts/informixroutines.sql", "\n\n\n"));
+                    .withInitScript("integrationTesting/informix/dbScripts/informix.sql");
 
     @ClassRule
     public static final TestRule chain = RuleChain
@@ -96,7 +95,7 @@ public class InformixRoutinesIT {
                 "-s", "informix",
                 "-cat", "test",
                 "-server", "dev",
-                "-o", "target/integrationtesting/informixroutines",
+                "-o", "target/integrationtesting/informix",
                 "-u", jdbcContainerRule.getContainer().getUsername(),
                 "-p", jdbcContainerRule.getContainer().getPassword(),
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
@@ -112,7 +111,7 @@ public class InformixRoutinesIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        InformixIndexIT.database = database;
     }
 
     @Test
@@ -122,10 +121,22 @@ public class InformixRoutinesIT {
     }
 
     @Test
-    public void databaseShouldHaveCompleteRoutineDefinition() {
-        String expecting = "CREATE FUNCTION gc_comb(partial1 LVARCHAR, partial2 LVARCHAR) RETURNING LVARCHAR; IF partial1 IS NULL OR partial1 = '' THEN RETURN partial2; ELIF partial2 IS NULL OR partial2 = '' THEN RETURN partial1; ELSE RETURN partial1 || ',' || partial2; END IF; END FUNCTION;";
-        String actual = database.getRoutinesMap().get("gc_comb(lvarchar,lvarchar)").getDefinition().trim();
-        assertThat(actual).isEqualToIgnoringCase(expecting);
+    public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
+        Table table = getTable("test");
+        TableColumn column = table.getColumn("firstname");
+        assertThat(column).isNotNull();
+    }
+
+    @Test
+    public void tableTestShouldHaveTwoIndexes() {
+        Table table = getTable("test");
+        assertThat(table.getIndexes().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void tableTestIndex_test_index_shouldHaveThreeColumns() {
+        TableIndex index = getTable("test").getIndex("test_index");
+        assertThat(index.getColumns().size()).isEqualTo(3);
     }
 
     private Table getTable(String tableName) {

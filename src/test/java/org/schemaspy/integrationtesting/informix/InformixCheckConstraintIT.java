@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.testcontainer;
+package org.schemaspy.integrationtesting.informix;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
@@ -43,6 +43,7 @@ import org.testcontainers.containers.InformixContainer;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.function.Supplier;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,11 +71,12 @@ public class InformixCheckConstraintIT {
 
     public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
 
-    public static JdbcContainerRule<InformixContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new InformixContainer())
+    @SuppressWarnings("unchecked")
+    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
+            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/informixIndexXMLIT/dbScripts/informixcc.sql");
+                    .withInitScript("integrationTesting/informix/dbScripts/informixcc.sql");
 
     @ClassRule
     public static final TestRule chain = RuleChain
@@ -111,7 +113,7 @@ public class InformixCheckConstraintIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        InformixCheckConstraintIT.database = database;
     }
 
     @Test

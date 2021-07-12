@@ -16,11 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.integrationtesting;
+package org.schemaspy.integrationtesting.oracle;
 
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
@@ -29,12 +32,14 @@ import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
-import org.schemaspy.testing.H2MemoryRule;
+import org.schemaspy.model.Table;
+import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.containers.OracleContainer;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -42,6 +47,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
@@ -50,11 +56,7 @@ import static org.mockito.BDDMockito.given;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class H2SpacesIT {
-
-    @ClassRule
-    public static H2MemoryRule h2MemoryRule = new H2MemoryRule("h2 spaces").addSqlScript("src/test/resources/integrationTesting/h2SpacesIT/dbScripts/spaces_in_schema_and_table.sql");
-
+public class OracleSpacesIT {
     @Autowired
     private SqlService sqlService;
 
@@ -72,27 +74,45 @@ public class H2SpacesIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
+    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
+            new JdbcContainerRule<>(() -> new OracleContainer("christophesurmont/oracle-xe-11g"))
+                    .assumeDockerIsPresent()
+                    .withAssumptions(assumeDriverIsPresent())
+                    .withInitScript("integrationTesting/oracle/dbScripts/spaces_in_table_names.sql");
+
+    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+
+    @ClassRule
+    public static final TestRule chain = RuleChain
+            .outerRule(jdbcContainerRule)
+            .around(jdbcDriverClassPresentRule);
+
     @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
+    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
         if (database == null) {
-            doCreateDatabaseRepresentation();
+            createDatabaseRepresentation();
         }
     }
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
-                "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
-                "-db", "h2 spaces",
-                "-s", "h2 spaces",
-                "-o", "target/integrationtesting/h2 spaces",
-                "-u", "sa"
+                "-t", "orathin",
+                "-db", jdbcContainerRule.getContainer().getSid(),
+                "-s", "ORASPACEIT",
+                "-cat", "%",
+                "-o", "target/integrationtesting/ORASPACEIT",
+                "-u", "oraspaceit",
+                "-p", "oraspaceit123",
+                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
+                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/h2 spaces"));
-        given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
-        given(arguments.getUser()).willReturn("sa");
-        given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());
-        given(arguments.getSchema()).willReturn(h2MemoryRule.getConnection().getSchema());
-        given(arguments.getDatabaseName()).willReturn("h2 spaces");
+        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/ORASPACEIT"));
+        given(arguments.getDatabaseType()).willReturn("orathin");
+        given(arguments.getUser()).willReturn("orait");
+        given(arguments.getSchema()).willReturn("ORASPACEIT");
+        given(arguments.getCatalog()).willReturn("%");
+        given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
         Config config = new Config(args);
         sqlService.connect(config);
         Database database = new Database(
@@ -102,17 +122,11 @@ public class H2SpacesIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        OracleSpacesIT.database = database;
     }
 
     @Test
-    public void databaseShouldExist() {
-        assertThat(database).isNotNull();
-        assertThat(database.getName()).isEqualToIgnoringCase("h2 spaces");
-    }
-
-    @Test
-    public void tableWithSpacesShouldExist() {
-        assertThat(database.getTables()).extracting(t -> t.getName()).contains("has space");
+    public void databaseShouldHaveTableWithSpaces() {
+        assertThat(database.getTables()).extracting(Table::getName).contains("test 1.0");
     }
 }

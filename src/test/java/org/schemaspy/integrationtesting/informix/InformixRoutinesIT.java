@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017, 2018 Nils Petzaell
+ * Copyright (C) 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.integrationtesting;
+package org.schemaspy.integrationtesting.informix;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
@@ -27,6 +27,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -34,29 +35,27 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
+import org.schemaspy.testing.SQLScriptsRunner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.OracleContainer;
+import org.testcontainers.containers.InformixContainer;
 
-import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.function.Supplier;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 /**
  * @author Nils Petzaell
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class OracleSpacesIT {
+@DirtiesContext
+public class InformixRoutinesIT {
     @Autowired
     private SqlService sqlService;
 
@@ -66,21 +65,19 @@ public class OracleSpacesIT {
     @Mock
     private ProgressListener progressListener;
 
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
+    @Autowired
+    private CommandLineArgumentParser commandLineArgumentParser;
 
     private static Database database;
 
-    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer("christophesurmont/oracle-xe-11g"))
+    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
+
+    @SuppressWarnings("unchecked")
+    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
+            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/oracleSpacesIT/dbScripts/spaces_in_table_names.sql");
-
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+                    .withInitFunctions(new SQLScriptsRunner("integrationTesting/informix/dbScripts/informixroutines.sql", "\n\n\n"));
 
     @ClassRule
     public static final TestRule chain = RuleChain
@@ -88,7 +85,7 @@ public class OracleSpacesIT {
             .around(jdbcDriverClassPresentRule);
 
     @Before
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
+    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
         if (database == null) {
             createDatabaseRepresentation();
         }
@@ -96,22 +93,18 @@ public class OracleSpacesIT {
 
     private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
-                "-t", "orathin",
-                "-db", jdbcContainerRule.getContainer().getSid(),
-                "-s", "ORASPACEIT",
-                "-cat", "%",
-                "-o", "target/integrationtesting/ORASPACEIT",
-                "-u", "oraspaceit",
-                "-p", "oraspaceit123",
+                "-t", "informix",
+                "-db", "test",
+                "-s", "informix",
+                "-cat", "test",
+                "-server", "dev",
+                "-o", "target/integrationtesting/informixroutines",
+                "-u", jdbcContainerRule.getContainer().getUsername(),
+                "-p", jdbcContainerRule.getContainer().getPassword(),
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
+                "-port", jdbcContainerRule.getContainer().getJdbcPort().toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/ORASPACEIT"));
-        given(arguments.getDatabaseType()).willReturn("orathin");
-        given(arguments.getUser()).willReturn("orait");
-        given(arguments.getSchema()).willReturn("ORASPACEIT");
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
+        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
         sqlService.connect(config);
         Database database = new Database(
@@ -121,11 +114,23 @@ public class OracleSpacesIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        OracleSpacesIT.database = database;
+        InformixRoutinesIT.database = database;
     }
 
     @Test
-    public void databaseShouldHaveTableWithSpaces() {
-        assertThat(database.getTables()).extracting(Table::getName).contains("test 1.0");
+    public void databaseShouldBePopulatedWithTableTest() {
+        Table table = getTable("test");
+        assertThat(table).isNotNull();
+    }
+
+    @Test
+    public void databaseShouldHaveCompleteRoutineDefinition() {
+        String expecting = "CREATE FUNCTION gc_comb(partial1 LVARCHAR, partial2 LVARCHAR) RETURNING LVARCHAR; IF partial1 IS NULL OR partial1 = '' THEN RETURN partial2; ELIF partial2 IS NULL OR partial2 = '' THEN RETURN partial1; ELSE RETURN partial1 || ',' || partial2; END IF; END FUNCTION;";
+        String actual = database.getRoutinesMap().get("gc_comb(lvarchar,lvarchar)").getDefinition().trim();
+        assertThat(actual).isEqualToIgnoringCase(expecting);
+    }
+
+    private Table getTable(String tableName) {
+        return database.getTablesMap().get(tableName);
     }
 }
