@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Nils Petzaell
+ * Copyright (C) 2017, 2018 Nils Petzaell
  *
  * This file is part of SchemaSpy.
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.testcontainer;
+package org.schemaspy.integrationtesting.oracle;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
@@ -31,15 +31,20 @@ import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.model.*;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableIndex;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.InformixContainer;
+import org.testcontainers.containers.OracleContainer;
 
+import javax.script.ScriptException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -51,7 +56,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext
-public class InformixIndexIT {
+public class OraclePKIT {
+
     @Autowired
     private SqlService sqlService;
 
@@ -66,13 +72,14 @@ public class InformixIndexIT {
 
     private static Database database;
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
+    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
 
-    public static JdbcContainerRule<InformixContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new InformixContainer())
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/informixIndexXMLIT/dbScripts/informix.sql");
+    @SuppressWarnings("unchecked")
+    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
+            new JdbcContainerRule<>(() -> new OracleContainer("christophesurmont/oracle-xe-11g"))
+            .assumeDockerIsPresent()
+            .withAssumptions(assumeDriverIsPresent())
+            .withInitScript("integrationTesting/oracle/dbScripts/pklogging.sql");
 
     @ClassRule
     public static final TestRule chain = RuleChain
@@ -80,7 +87,7 @@ public class InformixIndexIT {
             .around(jdbcDriverClassPresentRule);
 
     @Before
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
+    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
         if (database == null) {
             createDatabaseRepresentation();
         }
@@ -88,16 +95,15 @@ public class InformixIndexIT {
 
     private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
-                "-t", "informix",
-                "-db", "test",
-                "-s", "informix",
-                "-cat", "test",
-                "-server", "dev",
-                "-o", "target/integrationtesting/informix",
-                "-u", jdbcContainerRule.getContainer().getUsername(),
-                "-p", jdbcContainerRule.getContainer().getPassword(),
+                "-t", "orathin",
+                "-db", jdbcContainerRule.getContainer().getSid(),
+                "-s", "DBUSER",
+                "-cat", "%",
+                "-o", "target/integrationtesting/pklogging",
+                "-u", "dbuser",
+                "-p", "dbuser123",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getJdbcPort().toString()
+                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
         };
         CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
@@ -109,32 +115,19 @@ public class InformixIndexIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        OraclePKIT.database = database;
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTest() {
-        Table table = getTable("test");
+    public void databaseShouldHaveTable() {
+        Table table = getTable("GIWSDURATIONHISTORY");
         assertThat(table).isNotNull();
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
-        Table table = getTable("test");
-        TableColumn column = table.getColumn("firstname");
-        assertThat(column).isNotNull();
-    }
-
-    @Test
-    public void tableTestShouldHaveTwoIndexes() {
-        Table table = getTable("test");
-        assertThat(table.getIndexes().size()).isEqualTo(2);
-    }
-
-    @Test
-    public void tableTestIndex_test_index_shouldHaveThreeColumns() {
-        TableIndex index = getTable("test").getIndex("test_index");
-        assertThat(index.getColumns().size()).isEqualTo(3);
+    public void tableShouldHavePKIndex() {
+        Table table = getTable("GIWSDURATIONHISTORY");
+        assertThat(table.getIndexes().stream().filter(TableIndex::isPrimaryKey).count()).isEqualTo(1);
     }
 
     private Table getTable(String tableName) {

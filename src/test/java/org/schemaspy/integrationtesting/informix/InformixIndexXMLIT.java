@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.testcontainer;
+package org.schemaspy.integrationtesting.informix;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
@@ -45,6 +45,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,17 +58,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class InformixIndexXMLIT {
 
-    private static URL expectedXML = InformixIndexXMLIT.class.getResource("/integrationTesting/informixIndexXMLIT/expecting/test.informix.xml");
-    private static URL expectedDeletionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informixIndexXMLIT/expecting/deletionOrder.txt");
-    private static URL expectedInsertionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informixIndexXMLIT/expecting/insertionOrder.txt");
+    private static URL expectedXML = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/test.informix.xml");
+    private static URL expectedDeletionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/deletionOrder.txt");
+    private static URL expectedInsertionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/insertionOrder.txt");
 
     public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
 
-    public static JdbcContainerRule<InformixContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new InformixContainer())
+    @SuppressWarnings("unchecked")
+    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
+            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/informixIndexXMLIT/dbScripts/informix.sql");
+                    .withInitScript("integrationTesting/informix/dbScripts/informix.sql");
 
     @ClassRule
     public static final TestRule chain = RuleChain
@@ -80,7 +82,7 @@ public class InformixIndexXMLIT {
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @Before
-    public void createXML() throws Exception {
+    public void createXML() {
         if (shouldRun.get()) {
             String[] args = {
                     "-t", "informix",
