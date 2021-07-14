@@ -50,6 +50,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Upload test output
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: testout
+          path: |
+            target/testout/
+            !target/testout/**/bower/
+            !target/testout/**/fonts/
+            !target/testout/**/*.js
+          retention-days: 7
       - name: Create latest.json
         if: success()
         run: |
