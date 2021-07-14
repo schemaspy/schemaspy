@@ -98,7 +98,7 @@ public class InformixRoutinesIT {
                 "-s", "informix",
                 "-cat", "test",
                 "-server", "dev",
-                "-o", "target/integrationtesting/informixroutines",
+                "-o", "target/testout/integrationtesting/informix/routines",
                 "-u", jdbcContainerRule.getContainer().getUsername(),
                 "-p", jdbcContainerRule.getContainer().getPassword(),
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),

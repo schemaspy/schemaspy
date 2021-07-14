@@ -56,17 +56,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class MysqlHTMLVizJsIT {
 
-    private static final Path outputPath = Paths.get("target","mysqlhtml_vizjs_svg");
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","html_vizjs_svg");
 
     private static URL expectedXML = MysqlHTMLVizJsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_vizjs_svg/htmlit.htmlit.xml");
     private static URL expectedDeletionOrder = MysqlHTMLVizJsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_vizjs_svg/deletionOrder.txt");
     private static URL expectedInsertionOrder = MysqlHTMLVizJsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_vizjs_svg/insertionOrder.txt");
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
                         .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
                         .withQueryString("?useSSL=false")
                         .withInitScript("integrationTesting/mysql/dbScripts/htmlit.sql")
@@ -85,7 +86,7 @@ public class MysqlHTMLVizJsIT {
                     "-t", "mysql",
                     "-db", "htmlit",
                     "-s", "htmlit",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
+                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
@@ -121,7 +122,7 @@ public class MysqlHTMLVizJsIT {
     public void producesSameContent() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
-                        Paths.get(outputPath.toString()),
+                        outputPath,
                         Paths.get("src","test","resources","integrationTesting","mysql","expecting","mysqlhtml_vizjs_svg")
                 );
         softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();

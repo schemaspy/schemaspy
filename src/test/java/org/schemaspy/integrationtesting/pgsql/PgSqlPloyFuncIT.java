@@ -42,6 +42,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -51,6 +53,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @DirtiesContext
 public class PgSqlPloyFuncIT {
+
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","pgsql","polyfunc");
 
     @Autowired
     private SqlService sqlService;
@@ -66,11 +70,12 @@ public class PgSqlPloyFuncIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
                     PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10.4"))
+                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/polyfunc.sql", "\n\n\n"))
@@ -89,7 +94,7 @@ public class PgSqlPloyFuncIT {
                 "-db", "test",
                 "-s", "polyfunc",
                 "-cat", "%",
-                "-o", "target/integrationtesting/pgsqlpolyfunc",
+                "-o", outputPath.toString(),
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
@@ -105,7 +110,7 @@ public class PgSqlPloyFuncIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        PgSqlPloyFuncIT.database = database;
     }
 
     @Test

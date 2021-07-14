@@ -45,6 +45,8 @@ import org.testcontainers.containers.OracleContainer;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -57,6 +59,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @DirtiesContext
 public class OracleIT {
+
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","oracle","oracle");
 
     @Autowired
     private SqlService sqlService;
@@ -99,7 +103,7 @@ public class OracleIT {
                 "-db", jdbcContainerRule.getContainer().getSid(),
                 "-s", "ORAIT",
                 "-cat", "%",
-                "-o", "target/integrationtesting/orait",
+                "-o", outputPath.toString(),
                 "-u", "orait",
                 "-p", "orait123",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),

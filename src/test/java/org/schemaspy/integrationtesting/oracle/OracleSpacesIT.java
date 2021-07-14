@@ -45,6 +45,8 @@ import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -57,6 +59,9 @@ import static org.mockito.BDDMockito.given;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class OracleSpacesIT {
+
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","oracle","spaces");
+
     @Autowired
     private SqlService sqlService;
 
@@ -101,13 +106,13 @@ public class OracleSpacesIT {
                 "-db", jdbcContainerRule.getContainer().getSid(),
                 "-s", "ORASPACEIT",
                 "-cat", "%",
-                "-o", "target/integrationtesting/ORASPACEIT",
+                "-o", outputPath.toString(),
                 "-u", "oraspaceit",
                 "-p", "oraspaceit123",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/ORASPACEIT"));
+        given(arguments.getOutputDirectory()).willReturn(outputPath.toFile());
         given(arguments.getDatabaseType()).willReturn("orathin");
         given(arguments.getUser()).willReturn("orait");
         given(arguments.getSchema()).willReturn("ORASPACEIT");

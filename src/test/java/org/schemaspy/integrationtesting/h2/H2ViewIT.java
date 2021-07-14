@@ -83,10 +83,10 @@ public class H2ViewIT {
                 "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
                 "-db", "h2view",
                 "-s", "h2view",
-                "-o", "target/integrationtesting/h2view",
+                "-o", "target/testout/integrationtesting/h2/view",
                 "-u", "sa"
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/h2view"));
+        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/h2/view"));
         given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
         given(arguments.getUser()).willReturn("sa");
         given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());

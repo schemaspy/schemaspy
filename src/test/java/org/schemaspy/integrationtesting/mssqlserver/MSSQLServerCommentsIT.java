@@ -90,9 +90,10 @@ public class MSSQLServerCommentsIT {
     private static Database def_e;
     private static Database def_f;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
     public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+            new SuiteOrTestJdbcContainerRule<MSSQLContainer>(
                     MssqlServerSuite.jdbcContainerRule,
                     new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
                             .assumeDockerIsPresent()
@@ -142,19 +143,19 @@ public class MSSQLServerCommentsIT {
         }
     }
 
-    private Database createDatabaseRepresentation(String db, String schema) throws SQLException, IOException, URISyntaxException {
+    private Database createDatabaseRepresentation(String db, String schema) throws SQLException, IOException {
         String[] args = {
                 "-t", "mssql17",
                 "-db", db,
                 "-s", schema,
                 "-cat", "%",
-                "-o", "target/integrationtesting/mssql",
+                "-o", "target/testout/integrationtesting/mssql/comments",
                 "-u", "sa",
                 "-p", jdbcContainerRule.getContainer().getPassword(),
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(1433).toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mssql"));
+        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/mssql/comments"));
         given(arguments.getDatabaseType()).willReturn("mssql08");
         given(arguments.getUser()).willReturn("sa");
         given(arguments.getSchema()).willReturn(schema);

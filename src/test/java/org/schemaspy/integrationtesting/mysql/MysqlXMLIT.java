@@ -38,6 +38,7 @@ import org.xmlunit.diff.Diff;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,15 +54,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class MysqlXMLIT {
 
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","xml");
+
     private static URL expectedXML = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/xmlit.xmlit.xml");
     private static URL expectedDeletionOrder = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/deletionOrder.txt");
     private static URL expectedInsertionOrder = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/insertionOrder.txt");
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
                             .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
                             .withQueryString("?useSSL=false")
                             .withInitScript("integrationTesting/mysql/dbScripts/xmlit.sql")
@@ -74,19 +78,19 @@ public class MysqlXMLIT {
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @Before
-    public void generateXML() throws Exception {
+    public void generateXML() {
         if (shouldRun.get()) {
-            MySQLContainer container = jdbcContainerRule.getContainer();
+            MySQLContainer<?> container = jdbcContainerRule.getContainer();
             String[] args = new String[]{
                     "-t", "mysql",
                     "-db", "xmlit",
                     "-s", "xmlit",
-                    "-host", container.getContainerIpAddress() + ":" + String.valueOf(container.getMappedPort(3306)),
+                    "-host", container.getContainerIpAddress() + ":" + container.getMappedPort(3306),
                     "-port", String.valueOf(container.getMappedPort(3306)),
                     "-u", container.getUsername(),
                     "-p", container.getPassword(),
                     "-nohtml",
-                    "-o", "target/mysqlxmlit",
+                    "-o", outputPath.toString(),
                     "-connprops", "useSSL\\=false"
             };
             schemaSpyRunner.run(args);
@@ -97,7 +101,7 @@ public class MysqlXMLIT {
     @Test
     public void verifyXML() {
         Diff d = XmlOutputDiff.diffXmlOutput(
-                Input.fromFile("target/mysqlxmlit/xmlit.xmlit.xml"),
+                Input.fromFile(outputPath.resolve("xmlit.xmlit.xml").toString()),
                 Input.fromURL(expectedXML)
                 );
         assertThat(d.getDifferences()).isEmpty();
@@ -105,11 +109,11 @@ public class MysqlXMLIT {
 
     @Test
     public void verifyDeletionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/mysqlxmlit/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
+        assertThat(Files.newInputStream(outputPath.resolve("deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
     }
 
     @Test
     public void verifyInsertionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/mysqlxmlit/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
+        assertThat(Files.newInputStream(outputPath.resolve("insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
     }
 }

@@ -85,10 +85,10 @@ public class H2SpacesIT {
                 "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
                 "-db", "h2 spaces",
                 "-s", "h2 spaces",
-                "-o", "target/integrationtesting/h2 spaces",
+                "-o", "target/testout/integrationtesting/h2/ spaces",
                 "-u", "sa"
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/h2 spaces"));
+        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/h2/ spaces"));
         given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
         given(arguments.getUser()).willReturn("sa");
         given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());

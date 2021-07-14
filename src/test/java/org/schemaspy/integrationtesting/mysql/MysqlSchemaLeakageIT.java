@@ -43,6 +43,8 @@ import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -52,6 +54,8 @@ import static org.mockito.BDDMockito.given;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class MysqlSchemaLeakageIT {
+
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","schema_leakage");
 
     @Autowired
     private SqlService sqlService;
@@ -70,11 +74,12 @@ public class MysqlSchemaLeakageIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withQueryString("?useSSL=false")
@@ -95,14 +100,14 @@ public class MysqlSchemaLeakageIT {
                 "-db", "schemaleak",
                 "-s", "schemaleak",
                 "-cat", "%",
-                "-o", "target/integrationtesting/mysql_schema_leakage",
                 "-u", "testUser",
                 "-p", "password",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-o", outputPath.toString(),
                 "-connprops", "useSSL\\=false"
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mysql_schema_leakage"));
+        given(arguments.getOutputDirectory()).willReturn(outputPath.toFile());
         given(arguments.getDatabaseType()).willReturn("mysql");
         given(arguments.getUser()).willReturn("testUser");
         given(arguments.getSchema()).willReturn("schemaleak");

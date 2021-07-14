@@ -95,7 +95,7 @@ public class InformixIndexIT {
                 "-s", "informix",
                 "-cat", "test",
                 "-server", "dev",
-                "-o", "target/integrationtesting/informix",
+                "-o", "target/testout/integrationtesting/informix/index",
                 "-u", jdbcContainerRule.getContainer().getUsername(),
                 "-p", jdbcContainerRule.getContainer().getPassword(),
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),

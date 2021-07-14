@@ -41,6 +41,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -50,6 +52,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @DirtiesContext
 public class PgSqlCheckConstraintsIT {
+
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","pgsql","check_constraints");
 
     @Autowired
     private SqlService sqlService;
@@ -65,11 +69,12 @@ public class PgSqlCheckConstraintsIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
                     PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10.4"))
+                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/dvdrental.sql", "\n\n\n"))
@@ -88,7 +93,7 @@ public class PgSqlCheckConstraintsIT {
                 "-db", "test",
                 "-s", "public",
                 "-cat", "%",
-                "-o", "target/integrationtesting/pgsqlcheckconstraint",
+                "-o", outputPath.toString(),
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
@@ -104,7 +109,7 @@ public class PgSqlCheckConstraintsIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        PgSqlCheckConstraintsIT.database = database;
     }
 
     @Test
