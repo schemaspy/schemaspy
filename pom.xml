@@ -422,6 +422,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
+                <configuration>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -444,6 +447,7 @@
                         <pomImplementationBuild>${buildNumber}</pomImplementationBuild>
                         <oracle.jdbc.timezoneAsRegion>false</oracle.jdbc.timezoneAsRegion>
                     </systemPropertyVariables>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>
                 <executions>
                     <execution>

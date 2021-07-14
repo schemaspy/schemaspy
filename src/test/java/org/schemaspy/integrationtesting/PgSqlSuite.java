@@ -41,8 +41,9 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 public class PgSqlSuite {
 
     @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10.4"))
+    @SuppressWarnings("unchecked")
+    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
+            new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/", "\n\n\n"));

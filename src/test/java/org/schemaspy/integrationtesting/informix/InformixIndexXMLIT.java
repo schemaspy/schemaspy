@@ -90,7 +90,7 @@ public class InformixIndexXMLIT {
                     "-s", "informix",
                     "-cat", "test",
                     "-server", "dev",
-                    "-o", "target/informix_xml",
+                    "-o", "target/testout/integrationtesting/informix/xml",
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
@@ -105,7 +105,7 @@ public class InformixIndexXMLIT {
     @Test
     public void verifyXML() {
         Diff d = DiffBuilder.compare(Input.fromURL(expectedXML))
-                .withTest(Input.fromFile("target/informix_xml/test.informix.xml"))
+                .withTest(Input.fromFile("target/testout/integrationtesting/informix/xml/test.informix.xml"))
                 .withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, new IgnoreUsingXPath("/database[1]/@type"), new IgnoreNonPrintedInCData()))
                 .build();
         assertThat(d.getDifferences()).isEmpty();
@@ -113,12 +113,12 @@ public class InformixIndexXMLIT {
 
     @Test
     public void verifyDeletionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/informix_xml/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
+        assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/informix/xml/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
     }
 
     @Test
     public void verifyInsertionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/informix_xml/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
+        assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/informix/xml/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
     }
 
 }

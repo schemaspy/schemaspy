@@ -71,9 +71,10 @@ public class MSSQLServerRemoteTablesIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
     public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+            new SuiteOrTestJdbcContainerRule<MSSQLContainer>(
                     MssqlServerSuite.jdbcContainerRule,
                     new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
                             .assumeDockerIsPresent()
@@ -88,11 +89,11 @@ public class MSSQLServerRemoteTablesIT {
         }
     }
 
-    private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "mssql17",
                 "-db", "ACME",
-                "-o", "target/integrationtesting/mssql",
+                "-o", "target/testout/integrationtesting/mssql/remote_table",
                 "-u", "schemaspy",
                 "-p", "qwerty123!",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
@@ -108,7 +109,7 @@ public class MSSQLServerRemoteTablesIT {
                 databaseMetaData.getConnection().getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        MSSQLServerRemoteTablesIT.database = database;
     }
 
     @Test

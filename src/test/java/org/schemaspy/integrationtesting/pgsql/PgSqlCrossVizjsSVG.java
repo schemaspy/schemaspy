@@ -49,13 +49,14 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 @Ignore
 public class PgSqlCrossVizjsSVG {
 
-    private Path outputPath = Paths.get("target","integrationTest", "pgsql", "cross_vizjs_svg");
+    private Path outputPath = Paths.get("target","testout","integrationtesting","pgsql", "cross_vizjs_svg");
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
                     PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10.4"))
+                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/cross_schema_fk.sql", "\n\n\n"))

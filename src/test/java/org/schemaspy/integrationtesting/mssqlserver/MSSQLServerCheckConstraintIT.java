@@ -72,9 +72,10 @@ public class MSSQLServerCheckConstraintIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
     public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+            new SuiteOrTestJdbcContainerRule<MSSQLContainer>(
                     MssqlServerSuite.jdbcContainerRule,
                     new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
                             .assumeDockerIsPresent()
@@ -89,19 +90,19 @@ public class MSSQLServerCheckConstraintIT {
         }
     }
 
-    private void createDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "mssql17",
                 "-db", "CheckConstraint",
                 "-s", "CheckConstraint",
                 "-cat", "CheckConstraint",
-                "-o", "target/integrationtesting/mssql/CheckConstraint",
+                "-o", "target/testout/integrationtesting/mssql/CheckConstraint",
                 "-u", "sa",
                 "-p", jdbcContainerRule.getContainer().getPassword(),
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(1433).toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/mssqlCheckConstraint"));
+        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/mssql/CheckConstraint"));
         given(arguments.getDatabaseType()).willReturn("mssql08");
         given(arguments.getUser()).willReturn("sa");
         given(arguments.getSchema()).willReturn("CheckConstraint");
@@ -116,7 +117,7 @@ public class MSSQLServerCheckConstraintIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        MSSQLServerCheckConstraintIT.database = database;
     }
 
     @Test

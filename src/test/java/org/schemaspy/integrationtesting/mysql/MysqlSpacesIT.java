@@ -42,6 +42,8 @@ import org.testcontainers.containers.MySQLContainer;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -61,6 +63,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 */
 public class MysqlSpacesIT {
 
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","spaces");
+
     @Autowired
     private SqlService sqlService;
 
@@ -75,11 +79,12 @@ public class MysqlSpacesIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withQueryString("?useSSL=false")
@@ -100,11 +105,11 @@ public class MysqlSpacesIT {
                 "-db", "TEST 1.0",
                 "-s", "TEST 1.0",
                 "-cat", "%",
-                "-o", "target/integrationtesting/mysql_spaces",
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-o", outputPath.toString(),
                 "-connprops", "useSSL\\=false"
         };
         CommandLineArguments arguments = commandLineArgumentParser.parse(args);

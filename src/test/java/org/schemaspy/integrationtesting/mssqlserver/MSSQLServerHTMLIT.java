@@ -61,9 +61,10 @@ public class MSSQLServerHTMLIT {
     private static URL expectedDeletionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/deletionOrder.txt");
     private static URL expectedInsertionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/insertionOrder.txt");
 
+    @SuppressWarnings("unchecked")
     @ClassRule
     public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+            new SuiteOrTestJdbcContainerRule<MSSQLContainer>(
                     MssqlServerSuite.jdbcContainerRule,
                     new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
                             .assumeDockerIsPresent()
@@ -84,11 +85,11 @@ public class MSSQLServerHTMLIT {
                     "-db", "htmlit",
                     "-s", "htmlit",
                     "-cat", "htmlit",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + String.valueOf(jdbcContainerRule.getContainer().getMappedPort(1433)),
+                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(1433),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(1433)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
-                    "-o", "target/mssqlhtml"
+                    "-o", "target/testout/integrationtesting/mssql/html"
             };
             schemaSpyRunner.run(args);
             shouldRun.set(false);
@@ -98,7 +99,7 @@ public class MSSQLServerHTMLIT {
     @Test
     public void verifyXML() {
         Diff d = XmlOutputDiff.diffXmlOutput(
-                Input.fromFile("target/mssqlhtml/htmlit.htmlit.xml"),
+                Input.fromFile("target/testout/integrationtesting/mssql/html/htmlit.htmlit.xml"),
                 Input.fromURL(expectedXML)
         );
         assertThat(d.getDifferences()).isEmpty();
@@ -106,19 +107,19 @@ public class MSSQLServerHTMLIT {
 
     @Test
     public void verifyDeletionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/mssqlhtml/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
+        assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/mssql/html/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
     }
 
     @Test
     public void verifyInsertionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/mssqlhtml/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
+        assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/mssql/html/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
     }
 
     @Test
     public void producesSameContent() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
-                        Paths.get("target", "mssqlhtml"),
+                        Paths.get("target","testout","integrationtesting","mssql","html"),
                         Paths.get("src", "test", "resources", "integrationTesting", "mssqlserver", "expecting", "mssqlserverhtmlit")
                 );
         softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();

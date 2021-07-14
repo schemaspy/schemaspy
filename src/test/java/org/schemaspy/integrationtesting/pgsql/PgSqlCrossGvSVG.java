@@ -50,17 +50,18 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 @Ignore
 public class PgSqlCrossGvSVG {
 
-    private Path outputPath = Paths.get("target","integrationTest", "pgsql", "cross_gv_svg");
+    private Path outputPath = Paths.get("target","testout","integrationtesting","pgsql", "cross_gv_svg");
 
     private static URL expectedXML = PgSqlCrossGvSVG.class.getResource("/integrationTesting/pgsql/expecting/cross_gv_svg/htmlit.htmlit.xml");
     private static URL expectedDeletionOrder = PgSqlCrossGvSVG.class.getResource("/integrationTesting/pgsql/expecting/cross_gv_svg/deletionOrder.txt");
     private static URL expectedInsertionOrder = PgSqlCrossGvSVG.class.getResource("/integrationTesting/pgsql/expecting/cross_gv_svg/insertionOrder.txt");
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
                     PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new PostgreSQLContainer("postgres:10.4"))
+                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/cross_schema_fk.sql", "\n\n\n"))

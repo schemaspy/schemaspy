@@ -40,6 +40,7 @@ import org.xmlunit.diff.Diff;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -55,15 +56,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class MysqlHTMLRemoteRelationshipsIT {
 
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","html_remote_relationships");
+
     private static URL expectedXML = MysqlHTMLRemoteRelationshipsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_remote_relationships/htmlit.htmlit.xml");
     private static URL expectedDeletionOrder = MysqlHTMLRemoteRelationshipsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_remote_relationships/deletionOrder.txt");
     private static URL expectedInsertionOrder = MysqlHTMLRemoteRelationshipsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_remote_relationships/insertionOrder.txt");
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
                         .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
                         .withQueryString("?useSSL=false")
                         .withInitScript("integrationTesting/mysql/dbScripts/htmlit.sql")
@@ -82,11 +86,11 @@ public class MysqlHTMLRemoteRelationshipsIT {
                     "-t", "mysql",
                     "-db", "htmlit",
                     "-s", "htmlit",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
+                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
-                    "-o", "target/mysqlhtml_remote_relationships",
+                    "-o", outputPath.toString(),
                     "-connprops", "useSSL\\=false",
                     "-meta", Paths.get("src","test","resources","integrationTesting","mysql","metadata","remote_relationships.xml").toString()
             };
@@ -98,7 +102,7 @@ public class MysqlHTMLRemoteRelationshipsIT {
     @Test
     public void verifyXML() {
         Diff d = XmlOutputDiff.diffXmlOutput(
-                Input.fromFile("target/mysqlhtml_remote_relationships/htmlit.htmlit.xml"),
+                Input.fromFile(outputPath.resolve("htmlit.htmlit.xml").toString()),
                 Input.fromURL(expectedXML)
         );
         assertThat(d.getDifferences()).isEmpty();
@@ -106,19 +110,19 @@ public class MysqlHTMLRemoteRelationshipsIT {
 
     @Test
     public void verifyDeletionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/mysqlhtml_remote_relationships/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
+        assertThat(Files.newInputStream(outputPath.resolve("deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
     }
 
     @Test
     public void verifyInsertionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/mysqlhtml_remote_relationships/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
+        assertThat(Files.newInputStream(outputPath.resolve("insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
     }
 
     @Test
     public void producesSameContent() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
-                        Paths.get("target","mysqlhtml_remote_relationships"),
+                        outputPath,
                         Paths.get("src","test","resources","integrationTesting","mysql","expecting","mysqlhtml_remote_relationships")
                         );
         softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();

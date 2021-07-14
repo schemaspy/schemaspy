@@ -43,6 +43,8 @@ import org.testcontainers.containers.MySQLContainer;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -55,6 +57,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @DirtiesContext
 public class MysqlKeyWordTableIT {
+
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","keywords");
 
     @Autowired
     private SqlService sqlService;
@@ -70,11 +74,12 @@ public class MysqlKeyWordTableIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withQueryString("?useSSL=false")
@@ -89,17 +94,17 @@ public class MysqlKeyWordTableIT {
         }
     }
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException, URISyntaxException {
+    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "mysql",
                 "-db", "keywordtableit",
                 "-s", "keywordtableit",
-                "-o", "target/integrationtesting/mysql_keywords",
                 "-u", "test",
                 "-p", "test",
                 "-cat", "%",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-o", outputPath.toString(),
                 "-connprops", "useSSL\\=false"
         };
         CommandLineArguments arguments = commandLineArgumentParser.parse(args);

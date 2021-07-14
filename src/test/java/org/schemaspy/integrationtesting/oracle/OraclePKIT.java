@@ -45,6 +45,8 @@ import org.testcontainers.containers.OracleContainer;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -57,6 +59,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @DirtiesContext
 public class OraclePKIT {
+
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","oracle","pk");
 
     @Autowired
     private SqlService sqlService;
@@ -99,7 +103,7 @@ public class OraclePKIT {
                 "-db", jdbcContainerRule.getContainer().getSid(),
                 "-s", "DBUSER",
                 "-cat", "%",
-                "-o", "target/integrationtesting/pklogging",
+                "-o", outputPath.toString(),
                 "-u", "dbuser",
                 "-p", "dbuser123",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),

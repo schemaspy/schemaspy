@@ -105,11 +105,26 @@
                 <script>
                     var tableData = [
     {
-        "tableName": "user",
+        "tableName": "group",
+        "tableFileName": "group",
+        "tableType": "Table",
+        "keyClass": "indexedColumn",
+        "keyTitle": "Indexed",
+        "name": "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'><\/i>name",
+        "type": "VARCHAR",
+        "length": 16,
+        "nullable": "",
+        "autoUpdated": "",
+        "defaultValue": "null",
+        "comments": ""
+    },
+    {
+        "tableName": "group",
+        "tableFileName": "group",
         "tableType": "Table",
         "keyClass": "primaryKey",
         "keyTitle": "Primary Key",
-        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>userId",
+        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>groupId",
         "type": "INT",
         "length": 10,
         "nullable": "",
@@ -118,33 +133,8 @@
         "comments": ""
     },
     {
-        "tableName": "user",
-        "tableType": "Table",
-        "keyClass": "foreignKey",
-        "keyTitle": "Foreign Key",
-        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>email",
-        "type": "VARCHAR",
-        "length": 40,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
-        "tableName": "group",
-        "tableType": "Table",
-        "keyClass": "",
-        "keyTitle": "",
-        "name": "description",
-        "type": "VARCHAR",
-        "length": 80,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
         "tableName": "userAndGroup",
+        "tableFileName": "userAndGroup",
         "tableType": "View",
         "keyClass": "",
         "keyTitle": "",
@@ -158,6 +148,7 @@
     },
     {
         "tableName": "user",
+        "tableFileName": "user",
         "tableType": "Table",
         "keyClass": "foreignKey",
         "keyTitle": "Foreign Key",
@@ -170,33 +161,8 @@
         "comments": "<p>FK to groups omitted, implied relationship<\/p>"
     },
     {
-        "tableName": "group",
-        "tableType": "Table",
-        "keyClass": "indexedColumn",
-        "keyTitle": "Indexed",
-        "name": "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'><\/i>name",
-        "type": "VARCHAR",
-        "length": 16,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
-        "tableName": "user",
-        "tableType": "Table",
-        "keyClass": "",
-        "keyTitle": "",
-        "name": "name",
-        "type": "VARCHAR",
-        "length": 16,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": "<p>UserName<\/p>"
-    },
-    {
         "tableName": "userAndGroup",
+        "tableFileName": "userAndGroup",
         "tableType": "View",
         "keyClass": "",
         "keyTitle": "",
@@ -209,15 +175,58 @@
         "comments": "<p>UserName<\/p>"
     },
     {
-        "tableName": "group",
+        "tableName": "user",
+        "tableFileName": "user",
+        "tableType": "Table",
+        "keyClass": "",
+        "keyTitle": "",
+        "name": "name",
+        "type": "VARCHAR",
+        "length": 16,
+        "nullable": "",
+        "autoUpdated": "",
+        "defaultValue": "null",
+        "comments": "<p>UserName<\/p>"
+    },
+    {
+        "tableName": "user",
+        "tableFileName": "user",
         "tableType": "Table",
         "keyClass": "primaryKey",
         "keyTitle": "Primary Key",
-        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>groupId",
+        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>userId",
         "type": "INT",
         "length": 10,
         "nullable": "",
         "autoUpdated": "√",
+        "defaultValue": "null",
+        "comments": ""
+    },
+    {
+        "tableName": "group",
+        "tableFileName": "group",
+        "tableType": "Table",
+        "keyClass": "",
+        "keyTitle": "",
+        "name": "description",
+        "type": "VARCHAR",
+        "length": 80,
+        "nullable": "",
+        "autoUpdated": "",
+        "defaultValue": "null",
+        "comments": ""
+    },
+    {
+        "tableName": "user",
+        "tableFileName": "user",
+        "tableType": "Table",
+        "keyClass": "foreignKey",
+        "keyTitle": "Foreign Key",
+        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>email",
+        "type": "VARCHAR",
+        "length": 40,
+        "nullable": "",
+        "autoUpdated": "",
         "defaultValue": "null",
         "comments": ""
     }
@@ -234,7 +243,7 @@
                         <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
                         <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
                     </div>
-                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 6.1.0-SNAPSHOT</a></strong>
+                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 6.1.1-SNAPSHOT</a></strong>
                 </div>
                 <!-- /.container -->
             </footer>

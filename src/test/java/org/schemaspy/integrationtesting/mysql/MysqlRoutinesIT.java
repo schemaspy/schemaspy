@@ -40,6 +40,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
@@ -52,6 +54,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @DirtiesContext
 public class MysqlRoutinesIT {
+
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","routines");
 
     @Autowired
     private SqlService sqlService;
@@ -67,11 +71,12 @@ public class MysqlRoutinesIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withQueryString("?useSSL=false")
@@ -92,11 +97,11 @@ public class MysqlRoutinesIT {
                 "-db", "routinesit",
                 "-s", "routinesit",
                 "-cat", "%",
-                "-o", "target/integrationtesting/mysqlroutines",
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-o", outputPath.toString(),
                 "-connprops", "useSSL\\=false"
         };
         CommandLineArguments arguments = commandLineArgumentParser.parse(args);

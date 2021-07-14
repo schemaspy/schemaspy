@@ -85,10 +85,10 @@ public class H2PrimaryKeySeqnoIT {
                 "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
                 "-db", "pkorder",
                 "-s", "pkorder",
-                "-o", "target/integrationtesting/h2pkorder",
+                "-o", "target/testout/integrationtesting/h2/pkorder",
                 "-u", "sa"
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/h2pkorder"));
+        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/h2/pkorder"));
         given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
         given(arguments.getUser()).willReturn("sa");
         given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());

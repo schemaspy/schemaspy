@@ -36,6 +36,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -49,11 +50,14 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 @DirtiesContext
 public class MysqlMultiSchemaIT {
 
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","multischema");
+
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MySQLContainer("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withQueryString("?useSSL=false")
@@ -78,7 +82,7 @@ public class MysqlMultiSchemaIT {
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
-                    "-o", "target/mysqlmultischema",
+                    "-o", outputPath.toString(),
                     "-connprops", "useSSL\\=false"
             };
             schemaSpyRunner.run(args);
@@ -90,7 +94,7 @@ public class MysqlMultiSchemaIT {
     public void producesSameContentForIndex() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
                 .hasSameContent(
-                        Paths.get("target", "mysqlmultischema","index.html"),
+                        outputPath.resolve("index.html"),
                         Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema", "index.html")
                 );
         softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
@@ -101,7 +105,7 @@ public class MysqlMultiSchemaIT {
     public void producesSameContentForSchema() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
-                        Paths.get("target", "mysqlmultischema","htmlit"),
+                        outputPath.resolve("htmlit"),
                         Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema", "htmlit")
                 );
         softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();

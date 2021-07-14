@@ -42,13 +42,16 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
         MysqlSpacesIT.class,
         MysqlSpacesNoDotsIT.class,
         MysqlXMLIT.class,
-        MysqlHTMLOrphanIT.class
+        MysqlHTMLOrphanIT.class,
+        MysqlHTMLRemoteRelationshipsIT.class,
+        MysqlIllegalFileNameCharsInTableNameIT.class
 })
 public class MysqlSuite {
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5").withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"))
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5").withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withQueryString("?useSSL=false")

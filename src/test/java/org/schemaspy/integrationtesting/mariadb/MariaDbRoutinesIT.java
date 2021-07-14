@@ -69,11 +69,12 @@ public class MariaDbRoutinesIT {
 
     private static Database database;
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MySQLContainer("mariadb:10.2"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mariadb:10.2"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
                             .withInitScript("integrationTesting/mysql/dbScripts/routinesit.sql")
@@ -93,7 +94,7 @@ public class MariaDbRoutinesIT {
                 "-db", "routinesit",
                 "-s", "routinesit",
                 "-cat", "%",
-                "-o", "target/integrationtesting/mariadb",
+                "-o", "target/testout/integrationtesting/mariadb/routines",
                 "-u", "test",
                 "-p", "test",
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
@@ -109,7 +110,7 @@ public class MariaDbRoutinesIT {
                 arguments.getSchema()
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
+        MariaDbRoutinesIT.database = database;
     }
 
     @Test

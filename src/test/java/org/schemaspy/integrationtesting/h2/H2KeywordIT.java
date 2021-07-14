@@ -85,10 +85,10 @@ public class H2KeywordIT {
                 "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
                 "-db", "h2keyword",
                 "-s", "h2keyword",
-                "-o", "target/integrationtesting/h2keyword",
+                "-o", "target/testout/integrationtesting/h2/keyword",
                 "-u", "sa"
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/h2keyword"));
+        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/h2/keyword"));
         given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
         given(arguments.getUser()).willReturn("sa");
         given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());

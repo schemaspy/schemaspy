@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<database name="illegal" schema="illegal" type="MySQL - 5.7.25">
+<?xml version="1.0" encoding="UTF-8"?><database name="illegal" schema="illegal" type="MySQL - 5.7.33">
    <tables>
       <table catalog="illegal" name="us/er" numRows="0" remarks="Users of the system" type="TABLE">
          <column autoUpdated="true" defaultValue="null" digits="0" id="0" name="userId" nullable="false" remarks="" size="10" type="INT" typeCode="4"/>
@@ -39,10 +38,16 @@
       <routine dataAccess="CONTAINS SQL" deterministic="false" name="いいえ_det" returnType="char(50)" securityType="DEFINER" type="FUNCTION">
          <comment/>
          <definition language="SQL"/>
+         <parameters>
+            <parameter mode="IN" name="s" type="char(20)"/>
+         </parameters>
       </routine>
       <routine dataAccess="CONTAINS SQL" deterministic="true" name="はい_det" returnType="char(50)" securityType="DEFINER" type="FUNCTION">
          <comment><![CDATA[is deterministic]]></comment>
          <definition language="SQL"><![CDATA[RETURN CONCAT('Hello, ',s,'!')]]></definition>
+         <parameters>
+            <parameter mode="IN" name="s" type="char(20)"/>
+         </parameters>
       </routine>
    </routines>
 </database>

@@ -97,7 +97,7 @@ public class InformixCheckConstraintIT {
                 "-s", "informix",
                 "-cat", "test",
                 "-server", "dev",
-                "-o", "target/integrationtesting/informixcc",
+                "-o", "target/testout/integrationtesting/informix/cc",
                 "-u", jdbcContainerRule.getContainer().getUsername(),
                 "-p", jdbcContainerRule.getContainer().getPassword(),
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),

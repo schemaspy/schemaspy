@@ -40,6 +40,7 @@ import org.xmlunit.diff.Diff;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -55,15 +56,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class MysqlHTMLOrphanIT {
 
+    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","htmlorphanit");
+
     private static URL expectedXML = MysqlHTMLOrphanIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlorphan/htmlorphanit.htmlorphanit.xml");
     private static URL expectedDeletionOrder = MysqlHTMLOrphanIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlorphan/deletionOrder.txt");
     private static URL expectedInsertionOrder = MysqlHTMLOrphanIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlorphan/insertionOrder.txt");
 
+    @SuppressWarnings("unchecked")
     @ClassRule
-    public static JdbcContainerRule<MySQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<>(
+    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
+            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
                         .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
                         .withQueryString("?useSSL=false")
                         .withInitScript("integrationTesting/mysql/dbScripts/htmlorphanit.sql")
@@ -82,11 +86,11 @@ public class MysqlHTMLOrphanIT {
                     "-t", "mysql",
                     "-db", "htmlorphanit",
                     "-s", "htmlorphanit",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
+                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
-                    "-o", "target/mysqlhtmlorphanit",
+                    "-o", outputPath.toString(),
                     "-connprops", "useSSL\\=false"
             };
             schemaSpyRunner.run(args);
@@ -97,7 +101,7 @@ public class MysqlHTMLOrphanIT {
     @Test
     public void verifyXML() {
         Diff d = XmlOutputDiff.diffXmlOutput(
-                Input.fromFile("target/mysqlhtmlorphanit/htmlorphanit.htmlorphanit.xml"),
+                Input.fromFile(outputPath.resolve("htmlorphanit.htmlorphanit.xml").toString()),
                 Input.fromURL(expectedXML)
         );
         assertThat(d.getDifferences()).isEmpty();
@@ -105,19 +109,19 @@ public class MysqlHTMLOrphanIT {
 
     @Test
     public void verifyDeletionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/mysqlhtmlorphanit/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
+        assertThat(Files.newInputStream(outputPath.resolve("deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
     }
 
     @Test
     public void verifyInsertionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/mysqlhtmlorphanit/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
+        assertThat(Files.newInputStream(outputPath.resolve("insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
     }
 
     @Test
     public void producesSameContent() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
-                        Paths.get("target","mysqlhtmlorphanit"),
+                        outputPath,
                         Paths.get("src","test","resources","integrationTesting","mysql","expecting","mysqlhtmlorphan")
                         );
         softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
