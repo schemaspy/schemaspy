@@ -35,3 +35,14 @@ jobs:
           --errors
           --show-version
           verify
+      - name: Upload test output
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: testout
+          path: |
+            target/testout/
+            !target/testout/**/bower/
+            !target/testout/**/fonts/
+            !target/testout/**/*.js
+          retention-days: 7
