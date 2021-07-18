@@ -28,9 +28,12 @@ package org.schemaspy;
 import java.lang.invoke.MethodHandles;
 
 import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.cli.SchemaSpyRunner.ExitCode;
 import org.schemaspy.logging.StackTraceOmitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.PatternLayout;
 
 /**
  * @author John Currier
@@ -42,14 +45,20 @@ import org.slf4j.LoggerFactory;
  * @author Nils Petzaell
  */
 public class Main {
+	// Registers the conversion word before any other log invocation. There must not
+	// be any other Logger before this static initializer.
+	static {
+		PatternLayout.defaultConverterMap.put("debugEx", StackTraceOmitter.class.getName());
+	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	public static void main(String... args) {
 		final SchemaSpyRunner schemaSpyRunner = new SchemaSpyRunner();
-		schemaSpyRunner.run(args);
+		final ExitCode code = schemaSpyRunner.run(args);
 		if (StackTraceOmitter.hasOmittedStackTrace()) {
 			LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
 		}
+		System.exit(code.ordinal());
 	}
 }

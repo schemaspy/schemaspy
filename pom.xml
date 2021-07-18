@@ -279,6 +279,7 @@
 				<directory>src/main/resources</directory>
 				<includes>
 					<include>*.properties</include>
+					<include>*.xml</include>
 					<include>**/*.*</include>
 				</includes>
 				<filtering>true</filtering>

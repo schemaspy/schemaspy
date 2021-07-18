@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.pattern.ThrowableProxyConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.CoreConstants;
@@ -37,10 +36,6 @@ public class StackTraceOmitter extends ThrowableProxyConverter { // NOSONAR
 	private static final Logger SCHEMA_SPY_LOGGER = LoggerFactory.getLogger("org.schemaspy");
 
 	private static AtomicBoolean omittedStackTrace = new AtomicBoolean(false);
-
-	public void register() {
-		PatternLayout.defaultConverterMap.put("debugEx", StackTraceOmitter.class.getName());
-	}
 
 	public static boolean hasOmittedStackTrace() {
 		return omittedStackTrace.get();
