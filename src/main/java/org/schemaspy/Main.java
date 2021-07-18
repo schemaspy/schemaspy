@@ -25,15 +25,12 @@
  */
 package org.schemaspy;
 
+import java.lang.invoke.MethodHandles;
+
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.logging.StackTraceOmitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-
-import java.lang.invoke.MethodHandles;
 
 /**
  * @author John Currier
@@ -44,20 +41,15 @@ import java.lang.invoke.MethodHandles;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-@SpringBootApplication
 public class Main {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static void main(String... args) {
-        ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
-        SchemaSpyRunner schemaSpyRunner = context.getBean(SchemaSpyRunner.class);
-        schemaSpyRunner.run(args);
-        if (StackTraceOmitter.hasOmittedStackTrace()) {
-            LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
-        }
-        int exitCode = SpringApplication.exit(context, () -> 0);
-        System.exit(exitCode);
-    }
-
+	public static void main(String... args) {
+		final SchemaSpyRunner schemaSpyRunner = new SchemaSpyRunner();
+		schemaSpyRunner.run(args);
+		if (StackTraceOmitter.hasOmittedStackTrace()) {
+			LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
+		}
+	}
 }

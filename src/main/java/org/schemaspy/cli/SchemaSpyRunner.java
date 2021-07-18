@@ -18,107 +18,101 @@
  */
 package org.schemaspy.cli;
 
-import com.beust.jcommander.ParameterException;
-import org.schemaspy.Config;
-import org.schemaspy.SchemaAnalyzer;
-import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
-import org.schemaspy.model.EmptySchemaException;
-import org.schemaspy.model.InvalidConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ExitCodeGenerator;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-@Component
-public class SchemaSpyRunner implements ExitCodeGenerator {
+import org.schemaspy.Config;
+import org.schemaspy.SchemaAnalyzer;
+import org.schemaspy.ServiceFixture;
+import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
+import org.schemaspy.logging.StackTraceOmitter;
+import org.schemaspy.model.EmptySchemaException;
+import org.schemaspy.model.InvalidConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+import com.beust.jcommander.ParameterException;
 
-    private static final int EXIT_CODE_OK = 0;
-    private static final int EXIT_CODE_GENERIC_ERROR = 1;
-    private static final int EXIT_CODE_EMPTY_SCHEMA = 2;
-    private static final int EXIT_CODE_CONNECTION_ERROR = 3;
-    private static final int EXIT_CODE_CONFIG_ERROR = 4;
+public class SchemaSpyRunner {
 
-    @Autowired
-    private SchemaAnalyzer analyzer;
+	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Autowired
-    private CommandLineArguments arguments;
+	private static final int EXIT_CODE_OK = 0;
+	private static final int EXIT_CODE_GENERIC_ERROR = 1;
+	private static final int EXIT_CODE_EMPTY_SCHEMA = 2;
+	private static final int EXIT_CODE_CONNECTION_ERROR = 3;
+	private static final int EXIT_CODE_CONFIG_ERROR = 4;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	private final CommandLineArguments arguments = new CommandLineArguments();
 
-    @Autowired
-    private LoggingSystem loggingSystem;
+	private final CommandLineArgumentParser commandLineArgumentParser;
 
-    private int exitCode = EXIT_CODE_OK;
+	private final ServiceFixture serviceFixture = new ServiceFixture();
 
-    public void run(String... args) {
-        try {
-            commandLineArgumentParser.parse(args);
-        } catch (ParameterException e) {
-            LOGGER.error(e.getLocalizedMessage(),e);
-            exitCode = 1;
-            return;
-        }
-        if (arguments.isHelpRequired()) {
-            commandLineArgumentParser.printUsage();
-            return;
-        }
+	public SchemaSpyRunner() {
+		commandLineArgumentParser = new CommandLineArgumentParser(arguments);
+	}
 
-        if (arguments.isDbHelpRequired()) {
-            commandLineArgumentParser.printDatabaseTypesHelp();
-            return;
-        }
+	private int exitCode = EXIT_CODE_OK;
 
-        if (arguments.isDebug()) {
-            enableDebug();
-        }
+	public void run(String... args) {
+		try {
+			commandLineArgumentParser.parse(args);
+		} catch (ParameterException e) {
+			LOGGER.error(e.getLocalizedMessage(), e);
+			exitCode = 1;
+			return;
+		}
+		if (arguments.isHelpRequired()) {
+			commandLineArgumentParser.printUsage();
+			return;
+		}
 
-        runAnalyzer(args);
-    }
+		if (arguments.isDbHelpRequired()) {
+			commandLineArgumentParser.printDatabaseTypesHelp();
+			return;
+		}
 
-    public void enableDebug() {
-        loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
-        LOGGER.debug("Debug enabled");
-    }
+		if (arguments.isDebug()) {
+			enableDebug();
+		}
 
-    private void runAnalyzer(String... args) {
-        exitCode = EXIT_CODE_GENERIC_ERROR;
-        try {
-            exitCode = analyzer.analyze(new Config(args)) == null ? EXIT_CODE_GENERIC_ERROR : EXIT_CODE_OK;
-        } catch (ConnectionFailure couldntConnect) {
-            LOGGER.warn("Connection Failure", couldntConnect);
-            exitCode = EXIT_CODE_CONNECTION_ERROR;
-        } catch (EmptySchemaException noData) {
-            LOGGER.warn("Empty schema", noData);
-            exitCode = EXIT_CODE_EMPTY_SCHEMA;
-        } catch (InvalidConfigurationException badConfig) {
-            exitCode = EXIT_CODE_CONFIG_ERROR;
-            LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
-            if (badConfig.getParamName() != null) {
-                LOGGER.error("Bad parameter: '{} = {}'", badConfig.getParamName(), badConfig.getParamValue(), badConfig);
-            } else {
-                LOGGER.error("Bad config", badConfig);
-            }
-        } catch (SQLException e) {
-            LOGGER.error("SqlException", e);
-        } catch (IOException e) {
-            LOGGER.error("IOException", e);
-        }
-    }
+		runAnalyzer(args);
+	}
 
-    @Override
-    public int getExitCode() {
-        return exitCode;
-    }
+	public void enableDebug() {
+		// TODO: enable debugging
+		LOGGER.debug("Debug enabled");
+	}
+
+	private void runAnalyzer(String... args) {
+		exitCode = EXIT_CODE_GENERIC_ERROR;
+		final SchemaAnalyzer analyzer = new SchemaAnalyzer(serviceFixture.getSqlService(),
+				serviceFixture.getDatabaseService(), arguments);
+		new StackTraceOmitter().register();
+		try {
+			exitCode = analyzer.analyze(new Config(args)) == null ? EXIT_CODE_GENERIC_ERROR : EXIT_CODE_OK;
+		} catch (ConnectionFailure couldntConnect) {
+			LOGGER.warn("Connection Failure", couldntConnect);
+			exitCode = EXIT_CODE_CONNECTION_ERROR;
+		} catch (EmptySchemaException noData) {
+			LOGGER.warn("Empty schema", noData);
+			exitCode = EXIT_CODE_EMPTY_SCHEMA;
+		} catch (InvalidConfigurationException badConfig) {
+			exitCode = EXIT_CODE_CONFIG_ERROR;
+			LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
+			if (badConfig.getParamName() != null) {
+				LOGGER.error("Bad parameter: '{} = {}'", badConfig.getParamName(), badConfig.getParamValue(),
+						badConfig);
+			} else {
+				LOGGER.error("Bad config", badConfig);
+			}
+		} catch (SQLException e) {
+			LOGGER.error("SqlException", e);
+		} catch (IOException e) {
+			LOGGER.error("IOException", e);
+		}
+	}
 }
