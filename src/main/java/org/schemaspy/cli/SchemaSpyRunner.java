@@ -18,8 +18,11 @@
  */
 package org.schemaspy.cli;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Arrays;
 
@@ -56,6 +59,8 @@ public class SchemaSpyRunner {
 	}
 
 	public ExitCode run(String... args) {
+		printLogo();
+
 		try {
 			commandLineArgumentParser.parse(args);
 		} catch (ParameterException e) {
@@ -77,6 +82,17 @@ public class SchemaSpyRunner {
 		}
 
 		return runAnalyzer(args);
+	}
+
+	private void printLogo() {
+		final ClassLoader cl = ClassLoader.getSystemClassLoader();
+		try (BufferedReader bufferedReader = new BufferedReader(
+				new InputStreamReader(cl.getResourceAsStream("banner.txt"), StandardCharsets.UTF_8))) {
+			bufferedReader.lines().forEachOrdered(LOGGER::info);
+		} catch (IOException e) {
+			LOGGER.error("Failed to read COPYING (GPL)", e);
+		}
+
 	}
 
 	public void enableDebug() {
