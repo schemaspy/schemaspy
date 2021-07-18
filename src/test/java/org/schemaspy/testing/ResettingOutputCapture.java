@@ -62,6 +62,7 @@ public class ResettingOutputCapture implements TestRule {
 		MatcherAssert.assertThat(captured, matcher);
 	}
 
+	// Will run during test case execution and pipe log output through a buffer
 	private static class StreamProcessor extends Thread {
 		private final PipedInputStream pis;
 		private final PipedOutputStream pos;
@@ -82,7 +83,6 @@ public class ResettingOutputCapture implements TestRule {
 		public void run() {
 			System.setOut(new PrintStream(pos));
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(pis));) {
-				// once output is resotred, we must terminate
 				while (true) {
 					String line = br.readLine();
 					if (line == null) {
@@ -96,6 +96,7 @@ public class ResettingOutputCapture implements TestRule {
 			}
 		}
 
+		// reset stream
 		public String terminate() throws InterruptedException, IOException {
 			System.setOut(downstream);
 			pos.close();
