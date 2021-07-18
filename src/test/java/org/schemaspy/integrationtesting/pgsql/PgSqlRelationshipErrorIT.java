@@ -18,106 +18,80 @@
  */
 package org.schemaspy.integrationtesting.pgsql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.integrationtesting.PgSqlSuite;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.testing.SQLScriptsRunner;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.PostgreSQLContainer;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.Arguments;
+import org.schemaspy.integrationtesting.PgSqlSuite;
+import org.schemaspy.integrationtesting.TestServiceFixture;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.testing.SQLScriptsRunner;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class PgSqlRelationshipErrorIT {
 
+	private static final Path outputPath = Paths.get("target", "testout", "integrationtesting", "pgsql",
+			"relationship_error");
 
-    private static final Path outputPath = Paths.get("target","testout","integrationtesting","pgsql","relationship_error");
+	@SuppressWarnings("unchecked")
+	@ClassRule
+	public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule = new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
+			PgSqlSuite.jdbcContainerRule,
+			new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
+					.assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
+					.withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/relationship_error.sql",
+							"\n\n\n")));
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
-                    PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/relationship_error.sql", "\n\n\n"))
-            );
+	private final TestServiceFixture serviceFixture = new TestServiceFixture();
 
-    @Autowired
-    private SqlService sqlService;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Autowired
-    private DatabaseService databaseService;
+	private static Database database;
 
-    @Mock
-    private ProgressListener progressListener;
+	@Before
+	public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			doCreateDatabaseRepresentation();
+		}
+	}
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "pgsql", "-db", "test", "-cat", "test", "-s", "org_cendra_person", "-o",
+				outputPath.toString(), "-u", "test", "-p", "test", "-host",
+				jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getMappedPort(5432).toString() };
+		final CommandLineArguments arguments = Arguments.parseArguments(args);
+		Config config = new Config(args);
+		serviceFixture.sqlService().connect(config);
+		Database database = new Database(serviceFixture.sqlService().getDbmsMeta(), arguments.getDatabaseName(),
+				arguments.getCatalog(), arguments.getSchema());
+		serviceFixture.databaseService().gatherSchemaDetails(config, database, null, progressListener);
+		PgSqlRelationshipErrorIT.database = database;
+	}
 
-    private static Database database;
-
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "pgsql",
-                "-db", "test",
-                "-cat", "test",
-                "-s", "org_cendra_person",
-                "-o", outputPath.toString(),
-                "-u", "test",
-                "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        PgSqlRelationshipErrorIT.database = database;
-    }
-
-    @Test
-    public void onlyHasSingleRemoteTable() {
-        assertThat(database.getRemoteTables().size()).isEqualTo(1);
-    }
+	@Test
+	public void onlyHasSingleRemoteTable() {
+		assertThat(database.getRemoteTables().size()).isEqualTo(1);
+	}
 }

@@ -33,8 +33,6 @@ import org.schemaspy.logging.StackTraceOmitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.PatternLayout;
-
 /**
  * @author John Currier
  * @author Rafal Kasa
@@ -45,12 +43,6 @@ import ch.qos.logback.classic.PatternLayout;
  * @author Nils Petzaell
  */
 public class Main {
-	// Registers the conversion word before any other log invocation. There must not
-	// be any other Logger before this static initializer.
-	static {
-		PatternLayout.defaultConverterMap.put("debugEx", StackTraceOmitter.class.getName());
-	}
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	public static void main(String... args) {

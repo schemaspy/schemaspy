@@ -18,123 +18,98 @@
  */
 package org.schemaspy.integrationtesting.oracle;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableIndex;
-import org.schemaspy.testing.AssumeClassIsPresentRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.OracleContainer;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.script.ScriptException;
+
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.Arguments;
+import org.schemaspy.integrationtesting.TestServiceFixture;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableIndex;
+import org.schemaspy.testing.AssumeClassIsPresentRule;
+import org.testcontainers.containers.OracleContainer;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class OraclePKIT {
 
-    private static final Path outputPath = Paths.get("target","testout","integrationtesting","oracle","pk");
+	private static final Path outputPath = Paths.get("target", "testout", "integrationtesting", "oracle", "pk");
 
-    @Autowired
-    private SqlService sqlService;
+	private final TestServiceFixture serviceFixture = new TestServiceFixture();
 
-    @Autowired
-    private DatabaseService databaseService;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Mock
-    private ProgressListener progressListener;
+	private static Database database;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
 
-    private static Database database;
+	@SuppressWarnings("unchecked")
+	public static JdbcContainerRule<OracleContainer> jdbcContainerRule = new JdbcContainerRule<>(
+			() -> new OracleContainer("christophesurmont/oracle-xe-11g")).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent())
+					.withInitScript("integrationTesting/oracle/dbScripts/pklogging.sql");
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+	@ClassRule
+	public static final TestRule chain = RuleChain.outerRule(jdbcContainerRule).around(jdbcDriverClassPresentRule);
 
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer("christophesurmont/oracle-xe-11g"))
-            .assumeDockerIsPresent()
-            .withAssumptions(assumeDriverIsPresent())
-            .withInitScript("integrationTesting/oracle/dbScripts/pklogging.sql");
+	@Before
+	public synchronized void gatheringSchemaDetailsTest()
+			throws SQLException, IOException, ScriptException, URISyntaxException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			createDatabaseRepresentation();
+		}
+	}
 
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
+	private void createDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "orathin", "-db", jdbcContainerRule.getContainer().getSid(), "-s", "DBUSER", "-cat",
+				"%", "-o", outputPath.toString(), "-u", "dbuser", "-p", "dbuser123", "-host",
+				jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getOraclePort().toString() };
+		final CommandLineArguments arguments = Arguments.parseArguments(args);
+		Config config = new Config(args);
+		serviceFixture.sqlService().connect(config);
+		Database database = new Database(serviceFixture.sqlService().getDbmsMeta(), arguments.getDatabaseName(),
+				arguments.getCatalog(), arguments.getSchema());
+		serviceFixture.databaseService().gatherSchemaDetails(config, database, null, progressListener);
+		OraclePKIT.database = database;
+	}
 
-    @Before
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            createDatabaseRepresentation();
-        }
-    }
+	@Test
+	public void databaseShouldHaveTable() {
+		Table table = getTable("GIWSDURATIONHISTORY");
+		assertThat(table).isNotNull();
+	}
 
-    private void createDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "orathin",
-                "-db", jdbcContainerRule.getContainer().getSid(),
-                "-s", "DBUSER",
-                "-cat", "%",
-                "-o", outputPath.toString(),
-                "-u", "dbuser",
-                "-p", "dbuser123",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        OraclePKIT.database = database;
-    }
+	@Test
+	public void tableShouldHavePKIndex() {
+		Table table = getTable("GIWSDURATIONHISTORY");
+		assertThat(table.getIndexes().stream().filter(TableIndex::isPrimaryKey).count()).isEqualTo(1);
+	}
 
-    @Test
-    public void databaseShouldHaveTable() {
-        Table table = getTable("GIWSDURATIONHISTORY");
-        assertThat(table).isNotNull();
-    }
-
-    @Test
-    public void tableShouldHavePKIndex() {
-        Table table = getTable("GIWSDURATIONHISTORY");
-        assertThat(table.getIndexes().stream().filter(TableIndex::isPrimaryKey).count()).isEqualTo(1);
-    }
-
-    private Table getTable(String tableName) {
-        return database.getTablesMap().get(tableName);
-    }
+	private Table getTable(String tableName) {
+		return database.getTablesMap().get(tableName);
+	}
 }

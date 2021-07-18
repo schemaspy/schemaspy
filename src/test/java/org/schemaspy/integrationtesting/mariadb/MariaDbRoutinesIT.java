@@ -18,110 +18,81 @@
  */
 package org.schemaspy.integrationtesting.mariadb;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.integrationtesting.MysqlSuite;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MySQLContainer;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.Arguments;
+import org.schemaspy.integrationtesting.MysqlSuite;
+import org.schemaspy.integrationtesting.TestServiceFixture;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.testcontainers.containers.MySQLContainer;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 @Ignore
 public class MariaDbRoutinesIT {
+	private final TestServiceFixture serviceFixture = new TestServiceFixture();
 
-    @Autowired
-    private SqlService sqlService;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Autowired
-    private DatabaseService databaseService;
+	private static Database database;
 
-    @Mock
-    private ProgressListener progressListener;
+	@SuppressWarnings("unchecked")
+	@ClassRule
+	public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule = new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
+			MysqlSuite.jdbcContainerRule,
+			new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mariadb:10.2")).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent())
+					.withInitScript("integrationTesting/mysql/dbScripts/routinesit.sql").withInitUser("root", "test"));
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	@Before
+	public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			doCreateDatabaseRepresentation();
+		}
+	}
 
-    private static Database database;
+	private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "mariadb", "-db", "routinesit", "-s", "routinesit", "-cat", "%", "-o",
+				"target/testout/integrationtesting/mariadb/routines", "-u", "test", "-p", "test", "-host",
+				jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getMappedPort(3306).toString() };
+		final CommandLineArguments arguments = Arguments.parseArguments(args);
+		Config config = new Config(args);
+		serviceFixture.sqlService().connect(config);
+		Database database = new Database(serviceFixture.sqlService().getDbmsMeta(), arguments.getDatabaseName(),
+				arguments.getCatalog(), arguments.getSchema());
+		serviceFixture.databaseService().gatherSchemaDetails(config, database, null, progressListener);
+		MariaDbRoutinesIT.database = database;
+	}
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
-                    MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mariadb:10.2"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitScript("integrationTesting/mysql/dbScripts/routinesit.sql")
-                            .withInitUser("root", "test")
-            );
+	@Test
+	public void databaseShouldExist() {
+		assertThat(database).isNotNull();
+		assertThat(database.getName()).isEqualToIgnoringCase("routinesit");
+	}
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "mariadb",
-                "-db", "routinesit",
-                "-s", "routinesit",
-                "-cat", "%",
-                "-o", "target/testout/integrationtesting/mariadb/routines",
-                "-u", "test",
-                "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        MariaDbRoutinesIT.database = database;
-    }
-
-    @Test
-    public void databaseShouldExist() {
-        assertThat(database).isNotNull();
-        assertThat(database.getName()).isEqualToIgnoringCase("routinesit");
-    }
-
-    @Test
-    public void databaseShouldHaveRoutines() {
-        assertThat(database.getRoutinesMap().get("no_det").isDeterministic()).isFalse();
-        assertThat(database.getRoutinesMap().get("yes_det").isDeterministic()).isTrue();
-    }
+	@Test
+	public void databaseShouldHaveRoutines() {
+		assertThat(database.getRoutinesMap().get("no_det").isDeterministic()).isFalse();
+		assertThat(database.getRoutinesMap().get("yes_det").isDeterministic()).isTrue();
+	}
 }

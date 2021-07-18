@@ -80,6 +80,7 @@ public class DatabaseServiceIT {
 	public void gatheringSchemaDetailsTest() throws Exception {
 		String[] args = { "-t", "src/test/resources/integrationTesting/dbTypes/h2memory", "-db", "DatabaseServiceIT",
 				"-s", "DATABASESERVICEIT", "-o", "target/integrationtesting/databaseServiceIT", "-u", "sa" };
+		// TODO: incorporate this into Config class
 		given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/databaseServiceIT"));
 		given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
 		given(arguments.getUser()).willReturn("sa");

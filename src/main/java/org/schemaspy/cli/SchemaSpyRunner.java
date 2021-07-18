@@ -80,7 +80,9 @@ public class SchemaSpyRunner {
 	}
 
 	public void enableDebug() {
-		// TODO: enable debugging
+		final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger("org.schemaspy");
+		ch.qos.logback.classic.Logger logbackLogger = (ch.qos.logback.classic.Logger) logger;
+		logbackLogger.setLevel(ch.qos.logback.classic.Level.TRACE);
 		LOGGER.debug("Debug enabled");
 	}
 

@@ -18,97 +18,77 @@
  */
 package org.schemaspy.integrationtesting.mysql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.assertj.core.api.SoftAssertions;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.cli.SchemaSpyRunner;
-import org.schemaspy.integrationtesting.MysqlSuite;
-import org.schemaspy.testing.HtmlOutputValidator;
-import org.schemaspy.testing.SQLScriptsRunner;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MySQLContainer;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.integrationtesting.MysqlSuite;
+import org.schemaspy.testing.HtmlOutputValidator;
+import org.schemaspy.testing.SQLScriptsRunner;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.testcontainers.containers.MySQLContainer;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class MysqlMultiSchemaIT {
 
-    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","multischema");
+	private static final Path outputPath = Paths.get("target", "testout", "integrationtesting", "mysql", "multischema");
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
-                    MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withQueryString("?useSSL=false")
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/mysql/dbScripts/"))
-                            .withInitUser("root", "test")
-            );
+	@SuppressWarnings("unchecked")
+	@ClassRule
+	public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule = new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
+			MysqlSuite.jdbcContainerRule,
+			new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5")).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent()).withQueryString("?useSSL=false")
+					.withInitFunctions(new SQLScriptsRunner("integrationTesting/mysql/dbScripts/"))
+					.withInitUser("root", "test"));
 
-    @Autowired
-    private SchemaSpyRunner schemaSpyRunner;
+	private SchemaSpyRunner schemaSpyRunner = new SchemaSpyRunner();
 
-    private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
+	private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
-    @Before
-    public synchronized void generateHTML() throws Exception {
-        if (shouldRun.get()) {
-            String[] args = new String[]{
-                    "-t", "mysql",
-                    "-db", "htmlit",
-                    "-all",
-                    "-schemaSpec", "(?!^mysql$|^performance_schema$|^information_schema$).*",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
-                    "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
-                    "-u", jdbcContainerRule.getContainer().getUsername(),
-                    "-p", jdbcContainerRule.getContainer().getPassword(),
-                    "-o", outputPath.toString(),
-                    "-connprops", "useSSL\\=false"
-            };
-            schemaSpyRunner.run(args);
-            shouldRun.set(false);
-        }
-    }
+	@Before
+	public synchronized void generateHTML() throws Exception {
+		if (shouldRun.get()) {
+			String[] args = new String[] { "-t", "mysql", "-db", "htmlit", "-all", "-schemaSpec",
+					"(?!^mysql$|^performance_schema$|^information_schema$).*", "-host",
+					jdbcContainerRule.getContainer().getContainerIpAddress() + ":"
+							+ jdbcContainerRule.getContainer().getMappedPort(3306),
+					"-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)), "-u",
+					jdbcContainerRule.getContainer().getUsername(), "-p",
+					jdbcContainerRule.getContainer().getPassword(), "-o", outputPath.toString(), "-connprops",
+					"useSSL\\=false" };
+			schemaSpyRunner.run(args);
+			shouldRun.set(false);
+		}
+	}
 
-    @Test
-    public void producesSameContentForIndex() throws IOException {
-        SoftAssertions softAssertions = HtmlOutputValidator
-                .hasSameContent(
-                        outputPath.resolve("index.html"),
-                        Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema", "index.html")
-                );
-        softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
-        softAssertions.assertAll();
-    }
+	@Test
+	public void producesSameContentForIndex() throws IOException {
+		SoftAssertions softAssertions = HtmlOutputValidator.hasSameContent(outputPath.resolve("index.html"),
+				Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema",
+						"index.html"));
+		softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
+		softAssertions.assertAll();
+	}
 
-    @Test
-    public void producesSameContentForSchema() throws IOException {
-        SoftAssertions softAssertions = HtmlOutputValidator
-                .hasProducedValidOutput(
-                        outputPath.resolve("htmlit"),
-                        Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema", "htmlit")
-                );
-        softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
-        softAssertions.assertAll();
-    }
+	@Test
+	public void producesSameContentForSchema() throws IOException {
+		SoftAssertions softAssertions = HtmlOutputValidator.hasProducedValidOutput(outputPath.resolve("htmlit"),
+				Paths.get("src", "test", "resources", "integrationTesting", "mysql", "expecting", "mysqlmultischema",
+						"htmlit"));
+		softAssertions.assertThat(softAssertions.wasSuccess()).isTrue();
+		softAssertions.assertAll();
+	}
 }

@@ -18,85 +18,61 @@
  */
 package org.schemaspy.integrationtesting;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class SqliteIT {
 
-    @Autowired
-    private SqlService sqlService;
+	private final TestServiceFixture serviceFixture = new TestServiceFixture();
 
-    @Autowired
-    private DatabaseService databaseService;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Mock
-    private ProgressListener progressListener;
+	private static Database database;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	@Before
+	public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			doCreateDatabaseRepresentation();
+		}
+	}
 
-    private static Database database;
+	private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "sqlite-xerial", "-db",
+				"src/test/resources/integrationTesting/sqlite/database/chinook.db", "-s", "chinook", "-cat", "chinook",
+				"-o", "target/integrationtesting/sqlite", "-sso" };
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
+		final CommandLineArguments arguments = Arguments.parseArguments(args);
+		Config config = new Config(args);
+		serviceFixture.sqlService().connect(config);
+		Database database = new Database(serviceFixture.sqlService().getDbmsMeta(), arguments.getDatabaseName(),
+				arguments.getCatalog(), arguments.getSchema());
+		serviceFixture.databaseService().gatherSchemaDetails(config, database, null, progressListener);
+		this.database = database;
+	}
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "sqlite-xerial",
-                "-db", "src/test/resources/integrationTesting/sqlite/database/chinook.db",
-                "-s", "chinook",
-                "-cat", "chinook",
-                "-o", "target/integrationtesting/sqlite",
-                "-sso"
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        this.database = database;
-    }
+	@Test
+	public void databaseContainsTable() {
+		assertThat(database.getTables().size()).isEqualTo(11);
+	}
 
-    @Test
-    public void databaseContainsTable() {
-        assertThat(database.getTables().size()).isEqualTo(11);
-    }
-
-    @Test
-    public void databaseTablePlaylistsContainsPrimaryKey() {
-        assertThat(database.getTablesMap().get("playlists").getPrimaryColumns().size()).isGreaterThanOrEqualTo(1);
-    }
+	@Test
+	public void databaseTablePlaylistsContainsPrimaryKey() {
+		assertThat(database.getTablesMap().get("playlists").getPrimaryColumns().size()).isGreaterThanOrEqualTo(1);
+	}
 }
