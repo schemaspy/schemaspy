@@ -86,8 +86,6 @@ public class DotTableFormatter implements Relationships {
         Set<Table> tablesWritten = new HashSet<>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
-        DotConnectorFinder finder = new DotConnectorFinder();
-
         Name diagramName = new Degree(
             twoDegreesOfSeparation,
             new Implied(
@@ -101,13 +99,13 @@ public class DotTableFormatter implements Relationships {
         Factory factory = getFactory(table, true);
         Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
 
-        Set<DotConnector> connectors = new TreeSet<>(finder.getRelatedConnectors(table, includeImplied));
+        Set<DotConnector> connectors = new TreeSet<>(new DotConnectorFinder().getRelatedConnectors(table, includeImplied));
         tablesWritten.add(table);
 
         Map<Table, DotNode> nodes = new TreeMap<>();
 
         // Immediate relatives should be written first
-        writeImmediateRelatives(relatedTables, tablesWritten, nodes, connectors, finder);
+        writeImmediateRelatives(relatedTables, tablesWritten, nodes, connectors);
 
         Set<Table> allCousins = new HashSet<>();
         Set<DotConnector> allCousinConnectors = new TreeSet<>();
@@ -122,7 +120,7 @@ public class DotTableFormatter implements Relationships {
                     if (!tablesWritten.add(cousin))
                         continue; // already written
 
-                    allCousinConnectors.addAll(finder.getRelatedConnectors(cousin, relatedTable, false, includeImplied));
+                    allCousinConnectors.addAll(new DotConnectorFinder().getRelatedConnectors(cousin, relatedTable, false, includeImplied));
                     nodes.put(cousin, new DotNode(cousin, false, new DotNodeConfig(), dotConfig));
                 }
 
@@ -139,7 +137,7 @@ public class DotTableFormatter implements Relationships {
             iter.remove(); // cut down the combos as quickly as possible
 
             for (Table participantB : participants) {
-                for (DotConnector connector : finder.getRelatedConnectors(participantA, participantB, false, includeImplied)) {
+                for (DotConnector connector : new DotConnectorFinder().getRelatedConnectors(participantA, participantB, false, includeImplied)) {
                     if (twoDegreesOfSeparation && (allCousins.contains(participantA) || allCousins.contains(participantB))) {
                         allCousinConnectors.add(connector);
                     } else {
@@ -244,9 +242,10 @@ public class DotTableFormatter implements Relationships {
         Set<Table> relatedTables,
         Set<Table> tablesWritten,
         Map<Table, DotNode> nodes,
-        Set<DotConnector> connectors,
-        DotConnectorFinder finder
+        Set<DotConnector> connectors
     ) {
+        final DotConnectorFinder finder = new DotConnectorFinder();
+
         for (Table relatedTable : relatedTables) {
             if (!tablesWritten.contains(relatedTable)) {
                 DotNodeConfig nodeConfigurations = new DotNodeConfig(false, false);
