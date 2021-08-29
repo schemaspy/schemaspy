@@ -27,6 +27,8 @@ import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Default;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Included;
+import org.schemaspy.output.dot.schemaspy.connectors.PairConnectors;
+import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
 import org.schemaspy.output.dot.schemaspy.name.Degree;
 import org.schemaspy.output.dot.schemaspy.name.EmptyName;
 import org.schemaspy.output.dot.schemaspy.name.Implied;
@@ -99,7 +101,7 @@ public class DotTableFormatter implements Relationships {
         Factory factory = getFactory(table, true);
         Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
 
-        Set<DotConnector> connectors = new TreeSet<>(new DotConnectorFinder().getRelatedConnectors(table, includeImplied));
+        Set<DotConnector> connectors = new TreeSet<>(new SimpleConnectors(table, includeImplied).unique());
         tablesWritten.add(table);
 
         Map<Table, DotNode> nodes = new TreeMap<>();
@@ -120,7 +122,7 @@ public class DotTableFormatter implements Relationships {
                     if (!tablesWritten.add(cousin))
                         continue; // already written
 
-                    allCousinConnectors.addAll(new DotConnectorFinder().getRelatedConnectors(cousin, relatedTable, false, includeImplied));
+                    allCousinConnectors.addAll(new PairConnectors(cousin, relatedTable, false, includeImplied).unique());
                     nodes.put(cousin, new DotNode(cousin, false, new DotNodeConfig(), dotConfig));
                 }
 
@@ -137,7 +139,7 @@ public class DotTableFormatter implements Relationships {
             iter.remove(); // cut down the combos as quickly as possible
 
             for (Table participantB : participants) {
-                for (DotConnector connector : new DotConnectorFinder().getRelatedConnectors(participantA, participantB, false, includeImplied)) {
+                for (DotConnector connector : new PairConnectors(participantA, participantB, false, includeImplied).unique()) {
                     if (twoDegreesOfSeparation && (allCousins.contains(participantA) || allCousins.contains(participantB))) {
                         allCousinConnectors.add(connector);
                     } else {
@@ -244,14 +246,12 @@ public class DotTableFormatter implements Relationships {
         Map<Table, DotNode> nodes,
         Set<DotConnector> connectors
     ) {
-        final DotConnectorFinder finder = new DotConnectorFinder();
-
         for (Table relatedTable : relatedTables) {
             if (!tablesWritten.contains(relatedTable)) {
                 DotNodeConfig nodeConfigurations = new DotNodeConfig(false, false);
                 DotNode node = new DotNode(relatedTable, false, nodeConfigurations, dotConfig);
                 nodes.put(relatedTable, node);
-                connectors.addAll(finder.getRelatedConnectors(relatedTable, table, true, includeImplied));
+                connectors.addAll(new PairConnectors(relatedTable, table, true, includeImplied).unique());
             }
         }
 

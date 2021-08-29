@@ -24,6 +24,7 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -58,7 +59,6 @@ public class DotSummaryFormatter {
     }
 
     private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, PrintWriter dot) {
-        DotConnectorFinder finder = new DotConnectorFinder();
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
         boolean wroteImplied = false;
 
@@ -91,7 +91,7 @@ public class DotSummaryFormatter {
         Set<DotConnector> connectors = new TreeSet<>();
 
         for (DotNode node : nodes.values()) {
-            connectors.addAll(finder.getRelatedConnectors(node.getTable(), includeImplied));
+            connectors.addAll(new SimpleConnectors(node.getTable(), includeImplied).unique());
         }
 
         markExcludedColumns(nodes, stats.getExcludedColumns());
