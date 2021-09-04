@@ -114,20 +114,7 @@ public class DotTableFormatter implements Relationships {
 
         // next write 'cousins' (2nd degree of separation)
         if (twoDegreesOfSeparation) {
-            for (Table relatedTable : relatedTables) {
-                Factory cousinsFactory = getFactory(relatedTable, false);
-                Set<Table> cousins = getTableImmediateRelatives(relatedTable, cousinsFactory, includeImplied, skippedImpliedConstraints);
-
-                for (Table cousin : cousins) {
-                    if (!tablesWritten.add(cousin))
-                        continue; // already written
-
-                    allCousinConnectors.addAll(new PairConnectors(cousin, relatedTable, false, includeImplied).unique());
-                    nodes.put(cousin, new DotNode(cousin, false, new DotNodeConfig(), dotConfig));
-                }
-
-                allCousins.addAll(cousins);
-            }
+            writeCousins(relatedTables, skippedImpliedConstraints, tablesWritten, allCousinConnectors, nodes, allCousins);
         }
 
         // glue together any 'participants' that aren't yet connected
@@ -260,6 +247,29 @@ public class DotTableFormatter implements Relationships {
         for (DotConnector connector : connectors) {
             if (connector.pointsTo(table))
                 connector.connectToParentDetails();
+        }
+    }
+
+    private void writeCousins(
+        Set<Table> relatedTables,
+        Set<ForeignKeyConstraint> skippedImpliedConstraints,
+        Set<Table> tablesWritten,
+        Set<DotConnector> allCousinConnectors,
+        Map<Table, DotNode> nodes,
+        Set<Table> allCousins) {
+        for (Table relatedTable : relatedTables) {
+            Factory cousinsFactory = getFactory(relatedTable, false);
+            Set<Table> cousins = getTableImmediateRelatives(relatedTable, cousinsFactory, includeImplied, skippedImpliedConstraints);
+
+            for (Table cousin : cousins) {
+                if (!tablesWritten.add(cousin))
+                    continue; // already written
+
+                allCousinConnectors.addAll(new PairConnectors(cousin, relatedTable, false, includeImplied).unique());
+                nodes.put(cousin, new DotNode(cousin, false, new DotNodeConfig(), dotConfig));
+            }
+
+            allCousins.addAll(cousins);
         }
     }
 }
