@@ -27,6 +27,7 @@ import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Default;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Included;
+import org.schemaspy.output.dot.schemaspy.connectors.DotConnectors;
 import org.schemaspy.output.dot.schemaspy.connectors.PairConnectors;
 import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
 import org.schemaspy.output.dot.schemaspy.name.Degree;
@@ -256,17 +257,22 @@ public class DotTableFormatter implements Relationships {
         Set<Table> tablesWritten,
         Set<DotConnector> allCousinConnectors,
         Map<Table, DotNode> nodes,
-        Set<Table> allCousins) {
+        Set<Table> allCousins
+    ) {
         for (Table relatedTable : relatedTables) {
             Factory cousinsFactory = getFactory(relatedTable, false);
             Set<Table> cousins = getTableImmediateRelatives(relatedTable, cousinsFactory, includeImplied, skippedImpliedConstraints);
 
             for (Table cousin : cousins) {
-                if (!tablesWritten.add(cousin))
-                    continue; // already written
+                if (!tablesWritten.contains(cousin)) {
+                    tablesWritten.add(cousin);
 
-                allCousinConnectors.addAll(new PairConnectors(cousin, relatedTable, false, includeImplied).unique());
-                nodes.put(cousin, new DotNode(cousin, false, new DotNodeConfig(), dotConfig));
+                    final Set<DotConnector> connectors = new PairConnectors(cousin, relatedTable, false, includeImplied).unique();
+                    allCousinConnectors.addAll(connectors);
+
+                    final DotNode node = new DotNode(cousin, false, new DotNodeConfig(), dotConfig);
+                    nodes.put(cousin, node);
+                }
             }
 
             allCousins.addAll(cousins);
