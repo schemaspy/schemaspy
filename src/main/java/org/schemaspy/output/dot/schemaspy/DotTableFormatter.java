@@ -260,8 +260,7 @@ public class DotTableFormatter implements Relationships {
         Set<Table> allCousins
     ) {
         for (Table relatedTable : relatedTables) {
-            Factory cousinsFactory = getFactory(relatedTable, false);
-            Set<Table> cousins = getTableImmediateRelatives(relatedTable, cousinsFactory, includeImplied, skippedImpliedConstraints);
+            Set<Table> cousins = cousinsOf(relatedTable, skippedImpliedConstraints);
 
             for (Table cousin : cousins) {
                 if (!tablesWritten.contains(cousin)) {
@@ -277,5 +276,10 @@ public class DotTableFormatter implements Relationships {
 
             allCousins.addAll(cousins);
         }
+    }
+
+    private Set<Table> cousinsOf(Table relatedTable, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
+        Factory cousinsFactory = getFactory(relatedTable, false);
+        return getTableImmediateRelatives(relatedTable, cousinsFactory, includeImplied, skippedImpliedConstraints);
     }
 }
