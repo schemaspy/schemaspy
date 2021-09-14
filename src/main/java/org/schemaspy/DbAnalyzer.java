@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author John Currier
@@ -44,89 +45,158 @@ import java.util.regex.Pattern;
  * @author Daniel Watt
  * @author Mårten Bohlin
  * @author Nils Petzaell
+ * @author Henri Chain
  */
 public class DbAnalyzer {
+    private static class Key extends LinkedHashSet<TableColumn> {
+        Key() {
+            super();
+        }
+
+        Key(TableColumn single) {
+            this();
+            add(single);
+        }
+
+        Key(Collection<TableColumn> columns) {
+            super(columns);
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	
     public static List<ImpliedForeignKeyConstraint> getImpliedConstraints(Collection<Table> tables) {
-        List<TableColumn> columnsWithoutParents = new ArrayList<>();
-        Map<DatabaseObject, Table> keyedTablesByPrimary = new TreeMap<>();
-        
+        // foreign table -> potential foreign column -> set of primary keys that it could reference, sorted by descending length
+        Map<Table, Map<TableColumn, SortedSet<Key>>> potentialParentsForColumnByTable = new HashMap<>();
+
+        // foreign table -> primary key -> set of possible foreign keys
+        Map<Table, Map<Key, Set<Key>>> potentialFKsByTable = new HashMap<>();
+
+        Comparator<Key> columnSizeComparator = Comparator.comparingInt((Key l) -> -l.size()).thenComparing(Set::hashCode);
+
+        // PK -> table
+        SortedMap<Key, Table> tablesByPrimary = new TreeMap<>(columnSizeComparator);
+
         // gather all the primary key columns and columns without parents
         for (Table table : tables) {
-            List<TableColumn> tablePrimaries = table.getPrimaryColumns();
-            if (tablePrimaries.size() == 1 || tablePrimaries.stream().anyMatch(t -> "LanguageId".equals(t.getName()))) { // can't match up multiples...yet...
-            	TableColumn tableColumn = tablePrimaries.get(0);
-                DatabaseObject primary = new DatabaseObject(tableColumn);
-                if (tableColumn.allowsImpliedChildren()) {
-                    // new primary key name/type 
-                    keyedTablesByPrimary.put(primary, table);
+            Key primaryKey = new Key(table.getPrimaryColumns());
+
+            // Add to list of primary keys if it allows implied children
+            if (!primaryKey.isEmpty()) {
+                if (primaryKey.stream().allMatch(TableColumn::allowsImpliedChildren)) {
+                    tablesByPrimary.put(primaryKey, table);
                 }
             }
 
-            //TODO fixed column name "LanguageId" should be moved to schemaspy properties
+            Map<TableColumn, SortedSet<Key>> columnsWithoutParents = new HashMap<>();
+
             for (TableColumn column : table.getColumns()) {
-                if (!column.isForeignKey() && !column.isPrimary() && column.allowsImpliedParents() && !"LanguageId".equals(column.getName()))
-                    columnsWithoutParents.add(column);
+                // Mark columns that are not a foreign key, and either part of a composite primary key or not the primary key,
+                // as potential foreign keys to another table
+                if (!column.isForeignKey() && (!column.isPrimary() || column.getTable().getPrimaryColumns().size() > 1))
+                    columnsWithoutParents.put(column, new TreeSet<>(columnSizeComparator));
+            }
+            potentialParentsForColumnByTable.put(table, columnsWithoutParents);
+
+            potentialFKsByTable.put(table, new HashMap<>());
+        }
+
+        // The return value
+        List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<>();
+
+        // Look at all primary keys, and try to match them with all potential FK columns
+        for (Map.Entry<Key, Table> entry : tablesByPrimary.entrySet()) {
+            Key primaryKey = entry.getKey();
+            Table primaryTable = entry.getValue();
+
+            // Go through all tables with potential FK columns
+            for (Map.Entry<Table, Map<TableColumn, SortedSet<Key>>> e : potentialParentsForColumnByTable.entrySet()) {
+                Table foreignTable = e.getKey();
+                if (foreignTable == primaryTable) {
+                    continue;
+                }
+                Map<Key, Set<Key>> potentialFKs = potentialFKsByTable.get(foreignTable);
+
+                Map<TableColumn, SortedSet<Key>> potentialParentsForColumn = e.getValue();
+                Key matchingColumns = new Key();
+
+                // Try to match each PK column to a potential FK column of foreignTable
+                for (TableColumn parentColumn : primaryKey) {
+                    for (TableColumn childColumn : potentialParentsForColumn.keySet()) {
+                        if (childColumn.getName().compareToIgnoreCase(parentColumn.getName()) == 0
+                                // if adress_id=adress_id OR shipping_adress_id like &description%_adress_id
+                                || childColumn.getName().matches("(?i).*_" + Pattern.quote(parentColumn.getName()))
+                                // if order.adressid=>adress.id. find FKs that made from %parentTablename%PKcol%
+                                // if order.adress_id=>adress.id. find FKs that made from %tablename%_%PKcol%
+                                || childColumn.getName().matches("(?i)" + Pattern.quote(primaryTable.getName()) + ".*" + Pattern.quote(parentColumn.getName()))
+                        ) {
+                            // check if columnTypes Or ColumnTypeNames are same.
+                            if ((childColumn.getType() != null && parentColumn.getType() != null
+                                    && childColumn.getType().compareTo(parentColumn.getType()) == 0)
+                                    || childColumn.getTypeName().compareToIgnoreCase(parentColumn.getTypeName()) == 0) {
+                                // check if column lengths are same.
+                                if (childColumn.getLength() - parentColumn.getLength() == 0) {
+                                    matchingColumns.add(childColumn);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // If we found a match in foreignTable for each of the primaryTable PK columns,
+                // Then add the PK as a potential match for the each of the corresponding foreignTable columns
+                if (matchingColumns.size() == primaryKey.size()) {
+                    for (TableColumn matchingColumn : matchingColumns) {
+                        potentialParentsForColumn.get(matchingColumn).add(primaryKey);
+                    }
+
+                    potentialFKs.putIfAbsent(primaryKey, new HashSet<>());
+                    potentialFKs.get(primaryKey).add(matchingColumns);
+                }
             }
         }
 
-        sortColumnsByTable(columnsWithoutParents);
-        List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<>();
-        
-        for (TableColumn childColumn : columnsWithoutParents) {
-            DatabaseObject columnWithoutParent = new DatabaseObject(childColumn);
-            
-            // search for Parent(PK) table
-        	Table primaryTable = null;
-        	Integer numPrimaryTableFound=0;
-			for (Map.Entry<DatabaseObject, Table> entry : keyedTablesByPrimary.entrySet()) {
-				DatabaseObject key = entry.getKey();
-				if (columnWithoutParent.getName().compareToIgnoreCase(key.getName()) == 0
-						// if adress_id=adress_id OR shipping_adress_id like &description%_adress_id
-						|| columnWithoutParent.getName().matches("(?i).*_" + Pattern.quote(key.getName()))
-						// if order.adressid=>adress.id. find FKs that made from %parentTablename%PKcol%
-						// if order.adress_id=>adress.id. find FKs that made from %tablename%_%PKcol%
-						|| columnWithoutParent.getName().matches("(?i)" + Pattern.quote(entry.getValue().getName()) + ".*" + Pattern.quote(key.getName()))
-						) {
-					// check f columnTypes Or ColumnTypeNames are same.
-					if ((columnWithoutParent.getType() != null && key.getType() != null
-							&& columnWithoutParent.getType().compareTo(key.getType()) == 0)
-							|| columnWithoutParent.getTypeName().compareToIgnoreCase(key.getTypeName()) == 0) {
-						// check if column lengths are same.
-						if (columnWithoutParent.getLength() - key.getLength() == 0) {
-							// found parent table.
-							primaryTable = entry.getValue();
-							numPrimaryTableFound++;
-							// if child column refrencing multiple PK(Parent) tables then dont create implied relationship and exit the loop.
-							// one column can reference only one parent table.! 
-							if (numPrimaryTableFound>1) {
-								primaryTable=null;
-								break;
-							}
-						}
-					}
-				}
-			}
-            
-            if (primaryTable != null && primaryTable != childColumn.getTable()) {
-                //Optional<DatabaseObject> databaseObject = primaryColumns.stream().filter(d-> d.getName().equals(primaryTable.getName())).findFirst();
-                //if (databaseObject.isPresent()) {
-                //    TableColumn parentColumn = primaryTable.getColumn(databaseObject.get().getOrginalName());
-            	
-            	// // can't match up multiples...yet...==> so checks only first  PK column.
-            	TableColumn parentColumn = primaryTable.getPrimaryColumns().get(0);
-                // make sure the potential child->parent relationships isn't already a
-                // parent->child relationship
-                if (parentColumn.getParentConstraint(childColumn) == null) {
-                    // ok, we've found a potential relationship with a column matches a primary
-                    // key column in another table and isn't already related to that column
-                    impliedConstraints.add(new ImpliedForeignKeyConstraint(parentColumn, childColumn));
+        // Evaluate all the potential matches
+        for (Map.Entry<Table, Map<TableColumn, SortedSet<Key>>> e : potentialParentsForColumnByTable.entrySet()) {
+            Table childTable = e.getKey();
+            Map<TableColumn, SortedSet<Key>> potentialParentsForColumn = e.getValue();
+            Map<Key, Set<Key>> potentialFKs = potentialFKsByTable.get(childTable);
+
+            for (Map.Entry<TableColumn, SortedSet<Key>> e2 : potentialParentsForColumn.entrySet()) {
+                TableColumn childColumn = e2.getKey();
+                SortedSet<Key> primaryKeys = e2.getValue();
+                if (!primaryKeys.isEmpty()) {
+                    int maxSize = primaryKeys.first().size();
+                    // Remove all matches that are less than the max size
+                    for (Key primaryKey : primaryKeys) {
+                        if (primaryKey.size() < maxSize) {
+                            potentialFKs.get(primaryKey).removeIf(fk -> fk.contains(childColumn));
+                        }
+                    }
+                    primaryKeys.removeIf(primaryKey -> primaryKey.size() < maxSize);
+
+                    // If there is more than one possible target table, ignore all the matches
+                    Set<Table> parentTables = primaryKeys.stream().map(p -> p.iterator().next().getTable()).collect(Collectors.toSet());
+                    if (parentTables.size() > 1) {
+                        for (Key primaryKey : primaryKeys) {
+                            potentialFKs.get(primaryKey).removeIf(fk -> fk.contains(childColumn));
+                        }
+                        primaryKeys.clear();
+                    }
                 }
-                //}
             }
         }
-        
+
+        for (Map<Key, Set<Key>> potentials : potentialFKsByTable.values()) {
+            for (Map.Entry<Key, Set<Key>> potential : potentials.entrySet()) {
+                Key primary = potential.getKey();
+                Set<Key> foreigns = potential.getValue();
+                for (Key foreign : foreigns) {
+                    impliedConstraints.add(new ImpliedForeignKeyConstraint(new ArrayList<>(primary), new ArrayList<>(foreign)));
+                }
+            }
+        }
 
         return impliedConstraints;
     }
