@@ -43,7 +43,7 @@ public class ColumnService {
     public void gatherColumns(Table table) throws SQLException {
         initColumns(table);
         if (!(table.isView() || table.isRemote())) {
-            initColumnAutoUpdate(table, false);
+            initColumnAutoUpdate(table, true);
         }
     }
 
@@ -129,15 +129,15 @@ public class ColumnService {
         // so we can ask if the columns are auto updated
         // Ugh!!!  Should have been in DatabaseMetaData instead!!!
         StringBuilder sql = new StringBuilder("select * from ");
-        sql.append(sqlService.getQualifiedTableName(
-                table.getCatalog(),
-                table.getSchema(),
-                table.getName(),
-                forceQuotes)
-        );
+        String tableName=sqlService.getQualifiedTableName(
+            table.getCatalog(),
+            table.getSchema(),
+            table.getName(),
+            forceQuotes);
+        sql.append(tableName);
 
         sql.append(" where 0 = 1");
-
+        //LOGGER.info("SQL:"+sql.toString());
         try (PreparedStatement stmt = sqlService.getDatabaseMetaData().getConnection().prepareStatement(sql.toString());
              ResultSet rs = stmt.executeQuery()) {
 
@@ -146,7 +146,7 @@ public class ColumnService {
                 String columnName = rsMeta.getColumnName(i);
                 TableColumn column = getColumn(table, columnName);
                 if (Objects.isNull(column)) {
-                    throw new InconsistencyException("Column information from DatabaseMetaData differs from ResultSetMetaData, expected to find column named: '"+ columnName + "' in " + listColumns(table));
+                    throw new InconsistencyException("Column information from DatabaseMetaData differs from ResultSetMetaData, expected to find column named: '"+ columnName + "' in columns" + listColumns(table) +" of table: "+tableName);
                 }
                 column.setIsAutoUpdated(rsMeta.isAutoIncrement(i));
             }
