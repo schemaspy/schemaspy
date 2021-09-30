@@ -92,6 +92,7 @@ public class MustacheSummaryDiagramFactory {
             }
             // real relationships exist so generate the 'big' form of the relationships .dot file
             generateRealLarge(database, tables, showDetailedTables, diagrams, outputExceptions, stats);
+            generateFull(database, tables, showDetailedTables, diagrams, outputExceptions, stats);
         } else {
             Files.deleteIfExists(realCompactDot.toPath());
         }
@@ -123,6 +124,19 @@ public class MustacheSummaryDiagramFactory {
             outputExceptions.add(new OutputException(FAILED_DOT + realLargeDot.toString(), ioexception));
         } catch (DiagramException diagramException) {
             outputExceptions.add(new OutputException(FAILED_DIAGRAM + realLargeDot.toString(), diagramException));
+        }
+    }
+
+    private void generateFull(Database database, Collection<Table> tables, boolean showDetailedTables, List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions, WriteStats stats) {
+        File fullDot = summaryDir.resolve(FILE_PREFIX + ".full.dot").toFile();
+        try (PrintWriter out = Writers.newPrintWriter(fullDot)) {
+            dotProducer.writeSummaryFullRelationships(database, tables, false, showDetailedTables, stats, out);
+            MustacheTableDiagram fullDiagram = mustacheDiagramFactory.generateSummaryDiagram("Full", fullDot, FILE_PREFIX + ".full");
+            diagrams.add(fullDiagram);
+        } catch (IOException ioexception) {
+            outputExceptions.add(new OutputException(FAILED_DOT + fullDot.toString(), ioexception));
+        } catch (DiagramException diagramException) {
+            outputExceptions.add(new OutputException(FAILED_DIAGRAM + fullDot.toString(), diagramException));
         }
     }
 
