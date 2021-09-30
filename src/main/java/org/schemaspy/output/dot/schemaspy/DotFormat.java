@@ -57,7 +57,7 @@ public class DotFormat {
         dot.println("    ranksep=\"0.46\"");
         dot.println("    fontname=\"" + dotConfig.getFont() + "\"");
         dot.println("    fontsize=\"" + dotConfig.getFontSize() + "\"");
-        dot.println("    ration=\"compress\"");
+        dot.println("    ratio=\"compress\"");
         dot.println("  ];");
         dot.println("  node [");
         dot.println("    fontname=\"" + dotConfig.getFont() + "\"");
