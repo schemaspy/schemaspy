@@ -92,7 +92,7 @@ public class MustacheSummaryDiagramFactory {
             }
             // real relationships exist so generate the 'big' form of the relationships .dot file
             generateRealLarge(database, tables, showDetailedTables, diagrams, outputExceptions, stats);
-            generateFull(database, tables, showDetailedTables, diagrams, outputExceptions, stats);
+            generateRealFull(database, tables, showDetailedTables, diagrams, outputExceptions, stats);
         } else {
             Files.deleteIfExists(realCompactDot.toPath());
         }
@@ -127,16 +127,16 @@ public class MustacheSummaryDiagramFactory {
         }
     }
 
-    private void generateFull(Database database, Collection<Table> tables, boolean showDetailedTables, List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions, WriteStats stats) {
-        File fullDot = summaryDir.resolve(FILE_PREFIX + ".full.dot").toFile();
-        try (PrintWriter out = Writers.newPrintWriter(fullDot)) {
+    private void generateRealFull(Database database, Collection<Table> tables, boolean showDetailedTables, List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions, WriteStats stats) {
+        File realFullDot = summaryDir.resolve(FILE_PREFIX + ".real.full.dot").toFile();
+        try (PrintWriter out = Writers.newPrintWriter(realFullDot)) {
             dotProducer.writeSummaryFullRelationships(database, tables, false, showDetailedTables, stats, out);
-            MustacheTableDiagram fullDiagram = mustacheDiagramFactory.generateSummaryDiagram("Full", fullDot, FILE_PREFIX + ".full");
-            diagrams.add(fullDiagram);
+            MustacheTableDiagram realFullDiagram = mustacheDiagramFactory.generateSummaryDiagram("Full", realFullDot, FILE_PREFIX + ".real.full");
+            diagrams.add(realFullDiagram);
         } catch (IOException ioexception) {
-            outputExceptions.add(new OutputException(FAILED_DOT + fullDot.toString(), ioexception));
+            outputExceptions.add(new OutputException(FAILED_DOT + realFullDot.toString(), ioexception));
         } catch (DiagramException diagramException) {
-            outputExceptions.add(new OutputException(FAILED_DIAGRAM + fullDot.toString(), diagramException));
+            outputExceptions.add(new OutputException(FAILED_DIAGRAM + realFullDot.toString(), diagramException));
         }
     }
 
