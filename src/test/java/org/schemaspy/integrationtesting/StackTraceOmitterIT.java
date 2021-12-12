@@ -18,58 +18,39 @@
  */
 package org.schemaspy.integrationtesting;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class StackTraceOmitterIT {
 
-    @Rule
-    public LoggingRule loggingRule = new LoggingRule();
+	@Rule
+	public LoggingRule loggingRule = new LoggingRule();
 
-    @Autowired
-    private SchemaSpyRunner schemaSpyRunner;
+	private SchemaSpyRunner schemaSpyRunner = new SchemaSpyRunner();
 
-    @Autowired
-    private LoggingSystem loggingSystem;
+	@Test
+	@Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
+	public void noStacktraceWhenLoggingIsOf() {
+		schemaSpyRunner.run(new String[] { "-sso", "-o", "target/somefolder", "-t", "doesnt-exist" });
+		String log = loggingRule.getLog();
+		assertThat(log).isNotEmpty();
+		assertThat(log).doesNotContain("Caused by:");
+	}
 
-    @Test
-    @DirtiesContext
-    @Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
-    public void noStacktraceWhenLoggingIsOf() {
-        schemaSpyRunner.run(new String[] {"-sso","-o","target/somefolder", "-t", "doesnt-exist"});
-        String log = loggingRule.getLog();
-        assertThat(log).isNotEmpty();
-        assertThat(log).doesNotContain("Caused by:");
-    }
-
-    @Test
-    @DirtiesContext
-    @Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
-    public void stacktraceWhenLoggingIsOn() {
-        try {
-            schemaSpyRunner.run(new String[]{"-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug"});
-            String log = loggingRule.getLog();
-            assertThat(log).isNotEmpty();
-            assertThat(log).contains("Caused by:");
-        } finally {
-            loggingSystem.setLogLevel("org.schemaspy", LogLevel.INFO);
-        }
-    }
+	@Test
+	@Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
+	public void stacktraceWhenLoggingIsOn() {
+		schemaSpyRunner.run(new String[] { "-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug" });
+		String log = loggingRule.getLog();
+		assertThat(log).isNotEmpty();
+		assertThat(log).contains("Caused by:");
+	}
 }

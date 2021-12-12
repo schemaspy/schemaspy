@@ -18,115 +18,88 @@
  */
 package org.schemaspy.integrationtesting.mysql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.integrationtesting.MysqlSuite;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MySQLContainer;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
-import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import javax.script.ScriptException;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.MysqlSuite;
+import org.schemaspy.integrationtesting.TestServiceFixture;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.testcontainers.containers.MySQLContainer;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
+
 public class MysqlSchemaLeakageIT {
 
-    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","schema_leakage");
+	private static final Path outputPath = Paths.get("target", "testout", "integrationtesting", "mysql",
+			"schema_leakage");
 
-    @Autowired
-    private SqlService sqlService;
+	private final TestServiceFixture serviceFixture = new TestServiceFixture();
 
-    @Autowired
-    private DatabaseService databaseService;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Mock
-    private ProgressListener progressListener;
+	@Mock
+	private CommandLineArguments arguments;
 
-    @MockBean
-    private CommandLineArguments arguments;
+	private static Database database;
 
-    @MockBean
-    private CommandLineRunner commandLineRunner;
+	@SuppressWarnings("unchecked")
+	@ClassRule
+	public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule = new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
+			MysqlSuite.jdbcContainerRule,
+			new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5")).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent()).withQueryString("?useSSL=false")
+					.withInitScript("integrationTesting/mysql/dbScripts/mysql_table_view_collision.sql")
+					.withInitUser("root", "test"));
 
-    private static Database database;
+	@Before
+	public synchronized void createDatabaseRepresentation()
+			throws SQLException, IOException, ScriptException, URISyntaxException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			doCreateDatabaseRepresentation();
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
-                    MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withQueryString("?useSSL=false")
-                            .withInitScript("integrationTesting/mysql/dbScripts/mysql_table_view_collision.sql")
-                            .withInitUser("root", "test")
-            );
+	private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "mysql", "-db", "schemaleak", "-s", "schemaleak", "-cat", "%", "-u", "testUser", "-p",
+				"password", "-host", jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getMappedPort(3306).toString(), "-o", outputPath.toString(),
+				"-connprops", "useSSL\\=false" };
+		given(arguments.getOutputDirectory()).willReturn(outputPath.toFile());
+		given(arguments.getDatabaseType()).willReturn("mysql");
+		given(arguments.getUser()).willReturn("testUser");
+		given(arguments.getSchema()).willReturn("schemaleak");
+		given(arguments.getCatalog()).willReturn("%");
+		given(arguments.getDatabaseName()).willReturn("schemaleak");
+		Config config = new Config(args);
+		serviceFixture.sqlService().connect(config);
+		Database database = new Database(serviceFixture.sqlService().getDbmsMeta(), arguments.getDatabaseName(),
+				arguments.getCatalog(), arguments.getSchema());
+		serviceFixture.databaseService().gatherSchemaDetails(config, database, null, progressListener);
+		MysqlSchemaLeakageIT.database = database;
+	}
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "mysql",
-                "-db", "schemaleak",
-                "-s", "schemaleak",
-                "-cat", "%",
-                "-u", "testUser",
-                "-p", "password",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
-                "-o", outputPath.toString(),
-                "-connprops", "useSSL\\=false"
-        };
-        given(arguments.getOutputDirectory()).willReturn(outputPath.toFile());
-        given(arguments.getDatabaseType()).willReturn("mysql");
-        given(arguments.getUser()).willReturn("testUser");
-        given(arguments.getSchema()).willReturn("schemaleak");
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn("schemaleak");
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        MysqlSchemaLeakageIT.database = database;
-    }
-
-    @Test
-    public void shouldHaveNoViews() {
-        assertThat(database.getViews().size()).isEqualTo(0);
-    }
+	@Test
+	public void shouldHaveNoViews() {
+		assertThat(database.getViews().size()).isEqualTo(0);
+	}
 }

@@ -20,55 +20,52 @@
  */
 package org.schemaspy.cli;
 
-import com.beust.jcommander.IDefaultProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
 
+import com.beust.jcommander.IDefaultProvider;
+
 /**
- * Implementation of {@link IDefaultProvider} that provides values reading from a {@link Properties} file.
+ * Implementation of {@link IDefaultProvider} that provides values reading from
+ * a {@link Properties} file.
  *
- * TODO
- * JCommander already provides a com.beust.jcommander.defaultprovider.PropertyFileDefaultProvider.
- * But it always reports "cannot find file on classpath" although it exists. Maybe open an issue at the JCommander project?
+ * TODO JCommander already provides a
+ * com.beust.jcommander.defaultprovider.PropertyFileDefaultProvider. But it
+ * always reports "cannot find file on classpath" although it exists. Maybe open
+ * an issue at the JCommander project?
+ *
  * @author Thomas Traude
  * @author Daniel Watt
  * @author Nils Petzaell
  */
 public class PropertyFileDefaultProvider implements IDefaultProvider {
+	private final Properties properties;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	public PropertyFileDefaultProvider(String propertiesFilename) {
+		Objects.requireNonNull(propertiesFilename);
+		properties = loadProperties(propertiesFilename);
+	}
 
-    private final Properties properties;
+	private static Properties loadProperties(String path) {
+		try {
+			String contents = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+			Properties properties = new Properties();
+			// Replace backslashes with double backslashes to escape windows path separator.
+			// Example input: schemaspy.o=C:\tools\schemaspy\output
+			properties.load(new StringReader(contents.replace("\\", "\\\\")));
+			return properties;
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Could not find or load properties file: " + path, e);
+		}
+	}
 
-    public PropertyFileDefaultProvider(String propertiesFilename) {
-        Objects.requireNonNull(propertiesFilename);
-        properties = loadProperties(propertiesFilename);
-    }
-
-    private static Properties loadProperties(String path) {
-        try {
-            String contents = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
-            Properties properties = new Properties();
-            // Replace backslashes with double backslashes to escape windows path separator.
-            // Example input: schemaspy.o=C:\tools\schemaspy\output
-            properties.load(new StringReader(contents.replace("\\", "\\\\")));
-            return properties;
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Could not find or load properties file: " + path, e);
-        }
-    }
-
-    @Override
-    public String getDefaultValueFor(String optionName) {
-        return properties.getProperty(optionName);
-    }
+	@Override
+	public String getDefaultValueFor(String optionName) {
+		return properties.getProperty(optionName);
+	}
 }

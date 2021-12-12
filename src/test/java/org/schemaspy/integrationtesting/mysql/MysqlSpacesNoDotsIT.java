@@ -18,136 +18,118 @@
  */
 package org.schemaspy.integrationtesting.mysql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.integrationtesting.MysqlSuite;
-import org.schemaspy.model.*;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MySQLContainer;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.script.ScriptException;
+
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.Arguments;
+import org.schemaspy.integrationtesting.MysqlSuite;
+import org.schemaspy.integrationtesting.TestServiceFixture;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ForeignKeyConstraint;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+import org.schemaspy.model.TableIndex;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.testcontainers.containers.MySQLContainer;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class MysqlSpacesNoDotsIT {
 
-    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","spaces_no_dots");
+	private static final Path outputPath = Paths.get("target", "testout", "integrationtesting", "mysql",
+			"spaces_no_dots");
 
-    @Autowired
-    private SqlService sqlService;
+	private final TestServiceFixture serviceFixture = new TestServiceFixture();
 
-    @Autowired
-    private DatabaseService databaseService;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Mock
-    private ProgressListener progressListener;
+	private static Database database;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	@SuppressWarnings("unchecked")
+	@ClassRule
+	public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule = new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
+			MysqlSuite.jdbcContainerRule,
+			new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5")).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent()).withQueryString("?useSSL=false")
+					.withInitScript("integrationTesting/mysql/dbScripts/spacesnodotsit.sql")
+					.withInitUser("root", "test"));
 
-    private static Database database;
+	@Before
+	public synchronized void createDatabaseRepresentation()
+			throws SQLException, IOException, ScriptException, URISyntaxException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			doCreateDatabaseRepresentation();
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
-                    MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withQueryString("?useSSL=false")
-                            .withInitScript("integrationTesting/mysql/dbScripts/spacesnodotsit.sql")
-                            .withInitUser("root", "test")
-            );
+	private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "mysql", "-db", "TEST 1", "-s", "TEST 1", "-cat", "%", "-u", "test", "-p", "test",
+				"-host", jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getMappedPort(3306).toString(), "-o", outputPath.toString(),
+				"-connprops", "useSSL\\=false" };
+		final CommandLineArguments arguments = Arguments.parseArguments(args);
+		Config config = new Config(args);
+		serviceFixture.sqlService().connect(config);
+		Database database = new Database(serviceFixture.sqlService().getDbmsMeta(), arguments.getDatabaseName(),
+				arguments.getCatalog(), arguments.getSchema());
+		serviceFixture.databaseService().gatherSchemaDetails(config, database, null, progressListener);
+		MysqlSpacesNoDotsIT.database = database;
+	}
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
+	@Test
+	public void databaseShouldExist() {
+		assertThat(database).isNotNull();
+		assertThat(database.getName()).isEqualToIgnoringCase("TEST 1");
+	}
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "mysql",
-                "-db", "TEST 1",
-                "-s", "TEST 1",
-                "-cat", "%",
-                "-u", "test",
-                "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
-                "-o", outputPath.toString(),
-                "-connprops", "useSSL\\=false"
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        MysqlSpacesNoDotsIT.database = database;
-    }
+	@Test
+	public void databaseShouldHaveTable() {
+		assertThat(database.getTables()).extracting(Table::getName).contains("TABLE 1");
+	}
 
-    @Test
-    public void databaseShouldExist() {
-        assertThat(database).isNotNull();
-        assertThat(database.getName()).isEqualToIgnoringCase("TEST 1");
-    }
+	@Test
+	public void tableShouldHavePKWithAutoIncrement() {
+		assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("id");
+		assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isPrimary()).isTrue();
+		assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isAutoUpdated()).isTrue();
+	}
 
-    @Test
-    public void databaseShouldHaveTable() {
-        assertThat(database.getTables()).extracting(Table::getName).contains("TABLE 1");
-    }
+	@Test
+	public void tableShouldHaveForeignKey() {
+		assertThat(database.getTablesMap().get("TABLE 1").getForeignKeys()).extracting(ForeignKeyConstraint::getName)
+				.contains("link fk");
+	}
 
-    @Test
-    public void tableShouldHavePKWithAutoIncrement() {
-        assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("id");
-        assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isPrimary()).isTrue();
-        assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isAutoUpdated()).isTrue();
-    }
+	@Test
+	public void tableShouldHaveUniqueKey() {
+		assertThat(database.getTablesMap().get("TABLE 1").getIndexes()).extracting(TableIndex::getName)
+				.contains("name_link_unique");
+	}
 
-    @Test
-    public void tableShouldHaveForeignKey() {
-        assertThat(database.getTablesMap().get("TABLE 1").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
-    }
-
-    @Test
-    public void tableShouldHaveUniqueKey() {
-        assertThat(database.getTablesMap().get("TABLE 1").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
-    }
-
-    @Test
-    public void tableShouldHaveColumnWithSpaceInIt() {
-        assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("link id");
-    }
+	@Test
+	public void tableShouldHaveColumnWithSpaceInIt() {
+		assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName)
+				.contains("link id");
+	}
 }

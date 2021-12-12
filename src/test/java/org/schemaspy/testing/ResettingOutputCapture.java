@@ -18,35 +18,94 @@
  */
 package org.schemaspy.testing;
 
-import junit.framework.AssertionFailedError;
-import org.springframework.boot.test.rule.OutputCapture;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
 
-import java.lang.reflect.Field;
-import java.util.List;
+import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
 /**
  * @author Nils Petzaell
  */
-public class ResettingOutputCapture extends OutputCapture {
+public class ResettingOutputCapture implements TestRule {
+	private Matcher<String> matcher;
 
-    @Override
-    protected void releaseOutput() {
-        super.releaseOutput();
-        try {
-            clearMatchers();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new AssertionFailedError("Failed to clear 'matchers'");
-        }
-    }
+	@Override
+	public Statement apply(Statement base, Description description) {
+		return new RecordOutputStatement(base);
+	}
 
-    private void clearMatchers() throws NoSuchFieldException, IllegalAccessException {
-        Field matchersField = OutputCapture.class.getDeclaredField("matchers");
-        try {
-            matchersField.setAccessible(true);
-            List matchers = (List) matchersField.get(this);
-            matchers.clear();
-        } finally {
-            matchersField.setAccessible(false);
-        }
-    }
+	private class RecordOutputStatement extends Statement {
+		private final Statement next;
+
+		public RecordOutputStatement(Statement base) {
+			next = base;
+		}
+
+		@Override
+		public void evaluate() throws Throwable {
+			final StreamProcessor sp = new StreamProcessor();
+			sp.start();
+			next.evaluate();
+			checkIfMatches(sp.terminate());
+		}
+	}
+
+	private void checkIfMatches(String captured) {
+		MatcherAssert.assertThat(captured, matcher);
+	}
+
+	// Will run during test case execution and pipe log output through a buffer
+	private static class StreamProcessor extends Thread {
+		private final PipedInputStream pis;
+		private final PipedOutputStream pos;
+		private final PrintStream downstream;
+		private final StringBuilder content = new StringBuilder();
+
+		private StreamProcessor() {
+			downstream = System.out;
+			pos = new PipedOutputStream();
+			try {
+				pis = new PipedInputStream(pos);
+			} catch (IOException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
+		@Override
+		public void run() {
+			System.setOut(new PrintStream(pos));
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(pis));) {
+				while (true) {
+					String line = br.readLine();
+					if (line == null) {
+						return;
+					}
+					content.append(line).append("\n");
+					downstream.println(line);
+				}
+			} catch (IOException ex) {
+				throw new IllegalStateException(ex);
+			}
+		}
+
+		// reset stream
+		public String terminate() throws InterruptedException, IOException {
+			System.setOut(downstream);
+			pos.close();
+			join();
+			return content.toString();
+		}
+	}
+
+	public void expect(Matcher<String> matcher) {
+		this.matcher = matcher;
+	}
 }

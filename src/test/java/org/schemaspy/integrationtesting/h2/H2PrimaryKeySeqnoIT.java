@@ -18,24 +18,8 @@
  */
 package org.schemaspy.integrationtesting.h2;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.testing.H2MemoryRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,72 +27,66 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.TestServiceFixture;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.TableColumn;
+import org.schemaspy.testing.H2MemoryRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class H2PrimaryKeySeqnoIT {
+	private final TestServiceFixture serviceFixture = new TestServiceFixture();
 
-    @ClassRule
-    public static H2MemoryRule h2MemoryRule = new H2MemoryRule("pkorder").addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/pkordering.sql");
+	@ClassRule
+	public static H2MemoryRule h2MemoryRule = new H2MemoryRule("pkorder")
+			.addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/pkordering.sql");
 
-    @Autowired
-    private SqlService sqlService;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Autowired
-    private DatabaseService databaseService;
+	@Mock
+	private CommandLineArguments arguments;
 
-    @Mock
-    private ProgressListener progressListener;
+	private static Database database;
 
-    @MockBean
-    private CommandLineArguments arguments;
+	@Before
+	public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			doCreateDatabaseRepresentation();
+		}
+	}
 
-    @MockBean
-    private CommandLineRunner commandLineRunner;
+	private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "src/test/resources/integrationTesting/dbTypes/h2memory", "-db", "pkorder", "-s",
+				"pkorder", "-o", "target/testout/integrationtesting/h2/pkorder", "-u", "sa" };
+		given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/h2/pkorder"));
+		given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
+		given(arguments.getUser()).willReturn("sa");
+		given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());
+		given(arguments.getSchema()).willReturn(h2MemoryRule.getConnection().getSchema());
+		given(arguments.getDatabaseName()).willReturn("pkorder");
+		Config config = new Config(args);
+		serviceFixture.sqlService().connect(config);
+		Database database = new Database(serviceFixture.sqlService().getDbmsMeta(), arguments.getDatabaseName(),
+				arguments.getCatalog(), arguments.getSchema());
+		serviceFixture.databaseService().gatherSchemaDetails(config, database, null, progressListener);
+		H2PrimaryKeySeqnoIT.database = database;
+	}
 
-    private static Database database;
-
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
-                "-db", "pkorder",
-                "-s", "pkorder",
-                "-o", "target/testout/integrationtesting/h2/pkorder",
-                "-u", "sa"
-        };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/h2/pkorder"));
-        given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
-        given(arguments.getUser()).willReturn("sa");
-        given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());
-        given(arguments.getSchema()).willReturn(h2MemoryRule.getConnection().getSchema());
-        given(arguments.getDatabaseName()).willReturn("pkorder");
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        H2PrimaryKeySeqnoIT.database = database;
-    }
-
-    @Test
-    public void primaryKeysShouldBeInCorrectOrder() {
-        List<String> pkcolumnNames = database.getTablesMap().get("TABLE1").getPrimaryColumns().stream().map(TableColumn::getName).collect(Collectors.toList());
-        assertThat(pkcolumnNames).containsExactly("ZZ", "AA", "BB");
-    }
+	@Test
+	public void primaryKeysShouldBeInCorrectOrder() {
+		List<String> pkcolumnNames = database.getTablesMap().get("TABLE1").getPrimaryColumns().stream()
+				.map(TableColumn::getName).collect(Collectors.toList());
+		assertThat(pkcolumnNames).containsExactly("ZZ", "AA", "BB");
+	}
 }

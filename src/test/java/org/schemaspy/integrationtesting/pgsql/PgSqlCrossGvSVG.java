@@ -18,83 +18,66 @@
  */
 package org.schemaspy.integrationtesting.pgsql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.cli.SchemaSpyRunner;
-import org.schemaspy.integrationtesting.PgSqlSuite;
-import org.schemaspy.testing.SQLScriptsRunner;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.PostgreSQLContainer;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.integrationtesting.PgSqlSuite;
+import org.schemaspy.testing.SQLScriptsRunner;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 @Ignore
 public class PgSqlCrossGvSVG {
 
-    private Path outputPath = Paths.get("target","testout","integrationtesting","pgsql", "cross_gv_svg");
+	private Path outputPath = Paths.get("target", "testout", "integrationtesting", "pgsql", "cross_gv_svg");
 
-    private static URL expectedXML = PgSqlCrossGvSVG.class.getResource("/integrationTesting/pgsql/expecting/cross_gv_svg/htmlit.htmlit.xml");
-    private static URL expectedDeletionOrder = PgSqlCrossGvSVG.class.getResource("/integrationTesting/pgsql/expecting/cross_gv_svg/deletionOrder.txt");
-    private static URL expectedInsertionOrder = PgSqlCrossGvSVG.class.getResource("/integrationTesting/pgsql/expecting/cross_gv_svg/insertionOrder.txt");
+	private static URL expectedXML = PgSqlCrossGvSVG.class
+			.getResource("/integrationTesting/pgsql/expecting/cross_gv_svg/htmlit.htmlit.xml");
+	private static URL expectedDeletionOrder = PgSqlCrossGvSVG.class
+			.getResource("/integrationTesting/pgsql/expecting/cross_gv_svg/deletionOrder.txt");
+	private static URL expectedInsertionOrder = PgSqlCrossGvSVG.class
+			.getResource("/integrationTesting/pgsql/expecting/cross_gv_svg/insertionOrder.txt");
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
-                    PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/cross_schema_fk.sql", "\n\n\n"))
-            );
+	@SuppressWarnings("unchecked")
+	@ClassRule
+	public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule = new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
+			PgSqlSuite.jdbcContainerRule,
+			new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
+					.assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent()).withInitFunctions(
+							new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/cross_schema_fk.sql", "\n\n\n")));
 
-    @Autowired
-    private SchemaSpyRunner schemaSpyRunner;
+	private SchemaSpyRunner schemaSpyRunner = new SchemaSpyRunner();
 
-    private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
+	private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
-    @Before
-    public synchronized void generateHTML() throws Exception {
-        if (shouldRun.get()) {
-            String[] args = {
-                    "-t", "pgsql",
-                    "-db", "test",
-                    "-all",
-                    "-schemaSpec", "sch(a|b)",
-                    "-imageformat", "svg",
-                    "-cat", "%",
-                    "-o", outputPath.toString(),
-                    "-u", "test",
-                    "-p", "test",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                    "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
-            };
-            schemaSpyRunner.run(args);
-            shouldRun.set(false);
-        }
-    }
+	@Before
+	public synchronized void generateHTML() throws Exception {
+		if (shouldRun.get()) {
+			String[] args = { "-t", "pgsql", "-db", "test", "-all", "-schemaSpec", "sch(a|b)", "-imageformat", "svg",
+					"-cat", "%", "-o", outputPath.toString(), "-u", "test", "-p", "test", "-host",
+					jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+					jdbcContainerRule.getContainer().getMappedPort(5432).toString() };
+			schemaSpyRunner.run(args);
+			shouldRun.set(false);
+		}
+	}
 
-    @Test
-    public void verifyDiagramContent(){
+	@Test
+	public void verifyDiagramContent() {
 
-    }
+	}
 }

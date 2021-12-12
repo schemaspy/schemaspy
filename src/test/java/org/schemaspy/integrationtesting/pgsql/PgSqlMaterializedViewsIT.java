@@ -18,123 +18,97 @@
  */
 package org.schemaspy.integrationtesting.pgsql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.integrationtesting.PgSqlSuite;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.testing.SQLScriptsRunner;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.PostgreSQLContainer;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.integrationtesting.Arguments;
+import org.schemaspy.integrationtesting.PgSqlSuite;
+import org.schemaspy.integrationtesting.TestServiceFixture;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.testing.SQLScriptsRunner;
+import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class PgSqlMaterializedViewsIT {
 
-    private static final Path outputPath = Paths.get("target","testout","integrationtesting","pgsql","materialized_views");
+	private static final Path outputPath = Paths.get("target", "testout", "integrationtesting", "pgsql",
+			"materialized_views");
 
-    @Autowired
-    private SqlService sqlService;
+	private final TestServiceFixture serviceFixture = new TestServiceFixture();
 
-    @Autowired
-    private DatabaseService databaseService;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Mock
-    private ProgressListener progressListener;
+	private static Database database;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	@SuppressWarnings("unchecked")
+	@ClassRule
+	public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule = new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
+			PgSqlSuite.jdbcContainerRule,
+			new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
+					.assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
+					.withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/materialized_view.sql",
+							"\n\n\n")));
 
-    private static Database database;
+	@Before
+	public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			doCreateDatabaseRepresentation();
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
-                    PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/materialized_view.sql", "\n\n\n"))
-            );
+	private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "pgsql", "-db", "test", "-s", "mview", "-cat", "%", "-o", outputPath.toString(), "-u",
+				"test", "-p", "test", "-host", jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getMappedPort(5432).toString() };
+		final CommandLineArguments arguments = Arguments.parseArguments(args);
+		Config config = new Config(args);
+		serviceFixture.sqlService().connect(config);
+		Database database = new Database(serviceFixture.sqlService().getDbmsMeta(), arguments.getDatabaseName(),
+				arguments.getCatalog(), arguments.getSchema());
+		serviceFixture.databaseService().gatherSchemaDetails(config, database, null, progressListener);
+		PgSqlMaterializedViewsIT.database = database;
+	}
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
+	@Test
+	public void databaseShouldExist() {
+		assertThat(database).isNotNull();
+		assertThat(database.getName()).isEqualToIgnoringCase("test");
+	}
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "pgsql",
-                "-db", "test",
-                "-s", "mview",
-                "-cat", "%",
-                "-o", outputPath.toString(),
-                "-u", "test",
-                "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
-        PgSqlMaterializedViewsIT.database = database;
-    }
+	@Test
+	public void databaseShouldHaveTables() {
+		assertThat(database.getTables().size()).isEqualTo(1);
+		assertThat(database.getTablesMap().get("invoice")).isNotNull();
+	}
 
-    @Test
-    public void databaseShouldExist() {
-        assertThat(database).isNotNull();
-        assertThat(database.getName()).isEqualToIgnoringCase("test");
-    }
+	@Test
+	public void databaseShouldHaveView() {
+		assertThat(database.getViews().size()).isEqualTo(1);
+		assertThat(database.getViewsMap().get("sales_summary")).isNotNull();
+	}
 
-    @Test
-    public void databaseShouldHaveTables() {
-        assertThat(database.getTables().size()).isEqualTo(1);
-        assertThat(database.getTablesMap().get("invoice")).isNotNull();
-    }
-
-    @Test
-    public void databaseShouldHaveView() {
-        assertThat(database.getViews().size()).isEqualTo(1);
-        assertThat(database.getViewsMap().get("sales_summary")).isNotNull();
-    }
-
-    @Test
-    public void databaseShouldHaveMaterializedViewWithDefinition() {
-        assertThat(database.getViewsMap().get("sales_summary").getViewDefinition()).isNotEmpty();
-    }
+	@Test
+	public void databaseShouldHaveMaterializedViewWithDefinition() {
+		assertThat(database.getViewsMap().get("sales_summary").getViewDefinition()).isNotEmpty();
+	}
 }
