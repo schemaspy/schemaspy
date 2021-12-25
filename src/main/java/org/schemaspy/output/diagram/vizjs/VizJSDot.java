@@ -21,14 +21,15 @@ package org.schemaspy.output.diagram.vizjs;
 import org.apache.commons.io.IOUtils;
 import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.util.Writers;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
 public class VizJSDot implements DiagramProducer {
@@ -65,7 +66,7 @@ public class VizJSDot implements DiagramProducer {
         try {
             String dotSource = IOUtils.toString(dotFile.toURI().toURL(), StandardCharsets.UTF_8);
             String svg = toSvg(dotSource, MB_64);
-            try (FileWriter diagramWriter = new FileWriter(diagramFile)){
+            try (Writer diagramWriter = Writers.newBufferedWriter(diagramFile)){
                 IOUtils.write(svg, diagramWriter);
             }
             return "";
