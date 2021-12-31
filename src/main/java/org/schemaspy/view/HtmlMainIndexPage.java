@@ -23,6 +23,7 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
@@ -53,11 +54,11 @@ public class HtmlMainIndexPage {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MustacheCompiler mustacheCompiler;
-    private final String description;
+    private final Config config;
 
-    public HtmlMainIndexPage(MustacheCompiler mustacheCompiler, String description) {
+    public HtmlMainIndexPage(MustacheCompiler mustacheCompiler, Config config) {
         this.mustacheCompiler = mustacheCompiler;
-        this.description = description;
+        this.config = config;
     }
 
     public void write(Database database, Collection<Table> tables, List<? extends ForeignKeyConstraint> impliedConstraints, Writer writer) {
@@ -90,7 +91,10 @@ public class HtmlMainIndexPage {
                 .addToScope("anomaliesAmount", anomaliesAmount)
                 .addToScope("tables", mustacheTables)
                 .addToScope("database", database)
-                .addToScope("description", Markdown.toHtml(description, ""))
+                .addToScope("description", Markdown.toHtml(this.config.getDescription(), ""))
+                .addToScope("dbObjectPaging", !this.config.isNoDbObjectPaging())
+                .addToScope("dbObjectPageLength", this.config.getDbObjectPageLength())
+                .addToScope("dbObjectLengthChange", this.config.isDbObjectLengthChange())
                 .addToScope("schema", new MustacheSchema(database.getSchema(), ""))
                 .addToScope("catalog", new MustacheCatalog(database.getCatalog(), ""))
                 .addToScope("xmlName", getXmlName(database))

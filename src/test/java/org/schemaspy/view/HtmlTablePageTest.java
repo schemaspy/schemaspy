@@ -19,6 +19,7 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.Config;
 import org.schemaspy.model.Table;
 
 import java.io.StringWriter;
@@ -36,7 +37,8 @@ public class HtmlTablePageTest {
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
         MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig);
-        HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
+        Config config = new Config();
+        HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null, config);
         StringWriter writer = new StringWriter();
 
         Table table = mock(Table.class);
@@ -54,7 +56,8 @@ public class HtmlTablePageTest {
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isNumRowsEnabled()).thenReturn(false);
         MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig);
-        HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
+        Config config = new Config();
+        HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null, config);
         StringWriter writer = new StringWriter();
 
         Table table = mock(Table.class);

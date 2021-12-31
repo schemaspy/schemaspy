@@ -21,6 +21,7 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.Config;
 import org.schemaspy.model.Routine;
 import org.schemaspy.util.Markdown;
 import org.slf4j.Logger;
@@ -45,9 +46,11 @@ public class HtmlRoutinesPage {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MustacheCompiler mustacheCompiler;
+    private final Config config;
 
-    public HtmlRoutinesPage(MustacheCompiler mustacheCompiler) {
+    public HtmlRoutinesPage(MustacheCompiler mustacheCompiler, Config config) {
         this.mustacheCompiler = mustacheCompiler;
+        this.config = config;
     }
 
     public void write(Collection<Routine> routines, Writer writer) {
@@ -57,6 +60,9 @@ public class HtmlRoutinesPage {
                 .scriptName("routines.js")
                 .addToScope("routines", routines)
                 .addToScope("md2html", (Function<String,String>) md -> Markdown.toHtml(md, mustacheCompiler.getRootPath(0)))
+                .addToScope("routinePaging", !this.config.isNoRoutinePaging())
+                .addToScope("routinePageLength", this.config.getRoutinePageLength())
+                .addToScope("routineLengthChange", this.config.isRoutineLengthChange())
                 .getPageData();
 
         try {

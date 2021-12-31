@@ -22,6 +22,7 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +46,11 @@ public class HtmlMultipleSchemasIndexPage {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MustacheCompiler mustacheCompiler;
+    private final Config config;
 
-    public HtmlMultipleSchemasIndexPage(MustacheCompiler mustacheCompiler) {
+    public HtmlMultipleSchemasIndexPage(MustacheCompiler mustacheCompiler, Config config) {
         this.mustacheCompiler = mustacheCompiler;
+        this.config = config;
     }
 
     public void write(MustacheCatalog catalog, List<MustacheSchema> schemas, String description, String productName, Writer writer) {
@@ -63,6 +66,9 @@ public class HtmlMultipleSchemasIndexPage {
                 .addToScope("catalog", catalog)
                 .addToScope("schemasNumber", Integer.toString(schemas.size()))
                 .addToScope("isMultipleSchemas", true)
+                .addToScope("dbObjectPaging", !this.config.isNoDbObjectPaging())
+                .addToScope("dbObjectPageLength", this.config.getDbObjectPageLength())
+                .addToScope("dbObjectLengthChange", this.config.isDbObjectLengthChange())
                 .getPageData();
 
         try {

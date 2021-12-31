@@ -29,7 +29,13 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            <table id="standard_table" class="table table-bordered table-striped dataTable" role="grid">
+                            <table
+                                    id="standard_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="{{tablePaging}}"
+                                    data-page-length="{{tablePageLength}}"
+                                    data-length-change="{{tableLengthChange}}">
                                 <thead align='left'>
                                 <tr>
                                     <th>Column</th>
@@ -90,7 +96,13 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            <table id="indexes_table" class="table table-bordered table-striped dataTable" role="grid">
+                            <table
+                                    id="indexes_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="{{indexPaging}}"
+                                    data-page-length="{{indexPageLength}}"
+                                    data-length-change="{{indexLengthChange}}">
                                 <thead>
                                 <tr>
                                     <th>Constraint Name</th>
@@ -124,7 +136,13 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            <table id="check_table" class="table table-bordered table-striped dataTable" role="grid">
+                            <table
+                                    id="check_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="{{checkPaging}}"
+                                    data-page-length="{{checkPageLength}}"
+                                    data-length-change="{{checkLengthChange}}">
                                 <thead align='left'>
                                 <tr>
                                     <th>Constraint Name</th>

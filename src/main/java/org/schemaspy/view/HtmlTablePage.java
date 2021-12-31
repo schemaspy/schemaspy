@@ -24,6 +24,7 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.Config;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
@@ -53,10 +54,12 @@ public class HtmlTablePage {
 
     private final MustacheCompiler mustacheCompiler;
     private final SqlAnalyzer sqlAnalyzer;
+    private final Config config;
 
-    public HtmlTablePage(MustacheCompiler mustacheCompiler, SqlAnalyzer sqlAnalyzer) {
+    public HtmlTablePage(MustacheCompiler mustacheCompiler, SqlAnalyzer sqlAnalyzer, Config config) {
         this.mustacheCompiler = mustacheCompiler;
         this.sqlAnalyzer = sqlAnalyzer;
+        this.config = config;
     }
 
     public void write(Table table, List<MustacheTableDiagram> diagrams, Writer writer) {
@@ -92,6 +95,15 @@ public class HtmlTablePage {
                 .addToScope("diagrams", diagrams)
                 .addToScope("sqlCode", sqlCode(table))
                 .addToScope("references", sqlReferences(table))
+                .addToScope("tablePaging", !this.config.isNoTablePaging())
+                .addToScope("tablePageLength", this.config.getTablePageLength())
+                .addToScope("tableLengthChange", this.config.isTableLengthChange())
+                .addToScope("indexPaging", !this.config.isNoIndexPaging())
+                .addToScope("indexPageLength", this.config.getIndexPageLength())
+                .addToScope("indexLengthChange", this.config.isIndexLengthChange())
+                .addToScope("checkPaging", !this.config.isNoCheckPaging())
+                .addToScope("checkPageLength", this.config.getCheckPageLength())
+                .addToScope("checkLengthChange", this.config.isCheckLengthChange())
                 .depth(1)
                 .getPageData();
 

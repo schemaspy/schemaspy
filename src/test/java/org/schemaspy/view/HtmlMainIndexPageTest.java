@@ -19,15 +19,14 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.Config;
 import org.schemaspy.model.Catalog;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Schema;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.TreeSet;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -40,7 +39,9 @@ public class HtmlMainIndexPageTest {
         HtmlConfig htmlConfig = mock(HtmlConfig.class);
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig);
-        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, "normal *emp* **strong**");
+        Config config = new Config("-desc", "\"normal *emp* **strong**\"");
+        assertThat("normal *emp* **strong**").isEqualTo(config.getDescription());
+        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config);
         StringWriter writer = new StringWriter();
         Database database = mock(Database.class);
         when(database.getSchema()).thenReturn(new Schema("schema"));
@@ -56,7 +57,9 @@ public class HtmlMainIndexPageTest {
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isNumRowsEnabled()).thenReturn(false);
         MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsTrue", htmlConfig);
-        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, null);
+        Config config = new Config();
+        assertThat(Optional.empty()).isEqualTo(Optional.ofNullable(config.getDescription()));
+        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config);
         StringWriter writer = new StringWriter();
         Database database = mock(Database.class);
         when(database.getSchema()).thenReturn(new Schema("schema"));
@@ -72,7 +75,9 @@ public class HtmlMainIndexPageTest {
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
         MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsFalse", htmlConfig);
-        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, null);
+        Config config = new Config();
+        assertThat(Optional.empty()).isEqualTo(Optional.ofNullable(config.getDescription()));
+        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config);
         StringWriter writer = new StringWriter();
         Database database = mock(Database.class);
         when(database.getSchema()).thenReturn(new Schema("schema"));

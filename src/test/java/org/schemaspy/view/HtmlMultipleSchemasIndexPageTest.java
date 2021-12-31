@@ -20,6 +20,7 @@ package org.schemaspy.view;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.schemaspy.Config;
 import org.schemaspy.model.Catalog;
 
 import java.io.StringWriter;
@@ -41,7 +42,8 @@ public class HtmlMultipleSchemasIndexPageTest {
     @Test
     public void multiMainIndexShouldHaveDescription() {
         MustacheCompiler mustacheCompiler = new MustacheCompiler("withComment", htmlConfig);
-        HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
+        Config config = new Config();
+        HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler, config);
         StringWriter actual = new StringWriter();
         htmlMultipleSchemasIndexPage.write(new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),"A Description", "JAVA_TEST 1.0", actual);
         assertThat(actual.toString()).contains("<p>A Description</p>");
@@ -50,7 +52,8 @@ public class HtmlMultipleSchemasIndexPageTest {
     @Test
     public void multiMainIndexShouldNOTHaveDescription() {
         MustacheCompiler mustacheCompiler = new MustacheCompiler("noComment", htmlConfig);
-        HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
+        Config config = new Config();
+        HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler, config);
         StringWriter actual = new StringWriter();
         htmlMultipleSchemasIndexPage.write(new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),null, "JAVA_TEST 1.0", actual);
         assertThat(actual.toString()).doesNotContain("<p>A Description</p>");

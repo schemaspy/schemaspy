@@ -182,7 +182,7 @@ public class SchemaAnalyzer {
 
             prepareLayoutFiles(outputDir);
             MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config);
-            HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
+            HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler, config);
             try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
                 htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta), writer);
             }
@@ -371,7 +371,7 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config.getDescription());
+        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
             htmlMainIndexPage.write(db, tables, results.getImpliedConstraints(), writer);
         }
@@ -380,28 +380,28 @@ public class SchemaAnalyzer {
 
         List<ForeignKeyConstraint> constraints = DbAnalyzer.getForeignKeyConstraints(tables);
 
-        HtmlConstraintsPage htmlConstraintsPage = new HtmlConstraintsPage(mustacheCompiler);
+        HtmlConstraintsPage htmlConstraintsPage = new HtmlConstraintsPage(mustacheCompiler, config);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("constraints.html").toFile())) {
             htmlConstraintsPage.write(constraints, tables, writer);
         }
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
+        HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler, config);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("anomalies.html").toFile())) {
             htmlAnomaliesPage.write(tables, results.getImpliedConstraints(), writer);
         }
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlColumnsPage htmlColumnsPage = new HtmlColumnsPage(mustacheCompiler);
+        HtmlColumnsPage htmlColumnsPage = new HtmlColumnsPage(mustacheCompiler, config);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("columns.html").toFile())) {
             htmlColumnsPage.write(tables, writer);
         }
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
+        HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler, config);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines.html").toFile())) {
             htmlRoutinesPage.write(db.getRoutines(), writer);
         }
@@ -421,7 +421,7 @@ public class SchemaAnalyzer {
         LOGGER.info("Writing/diagramming details");
         SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getIdentifierQuoteString(), db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, commandLineArguments.getDegreeOfSeparation());
-        HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, sqlAnalyzer);
+        HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, sqlAnalyzer, config);
         for (Table table : tables) {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table, results.getStats());
             progressListener.graphingDetailsProgressed(table);

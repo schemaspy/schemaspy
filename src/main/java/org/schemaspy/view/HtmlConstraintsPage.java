@@ -23,6 +23,7 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.Config;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.slf4j.Logger;
@@ -50,9 +51,11 @@ public class HtmlConstraintsPage {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MustacheCompiler mustacheCompiler;
+    private final Config config;
 
-    public HtmlConstraintsPage(MustacheCompiler mustacheCompiler) {
+    public HtmlConstraintsPage(MustacheCompiler mustacheCompiler, Config config) {
         this.mustacheCompiler = mustacheCompiler;
+        this.config = config;
     }
 
     public void write(List<ForeignKeyConstraint> constraints, Collection<Table> tables, Writer writer) {
@@ -61,6 +64,12 @@ public class HtmlConstraintsPage {
                 .templateName("constraint.html")
                 .scriptName("constraint.js")
                 .addToScope("constraints", constraints)
+                .addToScope("fkPaging", !this.config.isNoFkPaging())
+                .addToScope("fkPageLength", this.config.getFkPageLength())
+                .addToScope("fkLengthChange", this.config.isFkLengthChange())
+                .addToScope("checkPaging", !this.config.isNoCheckPaging())
+                .addToScope("checkPageLength", this.config.getCheckPageLength())
+                .addToScope("checkLengthChange", this.config.isCheckLengthChange())
                 .addToScope("checkConstraints", collectCheckConstraints(tables))
                 .depth(0)
                 .getPageData();

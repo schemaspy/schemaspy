@@ -24,6 +24,7 @@ package org.schemaspy.view;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.schemaspy.Config;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.slf4j.Logger;
@@ -54,9 +55,11 @@ public class HtmlColumnsPage {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MustacheCompiler mustacheCompiler;
+    private final Config config;
 
-    public HtmlColumnsPage(MustacheCompiler mustacheCompiler) {
+    public HtmlColumnsPage(MustacheCompiler mustacheCompiler, Config config) {
         this.mustacheCompiler = mustacheCompiler;
+        this.config = config;
     }
 
     public void write(Collection<Table> tables, Writer writer) {
@@ -92,6 +95,9 @@ public class HtmlColumnsPage {
                 .templateName("column.html")
                 .scriptName("column.js")
                 .addToScope("tableData", columns.toString(4))
+                .addToScope("columnPaging", !this.config.isNoColumnPaging())
+                .addToScope("columnPageLength", this.config.getColumnPageLength())
+                .addToScope("columnLengthChange", this.config.isColumnLengthChange())
                 .depth(0)
                 .getPageData();
 

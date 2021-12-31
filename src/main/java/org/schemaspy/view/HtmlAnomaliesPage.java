@@ -22,6 +22,7 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
@@ -51,9 +52,11 @@ public class HtmlAnomaliesPage {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MustacheCompiler mustacheCompiler;
+    private final Config config;
 
-    public HtmlAnomaliesPage(MustacheCompiler mustacheCompiler) {
+    public HtmlAnomaliesPage(MustacheCompiler mustacheCompiler, Config config) {
         this.mustacheCompiler = mustacheCompiler;
+        this.config = config;
     }
 
     public void write(
@@ -75,6 +78,9 @@ public class HtmlAnomaliesPage {
                 .addToScope("oneColumnTables", oneColumnTables)
                 .addToScope("incrementingColumnNames", incrementingColumnNames)
                 .addToScope("uniqueNullables", uniqueNullables)
+                .addToScope("anomaliesPaging", !this.config.isNoAnomaliesPaging())
+                .addToScope("anomaliesPageLength", this.config.getAnomaliesPageLength())
+                .addToScope("anomaliesLengthChange", this.config.isAnomaliesLengthChange())
                 .depth(0)
                 .getPageData();
 

@@ -46,7 +46,13 @@
                             <span class="label label-primary pull-right"><i class="fa fa-database fa-2x"></i></span>
                         </div><!-- /.box-header -->
                         <div class="box-body">
-                            <table id="database_objects" class="table table-bordered table-striped dataTable" role="grid">
+                            <table
+                                    id="database_objects"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="{{dbObjectPaging}}"
+                                    data-page-length="{{dbObjectPageLength}}"
+                                    data-length-change="{{dbObjectLengthChange}}">
                                 <thead>
                                     <tr>
                                         <th valign="bottom">Schema</th>

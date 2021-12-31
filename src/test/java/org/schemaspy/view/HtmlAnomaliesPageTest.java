@@ -18,8 +18,8 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Rule;
 import org.junit.Test;
+import org.schemaspy.Config;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
@@ -28,7 +28,6 @@ import org.schemaspy.util.CaseInsensitiveMap;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -43,8 +42,8 @@ public class HtmlAnomaliesPageTest {
     }
 
     private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", htmlConfig);
-
-    private static HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
+    private static Config config = new Config();
+    private static HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler, config);
 
     @Test
     public void impliedRelationships() {
