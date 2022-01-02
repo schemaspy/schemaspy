@@ -19,8 +19,9 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
-import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Routine;
+import org.schemaspy.util.DataTableConfig;
 
 import java.io.StringWriter;
 import java.util.Collection;
@@ -36,9 +37,10 @@ public class HtmlRoutinesPageTest {
     public void markdownComment() {
         HtmlConfig htmlConfig = mock(HtmlConfig.class);
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig);
-        Config config = new Config();
-        HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler, config);
+        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
+        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig, dataTableConfig);
+        HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
         Collection<Routine> routines = Collections.singletonList(new Routine("ARoutine", "Function", "Integer", "SQL", "SELECT 1", true, "IMMUTABLE", "INVOKER", "normal *emp* **strong**"));
         StringWriter actual = new StringWriter();
 

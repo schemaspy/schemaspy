@@ -33,9 +33,9 @@
                                     id="standard_table"
                                     class="table table-bordered table-striped dataTable"
                                     role="grid"
-                                    data-paging="{{tablePaging}}"
-                                    data-page-length="{{tablePageLength}}"
-                                    data-length-change="{{tableLengthChange}}">
+                                    data-paging="{{dataTableConfig.standardTable.paging}}"
+                                    data-page-length="{{dataTableConfig.standardTable.pageLength}}"
+                                    data-length-change="{{dataTableConfig.standardTable.lengthChange}}">
                                 <thead align='left'>
                                 <tr>
                                     <th>Column</th>
@@ -100,9 +100,9 @@
                                     id="indexes_table"
                                     class="table table-bordered table-striped dataTable"
                                     role="grid"
-                                    data-paging="{{indexPaging}}"
-                                    data-page-length="{{indexPageLength}}"
-                                    data-length-change="{{indexLengthChange}}">
+                                    data-paging="{{dataTableConfig.indexesTable.paging}}"
+                                    data-page-length="{{dataTableConfig.indexesTable.pageLength}}"
+                                    data-length-change="{{dataTableConfig.indexesTable.lengthChange}}">
                                 <thead>
                                 <tr>
                                     <th>Constraint Name</th>
@@ -140,9 +140,9 @@
                                     id="check_table"
                                     class="table table-bordered table-striped dataTable"
                                     role="grid"
-                                    data-paging="{{checkPaging}}"
-                                    data-page-length="{{checkPageLength}}"
-                                    data-length-change="{{checkLengthChange}}">
+                                    data-paging="{{dataTableConfig.checkTable.paging}}"
+                                    data-page-length="{{dataTableConfig.checkTable.pageLength}}"
+                                    data-length-change="{{dataTableConfig.checkTable.lengthChange}}">
                                 <thead align='left'>
                                 <tr>
                                     <th>Constraint Name</th>

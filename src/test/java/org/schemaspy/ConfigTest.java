@@ -46,28 +46,6 @@ public class ConfigTest {
     }
 
     @Test
-    public void testDataTablesConfig() {
-        String[] args = ("-noDbObjectPaging -columnPageLength 45 -columnLengthChange -tablePageLength 20 " +
-                "-indexLengthChange -noCheckPaging -routineLengthChange")
-                .split(" ");
-        Config config = new Config(args);
-        assertThat(config.isNoDbObjectPaging()).isTrue();
-        assertThat(config.isNoCheckPaging()).isTrue();
-        assertThat(config.isNoIndexPaging()).isFalse();
-        assertThat(config.isNoRoutinePaging()).isFalse();
-
-        assertThat(config.getColumnPageLength()).isEqualTo(45);
-        assertThat(config.getTablePageLength()).isEqualTo(20);
-        assertThat(config.getDbObjectPageLength()).isEqualTo(50);
-        assertThat(config.getIndexPageLength()).isEqualTo(10);
-
-        assertThat(config.isIndexLengthChange()).isTrue();
-        assertThat(config.isRoutineLengthChange()).isTrue();
-        assertThat(config.isFkLengthChange()).isFalse();
-        assertThat(config.isDbObjectLengthChange()).isFalse();
-    }
-
-    @Test
     public void testLoadJars() {
         Config config = new Config("-loadjars", "true");
         assertThat(config.isLoadJDBCJarsEnabled()).isTrue();

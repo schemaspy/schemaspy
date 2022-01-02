@@ -19,8 +19,10 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
+import org.schemaspy.util.DataTableConfig;
 
 import java.io.StringWriter;
 import java.util.Collections;
@@ -39,7 +41,8 @@ public class HtmlRelationshipsPageTest {
         when(htmlConfig.isOneOfMultipleSchemas()).thenReturn(false);
         when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", htmlConfig);
+        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", htmlConfig, dataTableConfig);
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler);
         StringWriter writer = new StringWriter();
         MustacheSummaryDiagramResults mustacheSummaryDiagramResults = new MustacheSummaryDiagramResults(Collections.emptyList(), new WriteStats(Collections.emptyList()),true, Collections.emptyList(),Collections.singletonList(new OutputException("ERROR")));

@@ -19,11 +19,12 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
-import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.CaseInsensitiveMap;
+import org.schemaspy.util.DataTableConfig;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -39,11 +40,12 @@ public class HtmlAnomaliesPageTest {
     static {
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isOneOfMultipleSchemas()).thenReturn(false);
+        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
     }
 
-    private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", htmlConfig);
-    private static Config config = new Config();
-    private static HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler, config);
+    private static DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
+    private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", htmlConfig, dataTableConfig);
+    private static HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
 
     @Test
     public void impliedRelationships() {

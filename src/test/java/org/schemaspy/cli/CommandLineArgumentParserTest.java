@@ -231,6 +231,33 @@ public class CommandLineArgumentParserTest {
                 .isThrownBy(() ->parser.parse(args));
     }
 
+    @Test
+    public void testDataTablesConfig() {
+        String[] args = ("-o output/folder/ -u db_user " +
+                "-noDbObjectPaging -columnPageLength 45 -columnLengthChange -tablePageLength 20 " +
+                "-indexLengthChange -noCheckPaging -routineLengthChange")
+                .split(" ");
+
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(
+                new CommandLineArguments(), NO_DEFAULT_PROVIDER);
+        CommandLineArguments commandLine = parser.parse(args);
+
+        assertThat(commandLine.isNoDbObjectPaging()).isTrue();
+        assertThat(commandLine.isNoCheckPaging()).isTrue();
+        assertThat(commandLine.isNoIndexPaging()).isFalse();
+        assertThat(commandLine.isNoRoutinePaging()).isFalse();
+
+        assertThat(commandLine.getColumnPageLength()).isEqualTo(45);
+        assertThat(commandLine.getTablePageLength()).isEqualTo(20);
+        assertThat(commandLine.getDbObjectPageLength()).isEqualTo(50);
+        assertThat(commandLine.getIndexPageLength()).isEqualTo(10);
+
+        assertThat(commandLine.isIndexLengthChange()).isTrue();
+        assertThat(commandLine.isRoutineLengthChange()).isTrue();
+        assertThat(commandLine.isFkLengthChange()).isFalse();
+        assertThat(commandLine.isDbObjectLengthChange()).isFalse();
+    }
+
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.
 
     // given only parameter -configFile without value -> error
