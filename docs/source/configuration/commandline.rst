@@ -105,6 +105,101 @@ Html report related
 [-desc description]
     Add a description to the index page.
 
+DataTables related
+------------------
+
+Parameters for *Tables* table in *src/main/resources/layout/main.html*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[-noDbObjectPaging]
+    List data in table with no paging, i.e. all data in a single list.
+
+[-dbObjectPageLength number]
+    The number of items to list per page, if paging is enabled.
+
+[-dbObjectLengthChange]
+    Allow user of the webpage to change the number of items per page using a dropdown menu.
+
+Parameters for *Columns* table in *src/main/resources/layout/tables/table.html*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[-noTablePaging]
+    List data in table with no paging, i.e. all data in a single list.
+
+[-tablePageLength number]
+    The number of items to list per page, if paging is enabled.
+
+[-tableLengthChange]
+    Allow user of the webpage to change the number of items per page using a dropdown menu.
+
+Parameters for *Indexes* table in *src/main/resources/layout/tables/{table_name}.html*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[-noIndexPaging]
+    List data in table with no paging, i.e. all data in a single list.
+
+[-indexPageLength number]
+    The number of items to list per page, if paging is enabled.
+
+[-indexLengthChange]
+    Allow user of the webpage to change the number of items per page using a dropdown menu.
+
+Parameters for *Check Constraints* table in *src/main/resources/layout/tables/table.html* and *src/main/resources/layout/constraint.html*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[-noCheckPaging]
+    List data in table with no paging, i.e. all data in a single list.
+
+[-checkPageLength number]
+    The number of items to list per page, if paging is enabled.
+
+[-checkLengthChange]
+    Allow user of the webpage to change the number of items per page using a dropdown menu.
+
+Parameters for *Routines* table in *src/main/resources/layout/routines.html*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[-noRoutinePaging]
+    List data in table with no paging, i.e. all data in a single list.
+
+[-routinePageLength number]
+    The number of items to list per page, if paging is enabled.
+
+[-routineLengthChange]
+    Allow user of the webpage to change the number of items per page using a dropdown menu.
+
+Parameters for *Foreign Key Constraints* table in src/main/resources/layout/constraint.html
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[-noFkPaging]
+    List data in table with no paging, i.e. all data in a single list.
+
+[-fkPageLength number]
+    The number of items to list per page, if paging is enabled.
+
+[-fkLengthChange]
+    Allow user of the webpage to change the number of items per page using a dropdown menu.
+
+Parameters for *Columns* table in *src/main/resources/layout/column.html*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[-noColumnPaging]
+    List data in table with no paging, i.e. all data in a single list.
+
+[-columnPageLength number]
+    The number of items to list per page, if paging is enabled.
+
+[-columnLengthChange]
+    Allow user of the webpage to change the number of items per page using a dropdown menu.
+
+Parameters for *all* tables in *src/main/resources/layout/anomalies.html*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[-noAnomaliesPaging]
+    List data in table with no paging, i.e. all data in a single list.
+
+[-anomaliesPageLength number]
+    The number of items to list per page, if paging is enabled.
+
+[-anomaliesLengthChange]
+    Allow user of the webpage to change the number of items per page using a dropdown menu.
+
+
+**Note: -nopages overrides all [-no*Paging] parameters.**
+
+
 Diagram related
 ~~~~~~~~~~~~~~~
 [-gv directoryPath]
