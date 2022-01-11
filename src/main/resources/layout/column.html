@@ -10,7 +10,13 @@
                             <h3 class="box-title">Columns</h3>
                         </div>
                         <div class="box-body">
-                            <table id="column_table" class="table table-bordered table-striped dataTable" role="grid">
+                            <table
+                                    id="column_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="{{dataTableConfig.columnTable.paging}}"
+                                    data-page-length="{{dataTableConfig.columnTable.pageLength}}"
+                                    data-length-change="{{dataTableConfig.columnTable.lengthChange}}">
                                 <thead align='left'>
                                     <tr>
                                         <th>Table</th>

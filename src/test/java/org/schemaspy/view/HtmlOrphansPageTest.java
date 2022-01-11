@@ -19,6 +19,8 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.util.DataTableConfig;
 
 import java.io.StringWriter;
 import java.util.Collections;
@@ -34,7 +36,9 @@ public class HtmlOrphansPageTest {
         HtmlConfig htmlConfig = mock(HtmlConfig.class);
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isOneOfMultipleSchemas()).thenReturn(false);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("errorInOrpahns", htmlConfig);
+        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
+        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("errorInOrpahns", htmlConfig, dataTableConfig);
         HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(mustacheCompiler);
         StringWriter writer = new StringWriter();
         htmlOrphansPage.write(Collections.emptyList(), false, writer);

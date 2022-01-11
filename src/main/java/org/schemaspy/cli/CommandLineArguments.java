@@ -205,6 +205,173 @@ public class CommandLineArguments {
     )
     private int degreeOfSeparation = 2;
 
+
+    // DataTables options for database_objects (Tables) table in src/main/resources/layout/main.html
+    @Parameter(
+            names = {"noDbObjectPaging", "-noDbObjectPaging", "--noDbObjectPaging", "schemaspy.noDbObjectPaging"},
+            descriptionKey = "noDbObjectPaging"
+    )
+    private boolean noDbObjectPaging = false;
+
+    @Parameter(
+            names = {"dbObjectPageLength", "-dbObjectPageLength", "--dbObjectPageLength",
+                    "schemaspy.dbObjectPageLength"},
+            descriptionKey = "dbObjectPageLength"
+    )
+    private int dbObjectPageLength = 50;
+
+    @Parameter(
+            names = {"dbObjectLengthChange", "-dbObjectLengthChange", "--dbObjectLengthChange",
+                    "schemaspy.dbObjectLengthChange"},
+            descriptionKey = "dbObjectLengthChange"
+    )
+    private boolean dbObjectLengthChange = false;
+
+
+    // DataTables options for standard_table (Columns) table in src/main/resources/layout/tables/table.html
+    @Parameter(
+            names = {"noTablePaging", "-noTablePaging", "--noTablePaging", "schemaspy.noTablePaging"},
+            descriptionKey = "noTablePaging"
+    )
+    private boolean noTablePaging = false;
+
+    @Parameter(
+            names = {"tablePageLength", "-tablePageLength", "--tablePageLength", "schemaspy.tablePageLength"},
+            descriptionKey = "tablePageLength"
+    )
+    private int tablePageLength = 10;
+
+    @Parameter(
+            names = {"tableLengthChange", "-tableLengthChange", "--tableLengthChange", "schemaspy.tableLengthChange"},
+            descriptionKey = "tableLengthChange"
+    )
+    private boolean tableLengthChange = false;
+
+
+    // DataTables options for indexes_table (Indexes) table in src/main/resources/layout/tables/table.html
+    @Parameter(
+            names = {"noIndexPaging", "-noIndexPaging", "--noIndexPaging", "schemaspy.noIndexPaging"},
+            descriptionKey = "noIndexPaging"
+    )
+    private boolean noIndexPaging = false;
+
+    @Parameter(
+            names = {"indexPageLength", "-indexPageLength", "--indexPageLength", "schemaspy.indexPageLength"},
+            descriptionKey = "indexPageLength"
+    )
+    private int indexPageLength = 10;
+
+    @Parameter(
+            names = {"indexLengthChange", "-indexLengthChange", "--indexLengthChange", "schemaspy.indexLengthChange"},
+            descriptionKey = "indexLengthChange"
+    )
+    private boolean indexLengthChange = false;
+
+
+    // DataTables options for check_table (Check Constraints) table in
+    // src/main/resources/layout/tables/table.html and src/main/resources/layout/constraint.html
+    @Parameter(
+            names = {"noCheckPaging", "-noCheckPaging", "--noCheckPaging", "schemaspy.noCheckPaging"},
+            descriptionKey = "noCheckPaging"
+    )
+    private boolean noCheckPaging = false;
+
+    @Parameter(
+            names = {"checkPageLength", "-checkPageLength", "--checkPageLength", "schemaspy.checkPageLength"},
+            descriptionKey = "checkPageLength"
+    )
+    private int checkPageLength = 10;
+
+    @Parameter(
+            names = {"checkLengthChange", "-checkLengthChange", "--checkLengthChange", "schemaspy.checkLengthChange"},
+            descriptionKey = "checkLengthChange"
+    )
+    private boolean checkLengthChange = false;
+
+
+    // DataTables options for routine_table (Routines) table in src/main/resources/layout/routines.html
+    @Parameter(
+            names = {"noRoutinePaging", "-noRoutinePaging", "--noRoutinePaging", "schemaspy.noRoutinePaging"},
+            descriptionKey = "noRoutinePaging"
+    )
+    private boolean noRoutinePaging = false;
+
+    @Parameter(
+            names = {"routinePageLength", "-routinePageLength", "--routinePageLength", "schemaspy.routinePageLength"},
+            descriptionKey = "routinePageLength"
+    )
+    private int routinePageLength = 50;
+
+    @Parameter(
+            names = {"routineLengthChange", "-routineLengthChange", "--routineLengthChange",
+                    "schemaspy.routineLengthChange"},
+            descriptionKey = "routineLengthChange"
+    )
+    private boolean routineLengthChange = false;
+
+
+    // DataTables options for fk_table (Foreign Key Constraints) table in src/main/resources/layout/constraint.html
+    @Parameter(
+            names = {"noFkPaging", "-noFkPaging", "--noFkPaging", "schemaspy.noFkPaging"},
+            descriptionKey = "noFkPaging"
+    )
+    private boolean noFkPaging = false;
+
+    @Parameter(
+            names = {"fkPageLength", "-fkPageLength", "--fkPageLength", "schemaspy.fkPageLength"},
+            descriptionKey = "fkPageLength"
+    )
+    private int fkPageLength = 50;
+
+    @Parameter(
+            names = {"fkLengthChange", "-fkLengthChange", "--fkLengthChange", "schemaspy.fkLengthChange"},
+            descriptionKey = "fkLengthChange"
+    )
+    private boolean fkLengthChange = false;
+
+
+    // DataTables options for column_table (Columns) table in src/main/resources/layout/column.html
+    @Parameter(
+            names = {"noColumnPaging", "-noColumnPaging", "--noColumnPaging", "schemaspy.noColumnPaging"},
+            descriptionKey = "noColumnPaging"
+    )
+    private boolean noColumnPaging = false;
+
+    @Parameter(
+            names = {"columnPageLength", "-columnPageLength", "--columnPageLength", "schemaspy.columnPageLength"},
+            descriptionKey = "columnPageLength"
+    )
+    private int columnPageLength = 50;
+
+    @Parameter(
+            names = {"columnLengthChange", "-columnLengthChange", "--columnLengthChange",
+                    "schemaspy.columnLengthChange"},
+            descriptionKey = "columnLengthChange"
+    )
+    private boolean columnLengthChange = false;
+
+
+    // DataTables options for all tables in src/main/resources/layout/anomalies.html
+    @Parameter(
+            names = {"noAnomaliesPaging", "-noAnomaliesPaging", "--noAnomaliesPaging", "schemaspy.noAnomaliesPaging"},
+            descriptionKey = "noAnomaliesPaging"
+    )
+    private boolean noAnomaliesPaging = false;
+
+    @Parameter(
+            names = {"anomaliesPageLength", "-anomaliesPageLength", "--anomaliesPageLength",
+                    "schemaspy.anomaliesPageLength"},
+            descriptionKey = "anomaliesPageLength"
+    )
+    private int anomaliesPageLength = 10;
+
+    @Parameter(
+            names = {"anomaliesLengthChange", "-anomaliesLengthChange", "--anomaliesLengthChange",
+                    "schemaspy.anomaliesLengthChange"},
+            descriptionKey = "anomaliesLengthChange"
+    )
+    private boolean anomaliesLengthChange = false;
+
     public boolean isHelpRequired() {
         return helpRequired;
     }
@@ -267,5 +434,101 @@ public class CommandLineArguments {
 
     public int getDegreeOfSeparation() {
         return degreeOfSeparation;
+    }
+
+    public boolean isNoDbObjectPaging() {
+        return noDbObjectPaging;
+    }
+
+    public int getDbObjectPageLength() {
+        return dbObjectPageLength;
+    }
+
+    public boolean isDbObjectLengthChange() {
+        return dbObjectLengthChange;
+    }
+
+    public boolean isNoTablePaging() {
+        return noTablePaging;
+    }
+
+    public int getTablePageLength() {
+        return tablePageLength;
+    }
+
+    public boolean isTableLengthChange() {
+        return tableLengthChange;
+    }
+
+    public boolean isNoIndexPaging() {
+        return noIndexPaging;
+    }
+
+    public int getIndexPageLength() {
+        return indexPageLength;
+    }
+
+    public boolean isIndexLengthChange() {
+        return indexLengthChange;
+    }
+
+    public boolean isNoCheckPaging() {
+        return noCheckPaging;
+    }
+
+    public int getCheckPageLength() {
+        return checkPageLength;
+    }
+
+    public boolean isCheckLengthChange() {
+        return checkLengthChange;
+    }
+
+    public boolean isNoRoutinePaging() {
+        return noRoutinePaging;
+    }
+
+    public int getRoutinePageLength() {
+        return routinePageLength;
+    }
+
+    public boolean isRoutineLengthChange() {
+        return routineLengthChange;
+    }
+
+    public boolean isNoFkPaging() {
+        return noFkPaging;
+    }
+
+    public int getFkPageLength() {
+        return fkPageLength;
+    }
+
+    public boolean isFkLengthChange() {
+        return fkLengthChange;
+    }
+
+    public boolean isNoColumnPaging() {
+        return noColumnPaging;
+    }
+
+    public int getColumnPageLength() {
+        return columnPageLength;
+    }
+
+    public boolean isColumnLengthChange() {
+        return columnLengthChange;
+    }
+
+    public boolean isNoAnomaliesPaging() {
+        return noAnomaliesPaging;
+    }
+
+    public int getAnomaliesPageLength() {
+        return anomaliesPageLength;
+    }
+
+    public boolean isAnomaliesLengthChange() {
+        return anomaliesLengthChange;
     }
 }

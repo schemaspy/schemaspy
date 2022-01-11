@@ -46,6 +46,7 @@ import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.output.html.mustache.diagrams.*;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
+import org.schemaspy.util.DataTableConfig;
 import org.schemaspy.util.ManifestUtils;
 import org.schemaspy.util.Markdown;
 import org.schemaspy.util.ResourceWriter;
@@ -181,7 +182,8 @@ public class SchemaAnalyzer {
             }
 
             prepareLayoutFiles(outputDir);
-            MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config);
+            DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
+            MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config, dataTableConfig);
             HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
             try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
                 htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta), writer);
@@ -352,7 +354,8 @@ public class SchemaAnalyzer {
         results.getOutputExceptions().stream().forEachOrdered(exception ->
                 LOGGER.error("RelationShipDiagramError", exception)
         );
-        MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config);
+        DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config, dataTableConfig);
 
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {

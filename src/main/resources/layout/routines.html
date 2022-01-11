@@ -10,7 +10,13 @@
                             <h3 class="box-title">Routines</h3>
                         </div>
                         <div class="box-body">
-                            <table id="routine_table" class="table table-bordered table-striped dataTable" role="grid">
+                            <table
+                                    id="routine_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="{{dataTableConfig.routineTable.paging}}"
+                                    data-page-length="{{dataTableConfig.routineTable.pageLength}}"
+                                    data-length-change="{{dataTableConfig.routineTable.lengthChange}}">
                                 <thead align='left'>
                                     <tr>
                                         <th>Name</th>

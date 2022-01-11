@@ -25,6 +25,7 @@ package org.schemaspy.view;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+import org.schemaspy.util.DataTableConfig;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -47,11 +48,13 @@ public class MustacheCompiler {
 
     private final String databaseName;
     private final HtmlConfig htmlConfig;
+    private final DataTableConfig dataTableConfig;
     private final MustacheFactory mustacheFactory;
 
-    public MustacheCompiler(String databaseName, HtmlConfig htmlConfig) {
+    public MustacheCompiler(String databaseName, HtmlConfig htmlConfig, DataTableConfig dataTableConfig) {
         this.databaseName = databaseName;
         this.htmlConfig = htmlConfig;
+        this.dataTableConfig = dataTableConfig;
         this.mustacheFactory = new DefaultMustacheFactory(new MustacheCustomResolver(htmlConfig.getTemplateDirectory()));
     }
 
@@ -63,6 +66,7 @@ public class MustacheCompiler {
         pageScope.put("databaseName", databaseName);
         pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());
         pageScope.put("displayNumRows", htmlConfig.isNumRowsEnabled());
+        pageScope.put("dataTableConfig", dataTableConfig.getPageScopeMap());
         pageScope.putAll(pageData.getScope());
 
         Mustache mustachePage = mustacheFactory.compile(pageData.getTemplateName());

@@ -19,7 +19,9 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Table;
+import org.schemaspy.util.DataTableConfig;
 
 import java.io.StringWriter;
 import java.util.Collections;
@@ -35,7 +37,9 @@ public class HtmlTablePageTest {
         HtmlConfig htmlConfig = mock(HtmlConfig.class);
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig);
+        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
+        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig, dataTableConfig);
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
 
@@ -53,7 +57,9 @@ public class HtmlTablePageTest {
         HtmlConfig htmlConfig = mock(HtmlConfig.class);
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isNumRowsEnabled()).thenReturn(false);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig);
+        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
+        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig, dataTableConfig);
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
 
