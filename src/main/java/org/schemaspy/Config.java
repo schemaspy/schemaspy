@@ -68,6 +68,11 @@ import java.util.stream.Stream;
  * @author Nils Petzaell
  * @author Daniel Watt
  */
+
+/**
+ * See https://github.com/schemaspy/schemaspy/projects/3
+ */
+@Deprecated
 public final class Config implements HtmlConfig, GraphvizConfig {
 
     private static final int DEFAULT_FONT_SIZE = 11;
@@ -122,7 +127,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     private String imageFormat;
     private String renderer;
     private Boolean paginationEnabled;
-    /**      
+    /**
      * @deprecated replaced by -dp expanding folders
      */
     @Deprecated
