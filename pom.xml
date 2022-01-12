@@ -75,7 +75,7 @@
             <dependency>
                 <groupId>com.github.spullara.mustache.java</groupId>
                 <artifactId>compiler</artifactId>
-                <version>0.9.1</version>
+                <version>0.9.10</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
