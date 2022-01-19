@@ -18,6 +18,7 @@
  */
 package org.testcontainers.containers;
 
+import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import org.slf4j.Logger;
@@ -70,7 +71,7 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
         try {
             getMappedPort(INFORMIX_PORT);
         } catch (IllegalArgumentException iae) {
-            updateContainerInfo();
+            updateContainerInfo(dockerClient.inspectContainerCmd(containerId).exec());
         }
         return getMappedPort(INFORMIX_PORT);
     }
@@ -103,15 +104,21 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
         super.waitUntilContainerStarted();
         LOGGER.info("Restart container");
         dockerClient.restartContainerCmd(containerId).exec();
-        updateContainerInfo();
+        for(int i = 0; i < 10; i++) {
+            InspectContainerResponse inspectContainerResponse = dockerClient.inspectContainerCmd(containerId).exec();
+            if (inspectContainerResponse.getNetworkSettings().getPorts().getBindings().containsKey(ExposedPort.tcp(9088))) {
+                updateContainerInfo(inspectContainerResponse);
+                break;
+            }
+        }
         super.waitUntilContainerStarted();
     }
 
-    private void updateContainerInfo() {
+    private void updateContainerInfo(InspectContainerResponse inspectContainerResponse) {
         try {
             Field field = GenericContainer.class.getDeclaredField("containerInfo");
             field.setAccessible(true);
-            field.set(this, dockerClient.inspectContainerCmd(containerId).exec());
+            field.set(this, inspectContainerResponse);
             field.setAccessible(false);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             LOGGER.error("Failed to update container info", e);
