@@ -32,9 +32,6 @@ import org.schemaspy.view.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URLEncoder;
@@ -190,11 +187,7 @@ public class DotNode {
     }
 
     private int getTextWidth(String text) {
-        AffineTransform affinetransform = new AffineTransform();
-        FontRenderContext frc = new FontRenderContext(affinetransform, true, true);
-        int fontSize = dotConfig.getFontSize() + 1;
-        Font font = new Font(dotConfig.getFont(), Font.BOLD, fontSize);
-        return (int) (font.getStringBounds(text, frc).getWidth());
+        return dotConfig.getTextWidth(text);
     }
 
     private String columnToString(TableColumn column, Set<TableColumn> indexColumns, int maxWidth) {

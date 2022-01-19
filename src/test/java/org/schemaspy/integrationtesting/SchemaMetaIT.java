@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
-import org.schemaspy.DotConfigUsingConfig;
+import org.schemaspy.SimpleDotConfig;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -35,6 +35,7 @@ import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.ProgressListener;
+import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.testing.H2MemoryRule;
 import org.schemaspy.view.WriteStats;
@@ -65,9 +66,6 @@ public class SchemaMetaIT {
 
     @ClassRule
     public static H2MemoryRule h2MemoryRule = new H2MemoryRule("SchemaMetaIT").addSqlScript("src/test/resources/integrationTesting/schemaMetaIT/dbScripts/shemaMetaIT.h2.sql");
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Autowired
     private SqlService sqlService;
@@ -322,7 +320,18 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, databaseWithSchemaMeta, schemaMeta, progressListener);
 
-        DotFormatter dotFormatter = new DotFormatter(new DotConfigUsingConfig(config, false));
+        DotFormatter dotFormatter = new DotFormatter(
+            new SimpleDotConfig(
+                new DefaultFontConfig(
+                    config.getFont(),
+                    config.getFontSize()
+                ),
+                config.isRankDirBugEnabled(),
+                false,
+                config.isNumRowsEnabled(),
+                config.isOneOfMultipleSchemas()
+            )
+        );
 
         StringWriter withoutSchemaMetaOutput = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(withoutSchemaMetaOutput)) {

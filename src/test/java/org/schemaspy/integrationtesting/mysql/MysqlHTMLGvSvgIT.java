@@ -121,7 +121,7 @@ public class MysqlHTMLGvSvgIT {
     @Test
     public void producesSameContent() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
-                .hasProducedValidOutputExcludeSVG(
+                .hasProducedValidOutput(
                         outputPath,
                         Paths.get("src","test","resources","integrationTesting","mysql","expecting","mysqlhtml_gv_svg")
                         );
