@@ -23,7 +23,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.schemaspy.Config;
-import org.schemaspy.DotConfigUsingConfig;
+import org.schemaspy.SimpleDotConfig;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.diagram.DiagramFactory;
@@ -41,6 +41,7 @@ import java.util.Collections;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,9 +52,17 @@ public class DotNodeIT {
 
     private static DotFormatter dotFormatter =
             new DotFormatter(
-                    new DotConfigUsingConfig(
-                            Config.getInstance(),
-                            false));
+                    new SimpleDotConfig(
+                        new DefaultFontConfig(
+                            Config.getInstance().getFont(),
+                            Config.getInstance().getFontSize()
+                        ),
+                        Config.getInstance().isRankDirBugEnabled(),
+                        false,
+                        Config.getInstance().isNumRowsEnabled(),
+                        Config.getInstance().isOneOfMultipleSchemas()
+                    )
+            );
     private static DiagramFactory diagramFactory;
 
     private static File orphansDir;

@@ -18,31 +18,49 @@
  */
 package org.schemaspy.output.diagram.vizjs;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
-import java.net.URL;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.assertj.core.api.Assertions.contentOf;
 
 public class VizJSDotTest {
-    private VizJSDot javaDotViz = new VizJSDot();
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private static Path input = Paths.get("src", "test", "resources", "vizjs");
 
-    @Test
-    public void transformDotToSvg() throws Exception {
-        Path vizJSPath = Paths.get("src","test","resources","vizjs");
-        File diagramFile = temporaryFolder.newFile("location.1degree.svg");
-        javaDotViz.generateDiagram(vizJSPath.resolve("location.1degree.dot").toFile(), diagramFile);
-        assertThat(diagramFile.toPath()).hasSameContentAs(vizJSPath.resolve("location.1degree.svg"), StandardCharsets.UTF_8);
+    private static VizJSDot javaDotViz = new VizJSDot();
+
+    @TempDir
+    private static Path tempDir;
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "orphans.group.1degree",
+        "orphans.user.1degree",
+        "relationships.implied.compact",
+        "relationships.implied.large",
+        "tables.group.1degree",
+        "tables.group.implied1degrees",
+        "tables.user.1degree",
+        "tables.user.implied1degrees",
+        "tables.userAndGroup.1degree"
+    })
+    void generateSVG(String name) throws IOException {
+        File dotFile = input.resolve(name + ".dot").toFile();
+        File expect = input.resolve(name + ".svg").toFile();
+        File actual = Files.createFile(tempDir.resolve(name + ".svg")).toFile();
+        javaDotViz.generateDiagram(dotFile, actual);
+        assertThat(contentOf(actual, StandardCharsets.UTF_8))
+            .isEqualTo(contentOf(expect, StandardCharsets.UTF_8));
     }
 }

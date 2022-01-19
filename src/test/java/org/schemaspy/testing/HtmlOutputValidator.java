@@ -56,19 +56,11 @@ public class HtmlOutputValidator {
     };
 
     public static SoftAssertions hasProducedValidOutput(Path actualPath, Path expectedPath) throws IOException {
-        return hasProducedValidOutput(actualPath, expectedPath, true);
-    }
-    public static SoftAssertions hasProducedValidOutputExcludeSVG(Path actualPath, Path expectedPath) throws IOException {
-        return hasProducedValidOutput(actualPath, expectedPath, false);
-    }
-
-    public static SoftAssertions hasProducedValidOutput(Path actualPath, Path expectedPath, boolean includeSVG) throws IOException {
-
         List<Path> actualPaths;
         try (Stream<Path> pathStream = Files.find(actualPath, 5, (p, a) -> a.isRegularFile())) {
             actualPaths = pathStream.filter(p -> {
                 String path = p.toString().toLowerCase();
-                return path.endsWith("html") || path.endsWith("dot") || (includeSVG && path.contains("diagrams") && path.endsWith("svg"));
+                return path.endsWith("html");
             }).collect(Collectors.toList());
         }
         assertThat(actualPaths.size()).isGreaterThan(0);
