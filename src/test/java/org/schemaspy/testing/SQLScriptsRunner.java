@@ -68,7 +68,7 @@ public class SQLScriptsRunner implements Consumer<Connection> {
             List<URL> initScripts = getInitScripts();
             for (URL resource : initScripts) {
                 try {
-                    String sql = Resources.toString(resource, Charsets.UTF_8);
+                    String sql = Resources.toString(resource, Charsets.UTF_8).replaceAll("\\r", "");
                     ScriptUtils.executeSqlScript(connection, resource.getPath(), sql, false, false, ScriptUtils.DEFAULT_COMMENT_PREFIX, statementSeparator, ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER, ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
                 } catch (IOException | IllegalArgumentException e) {
                     LOGGER.error("Could not load classpath init script: {}", resource.getPath());
