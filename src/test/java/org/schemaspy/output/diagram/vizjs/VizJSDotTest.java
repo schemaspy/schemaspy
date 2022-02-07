@@ -32,7 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.contentOf;
+import static org.assertj.core.api.Assertions.linesOf;
 
 public class VizJSDotTest {
 
@@ -60,7 +60,7 @@ public class VizJSDotTest {
         File expect = input.resolve(name + ".svg").toFile();
         File actual = Files.createFile(tempDir.resolve(name + ".svg")).toFile();
         javaDotViz.generateDiagram(dotFile, actual);
-        assertThat(contentOf(actual, StandardCharsets.UTF_8))
-            .isEqualTo(contentOf(expect, StandardCharsets.UTF_8));
+        assertThat(linesOf(actual, StandardCharsets.UTF_8))
+            .isEqualTo(linesOf(expect, StandardCharsets.UTF_8));
     }
 }
