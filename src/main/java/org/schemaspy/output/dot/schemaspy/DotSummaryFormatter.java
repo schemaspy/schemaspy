@@ -48,18 +48,22 @@ public class DotSummaryFormatter {
     }
 
     public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
-        writeRelationships(db, tables, compact, showColumns, false, stats, dot);
+        writeRelationships(db, tables, compact, showColumns, false, false, stats, dot);
+    }
+
+    public void writeSummaryFullRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
+        writeRelationships(db, tables, compact, showColumns, true, false, stats, dot);
     }
 
     /**
      * Returns <code>true</code> if it wrote any implied relationships
      */
     public boolean writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
-        return writeRelationships(db, tables, compact, showColumns, true, stats, dot);
+        return writeRelationships(db, tables, compact, showColumns, false, true, stats, dot);
     }
 
-    private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, PrintWriter dot) {
-        DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
+    private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean showColumnDetails, boolean includeImplied, WriteStats stats, PrintWriter dot) {
+        DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, showColumnDetails) : new DotNodeConfig();
         boolean wroteImplied = false;
 
         String diagramName;
@@ -105,6 +109,9 @@ public class DotSummaryFormatter {
         }
 
         for (DotConnector connector : connectors) {
+            if (showColumnDetails) {
+                connector.connectToParentDetails();
+            }
             dot.println(connector.toString());
         }
 

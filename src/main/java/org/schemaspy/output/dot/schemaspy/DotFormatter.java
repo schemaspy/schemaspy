@@ -57,6 +57,10 @@ public class DotFormatter {
         this.dotOrphanFormatter = new DotOrphanFormatter(dotFormat, dotConfig);
     }
 
+    public void writeSummaryFullRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
+        dotSummaryFormatter.writeSummaryFullRelationships(db, tables, compact, showColumns, stats, dot);
+    }
+
     public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
         dotSummaryFormatter.writeSummaryRealRelationships(db, tables, compact, showColumns, stats, dot);
     }
