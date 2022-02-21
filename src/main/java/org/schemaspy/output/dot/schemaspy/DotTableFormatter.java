@@ -97,7 +97,7 @@ public class DotTableFormatter implements Relationships {
             )
         );
 
-        dotFormat.writeHeader(diagramName.value(), true, dot);
+        new DotFormat(dotConfig, diagramName, true, dot).writeHeader();
 
         Factory factory = getFactory(table, true);
         Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);

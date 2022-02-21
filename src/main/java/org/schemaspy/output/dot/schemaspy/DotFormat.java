@@ -21,6 +21,7 @@
 package org.schemaspy.output.dot.schemaspy;
 
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.name.Name;
 
 import java.io.PrintWriter;
 
@@ -34,11 +35,28 @@ import java.io.PrintWriter;
 public class DotFormat {
 
     private final DotConfig dotConfig;
+    private Name diagram;
+    private boolean showLabel;
+    private PrintWriter dot;
 
+    @Deprecated
     public DotFormat(DotConfig dotConfig) {
         this.dotConfig = dotConfig;
     }
 
+    public DotFormat(
+            final DotConfig dotConfig,
+            final Name diagram,
+            final boolean showLabel,
+            final PrintWriter dot
+    ) {
+        this.dotConfig = dotConfig;
+        this.diagram = diagram;
+        this.showLabel = showLabel;
+        this.dot = dot;
+    }
+
+    @Deprecated
     public void writeHeader(String diagramName, boolean showLabel, PrintWriter dot) {
         dot.println("digraph \"" + diagramName + "\" {");
         dot.println("  graph [");
@@ -67,5 +85,9 @@ public class DotFormat {
         dot.println("  edge [");
         dot.println("    arrowsize=\"0.8\"");
         dot.println("  ];");
+    }
+
+    public void writeHeader() {
+        writeHeader(diagram.value(), showLabel, dot);
     }
 }
