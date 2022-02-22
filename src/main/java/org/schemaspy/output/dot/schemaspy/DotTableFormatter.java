@@ -50,7 +50,6 @@ import java.util.*;
  */
 public class DotTableFormatter implements Relationships {
 
-    private final DotFormat dotFormat;
     private final DotConfig dotConfig;
     private final Table table;
     private final boolean twoDegreesOfSeparation;
@@ -59,7 +58,6 @@ public class DotTableFormatter implements Relationships {
     private final PrintWriter dot;
 
     public DotTableFormatter(
-        final DotFormat dotFormat,
         final DotConfig dotConfig,
         final Table table,
         final boolean twoDegreesOfSeparation,
@@ -67,7 +65,6 @@ public class DotTableFormatter implements Relationships {
         final boolean includeImplied,
         final PrintWriter dot
     ) {
-        this.dotFormat = dotFormat;
         this.dotConfig = dotConfig;
         this.table = table;
         this.twoDegreesOfSeparation = twoDegreesOfSeparation;

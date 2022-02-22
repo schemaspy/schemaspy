@@ -17,7 +17,6 @@ public final class RealRelationships implements Relationships {
     private final Relationships origin;
 
     public RealRelationships(
-        final DotFormat dotFormat,
         final DotConfig dotConfig,
         final Table table,
         final boolean twoDegreesOfSeparation,
@@ -26,7 +25,6 @@ public final class RealRelationships implements Relationships {
     ) {
         this(
             new DotTableFormatter(
-                dotFormat,
                 dotConfig,
                 table,
                 twoDegreesOfSeparation,
