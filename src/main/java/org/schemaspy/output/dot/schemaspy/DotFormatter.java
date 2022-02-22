@@ -66,11 +66,11 @@ public class DotFormatter {
     }
 
     public Set<ForeignKeyConstraint> writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
-        return new RealRelationships(dotFormat, dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
+        return new RealRelationships(dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
 
     public void writeTableAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
-        new ImpliedRelationships(dotFormat, dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
+        new ImpliedRelationships(dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
 
     public void writeOrphan(Table table, PrintWriter dot) {

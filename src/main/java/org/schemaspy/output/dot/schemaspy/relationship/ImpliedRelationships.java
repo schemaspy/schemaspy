@@ -17,7 +17,6 @@ public final class ImpliedRelationships implements Relationships {
     private final Relationships origin;
 
     public ImpliedRelationships(
-        final DotFormat dotFormat,
         final DotConfig dotConfig,
         final Table table,
         final boolean twoDegreesOfSeparation,
@@ -26,7 +25,6 @@ public final class ImpliedRelationships implements Relationships {
     ) {
         this(
             new DotTableFormatter(
-                dotFormat,
                 dotConfig,
                 table,
                 twoDegreesOfSeparation,
