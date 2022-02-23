@@ -33,7 +33,6 @@ import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
 import org.schemaspy.output.dot.schemaspy.name.Degree;
 import org.schemaspy.output.dot.schemaspy.name.EmptyName;
 import org.schemaspy.output.dot.schemaspy.name.Implied;
-import org.schemaspy.output.dot.schemaspy.name.Name;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.Columns;
 import org.schemaspy.view.WriteStats;
@@ -56,6 +55,37 @@ public class DotTableFormatter implements Relationships {
     private final WriteStats stats;
     private final boolean includeImplied;
     private final PrintWriter dot;
+    private final DotFormat format;
+
+    public DotTableFormatter(
+            final DotConfig dotConfig,
+            final Table table,
+            final boolean twoDegreesOfSeparation,
+            final WriteStats stats,
+            final boolean includeImplied,
+            final PrintWriter dot
+    ) {
+        this(
+                dotConfig,
+                table,
+                twoDegreesOfSeparation,
+                stats,
+                includeImplied,
+                dot,
+                new DotFormat(
+                        dotConfig,
+                        new Degree(
+                                twoDegreesOfSeparation,
+                                new Implied(
+                                        includeImplied,
+                                        new EmptyName()
+                                )
+                        ),
+                        true,
+                        dot
+                )
+        );
+    }
 
     public DotTableFormatter(
         final DotConfig dotConfig,
@@ -63,7 +93,8 @@ public class DotTableFormatter implements Relationships {
         final boolean twoDegreesOfSeparation,
         final WriteStats stats,
         final boolean includeImplied,
-        final PrintWriter dot
+        final PrintWriter dot,
+        final DotFormat format
     ) {
         this.dotConfig = dotConfig;
         this.table = table;
@@ -71,6 +102,7 @@ public class DotTableFormatter implements Relationships {
         this.stats = stats;
         this.includeImplied = includeImplied;
         this.dot = dot;
+        this.format = format;
     }
 
     @Override
@@ -86,15 +118,7 @@ public class DotTableFormatter implements Relationships {
         Set<Table> tablesWritten = new HashSet<>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
-        Name diagramName = new Degree(
-            twoDegreesOfSeparation,
-            new Implied(
-                includeImplied,
-                new EmptyName()
-            )
-        );
-
-        new DotFormat(dotConfig, diagramName, true, dot).writeHeader();
+        format.writeHeader();
 
         Factory factory = getFactory(table, true);
         Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
