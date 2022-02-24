@@ -35,7 +35,7 @@ import java.io.PrintWriter;
 public class DotFormat {
 
     private final DotConfig dotConfig;
-    private Name diagram;
+    private String name;
     private boolean showLabel;
     private PrintWriter dot;
 
@@ -50,8 +50,17 @@ public class DotFormat {
             final boolean showLabel,
             final PrintWriter dot
     ) {
+        this(dotConfig, diagram.value(), showLabel, dot);
+    }
+
+    public DotFormat(
+            final DotConfig dotConfig,
+            final String name,
+            final boolean showLabel,
+            final PrintWriter dot
+    ) {
         this.dotConfig = dotConfig;
-        this.diagram = diagram;
+        this.name = name;
         this.showLabel = showLabel;
         this.dot = dot;
     }
@@ -88,6 +97,6 @@ public class DotFormat {
     }
 
     public void writeHeader() {
-        writeHeader(diagram.value(), showLabel, dot);
+        writeHeader(name, showLabel, dot);
     }
 }

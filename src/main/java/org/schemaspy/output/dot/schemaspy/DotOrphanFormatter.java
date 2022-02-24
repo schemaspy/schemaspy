@@ -34,16 +34,14 @@ import java.io.PrintWriter;
  */
 public class DotOrphanFormatter {
 
-    private final DotFormat dotFormat;
     private final DotConfig dotConfig;
 
-    public DotOrphanFormatter(DotFormat dotFormat, DotConfig dotConfig) {
-        this.dotFormat = dotFormat;
+    public DotOrphanFormatter(DotConfig dotConfig) {
         this.dotConfig = dotConfig;
     }
 
     public void writeOrphan(Table table, PrintWriter dot) {
-        dotFormat.writeHeader(table.getName(), false, dot);
+        new DotFormat(dotConfig, table.getName(), false, dot).writeHeader();
         DotNodeConfig nodeConfig = new DotNodeConfig(true, true);
         dot.println(new DotNode(table, true, nodeConfig, dotConfig).toString());
         dot.println("}");
