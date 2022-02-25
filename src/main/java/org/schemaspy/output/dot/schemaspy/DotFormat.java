@@ -35,14 +35,9 @@ import java.io.PrintWriter;
 public class DotFormat {
 
     private final DotConfig dotConfig;
-    private String name;
+    private String diagramName;
     private boolean showLabel;
     private PrintWriter dot;
-
-    @Deprecated
-    public DotFormat(DotConfig dotConfig) {
-        this.dotConfig = dotConfig;
-    }
 
     public DotFormat(
             final DotConfig dotConfig,
@@ -55,18 +50,17 @@ public class DotFormat {
 
     public DotFormat(
             final DotConfig dotConfig,
-            final String name,
+            final String diagramName,
             final boolean showLabel,
             final PrintWriter dot
     ) {
         this.dotConfig = dotConfig;
-        this.name = name;
+        this.diagramName = diagramName;
         this.showLabel = showLabel;
         this.dot = dot;
     }
 
-    @Deprecated
-    public void writeHeader(String diagramName, boolean showLabel, PrintWriter dot) {
+    public void writeHeader() {
         dot.println("digraph \"" + diagramName + "\" {");
         dot.println("  graph [");
         boolean rankdirbug = dotConfig.isRankDirBugEnabled();
@@ -94,9 +88,5 @@ public class DotFormat {
         dot.println("  edge [");
         dot.println("    arrowsize=\"0.8\"");
         dot.println("  ];");
-    }
-
-    public void writeHeader() {
-        writeHeader(name, showLabel, dot);
     }
 }
