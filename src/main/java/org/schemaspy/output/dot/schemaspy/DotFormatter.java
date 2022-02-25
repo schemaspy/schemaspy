@@ -42,7 +42,6 @@ import java.util.Set;
 public class DotFormatter {
 
     private final DotConfig dotConfig;
-    private final DotFormat dotFormat;
 
     private final DotSummaryFormatter dotSummaryFormatter;
     private final DotOrphanFormatter dotOrphanFormatter;
@@ -52,8 +51,7 @@ public class DotFormatter {
      */
     public DotFormatter(DotConfig dotConfig) {
         this.dotConfig = dotConfig;
-        this.dotFormat = new DotFormat(dotConfig);
-        this.dotSummaryFormatter = new DotSummaryFormatter(dotFormat, dotConfig);
+        this.dotSummaryFormatter = new DotSummaryFormatter(dotConfig);
         this.dotOrphanFormatter = new DotOrphanFormatter(dotConfig);
     }
 

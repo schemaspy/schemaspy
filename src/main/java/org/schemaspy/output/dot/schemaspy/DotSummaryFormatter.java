@@ -39,11 +39,9 @@ import java.util.*;
  */
 public class DotSummaryFormatter {
 
-    private final DotFormat dotFormat;
     private final DotConfig dotConfig;
 
-    public DotSummaryFormatter(DotFormat dotFormat, DotConfig dotConfig) {
-        this.dotFormat = dotFormat;
+    public DotSummaryFormatter(DotConfig dotConfig) {
         this.dotConfig = dotConfig;
     }
 
@@ -74,7 +72,7 @@ public class DotSummaryFormatter {
             else
                 diagramName = "largeRelationshipsDiagram";
         }
-        dotFormat.writeHeader(diagramName, true, dot);
+        new DotFormat(dotConfig, diagramName, true, dot).writeHeader();
 
         Map<Table, DotNode> nodes = new TreeMap<>();
 
