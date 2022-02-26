@@ -41,7 +41,8 @@ public class DotOrphanFormatter {
     }
 
     public void writeOrphan(Table table, PrintWriter dot) {
-        new DotFormat(dotConfig, table.getName(), false, dot).writeHeader();
+        DotFormat format = new DotFormat(dotConfig, table.getName(), false);
+        dot.println(format.header());
         DotNodeConfig nodeConfig = new DotNodeConfig(true, true);
         dot.println(new DotNode(table, true, nodeConfig, dotConfig).toString());
         dot.println("}");

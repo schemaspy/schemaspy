@@ -27,7 +27,6 @@ import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Default;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Included;
-import org.schemaspy.output.dot.schemaspy.connectors.DotConnectors;
 import org.schemaspy.output.dot.schemaspy.connectors.PairConnectors;
 import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
 import org.schemaspy.output.dot.schemaspy.name.Degree;
@@ -81,8 +80,7 @@ public class DotTableFormatter implements Relationships {
                                         new EmptyName()
                                 )
                         ),
-                        true,
-                        dot
+                        true
                 )
         );
     }
@@ -118,7 +116,7 @@ public class DotTableFormatter implements Relationships {
         Set<Table> tablesWritten = new HashSet<>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
-        format.writeHeader();
+        dot.println(format.header());
 
         Factory factory = getFactory(table, true);
         Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
