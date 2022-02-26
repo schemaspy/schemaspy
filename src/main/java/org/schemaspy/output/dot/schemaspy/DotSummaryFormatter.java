@@ -72,7 +72,8 @@ public class DotSummaryFormatter {
             else
                 diagramName = "largeRelationshipsDiagram";
         }
-        new DotFormat(dotConfig, diagramName, true, dot).writeHeader();
+        DotFormat format = new DotFormat(dotConfig, diagramName, true);
+        dot.println(format.header());
 
         Map<Table, DotNode> nodes = new TreeMap<>();
 

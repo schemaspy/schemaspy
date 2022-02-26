@@ -23,8 +23,6 @@ package org.schemaspy.output.dot.schemaspy;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.name.Name;
 
-import java.io.PrintWriter;
-
 /**
  * Format table data into .dot format to feed to Graphvis' dot program.
  *
@@ -32,39 +30,35 @@ import java.io.PrintWriter;
  * @author Rafal Kasa
  * @author Nils Petzaell
  */
-public class DotFormat {
+public final class DotFormat {
 
     private final DotConfig dotConfig;
-    private String diagramName;
-    private boolean showLabel;
-    private PrintWriter dot;
+    private final String diagramName;
+    private final boolean showLabel;
 
     public DotFormat(
             final DotConfig dotConfig,
             final Name diagram,
-            final boolean showLabel,
-            final PrintWriter dot
+            final boolean showLabel
     ) {
-        this(dotConfig, diagram.value(), showLabel, dot);
+        this(dotConfig, diagram.value(), showLabel);
     }
 
     public DotFormat(
             final DotConfig dotConfig,
             final String diagramName,
-            final boolean showLabel,
-            final PrintWriter dot
+            final boolean showLabel
     ) {
         this.dotConfig = dotConfig;
         this.diagramName = diagramName;
         this.showLabel = showLabel;
-        this.dot = dot;
     }
 
-    public void writeHeader() {
-        StringBuilder header = new StringBuilder();
+    public String header() {
+        final StringBuilder header = new StringBuilder();
         header.append("digraph \"" + diagramName + "\" {");
         header.append("  graph [");
-        boolean rankdirbug = dotConfig.isRankDirBugEnabled();
+        final boolean rankdirbug = dotConfig.isRankDirBugEnabled();
         if (!rankdirbug)
             header.append("    rankdir=\"RL\"");
         header.append("    bgcolor=\"" + StyleSheet.getInstance().getBodyBackground() + "\"");
@@ -89,6 +83,6 @@ public class DotFormat {
         header.append("  edge [");
         header.append("    arrowsize=\"0.8\"");
         header.append("  ];");
-        dot.println(header);
+        return header.toString();
     }
 }
