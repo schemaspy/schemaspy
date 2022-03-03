@@ -29,6 +29,7 @@ import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Included;
 import org.schemaspy.output.dot.schemaspy.connectors.PairConnectors;
 import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
+import org.schemaspy.output.dot.schemaspy.name.DefaultName;
 import org.schemaspy.output.dot.schemaspy.name.Degree;
 import org.schemaspy.output.dot.schemaspy.name.EmptyName;
 import org.schemaspy.output.dot.schemaspy.name.Implied;
@@ -75,9 +76,11 @@ public class DotTableFormatter implements Relationships {
                         dotConfig,
                         new Degree(
                                 twoDegreesOfSeparation,
-                                new Implied(
-                                        includeImplied,
-                                        new EmptyName()
+                                new DefaultName(
+                                        new Implied(
+                                                includeImplied,
+                                                new EmptyName()
+                                        )
                                 )
                         ),
                         true

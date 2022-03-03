@@ -22,7 +22,6 @@ public final class Degree implements Name {
 
     @Override
     public String value() {
-        return (twoDegreesOfSeparation ? "twoDegreesRelationshipsDiagram" : "oneDegreeRelationshipsDiagram")
-            + origin.value();
+        return (twoDegreesOfSeparation ? "twoDegrees" : "oneDegree") + origin.value();
     }
 }

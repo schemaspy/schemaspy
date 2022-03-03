@@ -18,7 +18,7 @@ public class DegreeTest {
         final Name origin = new EmptyName();
         assertThat(
             new Degree(true, origin).value()
-        ).isEqualTo("twoDegreesRelationshipsDiagram" + origin.value());
+        ).isEqualTo("twoDegrees" + origin.value());
     }
 
     /**
@@ -31,6 +31,6 @@ public class DegreeTest {
         final Name origin = new EmptyName();
         assertThat(
             new Degree(false, origin).value()
-        ).isEqualTo("oneDegreeRelationshipsDiagram" + origin.value());
+        ).isEqualTo("oneDegree" + origin.value());
     }
 }
