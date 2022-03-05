@@ -25,6 +25,10 @@ import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
+import org.schemaspy.output.dot.schemaspy.name.DefaultName;
+import org.schemaspy.output.dot.schemaspy.name.EmptyName;
+import org.schemaspy.output.dot.schemaspy.name.Implied;
+import org.schemaspy.output.dot.schemaspy.name.Sized;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -60,18 +64,15 @@ public class DotSummaryFormatter {
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
         boolean wroteImplied = false;
 
-        String diagramName;
-        if (includeImplied) {
-            if (compact)
-                diagramName = "compactImpliedRelationshipsDiagram";
-            else
-                diagramName = "largeImpliedRelationshipsDiagram";
-        } else {
-            if (compact)
-                diagramName = "compactRelationshipsDiagram";
-            else
-                diagramName = "largeRelationshipsDiagram";
-        }
+        String diagramName = new Sized(
+                compact,
+                new Implied(
+                        includeImplied,
+                        new DefaultName(
+                                new EmptyName()
+                        )
+                )
+        ).value();
         DotFormat format = new DotFormat(dotConfig, diagramName, true);
         dot.println(format.header());
 
