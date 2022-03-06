@@ -25,10 +25,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
-import org.schemaspy.output.dot.schemaspy.name.DefaultName;
-import org.schemaspy.output.dot.schemaspy.name.EmptyName;
-import org.schemaspy.output.dot.schemaspy.name.Implied;
-import org.schemaspy.output.dot.schemaspy.name.Sized;
+import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -64,7 +61,7 @@ public class DotSummaryFormatter {
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
         boolean wroteImplied = false;
 
-        String diagramName = new Sized(
+        Name name = new Sized(
                 compact,
                 new Implied(
                         includeImplied,
@@ -72,8 +69,8 @@ public class DotSummaryFormatter {
                                 new EmptyName()
                         )
                 )
-        ).value();
-        DotFormat format = new DotFormat(dotConfig, diagramName, true);
+        );
+        DotFormat format = new DotFormat(dotConfig, name, true);
         dot.println(format.header());
 
         Map<Table, DotNode> nodes = new TreeMap<>();
