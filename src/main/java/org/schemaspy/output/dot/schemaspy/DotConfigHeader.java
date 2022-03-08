@@ -30,13 +30,13 @@ import org.schemaspy.output.dot.schemaspy.name.Name;
  * @author Rafal Kasa
  * @author Nils Petzaell
  */
-public final class DotFormat {
+public final class DotConfigHeader implements Header {
 
     private final DotConfig dotConfig;
     private final String diagramName;
     private final boolean showLabel;
 
-    public DotFormat(
+    public DotConfigHeader(
             final DotConfig dotConfig,
             final Name diagram,
             final boolean showLabel
@@ -44,7 +44,7 @@ public final class DotFormat {
         this(dotConfig, diagram.value(), showLabel);
     }
 
-    public DotFormat(
+    public DotConfigHeader(
             final DotConfig dotConfig,
             final String diagramName,
             final boolean showLabel
@@ -54,7 +54,8 @@ public final class DotFormat {
         this.showLabel = showLabel;
     }
 
-    public String header() {
+    @Override
+    public String value() {
         final StringBuilder header = new StringBuilder();
         header.append("digraph \"" + diagramName + "\" {");
         header.append("  graph [");

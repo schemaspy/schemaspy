@@ -70,8 +70,8 @@ public class DotSummaryFormatter {
                         )
                 )
         );
-        DotFormat format = new DotFormat(dotConfig, name, true);
-        dot.println(format.header());
+        Header header = new DotConfigHeader(dotConfig, name, true);
+        dot.println(header.value());
 
         Map<Table, DotNode> nodes = new TreeMap<>();
 

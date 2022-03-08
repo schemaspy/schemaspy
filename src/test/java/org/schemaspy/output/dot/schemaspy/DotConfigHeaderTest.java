@@ -5,7 +5,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import org.schemaspy.output.dot.DotConfig;
 
-public class DotFormatTest {
+public class DotConfigHeaderTest {
 
     /**
      * Given a name,
@@ -15,7 +15,7 @@ public class DotFormatTest {
     @Test
     void interpretName() {
         MatcherAssert.assertThat(
-                new DotFormat(
+                new DotConfigHeader(
                         new DotConfig() {
                             @Override
                             public boolean isRankDirBugEnabled() {
@@ -54,7 +54,7 @@ public class DotFormatTest {
                         },
                         () -> "Graph",
                         false
-                ).header(),
+                ).value(),
                 CoreMatchers.containsString("digraph \"Graph\" {")
         );
     }
@@ -67,7 +67,7 @@ public class DotFormatTest {
     @Test
     void interpretFonts() {
         MatcherAssert.assertThat(
-                new DotFormat(
+                new DotConfigHeader(
                         new DotConfig() {
                             @Override
                             public boolean isRankDirBugEnabled() {
@@ -106,7 +106,7 @@ public class DotFormatTest {
                         },
                         "",
                         false
-                ).header(),
+                ).value(),
                 CoreMatchers.containsString("    fontname=\"font\"")
         );
     }
@@ -119,7 +119,7 @@ public class DotFormatTest {
     @Test
     void justifyLabel() {
         MatcherAssert.assertThat(
-                new DotFormat(
+                new DotConfigHeader(
                         new DotConfig() {
                             @Override
                             public boolean isRankDirBugEnabled() {
@@ -158,7 +158,7 @@ public class DotFormatTest {
                         },
                         "",
                         true
-                ).header(),
+                ).value(),
                 CoreMatchers.containsString("    labeljust=\"l\"")
         );
     }

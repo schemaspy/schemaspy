@@ -55,7 +55,7 @@ public class DotTableFormatter implements Relationships {
     private final WriteStats stats;
     private final boolean includeImplied;
     private final PrintWriter dot;
-    private final DotFormat format;
+    private final Header header;
 
     public DotTableFormatter(
             final DotConfig dotConfig,
@@ -72,7 +72,7 @@ public class DotTableFormatter implements Relationships {
                 stats,
                 includeImplied,
                 dot,
-                new DotFormat(
+                new DotConfigHeader(
                         dotConfig,
                         new Degree(
                                 twoDegreesOfSeparation,
@@ -95,7 +95,7 @@ public class DotTableFormatter implements Relationships {
         final WriteStats stats,
         final boolean includeImplied,
         final PrintWriter dot,
-        final DotFormat format
+        final Header header
     ) {
         this.dotConfig = dotConfig;
         this.table = table;
@@ -103,7 +103,7 @@ public class DotTableFormatter implements Relationships {
         this.stats = stats;
         this.includeImplied = includeImplied;
         this.dot = dot;
-        this.format = format;
+        this.header = header;
     }
 
     @Override
@@ -119,7 +119,7 @@ public class DotTableFormatter implements Relationships {
         Set<Table> tablesWritten = new HashSet<>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
-        dot.println(format.header());
+        dot.println(header.value());
 
         Factory factory = getFactory(table, true);
         Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
