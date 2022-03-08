@@ -5,7 +5,6 @@ import java.util.Set;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.DotConfig;
-import org.schemaspy.output.dot.schemaspy.DotFormat;
 import org.schemaspy.output.dot.schemaspy.DotTableFormatter;
 import org.schemaspy.view.WriteStats;
 
