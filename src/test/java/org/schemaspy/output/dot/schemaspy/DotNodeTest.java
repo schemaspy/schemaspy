@@ -112,7 +112,7 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.toString()).contains("URL=\"a_table_4867c34f.html\"");
+        assertThat(dotNode.value()).contains("URL=\"a_table_4867c34f.html\"");
     }
 
     @Test
@@ -132,7 +132,7 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.toString()).contains("URL=\"../../../schema/tables/a_table_4867c34f.html\"");
+        assertThat(dotNode.value()).contains("URL=\"../../../schema/tables/a_table_4867c34f.html\"");
     }
 
     @Test
@@ -149,7 +149,7 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.toString()).contains("URL=\"tables/a_table_4867c34f.html\"");
+        assertThat(dotNode.value()).contains("URL=\"tables/a_table_4867c34f.html\"");
     }
 
     @Test
@@ -169,7 +169,7 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.toString()).contains("URL=\"../schema/tables/a_table_4867c34f.html\"");
+        assertThat(dotNode.value()).contains("URL=\"../schema/tables/a_table_4867c34f.html\"");
     }
 
     @Test
@@ -186,7 +186,7 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.toString()).contains("URL=\"a_table_4867c34f.html\"");
+        assertThat(dotNode.value()).contains("URL=\"a_table_4867c34f.html\"");
     }
 
     @Test
@@ -205,7 +205,7 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.toString()).contains("URL=\"../../schema/tables/a_table_4867c34f.html\"");
+        assertThat(dotNode.value()).contains("URL=\"../../schema/tables/a_table_4867c34f.html\"");
     }
 
     @Test
@@ -323,7 +323,7 @@ public class DotNodeTest {
     }
 
     private void assertDotNode(DotNode dotNode, String fileName) throws IOException {
-        List<String> actualLines = Arrays.asList(dotNode.toString().split(System.lineSeparator()));
+        List<String> actualLines = Arrays.asList(dotNode.value().split(System.lineSeparator()));
         List<String> expectLines = getLines(fileName);
         assertThat(actualLines).hasSameSizeAs(expectLines);
         SoftAssertions.assertSoftly(soft -> {
@@ -354,7 +354,7 @@ public class DotNodeTest {
             )
         );
         table.setNumRows(1);
-        assertThat(dotNode.toString()).contains("row");
+        assertThat(dotNode.value()).contains("row");
     }
 
     @Test
@@ -375,7 +375,7 @@ public class DotNodeTest {
             )
         );
         table.setNumRows(2);
-        assertThat(dotNode.toString()).contains("rows");
+        assertThat(dotNode.value()).contains("rows");
     }
 
     @Test
@@ -396,7 +396,7 @@ public class DotNodeTest {
             )
         );
         table.setNumRows(1);
-        assertThat(dotNode.toString()).doesNotContain("row");
+        assertThat(dotNode.value()).doesNotContain("row");
     }
 
     @Test
@@ -414,7 +414,7 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.toString()).contains("tooltip=\"&lt;table&gt;");
+        assertThat(dotNode.value()).contains("tooltip=\"&lt;table&gt;");
     }
 
     @Test
@@ -437,7 +437,7 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.toString()).contains("<TD PORT=\"&lt;A&gt;.type\" ALIGN=\"LEFT\">&lt;t&gt;</TD>");
+        assertThat(dotNode.value()).contains("<TD PORT=\"&lt;A&gt;.type\" ALIGN=\"LEFT\">&lt;t&gt;</TD>");
     }
 
     @Test
@@ -460,6 +460,6 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.toString()).contains("[&lt;D&gt;]");
+        assertThat(dotNode.value()).contains("[&lt;D&gt;]");
     }
 }

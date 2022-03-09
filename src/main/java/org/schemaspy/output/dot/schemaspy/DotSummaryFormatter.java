@@ -96,7 +96,7 @@ public class DotSummaryFormatter {
         for (DotNode node : nodes.values()) {
             Table table = node.getTable();
 
-            dot.println(node.toString());
+            dot.println(node.value());
             stats.wroteTable(table);
             wroteImplied = wroteImplied || (includeImplied && table.isOrphan(false));
         }

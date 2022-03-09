@@ -50,7 +50,7 @@ import java.util.Set;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-public class DotNode {
+public class DotNode implements Node {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Html html = new Html();
@@ -98,6 +98,11 @@ public class DotNode {
 
     public void excludeColumn(TableColumn column) {
         excludedColumns.add(column);
+    }
+
+    @Override
+    public String value() {
+        return toString();
     }
 
     @Override
