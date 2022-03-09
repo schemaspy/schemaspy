@@ -187,7 +187,7 @@ public class DotTableFormatter implements Relationships {
         }
 
         for (DotNode node : nodes.values()) {
-            dot.println(node.toString());
+            dot.println(node.value());
             stats.wroteTable(node.getTable());
         }
 
