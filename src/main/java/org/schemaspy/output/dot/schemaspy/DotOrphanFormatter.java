@@ -41,10 +41,20 @@ public class DotOrphanFormatter {
     }
 
     public void writeOrphan(Table table, PrintWriter dot) {
-        Header header = new DotConfigHeader(dotConfig, table.getName(), false);
+        writeOrphan(
+                dot,
+                new DotConfigHeader(dotConfig, table.getName(), false),
+                new DotNode(
+                        table,
+                        true,
+                        new DotNodeConfig(true, true),
+                        dotConfig
+                )
+        );
+    }
+
+    public void writeOrphan(PrintWriter dot, Header header, Node node) {
         dot.println(header.value());
-        DotNodeConfig nodeConfig = new DotNodeConfig(true, true);
-        Node node = new DotNode(table, true, nodeConfig, dotConfig);
         dot.println(node.value());
         dot.println("}");
         dot.flush();
