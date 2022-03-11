@@ -46,9 +46,6 @@ public class DotFormatter {
     private final DotSummaryFormatter dotSummaryFormatter;
     private final DotOrphanFormatter dotOrphanFormatter;
 
-    /**
-     * Singleton - prevent creation
-     */
     public DotFormatter(DotConfig dotConfig) {
         this.dotConfig = dotConfig;
         this.dotSummaryFormatter = new DotSummaryFormatter(dotConfig);
