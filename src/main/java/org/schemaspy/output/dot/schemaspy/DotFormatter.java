@@ -44,12 +44,10 @@ public class DotFormatter {
     private final DotConfig dotConfig;
 
     private final DotSummaryFormatter dotSummaryFormatter;
-    private final DotOrphanFormatter dotOrphanFormatter;
 
     public DotFormatter(DotConfig dotConfig) {
         this.dotConfig = dotConfig;
         this.dotSummaryFormatter = new DotSummaryFormatter(dotConfig);
-        this.dotOrphanFormatter = new DotOrphanFormatter(dotConfig);
     }
 
     public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
@@ -69,6 +67,6 @@ public class DotFormatter {
     }
 
     public void writeOrphan(Table table, PrintWriter dot) {
-        dotOrphanFormatter.writeOrphan(table, dot);
+        new DotOrphanFormatter(dotConfig).writeOrphan(table, dot);
     }
 }
