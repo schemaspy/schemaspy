@@ -65,8 +65,4 @@ public class DotFormatter {
     public void writeTableAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
         new ImpliedRelationships(dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
-
-    public void writeOrphan(Table table, PrintWriter dot) {
-        new DotOrphanFormatter(dotConfig).writeOrphan(table, dot);
-    }
 }
