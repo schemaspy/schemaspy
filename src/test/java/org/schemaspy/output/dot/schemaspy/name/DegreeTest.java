@@ -11,26 +11,24 @@ public class DegreeTest {
     /**
      * Given two degrees of separation,
      * When the object is asked to represent itself,
-     * Then the origin's representation should be prepended with appropriate indication.
+     * Then it should respond with two degrees.
      */
     @Test
     public void acknowledgeImplication() {
-        final Name origin = new EmptyName();
         assertThat(
-            new Degree(true, origin).value()
-        ).isEqualTo("twoDegrees" + origin.value());
+            new Degree(true).value()
+        ).isEqualTo("twoDegrees");
     }
 
     /**
      * Given one degree of separation,
      * When the object is asked to represent itself,
-     * Then the origin's representation should be provided.
+     * Then it should respond with one degree.
      */
     @Test
     public void acknowledgeNonImplication() {
-        final Name origin = new EmptyName();
         assertThat(
-            new Degree(false, origin).value()
-        ).isEqualTo("oneDegree" + origin.value());
+            new Degree(false).value()
+        ).isEqualTo("oneDegree");
     }
 }
