@@ -65,9 +65,7 @@ public class DotSummaryFormatter {
                 compact,
                 new Implied(
                         includeImplied,
-                        new DefaultName(
-                                new EmptyName()
-                        )
+                        new DefaultName()
                 )
         );
         Header header = new DotConfigHeader(dotConfig, name, true);
