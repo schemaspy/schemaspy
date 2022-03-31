@@ -11,15 +11,12 @@ public class DefaultNameTest {
 
     /**
      * When the object is asked to represent itself,
-     * Then it should respond with the default name.
+     * Then it should respond with relationships diagram.
      */
     @Test
     public void representName() {
-        final Name origin = new EmptyName();
         assertThat(
-                new DefaultName(
-                        origin
-                ).value()
-        ).isEqualTo("RelationshipsDiagram" + origin.value());
+                new DefaultName().value()
+        ).isEqualTo("RelationshipsDiagram");
     }
 }
