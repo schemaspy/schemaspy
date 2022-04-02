@@ -75,10 +75,7 @@ public class DotTableFormatter implements Relationships {
                                 new Degree(twoDegreesOfSeparation),
                                 new Concatenation(
                                         new DefaultName(),
-                                        new Implied(
-                                                includeImplied,
-                                                new EmptyName()
-                                        )
+                                        new Implied(includeImplied)
                                 )
                         ),
                         true
