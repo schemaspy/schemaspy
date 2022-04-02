@@ -63,8 +63,10 @@ public class DotSummaryFormatter {
 
         Name name = new Sized(
                 compact,
-                new Implied(
-                        includeImplied,
+                new Concatenation(
+                        new Implied(
+                                includeImplied
+                        ),
                         new DefaultName()
                 )
         );
