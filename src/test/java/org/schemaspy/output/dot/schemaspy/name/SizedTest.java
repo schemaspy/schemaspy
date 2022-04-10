@@ -5,33 +5,31 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link Degree}.
+ * Tests for {@link Sized}.
  */
 public class SizedTest {
 
     /**
      * Given that the graph is compact,
      * When the object is asked to represent itself,
-     * Then the response should reflect this.
+     * Then it should respond with compact.
      */
     @Test
     public void interpretCompact() {
-        final Name origin = new EmptyName();
         assertThat(
-                new Sized(true, origin).value()
-        ).isEqualTo("compact" + origin.value());
+                new Sized(true).value()
+        ).isEqualTo("compact");
     }
 
     /**
      * Given that the graph is not compact,
      * When the object is asked to represent itself,
-     * Then the response should reflect that the graph is large.
+     * Then the it should respond with large.
      */
     @Test
     public void interpretLarge() {
-        final Name origin = new EmptyName();
         assertThat(
-                new Sized(false, origin).value()
-        ).isEqualTo("large" + origin.value());
+                new Sized(false).value()
+        ).isEqualTo("large");
     }
 }

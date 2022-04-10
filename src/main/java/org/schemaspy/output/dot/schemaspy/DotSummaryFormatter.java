@@ -61,12 +61,10 @@ public class DotSummaryFormatter {
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
         boolean wroteImplied = false;
 
-        Name name = new Sized(
-                compact,
+        final Name name = new Concatenation(
+                new Sized(compact),
                 new Concatenation(
-                        new Implied(
-                                includeImplied
-                        ),
+                        new Implied(includeImplied),
                         new DefaultName()
                 )
         );
