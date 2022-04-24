@@ -36,8 +36,8 @@
         <sonar.junit.reportPaths>target/surefire-reports,target/failsafe-reports</sonar.junit.reportPaths>
 
         <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
-        <testcontainers-java.version>1.10.1</testcontainers-java.version>
-        <testcontainers-junit.version>${testcontainers-java.version}.0.0</testcontainers-junit.version>
+        <testcontainers-java.version>1.16.3</testcontainers-java.version>
+        <testcontainers-junit.version>1.10.1.0.0</testcontainers-junit.version>
 
         <java.version>1.8</java.version>
     </properties>
@@ -288,7 +288,7 @@
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>6.2.2.jre8</version>
+            <version>7.2.0.jre11</version>
             <scope>test</scope>
         </dependency>
         <dependency>

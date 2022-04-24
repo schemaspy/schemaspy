@@ -126,7 +126,7 @@ public class InformixRoutinesIT {
     @Test
     public void databaseShouldHaveCompleteRoutineDefinition() {
         String expecting = "CREATE FUNCTION gc_comb(partial1 LVARCHAR, partial2 LVARCHAR) RETURNING LVARCHAR; IF partial1 IS NULL OR partial1 = '' THEN RETURN partial2; ELIF partial2 IS NULL OR partial2 = '' THEN RETURN partial1; ELSE RETURN partial1 || ',' || partial2; END IF; END FUNCTION;";
-        String actual = database.getRoutinesMap().get("gc_comb(lvarchar,lvarchar)").getDefinition().trim();
+        String actual = database.getRoutinesMap().get("gc_comb(lvarchar,lvarchar)").getDefinition().replaceAll("(\r\n|\r|\n)", " ").replaceAll("\\s\\s+", " ");
         assertThat(actual).isEqualToIgnoringCase(expecting);
     }
 
