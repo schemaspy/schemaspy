@@ -42,7 +42,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.OracleContainer;
 
 import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -81,7 +80,7 @@ public class OracleSpacesIT {
 
     @SuppressWarnings("unchecked")
     public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer("christophesurmont/oracle-xe-11g"))
+            new JdbcContainerRule<>(() -> new OracleContainer("gvenzl/oracle-xe:11-slim").usingSid())
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
                     .withInitScript("integrationTesting/oracle/dbScripts/spaces_in_table_names.sql");

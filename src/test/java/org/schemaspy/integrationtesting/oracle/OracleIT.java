@@ -80,7 +80,7 @@ public class OracleIT {
 
     @SuppressWarnings("unchecked")
     public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer("christophesurmont/oracle-xe-11g"))
+            new JdbcContainerRule<>(() -> new OracleContainer("gvenzl/oracle-xe:11").usingSid())
             .assumeDockerIsPresent()
             .withAssumptions(assumeDriverIsPresent())
             .withInitScript("integrationTesting/oracle/dbScripts/oracle.sql");
