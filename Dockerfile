@@ -1,4 +1,4 @@
-FROM openjdk:8u111-jre-alpine
+FROM openjdk:17-alpine3.14
 
 ENV LC_ALL=C
 
