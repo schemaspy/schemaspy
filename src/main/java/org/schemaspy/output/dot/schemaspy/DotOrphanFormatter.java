@@ -20,9 +20,6 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
-import org.schemaspy.model.Table;
-import org.schemaspy.output.dot.DotConfig;
-
 import java.io.PrintWriter;
 
 /**
@@ -34,16 +31,20 @@ import java.io.PrintWriter;
  */
 public class DotOrphanFormatter {
 
-    private final DotConfig dotConfig;
+    private final PrintWriter dot;
+    private final Header header;
+    private final Node node;
 
-    public DotOrphanFormatter(DotConfig dotConfig) {
-        this.dotConfig = dotConfig;
+    public DotOrphanFormatter(final PrintWriter dot, final Header header, final Node node) {
+        this.dot = dot;
+        this.header = header;
+        this.node = node;
     }
 
-    public void writeOrphan(PrintWriter dot, Header header, Node node) {
-        dot.println(header.value());
-        dot.println(node.value());
-        dot.println("}");
-        dot.flush();
+    public void writeOrphan() {
+        this.dot.println(this.header.value());
+        this.dot.println(this.node.value());
+        this.dot.println("}");
+        this.dot.flush();
     }
 }

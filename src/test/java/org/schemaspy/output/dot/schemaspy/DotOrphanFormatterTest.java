@@ -18,51 +18,14 @@ public class DotOrphanFormatterTest {
      */
     @Test
     void writeHeader() {
-        final DotOrphanFormatter sut = new DotOrphanFormatter(
-                new DotConfig() {
-                    @Override
-                    public boolean isRankDirBugEnabled() {
-                        return false;
-                    }
-
-                    @Override
-                    public String getFont() {
-                        return null;
-                    }
-
-                    @Override
-                    public int getFontSize() {
-                        return 0;
-                    }
-
-                    @Override
-                    public int getTextWidth(String text) {
-                        return 0;
-                    }
-
-                    @Override
-                    public boolean useRelativeLinks() {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean isNumRowsEnabled() {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean isOneOfMultipleSchemas() {
-                        return false;
-                    }
-                }
-        );
         final Writer writer = new StringWriter();
         final String key = "header";
-        sut.writeOrphan(
+        final DotOrphanFormatter sut = new DotOrphanFormatter(
                 new PrintWriter(writer),
                 () -> key,
                 () -> ""
         );
+        sut.writeOrphan();
         MatcherAssert.assertThat(
                 writer.toString(),
                 CoreMatchers.containsString(key)
@@ -76,51 +39,14 @@ public class DotOrphanFormatterTest {
      */
     @Test
     void writeNode() {
-        final DotOrphanFormatter sut = new DotOrphanFormatter(
-                new DotConfig() {
-                    @Override
-                    public boolean isRankDirBugEnabled() {
-                        return false;
-                    }
-
-                    @Override
-                    public String getFont() {
-                        return null;
-                    }
-
-                    @Override
-                    public int getFontSize() {
-                        return 0;
-                    }
-
-                    @Override
-                    public int getTextWidth(String text) {
-                        return 0;
-                    }
-
-                    @Override
-                    public boolean useRelativeLinks() {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean isNumRowsEnabled() {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean isOneOfMultipleSchemas() {
-                        return false;
-                    }
-                }
-        );
         final Writer writer = new StringWriter();
         final String key = "node";
-        sut.writeOrphan(
+        final DotOrphanFormatter sut = new DotOrphanFormatter(
                 new PrintWriter(writer),
                 () -> "",
                 () -> key
         );
+        sut.writeOrphan();
         MatcherAssert.assertThat(
                 writer.toString(),
                 CoreMatchers.containsString(key)

@@ -81,7 +81,7 @@ public class DotNodeIT {
         File dotFile = new File(orphansDir, "dotFileColumnName");
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
-        new DotOrphanFormatter(dotConfig).writeOrphan(
+        new DotOrphanFormatter(
                 printWriter,
                 new DotConfigHeader(dotConfig, table.getName(), false),
                 new DotNode(
@@ -90,7 +90,7 @@ public class DotNodeIT {
                         new DotNodeConfig(true, true),
                         dotConfig
                 )
-        );
+        ).writeOrphan();
 
         assertThatCode(() -> diagramFactory.generateOrphanDiagram(dotFile,"illegalTableName"))
                 .doesNotThrowAnyException();
@@ -110,7 +110,7 @@ public class DotNodeIT {
         File dotFile = new File(orphansDir, "dotFileColumnName");
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
-        new DotOrphanFormatter(dotConfig).writeOrphan(
+        new DotOrphanFormatter(
                 printWriter,
                 new DotConfigHeader(dotConfig, table.getName(), false),
                 new DotNode(
@@ -119,7 +119,7 @@ public class DotNodeIT {
                         new DotNodeConfig(true, true),
                         dotConfig
                 )
-        );
+        ).writeOrphan();
         assertThatCode(() -> diagramFactory.generateOrphanDiagram(dotFile,"illegalColumnName"))
                 .doesNotThrowAnyException();
     }
