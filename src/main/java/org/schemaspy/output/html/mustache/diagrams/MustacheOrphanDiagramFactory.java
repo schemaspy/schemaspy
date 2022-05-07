@@ -78,7 +78,7 @@ public class MustacheOrphanDiagramFactory {
             File dotFile = orphanDir.resolve(dotBaseFilespec + ".1degree.dot").toFile();
 
             try (PrintWriter dotOut = Writers.newPrintWriter(dotFile)) {
-                new DotOrphanFormatter(dotConfig).writeOrphan(
+                new DotOrphanFormatter(
                         dotOut,
                         new DotConfigHeader(dotConfig, table.getName(), false),
                         new DotNode(
@@ -87,8 +87,7 @@ public class MustacheOrphanDiagramFactory {
                                 new DotNodeConfig(true, true),
                                 dotConfig
                         )
-                );
-
+                ).writeOrphan();
 
                 mustacheTableDiagrams.add(mustacheDiagramFactory.generateOrphanDiagram(dotBaseFilespec, dotFile, dotBaseFilespec + ".1degree"));
             } catch (IOException e) {
