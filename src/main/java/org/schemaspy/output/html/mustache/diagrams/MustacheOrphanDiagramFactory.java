@@ -21,8 +21,7 @@ package org.schemaspy.output.html.mustache.diagrams;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.dot.DotConfig;
-import org.schemaspy.output.dot.schemaspy.DotFormatter;
-import org.schemaspy.output.dot.schemaspy.DotOrphanFormatter;
+import org.schemaspy.output.dot.schemaspy.*;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.FileNameGenerator;
 import org.schemaspy.view.MustacheTableDiagram;
@@ -79,7 +78,18 @@ public class MustacheOrphanDiagramFactory {
             File dotFile = orphanDir.resolve(dotBaseFilespec + ".1degree.dot").toFile();
 
             try (PrintWriter dotOut = Writers.newPrintWriter(dotFile)) {
-                new DotOrphanFormatter(dotConfig).writeOrphan(table, dotOut);
+                new DotOrphanFormatter(dotConfig).writeOrphan(
+                        dotOut,
+                        new DotConfigHeader(dotConfig, table.getName(), false),
+                        new DotNode(
+                                table,
+                                true,
+                                new DotNodeConfig(true, true),
+                                dotConfig
+                        )
+                );
+
+
                 mustacheTableDiagrams.add(mustacheDiagramFactory.generateOrphanDiagram(dotBaseFilespec, dotFile, dotBaseFilespec + ".1degree"));
             } catch (IOException e) {
                 LOGGER.error("Failed to produce dot: {}", dotFile, e);

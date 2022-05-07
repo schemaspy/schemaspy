@@ -40,19 +40,6 @@ public class DotOrphanFormatter {
         this.dotConfig = dotConfig;
     }
 
-    public void writeOrphan(Table table, PrintWriter dot) {
-        writeOrphan(
-                dot,
-                new DotConfigHeader(dotConfig, table.getName(), false),
-                new DotNode(
-                        table,
-                        true,
-                        new DotNodeConfig(true, true),
-                        dotConfig
-                )
-        );
-    }
-
     public void writeOrphan(PrintWriter dot, Header header, Node node) {
         dot.println(header.value());
         dot.println(node.value());
