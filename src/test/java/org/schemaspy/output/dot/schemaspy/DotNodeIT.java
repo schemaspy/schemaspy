@@ -83,7 +83,8 @@ public class DotNodeIT {
         PrintWriter printWriter = new PrintWriter(writer);
         new DotOrphanFormatter(
                 printWriter,
-                new DotConfigHeader(dotConfig, table.getName(), false),
+                table::getName,
+                new DotConfigHeader(dotConfig, false),
                 new DotNode(
                         table,
                         true,
@@ -112,7 +113,8 @@ public class DotNodeIT {
         PrintWriter printWriter = new PrintWriter(writer);
         new DotOrphanFormatter(
                 printWriter,
-                new DotConfigHeader(dotConfig, table.getName(), false),
+                table::getName,
+                new DotConfigHeader(dotConfig, false),
                 new DotNode(
                         table,
                         true,

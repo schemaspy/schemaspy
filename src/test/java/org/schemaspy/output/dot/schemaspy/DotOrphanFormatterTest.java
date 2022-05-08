@@ -12,6 +12,27 @@ import java.io.Writer;
 public class DotOrphanFormatterTest {
 
     /**
+     * Given a name,
+     * When the object is asked to write itself,
+     * Then the response should contain the graph
+     */
+    @Test
+    void writeGraph() {
+        final Writer writer = new StringWriter();
+        final DotOrphanFormatter sut = new DotOrphanFormatter(
+                new PrintWriter(writer),
+                () -> "Graph",
+                () -> "",
+                () -> ""
+        );
+        sut.writeOrphan();
+        MatcherAssert.assertThat(
+                writer.toString(),
+                CoreMatchers.containsString("digraph \"Graph\" {")
+        );
+    }
+
+    /**
      * Given a header,
      * When the object is asked to write itself,
      * Then the response should contain the header
@@ -22,6 +43,7 @@ public class DotOrphanFormatterTest {
         final String key = "header";
         final DotOrphanFormatter sut = new DotOrphanFormatter(
                 new PrintWriter(writer),
+                () -> "",
                 () -> key,
                 () -> ""
         );
@@ -43,6 +65,7 @@ public class DotOrphanFormatterTest {
         final String key = "node";
         final DotOrphanFormatter sut = new DotOrphanFormatter(
                 new PrintWriter(writer),
+                () -> "",
                 () -> "",
                 () -> key
         );

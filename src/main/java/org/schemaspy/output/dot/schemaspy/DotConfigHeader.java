@@ -21,7 +21,6 @@
 package org.schemaspy.output.dot.schemaspy;
 
 import org.schemaspy.output.dot.DotConfig;
-import org.schemaspy.output.dot.schemaspy.name.Name;
 
 /**
  * Format table data into .dot format to feed to Graphvis' dot program.
@@ -33,31 +32,19 @@ import org.schemaspy.output.dot.schemaspy.name.Name;
 public final class DotConfigHeader implements Header {
 
     private final DotConfig dotConfig;
-    private final String diagramName;
     private final boolean showLabel;
 
     public DotConfigHeader(
             final DotConfig dotConfig,
-            final Name diagram,
-            final boolean showLabel
-    ) {
-        this(dotConfig, diagram.value(), showLabel);
-    }
-
-    public DotConfigHeader(
-            final DotConfig dotConfig,
-            final String diagramName,
             final boolean showLabel
     ) {
         this.dotConfig = dotConfig;
-        this.diagramName = diagramName;
         this.showLabel = showLabel;
     }
 
     @Override
     public String value() {
         final StringBuilder header = new StringBuilder();
-        header.append("digraph \"" + diagramName + "\" {");
         header.append("  graph [");
         final boolean rankdirbug = dotConfig.isRankDirBugEnabled();
         if (!rankdirbug)
