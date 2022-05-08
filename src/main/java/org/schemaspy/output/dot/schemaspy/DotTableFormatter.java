@@ -53,6 +53,7 @@ public class DotTableFormatter implements Relationships {
     private final boolean includeImplied;
     private final PrintWriter dot;
     private final Header header;
+    private final Name graph;
 
     public DotTableFormatter(
             final DotConfig dotConfig,
@@ -71,14 +72,14 @@ public class DotTableFormatter implements Relationships {
                 dot,
                 new DotConfigHeader(
                         dotConfig,
-                        new Concatenation(
-                                new Degree(twoDegreesOfSeparation),
-                                new Concatenation(
-                                        new DefaultName(),
-                                        new Implied(includeImplied)
-                                )
-                        ),
                         true
+                ),
+                new Concatenation(
+                        new Degree(twoDegreesOfSeparation),
+                        new Concatenation(
+                                new DefaultName(),
+                                new Implied(includeImplied)
+                        )
                 )
         );
     }
@@ -90,7 +91,8 @@ public class DotTableFormatter implements Relationships {
         final WriteStats stats,
         final boolean includeImplied,
         final PrintWriter dot,
-        final Header header
+        final Header header,
+        final Name graph
     ) {
         this.dotConfig = dotConfig;
         this.table = table;
@@ -99,6 +101,7 @@ public class DotTableFormatter implements Relationships {
         this.includeImplied = includeImplied;
         this.dot = dot;
         this.header = header;
+        this.graph = graph;
     }
 
     @Override
@@ -114,6 +117,7 @@ public class DotTableFormatter implements Relationships {
         Set<Table> tablesWritten = new HashSet<>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
+        dot.println("digraph \"" + graph.value() + "\" {");
         dot.println(header.value());
 
         Factory factory = getFactory(table, true);

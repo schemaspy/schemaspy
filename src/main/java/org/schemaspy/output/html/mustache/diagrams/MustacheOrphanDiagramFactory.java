@@ -80,7 +80,8 @@ public class MustacheOrphanDiagramFactory {
             try (PrintWriter dotOut = Writers.newPrintWriter(dotFile)) {
                 new DotOrphanFormatter(
                         dotOut,
-                        new DotConfigHeader(dotConfig, table.getName(), false),
+                        table::getName,
+                        new DotConfigHeader(dotConfig, false),
                         new DotNode(
                                 table,
                                 true,

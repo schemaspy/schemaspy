@@ -20,6 +20,8 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
+import org.schemaspy.output.dot.schemaspy.name.Name;
+
 import java.io.PrintWriter;
 
 /**
@@ -32,16 +34,19 @@ import java.io.PrintWriter;
 public class DotOrphanFormatter {
 
     private final PrintWriter dot;
+    private final Name name;
     private final Header header;
     private final Node node;
 
-    public DotOrphanFormatter(final PrintWriter dot, final Header header, final Node node) {
+    public DotOrphanFormatter(final PrintWriter dot, final Name name, final Header header, final Node node) {
         this.dot = dot;
+        this.name = name;
         this.header = header;
         this.node = node;
     }
 
     public void writeOrphan() {
+        this.dot.println("digraph \"" + name.value() + "\" {");
         this.dot.println(this.header.value());
         this.dot.println(this.node.value());
         this.dot.println("}");

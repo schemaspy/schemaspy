@@ -68,7 +68,8 @@ public class DotSummaryFormatter {
                         new DefaultName()
                 )
         );
-        Header header = new DotConfigHeader(dotConfig, name, true);
+        dot.println("digraph \"" + name.value() + "\" {");
+        Header header = new DotConfigHeader(dotConfig, true);
         dot.println(header.value());
 
         Map<Table, DotNode> nodes = new TreeMap<>();
