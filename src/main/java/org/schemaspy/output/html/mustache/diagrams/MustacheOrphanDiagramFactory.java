@@ -22,6 +22,8 @@ import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.*;
+import org.schemaspy.output.dot.schemaspy.graph.Orphan;
+import org.schemaspy.output.dot.schemaspy.graph.Graph;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.FileNameGenerator;
 import org.schemaspy.view.MustacheTableDiagram;
@@ -78,8 +80,7 @@ public class MustacheOrphanDiagramFactory {
             File dotFile = orphanDir.resolve(dotBaseFilespec + ".1degree.dot").toFile();
 
             try (PrintWriter dotOut = Writers.newPrintWriter(dotFile)) {
-                new DotOrphanFormatter(
-                        dotOut,
+                Graph graph = new Orphan(
                         table::getName,
                         new DotConfigHeader(dotConfig, false),
                         new DotNode(
@@ -88,7 +89,9 @@ public class MustacheOrphanDiagramFactory {
                                 new DotNodeConfig(true, true),
                                 dotConfig
                         )
-                ).writeOrphan();
+                );
+                dotOut.println(graph.dot());
+                dotOut.flush();
 
                 mustacheTableDiagrams.add(mustacheDiagramFactory.generateOrphanDiagram(dotBaseFilespec, dotFile, dotBaseFilespec + ".1degree"));
             } catch (IOException e) {

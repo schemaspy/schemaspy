@@ -30,6 +30,8 @@ import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.output.diagram.graphviz.GraphvizDot;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.graph.Orphan;
+import org.schemaspy.output.dot.schemaspy.graph.Graph;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,8 +83,7 @@ public class DotNodeIT {
         File dotFile = new File(orphansDir, "dotFileColumnName");
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
-        new DotOrphanFormatter(
-                printWriter,
+        Graph graph = new Orphan(
                 table::getName,
                 new DotConfigHeader(dotConfig, false),
                 new DotNode(
@@ -91,7 +92,9 @@ public class DotNodeIT {
                         new DotNodeConfig(true, true),
                         dotConfig
                 )
-        ).writeOrphan();
+        );
+        printWriter.println(graph.dot());
+        printWriter.flush();
 
         assertThatCode(() -> diagramFactory.generateOrphanDiagram(dotFile,"illegalTableName"))
                 .doesNotThrowAnyException();
@@ -111,8 +114,7 @@ public class DotNodeIT {
         File dotFile = new File(orphansDir, "dotFileColumnName");
         Writer writer = Files.newBufferedWriter(dotFile.toPath(),StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
         PrintWriter printWriter = new PrintWriter(writer);
-        new DotOrphanFormatter(
-                printWriter,
+        Graph graph = new Orphan(
                 table::getName,
                 new DotConfigHeader(dotConfig, false),
                 new DotNode(
@@ -121,7 +123,9 @@ public class DotNodeIT {
                         new DotNodeConfig(true, true),
                         dotConfig
                 )
-        ).writeOrphan();
+        );
+        printWriter.println(graph.dot());
+        printWriter.flush();
         assertThatCode(() -> diagramFactory.generateOrphanDiagram(dotFile,"illegalColumnName"))
                 .doesNotThrowAnyException();
     }
