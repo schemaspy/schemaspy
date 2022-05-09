@@ -29,7 +29,6 @@ import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.config.PropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
-import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.view.HtmlConfig;
 import org.slf4j.Logger;
@@ -73,7 +72,7 @@ import java.util.stream.Stream;
  * See https://github.com/schemaspy/schemaspy/projects/3
  */
 @Deprecated
-public final class Config implements HtmlConfig, GraphvizConfig {
+public final class Config implements HtmlConfig {
 
     private static final int DEFAULT_FONT_SIZE = 11;
     private static final int DEFAULT_TABLE_DETAILS_THRESHOLD = 300;
@@ -86,6 +85,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     private Map<String, String> originalDbSpecificOptions;
     private boolean helpRequired;
     private boolean dbHelpRequired;
+    @Deprecated
     private String graphvizDir;
     private String dbType;
     private String schema;
@@ -123,8 +123,11 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     private Boolean viewsEnabled;
     private Boolean railsEnabled;
     private Boolean evaluateAll;
+    @Deprecated
     private Boolean highQuality;
+    @Deprecated
     private String imageFormat;
+    @Deprecated
     private String renderer;
     private Boolean paginationEnabled;
     /**
@@ -211,6 +214,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      *
      * @param graphvizDir string absolute path to graphviz dot executable
      */
+    @Deprecated
     public void setGraphvizDir(String graphvizDir) {
         if (graphvizDir.endsWith("\""))
             graphvizDir = graphvizDir.substring(0, graphvizDir.length() - 1);
@@ -227,6 +231,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      *
      * @return path to graphviz executable as supplied with -gv else null
      */
+    @Deprecated
     public String getGraphvizDir() {
         if (graphvizDir == null) {
             String gv = pullParam("-gv");
@@ -986,6 +991,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * Note that using {@link #setHighQuality(boolean)} is the preferred approach
      * over using this method.
      */
+    @Deprecated
     public void setRenderer(String renderer) {
         this.renderer = renderer;
     }
@@ -994,6 +1000,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * @return rendere to use as specified by -renderer else null and graphviz default
      * @see #setRenderer(String)
      */
+    @Deprecated
     public String getRenderer() {
         if (renderer == null) {
             renderer = pullParam("-renderer");
@@ -1012,6 +1019,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
      * larger image files (which take longer to download / display), but it generally
      * looks better.
      */
+    @Deprecated
     public void setHighQuality(boolean highQuality) {
         this.highQuality = highQuality;
     }
@@ -1019,6 +1027,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * @see #setHighQuality(boolean)
      */
+    @Deprecated
     public boolean isHighQuality() {
         if (highQuality == null) {
             highQuality = options.remove("-hq");
@@ -1029,6 +1038,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     /**
      * @see #setHighQuality(boolean)
      */
+    @Deprecated
     public boolean isLowQuality() {
         if (highQuality == null) {
             highQuality = !options.remove("-lq");
@@ -1151,10 +1161,12 @@ public final class Config implements HtmlConfig, GraphvizConfig {
         return loadJDBCJarsEnabled;
     }
 
+    @Deprecated
     public void setImageFormat(String imageFormat) {
         this.imageFormat = imageFormat;
     }
 
+    @Deprecated
     public String getImageFormat() {
         if (imageFormat == null) {
             imageFormat = pullParam("-imageformat");
