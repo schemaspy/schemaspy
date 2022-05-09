@@ -72,4 +72,21 @@ public class GraphvizDotTest {
         assertThat(loggingRule.getLog()).contains("gd");
     }
 
+    @Test
+    @Logger(GraphvizDot.class)
+    public void defaultRenderer() {
+        assumeThat(System.getProperty("os.name"), is("Linux"));
+        GraphvizConfig graphvizConfig = new GraphvizConfigCli().withGraphvizDir("src/test/resources/dotFakes/2.32.0");
+        GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
+        assertThat(loggingRule.getLog()).contains("cairo");
+    }
+
+    @Test
+    @Logger(GraphvizDot.class)
+    public void lowQualityRenderer() {
+        assumeThat(System.getProperty("os.name"), is("Linux"));
+        GraphvizConfig graphvizConfig = new GraphvizConfigCli().withGraphvizDir("src/test/resources/dotFakes/2.32.0").withLowQuality();
+        GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
+        assertThat(loggingRule.getLog()).contains("gd");
+    }
 }

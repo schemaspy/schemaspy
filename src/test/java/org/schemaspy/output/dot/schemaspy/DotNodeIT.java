@@ -70,7 +70,7 @@ public class DotNodeIT {
     @BeforeClass
     public static void setup() throws IOException {
         GraphvizConfig graphvizConfig = mock(GraphvizConfig.class);
-        when(graphvizConfig.isHighQuality()).thenReturn(true);
+        when(graphvizConfig.isLowQuality()).thenReturn(false);
         when(graphvizConfig.getImageFormat()).thenReturn("png");
         orphansDir = temporaryFolder.getRoot().toPath().resolve("diagrams").resolve("orphans").toFile();
         diagramFactory = new DiagramFactory(new GraphvizDot(graphvizConfig), temporaryFolder.getRoot());

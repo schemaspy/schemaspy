@@ -19,9 +19,8 @@
 package org.schemaspy.output.diagram.graphviz;
 
 public interface GraphvizConfig {
-
     String getGraphvizDir();
     String getRenderer();
-    boolean isHighQuality();
+    boolean isLowQuality();
     String getImageFormat();
 }
