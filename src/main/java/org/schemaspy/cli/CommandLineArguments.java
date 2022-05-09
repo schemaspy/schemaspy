@@ -21,6 +21,9 @@ package org.schemaspy.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
+import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
+import org.schemaspy.output.diagram.graphviz.GraphvizConfigCli;
 
 import java.io.File;
 
@@ -185,6 +188,9 @@ public class CommandLineArguments {
             }
     )
     private Integer port;
+
+    @ParametersDelegate
+    private GraphvizConfigCli graphvizConfig = new GraphvizConfigCli();
 
     @Parameter(
             names = {
@@ -426,6 +432,10 @@ public class CommandLineArguments {
 
     public Integer getPort() {
         return port;
+    }
+
+    public GraphvizConfig getGraphVizConfig() {
+        return graphvizConfig;
     }
 
     public boolean useVizJS() {

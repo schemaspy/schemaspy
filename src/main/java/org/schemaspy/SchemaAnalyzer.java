@@ -317,7 +317,7 @@ public class SchemaAnalyzer {
         if (useVizJS) {
             diagramFactory = new DiagramFactory(new VizJSDot(),outputDir);
         } else {
-            diagramFactory = new DiagramFactory(new GraphvizDot(config),outputDir);
+            diagramFactory = new DiagramFactory(new GraphvizDot(commandLineArguments.getGraphVizConfig()),outputDir);
         }
         Path htmlInfoFile = outputDir.toPath().resolve("info-html.txt");
         Files.deleteIfExists(htmlInfoFile);
