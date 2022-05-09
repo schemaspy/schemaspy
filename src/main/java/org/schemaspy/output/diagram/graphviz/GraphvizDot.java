@@ -58,6 +58,7 @@ public class GraphvizDot implements DiagramProducer {
         this.graphvizVersion = initVersion();
         initValidRenders();
         effectiveRenderer = initRenderer();
+        LOGGER.info("Graphviz renderer set to '{}'", effectiveRenderer);
     }
 
     private GraphvizVersion initVersion() {
@@ -132,20 +133,19 @@ public class GraphvizDot implements DiagramProducer {
      */
     private String initRenderer() {
         String possibleRenderer = graphvizConfig.getRenderer();
-        if (Objects.isNull(possibleRenderer) || !validRenders.contains(possibleRenderer)) {
-            if (Objects.nonNull(possibleRenderer) && !validRenders.contains(possibleRenderer)) {
-                LOGGER.warn("Specified renderer '{}' is not supported, available renders are {}", possibleRenderer, validRenders);
+        if (Objects.nonNull(possibleRenderer) && validRenders.contains(possibleRenderer)) {
+            if (validRenders.contains(possibleRenderer)) {
+                return possibleRenderer;
             }
-            if (validRenders.contains(CAIRO_RENDERER)) {
-                possibleRenderer = CAIRO_RENDERER;
-            } else if (validRenders.contains(GD_RENDERER)) {
-                possibleRenderer = GD_RENDERER;
-            } else {
-                possibleRenderer = EMPTY_RENDERER;
-            }
+            LOGGER.warn("Specified renderer '{}' is not supported, available renders are {}", possibleRenderer, validRenders);
         }
-        LOGGER.info("Graphviz renderer set to '{}'", possibleRenderer);
-        return possibleRenderer;
+        if (graphvizConfig.isLowQuality() && validRenders.contains(GD_RENDERER)) {
+            return GD_RENDERER;
+        }
+        if (validRenders.contains(CAIRO_RENDERER)) {
+            return CAIRO_RENDERER;
+        }
+        return EMPTY_RENDERER;
     }
 
     public String getImplementationDetails() {

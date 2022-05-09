@@ -26,12 +26,12 @@ public class GraphvizConfigCli implements GraphvizConfig {
 
     @Parameter(
             names = {
-                    "-hq", "--high-quality", "hq",
-                    "schemaspy.hq"
+                    "-lq", "--low-quality", "lq",
+                    "schemaspy.lq"
             },
-            descriptionKey = "hq"
+            descriptionKey = "lq"
     )
-    private boolean highQuality = false;
+    private boolean lowQuality = false;
 
     @Parameter(
             names = {
@@ -44,27 +44,27 @@ public class GraphvizConfigCli implements GraphvizConfig {
 
     public GraphvizConfigCli() {}
 
-    private GraphvizConfigCli(String graphvizDir, String renderer, boolean highQuality, String imageFormat) {
+    private GraphvizConfigCli(String graphvizDir, String renderer, boolean lowQuality, String imageFormat) {
         this.graphvizDir = graphvizDir;
         this.renderer = renderer;
-        this.highQuality = highQuality;
+        this.lowQuality = lowQuality;
         this.imageFormat = imageFormat;
     }
 
     public GraphvizConfigCli withGraphvizDir(String graphvizDir) {
-        return new GraphvizConfigCli(graphvizDir, renderer, highQuality, imageFormat);
+        return new GraphvizConfigCli(graphvizDir, renderer, lowQuality, imageFormat);
     }
 
     public GraphvizConfigCli withRenderer(String renderer) {
-        return new GraphvizConfigCli(graphvizDir, renderer, highQuality, imageFormat);
+        return new GraphvizConfigCli(graphvizDir, renderer, lowQuality, imageFormat);
     }
 
-    public GraphvizConfigCli withHighQuality() {
+    public GraphvizConfigCli withLowQuality() {
         return new GraphvizConfigCli(graphvizDir, renderer, true, imageFormat);
     }
 
     public GraphvizConfigCli withImageFormat(String imageFormat) {
-        return new GraphvizConfigCli(graphvizDir, renderer, highQuality, imageFormat);
+        return new GraphvizConfigCli(graphvizDir, renderer, lowQuality, imageFormat);
     }
 
     @Override
@@ -78,8 +78,8 @@ public class GraphvizConfigCli implements GraphvizConfig {
     }
 
     @Override
-    public boolean isHighQuality() {
-        return highQuality;
+    public boolean isLowQuality() {
+        return lowQuality;
     }
 
     @Override
