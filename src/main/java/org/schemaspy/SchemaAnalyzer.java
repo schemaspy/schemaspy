@@ -221,7 +221,7 @@ public class SchemaAnalyzer {
             catalog = new CatalogResolver(databaseMetaData).resolveCatalog(catalog);
             schema = new SchemaResolver(databaseMetaData).resolveSchema(schema);
 
-            SchemaMeta schemaMeta = config.getMeta() == null ? null : new SchemaMeta(config.getMeta(), dbName, schema);
+            SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema);
             if (commandLineArguments.isHtmlEnabled()) {
                 FileUtils.forceMkdir(new File(outputDir, "tables"));
                 FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));

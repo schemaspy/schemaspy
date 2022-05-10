@@ -258,10 +258,12 @@ public final class Config implements HtmlConfig {
      *
      * @param meta path to schemameta-file
      */
+    @Deprecated
     public void setMeta(String meta) {
         this.meta = meta;
     }
 
+    @Deprecated
     public String getMeta() {
         if (meta == null)
             meta = pullParam("-meta");
