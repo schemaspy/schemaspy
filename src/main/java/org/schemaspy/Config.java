@@ -88,7 +88,6 @@ public final class Config implements HtmlConfig {
     @Deprecated
     private String graphvizDir;
     private String dbType;
-    private String schema;
     private List<String> schemas;
     private boolean oneOfMultipleSchemas;
     private String user;
@@ -313,21 +312,6 @@ public final class Config implements HtmlConfig {
         if (db == null)
             db = pullParam("-db");
         return db;
-    }
-
-    public void setSchema(String schema) {
-        this.schema = schema;
-    }
-
-    /**
-     * @deprecated use {@link CommandLineArguments#getSchema()}
-     * @return schema as supplied with -s
-     */
-    @Deprecated
-    public String getSchema() {
-        if (schema == null)
-            schema = pullParam("-s");
-        return schema;
     }
 
     public void setHost(String host) {
