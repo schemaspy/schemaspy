@@ -201,6 +201,15 @@ public class CommandLineArguments {
 
     @Parameter(
             names = {
+                    "-host", "--host", "host",
+                    "schemaspy.host"
+            },
+            descriptionKey = "host"
+    )
+    private String host;
+
+    @Parameter(
+            names = {
                     "-port", "--port", "port",
                     "schemaspy.port"
             }
