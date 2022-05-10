@@ -329,7 +329,7 @@ public class SchemaAnalyzer {
         progressListener.graphingSummaryProgressed();
 
         boolean showDetailedTables = tables.size() <= config.getMaxDetailedTables();
-        final boolean includeImpliedConstraints = config.isImpliedConstraintsEnabled();
+        final boolean includeImpliedConstraints = commandLineArguments.withImpliedRelationships();
 
         // if evaluating a 'ruby on rails-based' database then connect the columns
         // based on RoR conventions

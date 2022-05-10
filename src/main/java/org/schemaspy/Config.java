@@ -203,6 +203,7 @@ public final class Config implements HtmlConfig {
         return generateHtml;
     }
 
+    @Deprecated
     public boolean isImpliedConstraintsEnabled() {
         if (includeImpliedConstraints == null)
             includeImpliedConstraints = !options.remove("-noimplied");

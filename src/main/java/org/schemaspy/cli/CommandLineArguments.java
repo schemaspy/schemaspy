@@ -100,6 +100,15 @@ public class CommandLineArguments {
 
     @Parameter(
             names = {
+                    "-noimplied", "--no-implied", "noimplied",
+                    "schemaspy.noimplied"
+            },
+            descriptionKey = "noimplied"
+    )
+    private boolean noImplied = false;
+
+    @Parameter(
+            names = {
                     "-t", "--database-type", "database-type",
                     "schemaspy.t", "schemaspy.database-type"
             },
@@ -400,6 +409,10 @@ public class CommandLineArguments {
 
     public boolean isHtmlEnabled() {
         return !nohtml;
+    }
+
+    public boolean withImpliedRelationships() {
+        return !noImplied;
     }
 
     public String getDatabaseType() {
