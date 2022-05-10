@@ -212,7 +212,8 @@ public class CommandLineArguments {
             names = {
                     "-port", "--port", "port",
                     "schemaspy.port"
-            }
+            },
+            descriptionKey = "port"
     )
     private Integer port;
 
