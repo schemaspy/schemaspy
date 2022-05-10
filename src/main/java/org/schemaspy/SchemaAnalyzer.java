@@ -161,8 +161,6 @@ public class SchemaAnalyzer {
                 config.setEvaluateAllEnabled(false);
                 if (dbName == null)
                     config.setDb(schema);
-                else
-                    config.setSchema(schema);
 
                 LOGGER.info("Analyzing '{}'", schema);
                 File outputDirForSchema = new File(outputDir, FileNameGenerator.generate(schema));
