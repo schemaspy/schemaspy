@@ -192,6 +192,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
         instance = config;
     }
 
+    @Deprecated
     public boolean isHtmlGenerationEnabled() {
         if (generateHtml == null)
             generateHtml = !options.remove("-nohtml");
