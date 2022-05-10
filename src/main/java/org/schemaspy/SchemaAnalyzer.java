@@ -47,11 +47,7 @@ import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.output.html.mustache.diagrams.*;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
-import org.schemaspy.util.DataTableConfig;
-import org.schemaspy.util.ManifestUtils;
-import org.schemaspy.util.Markdown;
-import org.schemaspy.util.ResourceWriter;
-import org.schemaspy.util.Writers;
+import org.schemaspy.util.*;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,11 +124,6 @@ public class SchemaAnalyzer {
 
     public Database analyzeMultipleSchemas(Config config, ProgressListener progressListener) throws SQLException, IOException {
         try {
-            // following params will be replaced by something appropriate
-            List<String> args = config.asList();
-            args.remove("-schemas");
-            args.remove("-schemata");
-
             List<String> schemas = config.getSchemas();
             Database db = null;
             String schemaSpec = config.getSchemaSpec();
