@@ -195,6 +195,7 @@ public final class Config implements HtmlConfig {
         instance = config;
     }
 
+    @Deprecated
     public boolean isHtmlGenerationEnabled() {
         if (generateHtml == null)
             generateHtml = !options.remove("-nohtml");

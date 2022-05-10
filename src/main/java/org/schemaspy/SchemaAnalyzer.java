@@ -107,7 +107,7 @@ public class SchemaAnalyzer {
         // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
         // and not already logging fine details (to keep from obfuscating those)
 
-        boolean render = config.isHtmlGenerationEnabled();
+        boolean render = commandLineArguments.isHtmlEnabled();
         ProgressListener progressListener = new ConsoleProgressListener(render, commandLineArguments);
 
         // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
@@ -222,7 +222,7 @@ public class SchemaAnalyzer {
             schema = new SchemaResolver(databaseMetaData).resolveSchema(schema);
 
             SchemaMeta schemaMeta = config.getMeta() == null ? null : new SchemaMeta(config.getMeta(), dbName, schema);
-            if (config.isHtmlGenerationEnabled()) {
+            if (commandLineArguments.isHtmlEnabled()) {
                 FileUtils.forceMkdir(new File(outputDir, "tables"));
                 FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
@@ -250,7 +250,7 @@ public class SchemaAnalyzer {
             }
 
             long duration = progressListener.startedGraphingSummaries();
-            if (config.isHtmlGenerationEnabled()) {
+            if (commandLineArguments.isHtmlEnabled()) {
                 generateHtmlDoc(config, commandLineArguments.useVizJS() , progressListener, outputDir, db, duration, tables);
             }
 
@@ -281,7 +281,7 @@ public class SchemaAnalyzer {
             duration = progressListener.finishedGatheringDetails();
             long overallDuration = progressListener.finished(tables, config);
 
-            if (config.isHtmlGenerationEnabled()) {
+            if (commandLineArguments.isHtmlEnabled()) {
                 LOGGER.info("Wrote table details in {} seconds", duration / SECONDS_IN_MS);
 
                 LOGGER.info("Wrote relationship details of {} tables/views to directory '{}' in {} seconds.", tables.size(), outputDir, overallDuration / SECONDS_IN_MS);
