@@ -118,12 +118,21 @@ public class CommandLineArguments {
 
     @Parameter(
             names = {
-                    "-db", "-database-name",
+                    "-db", "--database-name",
                     "schemaspy.db", "schemaspy.database-name"
             },
             descriptionKey = "databaseName"
     )
     private String databaseName;
+
+    @Parameter(
+            names = {
+                    "-meta", "--schema-meta",
+                    "meta", "schemaspy.meta"
+            },
+            descriptionKey = "meta"
+    )
+    private String schemaMeta;
 
     @Parameter(
             names = {
@@ -441,6 +450,10 @@ public class CommandLineArguments {
 
     public String getDatabaseName() {
         return databaseName;
+    }
+
+    public String getSchemaMeta() {
+        return schemaMeta;
     }
 
     public Integer getPort() {
