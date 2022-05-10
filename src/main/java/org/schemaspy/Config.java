@@ -82,11 +82,8 @@ public final class Config implements HtmlConfig {
     private static Config instance;
     private final List<String> options;
     private Map<String, String> dbSpecificOptions;
-    private Map<String, String> originalDbSpecificOptions;
     private boolean helpRequired;
     private boolean dbHelpRequired;
-    @Deprecated
-    private String graphvizDir;
     private String dbType;
     private List<String> schemas;
     private boolean oneOfMultipleSchemas;
@@ -97,7 +94,6 @@ public final class Config implements HtmlConfig {
     private String db;
     private String host;
     private Integer port;
-    private String meta;
     private Boolean exportedKeysEnabled;
     private String templateDirectory;
     private Pattern tableInclusions;
@@ -115,19 +111,11 @@ public final class Config implements HtmlConfig {
     private String description;
     private PropertiesResolver propertiesResolver = new PropertiesResolver();
     private Properties dbProperties;
-    private Boolean generateHtml;
-    private Boolean includeImpliedConstraints;
     private Boolean rankDirBugEnabled;
     private Boolean numRowsEnabled;
     private Boolean viewsEnabled;
     private Boolean railsEnabled;
     private Boolean evaluateAll;
-    @Deprecated
-    private Boolean highQuality;
-    @Deprecated
-    private String imageFormat;
-    @Deprecated
-    private String renderer;
     private Boolean paginationEnabled;
     /**
      * @deprecated replaced by -dp expanding folders
@@ -135,10 +123,7 @@ public final class Config implements HtmlConfig {
     @Deprecated
     private Boolean loadJDBCJarsEnabled = false;
     private String schemaSpec;  // used in conjunction with evaluateAll
-    private boolean hasOrphans;
-    private boolean hasRoutines;
     private boolean populating;
-    public static final String DOT_CHARSET = "UTF-8";
     private static final String ESCAPED_EQUALS = "\\=";
     private static final String DEFAULT_TABLE_INCLUSION = ".*"; // match everything
     private static final String DEFAULT_TABLE_EXCLUSION = ".*\\$.*";
@@ -192,81 +177,6 @@ public final class Config implements HtmlConfig {
      */
     public static void setInstance(Config config) {
         instance = config;
-    }
-
-    @Deprecated
-    public boolean isHtmlGenerationEnabled() {
-        if (generateHtml == null)
-            generateHtml = !options.remove("-nohtml");
-
-        return generateHtml;
-    }
-
-    @Deprecated
-    public boolean isImpliedConstraintsEnabled() {
-        if (includeImpliedConstraints == null)
-            includeImpliedConstraints = !options.remove("-noimplied");
-
-        return includeImpliedConstraints;
-    }
-
-    /**
-     * Set the path to Graphviz so we can find dot to generate ER diagrams
-     *
-     * @param graphvizDir string absolute path to graphviz dot executable
-     */
-    @Deprecated
-    public void setGraphvizDir(String graphvizDir) {
-        if (graphvizDir.endsWith("\""))
-            graphvizDir = graphvizDir.substring(0, graphvizDir.length() - 1);
-
-        this.graphvizDir = new File(graphvizDir).toString();
-    }
-
-    /**
-     * Return the path to Graphviz (used to find the dot executable to run to
-     * generate ER diagrams).
-     *
-     * Returns graphiz path or null
-     * was not specified.
-     *
-     * @return path to graphviz executable as supplied with -gv else null
-     */
-    @Deprecated
-    public String getGraphvizDir() {
-        if (graphvizDir == null) {
-            String gv = pullParam("-gv");
-            if (gv != null) {
-                setGraphvizDir(gv);
-            } else {
-                // expect to find Graphviz's bin directory on the PATH
-            }
-        }
-
-        return graphvizDir;
-    }
-
-    /**
-     * Meta files are XML-based files that provide additional metadata
-     * about the schema being evaluated.<p>
-     * <code>meta</code> is either the name of an individual XML file or
-     * the directory that contains meta files.<p>
-     * If a directory is specified then it is expected to contain files
-     * matching the pattern <code>[schema].meta.xml</code>.
-     * For databases that don't have schema substitute database for schema.
-     *
-     * @param meta path to schemameta-file
-     */
-    @Deprecated
-    public void setMeta(String meta) {
-        this.meta = meta;
-    }
-
-    @Deprecated
-    public String getMeta() {
-        if (meta == null)
-            meta = pullParam("-meta");
-        return meta;
     }
 
     public boolean isExportedKeysEnabled() {
@@ -971,70 +881,6 @@ public final class Config implements HtmlConfig {
     }
 
     /**
-     * Set the renderer to use for the -Tpng[:renderer[:formatter]] dot option as specified
-     * at <a href='http://www.graphviz.org/doc/info/command.html'>
-     * http://www.graphviz.org/doc/info/command.html</a>.<p>
-     * Note that the leading ":" is required while :formatter is optional.<p>
-     * The default renderer is typically GD.<p>
-     * Note that using {@link #setHighQuality(boolean)} is the preferred approach
-     * over using this method.
-     */
-    @Deprecated
-    public void setRenderer(String renderer) {
-        this.renderer = renderer;
-    }
-
-    /**
-     * @return rendere to use as specified by -renderer else null and graphviz default
-     * @see #setRenderer(String)
-     */
-    @Deprecated
-    public String getRenderer() {
-        if (renderer == null) {
-            renderer = pullParam("-renderer");
-        }
-        return renderer;
-    }
-
-    /**
-     * If <code>false</code> then generate output of "lower quality"
-     * than the default.
-     * Note that the default is intended to be "higher quality",
-     * but various installations of Graphviz may have have different abilities.
-     * That is, some might not have the "lower quality" libraries and others might
-     * not have the "higher quality" libraries.<p>
-     * Higher quality output takes longer to generate and results in significantly
-     * larger image files (which take longer to download / display), but it generally
-     * looks better.
-     */
-    @Deprecated
-    public void setHighQuality(boolean highQuality) {
-        this.highQuality = highQuality;
-    }
-
-    /**
-     * @see #setHighQuality(boolean)
-     */
-    @Deprecated
-    public boolean isHighQuality() {
-        if (highQuality == null) {
-            highQuality = options.remove("-hq");
-        }
-        return highQuality;
-    }
-
-    /**
-     * @see #setHighQuality(boolean)
-     */
-    @Deprecated
-    public boolean isLowQuality() {
-        if (highQuality == null) {
-            highQuality = !options.remove("-lq");
-        }
-        return !highQuality;
-    }
-
-    /**
      * Returns <code>true</code> if the options indicate that the user wants
      * to see some help information.
      *
@@ -1065,36 +911,6 @@ public final class Config implements HtmlConfig {
             }
         }
         return loadedFrom;
-    }
-
-    /**
-     * Not a true configuration item in that it's determined at runtime
-     */
-    public void setHasOrphans(boolean hasOrphans) {
-        this.hasOrphans = hasOrphans;
-    }
-
-    /**
-     * @return if we have orphan tables
-     * @see #setHasOrphans(boolean)
-     */
-    public boolean hasOrphans() {
-        return hasOrphans;
-    }
-
-    /**
-     * Not a true configuration item in that it's determined at runtime
-     */
-    public void setHasRoutines(boolean hasRoutines) {
-        this.hasRoutines = hasRoutines;
-    }
-
-    /**
-     * @return if we have found routines
-     * @see #setHasRoutines(boolean)
-     */
-    public boolean hasRoutines() {
-        return hasRoutines;
     }
 
     /**
@@ -1149,21 +965,6 @@ public final class Config implements HtmlConfig {
         return loadJDBCJarsEnabled;
     }
 
-    @Deprecated
-    public void setImageFormat(String imageFormat) {
-        this.imageFormat = imageFormat;
-    }
-
-    @Deprecated
-    public String getImageFormat() {
-        if (imageFormat == null) {
-            imageFormat = pullParam("-imageformat");
-            if (imageFormat == null)
-                imageFormat = "png";
-        }
-        return imageFormat;
-    }
-
     /**
      * Returns the database properties to use.
      * These should be determined by calling {@link #determineDbProperties(String)}.
@@ -1212,7 +1013,6 @@ public final class Config implements HtmlConfig {
      */
     public void setDbSpecificOptions(Map<String, String> dbSpecificOptions) {
         this.dbSpecificOptions = dbSpecificOptions;
-        originalDbSpecificOptions = new HashMap<>(dbSpecificOptions);
     }
 
     public Map<String, String> getDbSpecificOptions() {
