@@ -42,7 +42,6 @@ public class GraphvizDot implements DiagramProducer {
 
     private final GraphvizConfig graphvizConfig;
     private final GraphvizVersion graphvizVersion;
-    private final GraphvizVersion supportedGraphvizVersion = new GraphvizVersion("2.26");
     private final GraphvizVersion badGraphvizVersion = new GraphvizVersion("2.31");
     private final String lineSeparator = System.getProperty("line.separator");
     private String dotExe;
@@ -116,7 +115,7 @@ public class GraphvizDot implements DiagramProducer {
     }
 
     public boolean isValid() {
-        return exists() && (getGraphvizVersion().equals(supportedGraphvizVersion) || getGraphvizVersion().compareTo(badGraphvizVersion) > 0);
+        return exists() && (getGraphvizVersion().compareTo(badGraphvizVersion) != 0);
     }
 
     public boolean exists() {

@@ -48,9 +48,9 @@ public class GraphvizDotTest {
     }
 
     @Test
-    public void version2_28_0() {
+    public void version2_31_0() {
         assumeThat(System.getProperty("os.name"), is("Linux"));
-        GraphvizConfig graphvizConfig = new GraphvizConfigCli().withGraphvizDir("src/test/resources/dotFakes/2.28.0");
+        GraphvizConfig graphvizConfig = new GraphvizConfigCli().withGraphvizDir("src/test/resources/dotFakes/2.31.0");
         GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
         assertThat(graphvizDot.isValid()).isFalse();
     }
