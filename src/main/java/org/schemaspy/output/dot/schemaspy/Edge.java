@@ -28,7 +28,7 @@ import org.schemaspy.model.TableColumn;
  * @author John Currier
  * @author Nils Petzaell
  */
-public class DotConnector implements Comparable<DotConnector> {
+public class Edge implements Comparable<Edge> {
     private final TableColumn parentColumn;
     private final Table parentTable;
     private final TableColumn childColumn;
@@ -44,7 +44,7 @@ public class DotConnector implements Comparable<DotConnector> {
      * @param childColumn TableColumn
      * @param implied boolean
      */
-    public DotConnector(TableColumn parentColumn, TableColumn childColumn, boolean implied) {
+    public Edge(TableColumn parentColumn, TableColumn childColumn, boolean implied) {
         this.parentColumn = parentColumn;
         this.childColumn = childColumn;
         this.implied = implied;
@@ -143,7 +143,7 @@ public class DotConnector implements Comparable<DotConnector> {
         return edge.toString();
     }
 
-    public int compareTo(DotConnector other) {
+    public int compareTo(Edge other) {
         int rc = childTable.compareTo(other.childTable);
         if (rc == 0)
             rc = childColumn.getName().compareToIgnoreCase(other.childColumn.getName());
@@ -158,9 +158,9 @@ public class DotConnector implements Comparable<DotConnector> {
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof DotConnector))
+        if (!(other instanceof Edge))
             return false;
-        return compareTo((DotConnector)other) == 0;
+        return compareTo((Edge)other) == 0;
     }
 
     @Override

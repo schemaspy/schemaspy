@@ -24,7 +24,7 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
-import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
+import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
 import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.view.WriteStats;
 
@@ -84,10 +84,10 @@ public class DotSummaryFormatter {
             nodes.put(table, new DotNode(table, true, nodeConfig, dotConfig));
         }
 
-        Set<DotConnector> connectors = new TreeSet<>();
+        Set<Edge> edges = new TreeSet<>();
 
         for (DotNode node : nodes.values()) {
-            connectors.addAll(new SimpleConnectors(node.getTable(), includeImplied).unique());
+            edges.addAll(new SimpleEdges(node.getTable(), includeImplied).unique());
         }
 
         markExcludedColumns(nodes, stats.getExcludedColumns());
@@ -100,8 +100,8 @@ public class DotSummaryFormatter {
             wroteImplied = wroteImplied || (includeImplied && table.isOrphan(false));
         }
 
-        for (DotConnector connector : connectors) {
-            dot.println(connector.toString());
+        for (Edge edge : edges) {
+            dot.println(edge.toString());
         }
 
         dot.println("}");

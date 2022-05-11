@@ -1,13 +1,13 @@
-package org.schemaspy.output.dot.schemaspy.connectors;
+package org.schemaspy.output.dot.schemaspy.edge;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
-import org.schemaspy.output.dot.schemaspy.DotConnector;
+import org.schemaspy.output.dot.schemaspy.Edge;
 
-public class RelatedConnectors implements DotConnectors {
+public class RelatedEdges implements Edges {
     private final TableColumn column;
     private final Table targetTable;
     private final boolean includeExcluded;
@@ -17,9 +17,9 @@ public class RelatedConnectors implements DotConnectors {
      * @param column TableColumn
      * @param targetTable Table
      * @throws IOException
-     * @return Set of <code>dot</code> relationships (as {@link DotConnector}s)
+     * @return Set of <code>dot</code> relationships (as {@link Edge}s)
      */
-    public RelatedConnectors(TableColumn column, Table targetTable, boolean includeExcluded, boolean includeImplied) {
+    public RelatedEdges(TableColumn column, Table targetTable, boolean includeExcluded, boolean includeImplied) {
         this.column = column;
         this.targetTable = targetTable;
         this.includeExcluded = includeExcluded;
@@ -27,8 +27,8 @@ public class RelatedConnectors implements DotConnectors {
     }
 
     @Override
-    public Set<DotConnector> unique() {
-        Set<DotConnector> relatedConnectors = new HashSet<>();
+    public Set<Edge> unique() {
+        Set<Edge> relatedConnectors = new HashSet<>();
         if (!includeExcluded && column.isExcluded())
             return relatedConnectors;
 
@@ -40,7 +40,7 @@ public class RelatedConnectors implements DotConnectors {
                 continue;
             boolean implied = column.getParentConstraint(parentColumn).isImplied();
             if (!implied || includeImplied) {
-                relatedConnectors.add(new DotConnector(parentColumn, column, implied));
+                relatedConnectors.add(new Edge(parentColumn, column, implied));
             }
         }
 
@@ -52,7 +52,7 @@ public class RelatedConnectors implements DotConnectors {
                 continue;
             boolean implied = column.getChildConstraint(childColumn).isImplied();
             if (!implied || includeImplied) {
-                relatedConnectors.add(new DotConnector(column, childColumn, implied));
+                relatedConnectors.add(new Edge(column, childColumn, implied));
             }
         }
 
