@@ -27,8 +27,8 @@ import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Default;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Included;
-import org.schemaspy.output.dot.schemaspy.connectors.PairConnectors;
-import org.schemaspy.output.dot.schemaspy.connectors.SimpleConnectors;
+import org.schemaspy.output.dot.schemaspy.edge.PairEdges;
+import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
 import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.Columns;
@@ -123,20 +123,20 @@ public class DotTableFormatter implements Relationships {
         Factory factory = getFactory(table, true);
         Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
 
-        Set<DotConnector> connectors = new TreeSet<>(new SimpleConnectors(table, includeImplied).unique());
+        Set<Edge> edges = new TreeSet<>(new SimpleEdges(table, includeImplied).unique());
         tablesWritten.add(table);
 
         Map<Table, DotNode> nodes = new TreeMap<>();
 
         // Immediate relatives should be written first
-        writeImmediateRelatives(relatedTables, tablesWritten, nodes, connectors);
+        writeImmediateRelatives(relatedTables, tablesWritten, nodes, edges);
 
         Set<Table> allCousins = new HashSet<>();
-        Set<DotConnector> allCousinConnectors = new TreeSet<>();
+        Set<Edge> allCousinEdges = new TreeSet<>();
 
         // next write 'cousins' (2nd degree of separation)
         if (twoDegreesOfSeparation) {
-            writeCousins(relatedTables, skippedImpliedConstraints, tablesWritten, allCousinConnectors, nodes, allCousins);
+            writeCousins(relatedTables, skippedImpliedConstraints, tablesWritten, allCousinEdges, nodes, allCousins);
         }
 
         // glue together any 'participants' that aren't yet connected
@@ -148,11 +148,11 @@ public class DotTableFormatter implements Relationships {
             iter.remove(); // cut down the combos as quickly as possible
 
             for (Table participantB : participants) {
-                for (DotConnector connector : new PairConnectors(participantA, participantB, false, includeImplied).unique()) {
+                for (Edge edge : new PairEdges(participantA, participantB, false, includeImplied).unique()) {
                     if (twoDegreesOfSeparation && (allCousins.contains(participantA) || allCousins.contains(participantB))) {
-                        allCousinConnectors.add(connector);
+                        allCousinEdges.add(edge);
                     } else {
-                        connectors.add(connector);
+                        edges.add(edge);
                     }
                 }
             }
@@ -162,27 +162,27 @@ public class DotTableFormatter implements Relationships {
 
         // now directly connect the loose ends to the title of the
         // 2nd degree of separation tables
-        for (DotConnector connector : allCousinConnectors) {
-            if (allCousins.contains(connector.getParentTable()) && !relatedTables.contains(connector.getParentTable()))
-                connector.connectToParentTitle();
-            if (allCousins.contains(connector.getChildTable()) && !relatedTables.contains(connector.getChildTable()))
-                connector.connectToChildTitle();
+        for (Edge edge : allCousinEdges) {
+            if (allCousins.contains(edge.getParentTable()) && !relatedTables.contains(edge.getParentTable()))
+                edge.connectToParentTitle();
+            if (allCousins.contains(edge.getChildTable()) && !relatedTables.contains(edge.getChildTable()))
+                edge.connectToChildTitle();
         }
 
         // include the table itself
         nodes.put(table, new DotNode(table, false, new DotNodeConfig(true, true), dotConfig));
 
-        connectors.addAll(allCousinConnectors);
-        for (DotConnector connector : connectors) {
-            if (connector.isImplied()) {
-                DotNode node = nodes.get(connector.getParentTable());
+        edges.addAll(allCousinEdges);
+        for (Edge edge : edges) {
+            if (edge.isImplied()) {
+                DotNode node = nodes.get(edge.getParentTable());
                 if (node != null)
                     node.setShowImplied(true);
-                node = nodes.get(connector.getChildTable());
+                node = nodes.get(edge.getChildTable());
                 if (node != null)
                     node.setShowImplied(true);
             }
-            dot.println(connector.toString());
+            dot.println(edge.toString());
         }
 
         for (DotNode node : nodes.values()) {
@@ -253,22 +253,22 @@ public class DotTableFormatter implements Relationships {
         Set<Table> relatedTables,
         Set<Table> tablesWritten,
         Map<Table, DotNode> nodes,
-        Set<DotConnector> connectors
+        Set<Edge> edges
     ) {
         for (Table relatedTable : relatedTables) {
             if (!tablesWritten.contains(relatedTable)) {
                 DotNodeConfig nodeConfigurations = new DotNodeConfig(false, false);
                 DotNode node = new DotNode(relatedTable, false, nodeConfigurations, dotConfig);
                 nodes.put(relatedTable, node);
-                connectors.addAll(new PairConnectors(relatedTable, table, true, includeImplied).unique());
+                edges.addAll(new PairEdges(relatedTable, table, true, includeImplied).unique());
             }
         }
 
         // connect the edges that go directly to the target table
         // so they go to the target table's type column instead
-        for (DotConnector connector : connectors) {
-            if (connector.pointsTo(table))
-                connector.connectToParentDetails();
+        for (Edge edge : edges) {
+            if (edge.pointsTo(table))
+                edge.connectToParentDetails();
         }
     }
 
@@ -276,7 +276,7 @@ public class DotTableFormatter implements Relationships {
         Set<Table> relatedTables,
         Set<ForeignKeyConstraint> skippedImpliedConstraints,
         Set<Table> tablesWritten,
-        Set<DotConnector> allCousinConnectors,
+        Set<Edge> allCousinEdges,
         Map<Table, DotNode> nodes,
         Set<Table> allCousins
     ) {
@@ -287,8 +287,8 @@ public class DotTableFormatter implements Relationships {
                 if (!tablesWritten.contains(cousin)) {
                     tablesWritten.add(cousin);
 
-                    final Set<DotConnector> connectors = new PairConnectors(cousin, relatedTable, false, includeImplied).unique();
-                    allCousinConnectors.addAll(connectors);
+                    final Set<Edge> edges = new PairEdges(cousin, relatedTable, false, includeImplied).unique();
+                    allCousinEdges.addAll(edges);
 
                     final DotNode node = new DotNode(cousin, false, new DotNodeConfig(), dotConfig);
                     nodes.put(cousin, node);
