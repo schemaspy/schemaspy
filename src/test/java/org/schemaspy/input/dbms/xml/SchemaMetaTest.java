@@ -36,28 +36,28 @@ public class SchemaMetaTest {
     @Test
     @Logger(TableMeta.class)
     public void deprecationWarningRemarksInTable() {
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/remarksInTable.xml", "dbname", "schemaName");
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/remarksInTable.xml", "dbname", "schemaName", false);
         assertThat(LOGGING.getLog()).contains("deprecated");
     }
 
     @Test
     @Logger(TableColumnMeta.class)
     public void deprecationWarningRemarksInColumn() {
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/remarksInColumn.xml", "dbname", "schemaName");
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/remarksInColumn.xml", "dbname", "schemaName", false);
         assertThat(LOGGING.getLog()).contains("deprecated");
     }
 
     @Test
     @Logger(TableMeta.class)
     public void okCommentsInTable() {
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/commentsInTable.xml", "dbname", "schemaName");
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/commentsInTable.xml", "dbname", "schemaName", false);
         assertThat(LOGGING.getLog()).doesNotContain("deprecated");
     }
 
     @Test
     @Logger(TableColumnMeta.class)
     public void okCommentsInColumn() {
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/commentsInColumn.xml", "dbname", "schemaName");
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/commentsInColumn.xml", "dbname", "schemaName", false);
         assertThat(LOGGING.getLog()).doesNotContain("deprecated");
     }
 

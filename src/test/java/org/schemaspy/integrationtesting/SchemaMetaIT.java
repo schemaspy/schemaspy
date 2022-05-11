@@ -20,9 +20,7 @@ package org.schemaspy.integrationtesting;
 
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
@@ -118,7 +116,7 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/nullTableComment.xml","SchemaMetaIT", schema);
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/nullTableComment.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -149,7 +147,7 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/noTableComment.xml","SchemaMetaIT", schema);
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/noTableComment.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -167,7 +165,7 @@ public class SchemaMetaIT {
 
     @Test
     public void commentsAreReplacedWithReplaceComments() throws Exception {
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/replaceComments.xml","SchemaMetaIT", schema);
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/replaceComments.xml","SchemaMetaIT", schema, false);
         Database database = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -192,7 +190,7 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema);
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -216,7 +214,7 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema);
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -239,7 +237,7 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addColumn.xml","SchemaMetaIT", schema);
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addColumn.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -262,7 +260,7 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableImpliedOnAgent.xml","SchemaMetaIT", schema);
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableImpliedOnAgent.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -288,7 +286,7 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addFKInsteadOfImplied.xml","SchemaMetaIT", schema);
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addFKInsteadOfImplied.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -311,7 +309,7 @@ public class SchemaMetaIT {
         );
         databaseService.gatherSchemaDetails(config, database, null, progressListener);
 
-        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableDiagramAssociations.xml","SchemaMetaIT", schema);
+        SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableDiagramAssociations.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",

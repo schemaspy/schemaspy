@@ -22,7 +22,6 @@
  */
 package org.schemaspy.input.dbms.xml;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,14 +63,14 @@ public class SchemaMeta {
     private final String comments;
     private final File metaFile;
 
-    public SchemaMeta(String xmlMeta, String dbName, String schema) {
+    public SchemaMeta(String xmlMeta, String dbName, String schema, boolean isMultiSchema) {
         File meta = new File(xmlMeta);
         if (meta.isDirectory()) {
             String filename = (schema == null ? dbName : schema) + ".meta.xml";
             meta = new File(meta, filename);
 
             if (!meta.exists()) {
-                if (Config.getInstance().isOneOfMultipleSchemas()) {
+                if (isMultiSchema) {
                     // don't force all of the "one of many" schemas to have metafiles
                     LOGGER.info("Meta directory \"{}\" should contain a file named \"{}\"", xmlMeta, filename);
                     comments = null;
