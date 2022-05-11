@@ -21,6 +21,7 @@ package org.schemaspy.output.dot.schemaspy;
 
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
+import org.schemaspy.output.dot.schemaspy.graph.Element;
 
 /**
  * Represents Graphvis dot's concept of an edge.  That is, a connector between two nodes.
@@ -28,7 +29,7 @@ import org.schemaspy.model.TableColumn;
  * @author John Currier
  * @author Nils Petzaell
  */
-public class Edge implements Comparable<Edge> {
+public class Edge implements Comparable<Edge>, Element {
     private final TableColumn parentColumn;
     private final Table parentTable;
     private final TableColumn childColumn;
@@ -84,6 +85,11 @@ public class Edge implements Comparable<Edge> {
 
     public void connectToChildTitle() {
         childPort = "elipses";
+    }
+
+    @Override
+    public String value() {
+        return toString();
     }
 
     @Override
