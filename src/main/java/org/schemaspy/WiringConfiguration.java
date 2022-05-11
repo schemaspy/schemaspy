@@ -19,11 +19,9 @@
 package org.schemaspy;
 
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.*;
+import org.schemaspy.input.dbms.service.SqlService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.time.Clock;
 
 /**
  * @author Nils Petzaell
@@ -32,53 +30,13 @@ import java.time.Clock;
 public class WiringConfiguration {
 
     @Bean
-    public Clock clock() {
-        return Clock.systemDefaultZone();
-    }
-
-    @Bean
     public SqlService sqlService() {
         return new SqlService();
     }
 
     @Bean
-    public ColumnService columnService(SqlService sqlService) {
-        return new ColumnService(sqlService);
-    }
-
-    @Bean
-    public IndexService indexService(SqlService sqlService){
-        return new IndexService(sqlService);
-    }
-
-    @Bean
-    public TableService tableService(SqlService sqlService, ColumnService columnService, IndexService indexService) {
-        return new TableService(sqlService, columnService, indexService);
-    }
-
-    @Bean
-    public ViewService viewService(SqlService sqlService, ColumnService columnService) {
-        return new ViewService(sqlService, columnService);
-    }
-
-    @Bean
-    public RoutineService routineService(SqlService sqlService) {
-        return new RoutineService(sqlService);
-    }
-
-    @Bean
-    public SequenceService sequencesService(SqlService sqlService) {
-        return new SequenceService(sqlService);
-    }
-
-    @Bean
-    public DatabaseService databaseService(Clock clock, SqlService sqlService, TableService tableService, ViewService viewService, RoutineService routineService, SequenceService sequenceService) {
-        return new DatabaseService(clock, sqlService, tableService, viewService, routineService, sequenceService);
-    }
-
-    @Bean
-    public SchemaAnalyzer schemaAnalyzer(SqlService sqlService, DatabaseService databaseService, CommandLineArguments commandLineArguments) {
-        return new SchemaAnalyzer(sqlService, databaseService, commandLineArguments);
+    public SchemaAnalyzer schemaAnalyzer(SqlService sqlService, CommandLineArguments commandLineArguments) {
+        return new SchemaAnalyzer(sqlService, commandLineArguments);
     }
 
 }

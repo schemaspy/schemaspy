@@ -34,6 +34,7 @@ import org.schemaspy.input.dbms.CatalogResolver;
 import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.input.dbms.SchemaResolver;
 import org.schemaspy.input.dbms.service.DatabaseService;
+import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.model.*;
@@ -82,18 +83,16 @@ public class SchemaAnalyzer {
     private static final String DOT_HTML = ".html";
     private static final String INDEX_DOT_HTML = "index.html";
 
-
     private final SqlService sqlService;
-
-    private final DatabaseService databaseService;
+    private final DatabaseServiceFactory databaseServiceFactory;
 
     private final CommandLineArguments commandLineArguments;
 
     private final List<OutputProducer> outputProducers = new ArrayList<>();
 
-    public SchemaAnalyzer(SqlService sqlService, DatabaseService databaseService, CommandLineArguments commandLineArguments) {
+    public SchemaAnalyzer(SqlService sqlService, CommandLineArguments commandLineArguments) {
         this.sqlService = Objects.requireNonNull(sqlService);
-        this.databaseService = Objects.requireNonNull(databaseService);
+        this.databaseServiceFactory = new DatabaseServiceFactory(sqlService);
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
         addOutputProducer(new XmlProducerUsingDOM());
     }
@@ -113,16 +112,16 @@ public class SchemaAnalyzer {
         // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
         List<String> schemas = config.getSchemas();
         if (schemas != null || config.isEvaluateAllEnabled()) {
-            return this.analyzeMultipleSchemas(config, progressListener);
+            return this.analyzeMultipleSchemas(config, databaseServiceFactory.simple(), progressListener);
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
-            return analyze(schema, config, outputDirectory, progressListener);
+            return analyze(schema, config, outputDirectory, databaseServiceFactory.simple(), progressListener);
         }
     }
 
-    public Database analyzeMultipleSchemas(Config config, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyzeMultipleSchemas(Config config, DatabaseService databaseService, ProgressListener progressListener) throws SQLException, IOException {
         try {
             List<String> schemas = config.getSchemas();
             Database db = null;
@@ -164,7 +163,7 @@ public class SchemaAnalyzer {
 
                 LOGGER.info("Analyzing '{}'", schema);
                 File outputDirForSchema = new File(outputDir, FileNameGenerator.generate(schema));
-                db = this.analyze(schema, config, outputDirForSchema, progressListener);
+                db = this.analyze(schema, config, outputDirForSchema, databaseService, progressListener);
                 if (db == null) //if any of analysed schema returns null
                     return null;
                 mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
@@ -199,7 +198,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    public Database analyze(String schema, Config config, File outputDir, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyze(String schema, Config config, File outputDir, DatabaseService databaseService, ProgressListener progressListener) throws SQLException, IOException {
         try {
             LOGGER.info("Starting schema analysis");
 

@@ -27,7 +27,7 @@ import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
+import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.integrationtesting.MssqlServerSuite;
 import org.schemaspy.model.Database;
@@ -59,9 +59,6 @@ import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 public class MSSQLServerRemoteTablesIT {
     @Autowired
     private SqlService sqlService;
-
-    @Autowired
-    private DatabaseService databaseService;
 
     @Mock
     private ProgressListener progressListener;
@@ -108,7 +105,7 @@ public class MSSQLServerRemoteTablesIT {
                 databaseMetaData.getConnection().getCatalog(),
                 databaseMetaData.getConnection().getSchema()
         );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).simple().gatherSchemaDetails(config, database, null, progressListener);
         MSSQLServerRemoteTablesIT.database = database;
     }
 

@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
+import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
@@ -49,9 +49,6 @@ public class SqliteIT {
 
     @Autowired
     private SqlService sqlService;
-
-    @Autowired
-    private DatabaseService databaseService;
 
     @Mock
     private ProgressListener progressListener;
@@ -86,7 +83,7 @@ public class SqliteIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).simple().gatherSchemaDetails(config, database, null, progressListener);
         this.database = database;
     }
 
