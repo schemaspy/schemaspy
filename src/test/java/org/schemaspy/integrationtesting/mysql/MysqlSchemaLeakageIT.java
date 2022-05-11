@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseService;
+import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.model.Database;
@@ -40,7 +40,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 
 import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -59,9 +58,6 @@ public class MysqlSchemaLeakageIT {
 
     @Autowired
     private SqlService sqlService;
-
-    @Autowired
-    private DatabaseService databaseService;
 
     @Mock
     private ProgressListener progressListener;
@@ -121,7 +117,7 @@ public class MysqlSchemaLeakageIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).simple().gatherSchemaDetails(config, database, null, progressListener);
         MysqlSchemaLeakageIT.database = database;
     }
 

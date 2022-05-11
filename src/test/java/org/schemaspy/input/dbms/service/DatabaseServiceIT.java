@@ -60,9 +60,6 @@ public class DatabaseServiceIT {
     @Autowired
     private SqlService sqlService;
 
-    @Autowired
-    private DatabaseService databaseService;
-
     @Mock
     private ProgressListener progressListener;
 
@@ -97,7 +94,7 @@ public class DatabaseServiceIT {
                 catalog,
                 schema
         );
-        databaseService.gatherSchemaDetails(config, database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).simple().gatherSchemaDetails(config, database, null, progressListener);
 
         assertThat(database.getTables()).hasSize(1);
 
