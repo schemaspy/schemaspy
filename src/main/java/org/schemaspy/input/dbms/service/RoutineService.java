@@ -18,7 +18,6 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Routine;
 import org.schemaspy.model.RoutineParameter;
@@ -30,19 +29,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Properties;
 
 public class RoutineService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
+    private final Properties dbProperties;
 
-    public RoutineService(SqlService sqlService) {
+    public RoutineService(SqlService sqlService, Properties dbProperties) {
         this.sqlService = sqlService;
+        this.dbProperties = dbProperties;
     }
 
-    public void gatherRoutines(Config config, Database database) {
-        initRoutines(config, database);
-        initRoutineParameters(config, database);
+    public void gatherRoutines(Database database) {
+        initRoutines(database);
+        initRoutineParameters(database);
         database.getRoutinesMap().replaceAll((routineName, routine) -> {
             Routine newRoutine = new Routine(
                     routine.getName(),
@@ -64,9 +66,9 @@ public class RoutineService {
      *
      * @throws SQLException
      */
-    private void initRoutines(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectRoutinesSql");
-        boolean append = Boolean.parseBoolean(config.getDbProperties().getProperty("multirowdata", "false"));
+    private void initRoutines(Database db) {
+        String sql = dbProperties.getProperty("selectRoutinesSql");
+        boolean append = Boolean.parseBoolean(dbProperties.getProperty("multirowdata", "false"));
         if (sql != null) {
 
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
@@ -100,8 +102,8 @@ public class RoutineService {
         }
     }
 
-    private void initRoutineParameters(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectRoutineParametersSql");
+    private void initRoutineParameters(Database db) {
+        String sql = dbProperties.getProperty("selectRoutineParametersSql");
 
         if (sql != null) {
 
