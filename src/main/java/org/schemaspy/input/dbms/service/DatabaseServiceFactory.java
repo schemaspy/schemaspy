@@ -35,7 +35,7 @@ public class DatabaseServiceFactory {
                         )
                 ),
                 new RoutineService(sqlService),
-                new SequenceService(sqlService)
+                new SequenceService(sqlService, config.getDbProperties())
         );
     }
 }
