@@ -36,6 +36,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,6 +53,9 @@ public class DatabaseServiceTest {
 
     private Instant currentTime = Instant.now();
     private Clock clock = mock(Clock.class);
+
+    private static final Pattern DEFAULT_TABLE_INCLUSION = Pattern.compile(".*"); // match everything
+    private static final Pattern DEFAULT_TABLE_EXCLUSION = Pattern.compile(".*\\$.*");
 
     @Before
     public void setup() {
@@ -70,7 +75,21 @@ public class DatabaseServiceTest {
         ViewService viewService = mock(ViewService.class);
         RoutineService routineService = mock(RoutineService.class);
         SequenceService sequenceService = mock(SequenceService.class);
-        DatabaseService databaseService = new DatabaseService(clock, sqlService, tableService, viewService, routineService, sequenceService);
+        DatabaseService databaseService = new DatabaseService(
+                clock,
+                sqlService,
+                true,
+                DEFAULT_TABLE_INCLUSION,
+                DEFAULT_TABLE_EXCLUSION,
+                1,
+                true,
+                true,
+                new Properties(),
+                tableService,
+                viewService,
+                routineService,
+                sequenceService
+        );
         List<Table> tablesList = new ArrayList<>();
         tablesList.add(mock(Table.class));
         tablesList.add(mock(Table.class));
@@ -100,7 +119,21 @@ public class DatabaseServiceTest {
         ViewService viewService = mock(ViewService.class);
         RoutineService routineService = mock(RoutineService.class);
         SequenceService sequenceService = mock(SequenceService.class);
-        DatabaseService databaseService = new DatabaseService(clock, sqlService, tableService, viewService, routineService, sequenceService);
+        DatabaseService databaseService = new DatabaseService(
+                clock,
+                sqlService,
+                true,
+                DEFAULT_TABLE_INCLUSION,
+                DEFAULT_TABLE_EXCLUSION,
+                1,
+                false,
+                true,
+                new Properties(),
+                tableService,
+                viewService,
+                routineService,
+                sequenceService
+        );
         List<Table> tablesList = new ArrayList<>();
         tablesList.add(mock(Table.class));
         tablesList.add(mock(Table.class));
@@ -130,7 +163,21 @@ public class DatabaseServiceTest {
         ViewService viewService = mock(ViewService.class);
         RoutineService routineService = mock(RoutineService.class);
         SequenceService sequenceService = mock(SequenceService.class);
-        DatabaseService databaseService = new DatabaseService(clock, sqlService, tableService, viewService, routineService, sequenceService);
+        DatabaseService databaseService = new DatabaseService(
+                clock,
+                sqlService,
+                true,
+                DEFAULT_TABLE_INCLUSION,
+                DEFAULT_TABLE_EXCLUSION,
+                1,
+                true,
+                true,
+                new Properties(),
+                tableService,
+                viewService,
+                routineService,
+                sequenceService
+        );
         List<Table> tablesList = new ArrayList<>();
         tablesList.add(mock(Table.class));
         tablesList.add(mock(Table.class));

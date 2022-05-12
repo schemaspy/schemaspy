@@ -17,6 +17,13 @@ public class DatabaseServiceFactory {
         return new DatabaseService(
                 clock,
                 sqlService,
+                config.isViewsEnabled(),
+                config.getTableInclusions(),
+                config.getTableExclusions(),
+                config.getMaxDbThreads(),
+                config.isExportedKeysEnabled(),
+                config.isNumRowsEnabled(),
+                config.getDbProperties(),
                 new TableService(
                         sqlService,
                         config.isExportedKeysEnabled(),
