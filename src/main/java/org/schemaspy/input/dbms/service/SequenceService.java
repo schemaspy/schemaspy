@@ -18,7 +18,6 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Sequence;
 import org.slf4j.Logger;
@@ -28,18 +27,21 @@ import java.lang.invoke.MethodHandles;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class SequenceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
+    private final Properties dbProperties;
 
-    public SequenceService(SqlService sqlService) {
+    public SequenceService(SqlService sqlService, Properties dbProperties) {
         this.sqlService = sqlService;
+        this.dbProperties = dbProperties;
     }
 
-    public void gatherSequences(Config config, Database database) {
-        initSequences(config, database);
+    public void gatherSequences(Database database) {
+        initSequences(database);
     }
 
     /**
@@ -47,8 +49,8 @@ public class SequenceService {
      *
      * @throws SQLException
      */
-    private void initSequences(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectSequencesSql");
+    private void initSequences(Database db) {
+        String sql = dbProperties.getProperty("selectSequencesSql");
 
         if (sql != null) {
 
