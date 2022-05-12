@@ -19,6 +19,11 @@ public class DatabaseServiceFactory {
                 sqlService,
                 new TableService(
                         sqlService,
+                        config.isExportedKeysEnabled(),
+                        config.isOneOfMultipleSchemas(),
+                        config.getTableInclusions(),
+                        config.getTableExclusions(),
+                        config.getDbProperties(),
                         new ColumnService(
                                 sqlService,
                                 config.getIndirectColumnExclusions(),

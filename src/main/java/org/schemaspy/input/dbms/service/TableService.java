@@ -23,7 +23,6 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.Config;
 import org.schemaspy.input.dbms.service.helper.ExportForeignKey;
 import org.schemaspy.input.dbms.service.helper.ImportForeignKey;
 import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
@@ -41,6 +40,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -63,11 +63,30 @@ public class TableService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
+    private final boolean exportedKeys;
+    private final boolean multiSchemas;
+    private final Pattern include;
+    private final Pattern exclude;
+    private final Properties dbProperties;
     private final ColumnService columnService;
     private final IndexService indexService;
 
-    public TableService(SqlService sqlService, ColumnService columnService, IndexService indexService) {
+    public TableService(
+            SqlService sqlService,
+            boolean exportedKeys,
+            boolean multiSchemas,
+            Pattern include,
+            Pattern exclude,
+            Properties dbProperties,
+            ColumnService columnService,
+            IndexService indexService
+    ) {
         this.sqlService = Objects.requireNonNull(sqlService);
+        this.exportedKeys = exportedKeys;
+        this.multiSchemas = multiSchemas;
+        this.include = include;
+        this.exclude = exclude;
+        this.dbProperties = dbProperties;
         this.columnService = Objects.requireNonNull(columnService);
         this.indexService = Objects.requireNonNull(indexService);
     }
@@ -108,7 +127,7 @@ public class TableService {
         // also try to find all of the 'remote' tables in other schemas that
         // point to our primary keys (not necessary in the normal case
         // as we infer this from the opposite direction)
-        if ((table.getSchema() != null || table.getCatalog() != null) && Config.getInstance().isExportedKeysEnabled() ) {
+        if ((table.getSchema() != null || table.getCatalog() != null) && exportedKeys ) {
             try (ResultSet rs = sqlService.getDatabaseMetaData().getExportedKeys(table.getCatalog(), table.getSchema(), table.getName())) {
                 // get the foreign keys that reference our primary keys
                 // note that this can take an insane amount of time on Oracle (i.e. 30 secs per call)
@@ -158,7 +177,7 @@ public class TableService {
         } catch (SQLException sqlExc) {
             if (!remoteTable.isLogical()) {
                 // if explicitly asking for these details then propagate the exception
-                if (Config.getInstance().isOneOfMultipleSchemas())
+                if (multiSchemas)
                     throw sqlExc;
 
                 // otherwise just report the fact that we tried & couldn't
@@ -224,9 +243,6 @@ public class TableService {
     }
 
     private boolean shouldExclude(String databaseName, ImportForeignKey foreignKey) {
-        Pattern include = Config.getInstance().getTableInclusions();
-        Pattern exclude = Config.getInstance().getTableExclusions();
-
         if (!include.matcher(foreignKey.getPkTableName()).matches() || exclude.matcher(foreignKey.getPkTableName()).matches()) {
             LOGGER.debug("Ignoring {} referenced by FK {}", Table.getFullName(
                     databaseName,
@@ -255,7 +271,7 @@ public class TableService {
 
         SQLException originalFailure = null;
 
-        String sql = Config.getInstance().getDbProperties().getProperty("selectRowCountSql");
+        String sql = dbProperties.getProperty("selectRowCountSql");
         if (sql != null) {
             try {
                 return fetchNumRows(db, table, sql);
@@ -434,8 +450,8 @@ public class TableService {
         }
     }
 
-    public void gatherTableIds(Config config, Database db) throws SQLException {
-        String sql = config.getDbProperties().getProperty("selectTableIdsSql");
+    public void gatherTableIds(Database db) throws SQLException {
+        String sql = dbProperties.getProperty("selectTableIdsSql");
         if (sql != null) {
 
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
@@ -460,8 +476,8 @@ public class TableService {
      *
      * @throws SQLException
      */
-    public void gatherTableComments(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectTableCommentsSql");
+    public void gatherTableComments(Database db) {
+        String sql = dbProperties.getProperty("selectTableCommentsSql");
         if (sql != null) {
 
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
@@ -487,8 +503,8 @@ public class TableService {
      *
      * @throws SQLException
      */
-    public void gatherTableColumnComments(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectColumnCommentsSql");
+    public void gatherTableColumnComments(Database db) {
+        String sql = dbProperties.getProperty("selectColumnCommentsSql");
         if (sql != null) {
 
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
