@@ -99,8 +99,8 @@ public class DatabaseService {
         initIndexIds(config, db);
         tableService.gatherTableComments(config, db);
         tableService.gatherTableColumnComments(config, db);
-        viewService.gatherViewComments(config, db);
-        viewService.gatherViewColumnComments(config, db);
+        viewService.gatherViewComments(db);
+        viewService.gatherViewColumnComments(db);
         initColumnTypes(config, db);
         routineService.gatherRoutines(db);
         sequenceService.gatherSequences(db);

@@ -28,6 +28,7 @@ public class DatabaseServiceFactory {
                 ),
                 new ViewService(
                         sqlService,
+                        config.getDbProperties(),
                         new ColumnService(
                                 sqlService,
                                 config.getIndirectColumnExclusions(),

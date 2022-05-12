@@ -22,7 +22,6 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
@@ -36,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Properties;
 
 import static org.schemaspy.input.dbms.service.ColumnLabel.*;
 
@@ -53,12 +53,14 @@ public class ViewService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
+    private final Properties dbProperties;
     private final ColumnService columnService;
 
     private int deprecatedNagCounter = 0;
 
-    public ViewService(SqlService sqlService, ColumnService columnService) {
+    public ViewService(SqlService sqlService, Properties dbProperties, ColumnService columnService) {
         this.sqlService = Objects.requireNonNull(sqlService);
+        this.dbProperties = Objects.requireNonNull(dbProperties);
         this.columnService = Objects.requireNonNull(columnService);
     }
 
@@ -76,7 +78,7 @@ public class ViewService {
      * @throws SQLException if query fails
      */
     private void gatherViewDefinition(Database db, View view) throws SQLException {
-        String selectViewSql = Config.getInstance().getDbProperties().getProperty("selectViewSql");
+        String selectViewSql = dbProperties.getProperty("selectViewSql");
         if (selectViewSql == null) {
             return;
         }
@@ -129,8 +131,8 @@ public class ViewService {
     /**
      * Initializes view comments.
      */
-    public void gatherViewComments(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectViewCommentsSql");
+    public void gatherViewComments(Database db) {
+        String sql = dbProperties.getProperty("selectViewCommentsSql");
         if (sql != null) {
 
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
@@ -155,8 +157,8 @@ public class ViewService {
     /**
      * Initializes view column comments.
      */
-    public void gatherViewColumnComments(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectViewColumnCommentsSql");
+    public void gatherViewColumnComments(Database db) {
+        String sql = dbProperties.getProperty("selectViewColumnCommentsSql");
         if (sql != null) {
 
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
