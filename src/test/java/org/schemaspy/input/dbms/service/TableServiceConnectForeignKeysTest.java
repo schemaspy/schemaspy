@@ -30,6 +30,7 @@ import org.schemaspy.testing.LoggingRule;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -45,6 +46,7 @@ public class TableServiceConnectForeignKeysTest {
 
     private SqlService sqlService;
 
+    private static final Pattern DEFAULT_COLUMN_EXCLUSION = Pattern.compile("[^.]");
     private ColumnService columnService;
 
     private IndexService indexService;
@@ -63,7 +65,7 @@ public class TableServiceConnectForeignKeysTest {
     @Before
     public void setup() {
         sqlService = mock(SqlService.class);
-        columnService = new ColumnService(sqlService);
+        columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
         indexService = new IndexService(sqlService);
         tableService = new TableService(sqlService, columnService, indexService);
         database = new Database(dbmsMeta, "tableServiceTest","connectFK", "tst");

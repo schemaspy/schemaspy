@@ -32,6 +32,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,7 +49,9 @@ public class TableServiceAddForeignKeyTest {
 
     private SqlService sqlService = mock(SqlService.class);
 
-    private ColumnService columnService = new ColumnService(sqlService);
+    private static final Pattern DEFAULT_COLUMN_EXCLUSION = Pattern.compile("[^.]");
+
+    private ColumnService columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
 
     private IndexService indexService = new IndexService(sqlService);
 

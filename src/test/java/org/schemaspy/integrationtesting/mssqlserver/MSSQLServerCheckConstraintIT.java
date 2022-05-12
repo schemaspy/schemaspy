@@ -113,7 +113,7 @@ public class MSSQLServerCheckConstraintIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        new DatabaseServiceFactory(sqlService).simple().gatherSchemaDetails(config, database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(config, database, null, progressListener);
         MSSQLServerCheckConstraintIT.database = database;
     }
 

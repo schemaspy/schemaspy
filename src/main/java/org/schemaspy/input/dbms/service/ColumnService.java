@@ -18,7 +18,6 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.slf4j.Logger;
@@ -35,9 +34,13 @@ public class ColumnService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
+    private final Pattern excludeIndirectColumns;
+    private final Pattern excludeColumns;
 
-    public ColumnService(SqlService sqlService) {
+    public ColumnService(SqlService sqlService, Pattern excludeIndirectColumns, Pattern excludeColumns) {
         this.sqlService = sqlService;
+        this.excludeIndirectColumns = excludeIndirectColumns;
+        this.excludeColumns = excludeColumns;
     }
 
     public void gatherColumns(Table table) throws SQLException {
@@ -79,7 +82,7 @@ public class ColumnService {
         }
     }
 
-    private static TableColumn initColumn(Table table, ResultSet rs) throws SQLException {
+    private TableColumn initColumn(Table table, ResultSet rs) throws SQLException {
         TableColumn column = new TableColumn(table);
         // names and types are typically reused *many* times in a database,
         // so keep a single instance of each distinct one
@@ -109,9 +112,6 @@ public class ColumnService {
         column.setDefaultValue(rs.getString("COLUMN_DEF"));
         column.setComments(rs.getString("REMARKS"));
         column.setId(rs.getInt("ORDINAL_POSITION") - 1);
-
-        Pattern excludeIndirectColumns = Config.getInstance().getIndirectColumnExclusions();
-        Pattern excludeColumns = Config.getInstance().getColumnExclusions();
 
         column.setAllExcluded(column.matches(excludeColumns));
         column.setExcluded(column.isAllExcluded() || column.matches(excludeIndirectColumns));

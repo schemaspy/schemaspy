@@ -112,12 +112,12 @@ public class SchemaAnalyzer {
         // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
         List<String> schemas = config.getSchemas();
         if (schemas != null || config.isEvaluateAllEnabled()) {
-            return this.analyzeMultipleSchemas(config, databaseServiceFactory.simple(), progressListener);
+            return this.analyzeMultipleSchemas(config, databaseServiceFactory.simple(config), progressListener);
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
-            return analyze(schema, config, outputDirectory, databaseServiceFactory.simple(), progressListener);
+            return analyze(schema, config, outputDirectory, databaseServiceFactory.simple(config), progressListener);
         }
     }
 
