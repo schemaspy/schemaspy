@@ -21,7 +21,6 @@ package org.schemaspy.input.dbms.service;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.schemaspy.Config;
 import org.schemaspy.input.dbms.service.helper.ImportForeignKey;
 import org.schemaspy.model.*;
 import org.schemaspy.testing.ConfigRule;
@@ -32,6 +31,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,12 +50,23 @@ public class TableServiceAddForeignKeyTest {
     private SqlService sqlService = mock(SqlService.class);
 
     private static final Pattern DEFAULT_COLUMN_EXCLUSION = Pattern.compile("[^.]");
+    private static final Pattern DEFAULT_TABLE_INCLUSION = Pattern.compile(".*"); // match everything
+    private static final Pattern DEFAULT_TABLE_EXCLUSION = Pattern.compile(".*\\$.*");
 
     private ColumnService columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
 
     private IndexService indexService = new IndexService(sqlService);
 
-    private TableService tableService = new TableService(sqlService, columnService, indexService);
+    private TableService tableService = new TableService(
+            sqlService,
+            false,
+            false,
+            DEFAULT_TABLE_INCLUSION,
+            DEFAULT_TABLE_EXCLUSION,
+            new Properties(),
+            columnService,
+            indexService
+    );
 
     private DbmsMeta dbmsMeta = mock(DbmsMeta.class);
 
@@ -73,7 +84,6 @@ public class TableServiceAddForeignKeyTest {
     @Test
     @Logger(value = TableService.class, level = "debug")
     public void excludingTable() throws SQLException {
-        Config.getInstance().setTableExclusions("excludeMePlease");
         ImportForeignKey foreignKey = new ImportForeignKey.Builder()
                 .withFkName("notNull")
                 .withFkColumnName(null)
@@ -84,7 +94,16 @@ public class TableServiceAddForeignKeyTest {
                 .withUpdateRule(0)
                 .withDeleteRule(0)
                 .build();
-        tableService.addForeignKey(database, null, foreignKey, new HashMap<>());
+        new TableService(
+                sqlService,
+                false,
+                false,
+                DEFAULT_TABLE_INCLUSION,
+                Pattern.compile("excludeMePlease"),
+                new Properties(),
+                columnService,
+                indexService
+        ).addForeignKey(database, null, foreignKey, new HashMap<>());
         assertThat(loggingRule.getLog()).contains("Ignoring CAT.S.excludeMePlease referenced by FK notNull");
     }
 

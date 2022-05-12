@@ -21,7 +21,6 @@ package org.schemaspy.input.dbms.service;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.schemaspy.Config;
 import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 import org.schemaspy.model.*;
 import org.schemaspy.testing.ConfigRule;
@@ -30,6 +29,7 @@ import org.schemaspy.testing.LoggingRule;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,11 +47,11 @@ public class TableServiceConnectForeignKeysTest {
     private SqlService sqlService;
 
     private static final Pattern DEFAULT_COLUMN_EXCLUSION = Pattern.compile("[^.]");
+    private static final Pattern DEFAULT_TABLE_INCLUSION = Pattern.compile(".*"); // match everything
+    private static final Pattern DEFAULT_TABLE_EXCLUSION = Pattern.compile(".*\\$.*");
     private ColumnService columnService;
 
     private IndexService indexService;
-
-    private TableService tableService;
 
     private DbmsMeta dbmsMeta = mock(DbmsMeta.class);
 
@@ -67,7 +67,6 @@ public class TableServiceConnectForeignKeysTest {
         sqlService = mock(SqlService.class);
         columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
         indexService = new IndexService(sqlService);
-        tableService = new TableService(sqlService, columnService, indexService);
         database = new Database(dbmsMeta, "tableServiceTest","connectFK", "tst");
         table = new Table(database, database.getCatalog().getName(), database.getSchema().getName(), "mainTable", "mainTable");
         database.getTablesMap().put(table.getName(), table);
@@ -84,7 +83,16 @@ public class TableServiceConnectForeignKeysTest {
 
     @Test
     public void getImportedKeys() throws SQLException {
-        new Config("-noexportedkeys");
+        TableService tableService = new TableService(
+                sqlService,
+                false,
+                false,
+                DEFAULT_TABLE_INCLUSION,
+                DEFAULT_TABLE_EXCLUSION,
+                new Properties(),
+                columnService,
+                indexService
+        );
 
         ResultSet importKeysResultSet = mock(ResultSet.class);
         when(importKeysResultSet.next()).thenReturn(true, false);
@@ -147,6 +155,16 @@ public class TableServiceConnectForeignKeysTest {
 
     @Test
     public void getExportedKeys() throws SQLException {
+        TableService tableService = new TableService(
+                sqlService,
+                true,
+                false,
+                DEFAULT_TABLE_INCLUSION,
+                DEFAULT_TABLE_EXCLUSION,
+                new Properties(),
+                columnService,
+                indexService
+        );
         ResultSet importKeysResultSet = mock(ResultSet.class);
         when(importKeysResultSet.next()).thenReturn(false);
 

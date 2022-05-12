@@ -95,10 +95,10 @@ public class DatabaseService {
         initSchemas(db);
 
         initCheckConstraints(config, db);
-        tableService.gatherTableIds(config, db);
+        tableService.gatherTableIds(db);
         initIndexIds(config, db);
-        tableService.gatherTableComments(config, db);
-        tableService.gatherTableColumnComments(config, db);
+        tableService.gatherTableComments(db);
+        tableService.gatherTableColumnComments(db);
         viewService.gatherViewComments(db);
         viewService.gatherViewColumnComments(db);
         initColumnTypes(config, db);

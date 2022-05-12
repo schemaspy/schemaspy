@@ -112,6 +112,8 @@ public class SchemaAnalyzer {
         // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
         List<String> schemas = config.getSchemas();
         if (schemas != null || config.isEvaluateAllEnabled()) {
+            // set flag which later on used for generation rootPathtoHome link.
+            config.setOneOfMultipleSchemas(true);
             return this.analyzeMultipleSchemas(config, databaseServiceFactory.simple(config), progressListener);
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
@@ -149,8 +151,6 @@ public class SchemaAnalyzer {
 
             String dbName = config.getDb();
             File outputDir = commandLineArguments.getOutputDirectory();
-            // set flag which later on used for generation rootPathtoHome link.
-            config.setOneOfMultipleSchemas(true);
 
             List<MustacheSchema> mustacheSchemas = new ArrayList<>();
             MustacheCatalog mustacheCatalog = null;
