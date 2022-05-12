@@ -34,7 +34,7 @@ public class DatabaseServiceFactory {
                                 config.getColumnExclusions()
                         )
                 ),
-                new RoutineService(sqlService),
+                new RoutineService(sqlService, config.getDbProperties()),
                 new SequenceService(sqlService, config.getDbProperties())
         );
     }

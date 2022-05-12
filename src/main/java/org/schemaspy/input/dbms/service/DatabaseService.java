@@ -102,7 +102,7 @@ public class DatabaseService {
         viewService.gatherViewComments(config, db);
         viewService.gatherViewColumnComments(config, db);
         initColumnTypes(config, db);
-        routineService.gatherRoutines(config, db);
+        routineService.gatherRoutines(db);
         sequenceService.gatherSequences(db);
 
         listener.startedConnectingTables();
