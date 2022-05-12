@@ -18,7 +18,6 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
@@ -31,10 +30,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.util.Optional.ofNullable;
 
@@ -43,9 +39,11 @@ public class IndexService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SqlService sqlService;
+    private final Properties dbProperties;
 
-    public IndexService(SqlService sqlService) {
+    public IndexService(SqlService sqlService, Properties dbProperties) {
         this.sqlService = sqlService;
+        this.dbProperties = dbProperties;
     }
 
     public void gatherIndexes(Database database, Table table) throws SQLException {
@@ -66,7 +64,7 @@ public class IndexService {
         // first try to initialize using the index query spec'd in the .properties
         // do this first because some DB's (e.g. Oracle) do 'bad' things with getIndexInfo()
         // (they try to do a DDL analyze command that has some bad side-effects)
-        if (initIndexes(db, table, Config.getInstance().getDbProperties().getProperty("selectIndexesSql"))) {
+        if (initIndexes(db, table, dbProperties.getProperty("selectIndexesSql"))) {
             return;
         }
 
@@ -141,7 +139,7 @@ public class IndexService {
      */
     private void initPrimaryKeys(Database database, Table table) throws SQLException {
         LOGGER.debug("Querying primary keys for {}", table.getFullName());
-        String sql = Config.getInstance().getDbProperties().getProperty("selectPrimaryKeysSql");
+        String sql = dbProperties.getProperty("selectPrimaryKeysSql");
         try {
             if (Objects.nonNull(sql)) {
                 try (PreparedStatement preparedStatement = sqlService.prepareStatement(sql, database, table.getName());

@@ -36,7 +36,7 @@ public class DatabaseServiceFactory {
                                 config.getIndirectColumnExclusions(),
                                 config.getColumnExclusions()
                         ),
-                        new IndexService(sqlService)
+                        new IndexService(sqlService, config.getDbProperties())
                 ),
                 new ViewService(
                         sqlService,

@@ -66,7 +66,7 @@ public class TableServiceConnectForeignKeysTest {
     public void setup() {
         sqlService = mock(SqlService.class);
         columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
-        indexService = new IndexService(sqlService);
+        indexService = new IndexService(sqlService, new Properties());
         database = new Database(dbmsMeta, "tableServiceTest","connectFK", "tst");
         table = new Table(database, database.getCatalog().getName(), database.getSchema().getName(), "mainTable", "mainTable");
         database.getTablesMap().put(table.getName(), table);
