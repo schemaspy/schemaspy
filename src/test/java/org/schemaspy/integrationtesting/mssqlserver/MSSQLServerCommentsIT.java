@@ -166,7 +166,7 @@ public class MSSQLServerCommentsIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        new DatabaseServiceFactory(sqlService).simple().gatherSchemaDetails(config, database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(config, database, null, progressListener);
         return database;
     }
 

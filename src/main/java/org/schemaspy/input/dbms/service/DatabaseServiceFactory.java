@@ -1,5 +1,7 @@
 package org.schemaspy.input.dbms.service;
 
+import org.schemaspy.Config;
+
 import java.time.Clock;
 
 public class DatabaseServiceFactory {
@@ -11,12 +13,27 @@ public class DatabaseServiceFactory {
         this.sqlService = sqlService;
     }
 
-    public DatabaseService simple() {
+    public DatabaseService simple(Config config) {
         return new DatabaseService(
-                Clock.systemDefaultZone(),
+                clock,
                 sqlService,
-                new TableService(sqlService, new ColumnService(sqlService), new IndexService(sqlService)),
-                new ViewService(sqlService, new ColumnService(sqlService)),
+                new TableService(
+                        sqlService,
+                        new ColumnService(
+                                sqlService,
+                                config.getIndirectColumnExclusions(),
+                                config.getColumnExclusions()
+                        ),
+                        new IndexService(sqlService)
+                ),
+                new ViewService(
+                        sqlService,
+                        new ColumnService(
+                                sqlService,
+                                config.getIndirectColumnExclusions(),
+                                config.getColumnExclusions()
+                        )
+                ),
                 new RoutineService(sqlService),
                 new SequenceService(sqlService)
         );
