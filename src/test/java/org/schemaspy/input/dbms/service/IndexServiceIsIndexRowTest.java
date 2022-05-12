@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +39,7 @@ public class IndexServiceIsIndexRowTest {
 
     private SqlService sqlService = mock(SqlService.class);
 
-    private IndexService indexService = new IndexService(sqlService);
+    private IndexService indexService = new IndexService(sqlService, new Properties());
 
     private Supplier<Method> isIndexRowMethod = () -> {
         Method m = null;

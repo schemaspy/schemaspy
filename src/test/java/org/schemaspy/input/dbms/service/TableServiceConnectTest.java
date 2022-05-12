@@ -53,7 +53,7 @@ public class TableServiceConnectTest {
     private static final Pattern DEFAULT_TABLE_INCLUSION = Pattern.compile(".*"); // match everything
     private static final Pattern DEFAULT_TABLE_EXCLUSION = Pattern.compile(".*\\$.*");
 
-    private IndexService indexService = new IndexService(sqlService);
+    private IndexService indexService = new IndexService(sqlService, new Properties());
 
     private TableService tableService = new TableService(
             sqlService,

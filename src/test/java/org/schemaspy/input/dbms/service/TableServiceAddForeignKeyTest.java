@@ -55,7 +55,7 @@ public class TableServiceAddForeignKeyTest {
 
     private ColumnService columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
 
-    private IndexService indexService = new IndexService(sqlService);
+    private IndexService indexService = new IndexService(sqlService, new Properties());
 
     private TableService tableService = new TableService(
             sqlService,
