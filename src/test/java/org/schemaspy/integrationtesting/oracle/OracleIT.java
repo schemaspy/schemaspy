@@ -115,7 +115,7 @@ public class OracleIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(config, database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
         OracleIT.database = database;
     }
 

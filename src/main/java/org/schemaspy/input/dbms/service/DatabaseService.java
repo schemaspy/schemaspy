@@ -23,7 +23,6 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.Config;
 import org.schemaspy.input.dbms.service.helper.BasicTableMeta;
 import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 import org.schemaspy.input.dbms.xml.SchemaMeta;
@@ -63,6 +62,13 @@ public class DatabaseService {
 
     private final SqlService sqlService;
 
+    private final boolean viewsEnabled;
+    private final Pattern include;
+    private final Pattern exclude;
+    private final int maxThreads;
+    private final boolean exportedKeys;
+    private final boolean numberOfRows;
+    private final Properties dbProperties;
     private final TableService tableService;
     private final ViewService viewService;
     private final RoutineService routineService;
@@ -71,37 +77,58 @@ public class DatabaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public DatabaseService(Clock clock, SqlService sqlService, TableService tableService, ViewService viewService, RoutineService routineService, SequenceService sequenceService) {
+    public DatabaseService(
+            Clock clock,
+            SqlService sqlService,
+            boolean viewsEnabled,
+            Pattern tableInclusion,
+            Pattern tableExclusion,
+            int maxThreads,
+            boolean exportedKeys,
+            boolean numberOfRows,
+            Properties dbProperties,
+            TableService tableService,
+            ViewService viewService,
+            RoutineService routineService,
+            SequenceService sequenceService
+    ) {
         this.clock = Objects.requireNonNull(clock);
         this.sqlService = Objects.requireNonNull(sqlService);
+        this.viewsEnabled = viewsEnabled;
+        this.include = tableInclusion;
+        this.exclude = tableExclusion;
+        this.maxThreads = maxThreads;
+        this.exportedKeys = exportedKeys;
+        this.numberOfRows = numberOfRows;
+        this.dbProperties = dbProperties;
         this.tableService = Objects.requireNonNull(tableService);
         this.viewService = Objects.requireNonNull(viewService);
         this.routineService = Objects.requireNonNull(routineService);
         this.sequenceService = Objects.requireNonNull(sequenceService);
     }
 
-    public void gatherSchemaDetails(Config config, Database db, SchemaMeta schemaMeta, ProgressListener listener) throws SQLException {
+    public void gatherSchemaDetails(Database db, SchemaMeta schemaMeta, ProgressListener listener) throws SQLException {
         LOGGER.info("Gathering schema details");
 
         listener.startedGatheringDetails();
 
         DatabaseMetaData meta = sqlService.getDatabaseMetaData();
 
-        initTables(config, db, listener, meta);
-        if (config.isViewsEnabled())
-            initViews(config, db, listener, meta);
+        initTables(db, listener, meta);
+        if (viewsEnabled)
+            initViews(db, listener, meta);
         
         initCatalogs(db);
         initSchemas(db);
 
-        initCheckConstraints(config, db);
+        initCheckConstraints(db);
         tableService.gatherTableIds(db);
-        initIndexIds(config, db);
+        initIndexIds(db);
         tableService.gatherTableComments(db);
         tableService.gatherTableColumnComments(db);
         viewService.gatherViewComments(db);
         viewService.gatherViewColumnComments(db);
-        initColumnTypes(config, db);
+        initColumnTypes(db);
         routineService.gatherRoutines(db);
         sequenceService.gatherSequences(db);
 
@@ -113,7 +140,7 @@ public class DatabaseService {
     
     private void initCatalogs(Database db) throws SQLException {
 
-            String sql = Config.getInstance().getDbProperties().getProperty("selectCatalogsSql");
+            String sql = dbProperties.getProperty("selectCatalogsSql");
 
             if (sql != null && db.getCatalog() != null) {
                 try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
@@ -128,7 +155,7 @@ public class DatabaseService {
     }
 
     private void initSchemas(Database db) throws SQLException {
-    	  String sql = Config.getInstance().getDbProperties().getProperty("selectSchemasSql");
+    	  String sql = dbProperties.getProperty("selectSchemasSql");
 
           if (sql != null &&  db.getSchema() != null) {
               try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
@@ -149,14 +176,10 @@ public class DatabaseService {
      * @param metadata
      * @throws SQLException
      */
-    private void initTables(Config config, Database db, ProgressListener listener, final DatabaseMetaData metadata) throws SQLException {
-        final Pattern include = config.getTableInclusions();
-        final Pattern exclude = config.getTableExclusions();
-        final int maxThreads = config.getMaxDbThreads();
-
-        String[] types = getTypes(config, "tableTypes", "TABLE");
+    private void initTables(Database db, ProgressListener listener, final DatabaseMetaData metadata) throws SQLException {
+        String[] types = getTypes("tableTypes", "TABLE");
         NameValidator validator = new NameValidator("table", include, exclude, types);
-        List<BasicTableMeta> entries = getBasicTableMeta(config, db, metadata, true, types);
+        List<BasicTableMeta> entries = getBasicTableMeta(db, metadata, true, types);
 
         TableCreator creator;
         if (maxThreads == 1) {
@@ -197,14 +220,11 @@ public class DatabaseService {
      * @param metadata
      * @throws SQLException
      */
-    private void initViews(Config config, Database db, ProgressListener listener, DatabaseMetaData metadata) throws SQLException {
-        Pattern includeTables = config.getTableInclusions();
-        Pattern excludeTables = config.getTableExclusions();
+    private void initViews(Database db, ProgressListener listener, DatabaseMetaData metadata) throws SQLException {
+        String[] types = getTypes("viewTypes", "VIEW");
+        NameValidator validator = new NameValidator("view", include, exclude, types);
 
-        String[] types = getTypes(config, "viewTypes", "VIEW");
-        NameValidator validator = new NameValidator("view", includeTables, excludeTables, types);
-
-        for (BasicTableMeta entry : getBasicTableMeta(config, db, metadata, false, types)) {
+        for (BasicTableMeta entry : getBasicTableMeta(db, metadata, false, types)) {
             if (validator.isValid(entry.getName(), entry.getType())) {
                 View view = new View(db, entry.getCatalog(), entry.getSchema(), entry.getName(),
                         entry.getRemarks(), entry.getViewDefinition());
@@ -223,8 +243,8 @@ public class DatabaseService {
      * @param defaultValue
      * @return
      */
-    private static String[] getTypes(Config config, String propName, String defaultValue) {
-        String value = config.getDbProperties().getProperty(propName, defaultValue);
+    private String[] getTypes(String propName, String defaultValue) {
+        String value = dbProperties.getProperty(propName, defaultValue);
         List<String> types = new ArrayList<>();
         for (String type : value.split(",")) {
             type = type.trim();
@@ -298,7 +318,7 @@ public class DatabaseService {
             if (Objects.isNull(durationOneTable)) {
                 durationOneTable = Duration.between(startTables, clock.instant());
                 long timeLeft = durationOneTable.toMillis()*(db.getTables().size()-1);
-                if (timeLeft > THIRTY_MINUTES && Config.getInstance().isExportedKeysEnabled()) {
+                if (timeLeft > THIRTY_MINUTES && exportedKeys) {
                     String remaining = DurationFormatter.formatMS(timeLeft);
                     LOGGER.info("Estimated time remaining for connecting tables is {}, most time might be spent in getExportedKeys, you can disable getExportedKeys with `-noexportedkeys`. The implication of this is that you won't get cross schema relationships where table in analysis is FK, and the remote schema isn't analyzed", remaining);
                 }
@@ -313,7 +333,7 @@ public class DatabaseService {
             if (Objects.isNull(durationOneView)) {
                 durationOneView = Duration.between(startViews, clock.instant());
                 long timeLeft = durationOneView.toMillis()*(db.getViews().size()-1);
-                if (timeLeft > THIRTY_MINUTES && Config.getInstance().isExportedKeysEnabled()) {
+                if (timeLeft > THIRTY_MINUTES && exportedKeys) {
                     String remaining = DurationFormatter.formatMS(timeLeft);
                     LOGGER.info("Estimated time remaining for connecting views is {}, most time might be spent in getExportedKeys, you can disable getExportedKeys with `-noexportedkeys`. The implication of this is that you won't get cross schema relationships where table in analysis is FK, and the remote schema isn't analyzed", remaining);
                 }
@@ -341,7 +361,7 @@ public class DatabaseService {
             }
 
             if (table.getNumRows() == 0) {
-                long numRows = Config.getInstance().isNumRowsEnabled() ? tableService.fetchNumRows(db, table) : -1;
+                long numRows = numberOfRows ? tableService.fetchNumRows(db, table) : -1;
                 table.setNumRows(numRows);
             }
 
@@ -440,20 +460,21 @@ public class DatabaseService {
      * @return
      * @throws SQLException
      */
-    private List<BasicTableMeta> getBasicTableMeta(Config config,
-                                                   Database db,
-                                                   DatabaseMetaData metadata,
-                                                   boolean forTables,
-                                                   String... types) throws SQLException {
+    private List<BasicTableMeta> getBasicTableMeta(
+            Database db,
+            DatabaseMetaData metadata,
+            boolean forTables,
+            String... types
+    ) throws SQLException {
         List<BasicTableMeta> basics = new ArrayList<>();
-        if (!getBasicTableMetaFromSql(basics, config, db, forTables)) {
+        if (!getBasicTableMetaFromSql(basics, db, forTables)) {
             getBasicTableMetaFromDatabaseMetaData(basics, metadata, db, forTables, types);
         }
         return basics;
     }
-    private boolean getBasicTableMetaFromSql(List<BasicTableMeta> basics, Config config, Database database, boolean forTables) {
+    private boolean getBasicTableMetaFromSql(List<BasicTableMeta> basics, Database database, boolean forTables) {
         String queryName = forTables ? "selectTablesSql" : "selectViewsSql";
-        String sql = config.getDbProperties().getProperty(queryName);
+        String sql = dbProperties.getProperty(queryName);
 
         if (sql != null) {
             String clazz = forTables ? "table" : "view";
@@ -517,9 +538,9 @@ public class DatabaseService {
         }
     }
 
-    private void initCheckConstraints(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectCheckConstraintsSql");
-        boolean append = Boolean.parseBoolean(config.getDbProperties().getProperty("multirowdata", "false"));
+    private void initCheckConstraints(Database db) {
+        String sql = dbProperties.getProperty("selectCheckConstraintsSql");
+        boolean append = Boolean.parseBoolean(dbProperties.getProperty("multirowdata", "false"));
         if (sql != null) {
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db,null);
                  ResultSet rs = stmt.executeQuery()) {
@@ -542,8 +563,8 @@ public class DatabaseService {
         }
     }
 
-    private void initColumnTypes(Config config, Database db) {
-        String sql = config.getDbProperties().getProperty("selectColumnTypesSql");
+    private void initColumnTypes(Database db) {
+        String sql = dbProperties.getProperty("selectColumnTypesSql");
         if (sql != null) {
 
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
@@ -568,8 +589,8 @@ public class DatabaseService {
         }
     }
 
-    private void initIndexIds(Config config, Database db) throws SQLException {
-        String sql = config.getDbProperties().getProperty("selectIndexIdsSql");
+    private void initIndexIds(Database db) throws SQLException {
+        String sql = dbProperties.getProperty("selectIndexIdsSql");
         if (sql != null) {
 
             try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
