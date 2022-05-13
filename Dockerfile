@@ -7,7 +7,7 @@ ARG GIT_REVISION=local
 
 ENV MYSQL_VERSION=8.0.28
 ENV MARIADB_VERSION=1.1.10
-ENV POSTGRESQL_VERSION=42.2.25
+ENV POSTGRESQL_VERSION=42.3.5
 ENV JTDS_VERSION=1.3.1
 
 LABEL MYSQL_VERSION=$MYSQL_VERSION
@@ -28,7 +28,7 @@ RUN adduser java -h / -D && \
     cd /drivers_inc && \
     curl -JLO http://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/$MYSQL_VERSION/mysql-connector-java-$MYSQL_VERSION.jar && \
     curl -JLO http://search.maven.org/remotecontent?filepath=org/mariadb/jdbc/mariadb-java-client/$MARIADB_VERSION/mariadb-java-client-$MARIADB_VERSION.jar && \
-    curl -JLO http://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/$POSTGRESQL_VERSION.jre7/postgresql-$POSTGRESQL_VERSION.jre7.jar && \
+    curl -JLO http://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.jar && \
     curl -JLO http://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/$JTDS_VERSION/jtds-$JTDS_VERSION.jar && \
     mkdir /output && \
     chown -R java /drivers_inc && \
