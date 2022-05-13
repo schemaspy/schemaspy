@@ -35,10 +35,9 @@ public class HtmlOrphansPageTest {
     public void showError() {
         HtmlConfig htmlConfig = mock(HtmlConfig.class);
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isOneOfMultipleSchemas()).thenReturn(false);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("errorInOrpahns", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("errorInOrpahns", false, htmlConfig, dataTableConfig);
         HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(mustacheCompiler);
         StringWriter writer = new StringWriter();
         htmlOrphansPage.write(Collections.emptyList(), false, writer);

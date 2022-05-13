@@ -13,7 +13,7 @@ public class DatabaseServiceFactory {
         this.sqlService = sqlService;
     }
 
-    public DatabaseService simple(Config config) {
+    public DatabaseService forSingleSchema(Config config) {
         return new DatabaseService(
                 clock,
                 sqlService,
@@ -27,7 +27,7 @@ public class DatabaseServiceFactory {
                 new TableService(
                         sqlService,
                         config.isExportedKeysEnabled(),
-                        config.isOneOfMultipleSchemas(),
+                        false,
                         config.getTableInclusions(),
                         config.getTableExclusions(),
                         config.getDbProperties(),
@@ -51,4 +51,43 @@ public class DatabaseServiceFactory {
                 new SequenceService(sqlService, config.getDbProperties())
         );
     }
+    public DatabaseService forMultipleSchemas(Config config) {
+        return new DatabaseService(
+                clock,
+                sqlService,
+                config.isViewsEnabled(),
+                config.getTableInclusions(),
+                config.getTableExclusions(),
+                config.getMaxDbThreads(),
+                config.isExportedKeysEnabled(),
+                config.isNumRowsEnabled(),
+                config.getDbProperties(),
+                new TableService(
+                        sqlService,
+                        config.isExportedKeysEnabled(),
+                        true,
+                        config.getTableInclusions(),
+                        config.getTableExclusions(),
+                        config.getDbProperties(),
+                        new ColumnService(
+                                sqlService,
+                                config.getIndirectColumnExclusions(),
+                                config.getColumnExclusions()
+                        ),
+                        new IndexService(sqlService, config.getDbProperties())
+                ),
+                new ViewService(
+                        sqlService,
+                        config.getDbProperties(),
+                        new ColumnService(
+                                sqlService,
+                                config.getIndirectColumnExclusions(),
+                                config.getColumnExclusions()
+                        )
+                ),
+                new RoutineService(sqlService, config.getDbProperties()),
+                new SequenceService(sqlService, config.getDbProperties())
+        );
+    }
+
 }

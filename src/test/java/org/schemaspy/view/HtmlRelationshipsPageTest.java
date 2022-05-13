@@ -28,7 +28,6 @@ import java.io.StringWriter;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,11 +37,10 @@ public class HtmlRelationshipsPageTest {
     public void willWriteErrorInformation() {
         HtmlConfig htmlConfig = mock(HtmlConfig.class);
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isOneOfMultipleSchemas()).thenReturn(false);
         when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", false, htmlConfig, dataTableConfig);
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler);
         StringWriter writer = new StringWriter();
         MustacheSummaryDiagramResults mustacheSummaryDiagramResults = new MustacheSummaryDiagramResults(Collections.emptyList(), new WriteStats(Collections.emptyList()),true, Collections.emptyList(),Collections.singletonList(new OutputException("ERROR")));

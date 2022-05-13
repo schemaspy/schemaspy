@@ -39,12 +39,11 @@ public class HtmlAnomaliesPageTest {
     private static HtmlConfig htmlConfig = mock(HtmlConfig.class);
     static {
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isOneOfMultipleSchemas()).thenReturn(false);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
     }
 
     private static DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-    private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", htmlConfig, dataTableConfig);
+    private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", false, htmlConfig, dataTableConfig);
     private static HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
 
     @Test

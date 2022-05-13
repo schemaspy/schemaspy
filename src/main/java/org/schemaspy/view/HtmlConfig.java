@@ -23,8 +23,6 @@ public interface HtmlConfig {
 
     String getTemplateDirectory();
 
-    boolean isOneOfMultipleSchemas();
-
     boolean isPaginationEnabled();
 
     boolean isNumRowsEnabled();

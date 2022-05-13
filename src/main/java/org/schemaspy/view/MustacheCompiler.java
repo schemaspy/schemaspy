@@ -47,12 +47,14 @@ import java.util.stream.IntStream;
 public class MustacheCompiler {
 
     private final String databaseName;
+    private final boolean multipleSchemas;
     private final HtmlConfig htmlConfig;
     private final DataTableConfig dataTableConfig;
     private final MustacheFactory mustacheFactory;
 
-    public MustacheCompiler(String databaseName, HtmlConfig htmlConfig, DataTableConfig dataTableConfig) {
+    public MustacheCompiler(String databaseName, boolean multipleSchemas, HtmlConfig htmlConfig, DataTableConfig dataTableConfig) {
         this.databaseName = databaseName;
+        this.multipleSchemas = multipleSchemas;
         this.htmlConfig = htmlConfig;
         this.dataTableConfig = dataTableConfig;
         this.mustacheFactory = new DefaultMustacheFactory(new MustacheCustomResolver(htmlConfig.getTemplateDirectory()));
@@ -90,7 +92,7 @@ public class MustacheCompiler {
 
     private String getRootPathToHome(int depth) {
         String path = getRootPath(depth);
-        if (htmlConfig.isOneOfMultipleSchemas()) {
+        if (multipleSchemas) {
             path += "../";
         }
         return path;

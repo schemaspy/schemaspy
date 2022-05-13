@@ -99,7 +99,7 @@ public class H2SpacesIT {
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
         H2SpacesIT.database = database;
     }
 

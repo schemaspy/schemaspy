@@ -30,8 +30,8 @@ import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.output.diagram.graphviz.GraphvizDot;
 import org.schemaspy.output.dot.DotConfig;
-import org.schemaspy.output.dot.schemaspy.graph.Orphan;
 import org.schemaspy.output.dot.schemaspy.graph.Graph;
+import org.schemaspy.output.dot.schemaspy.graph.Orphan;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class DotNodeIT {
                     Config.getInstance().isRankDirBugEnabled(),
                     false,
                     Config.getInstance().isNumRowsEnabled(),
-                    Config.getInstance().isOneOfMultipleSchemas()
+                    false
             );
     private static DiagramFactory diagramFactory;
 

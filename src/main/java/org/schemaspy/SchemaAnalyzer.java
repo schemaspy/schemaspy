@@ -112,14 +112,12 @@ public class SchemaAnalyzer {
         // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
         List<String> schemas = config.getSchemas();
         if (schemas != null || config.isEvaluateAllEnabled()) {
-            // set flag which later on used for generation rootPathtoHome link.
-            config.setOneOfMultipleSchemas(true);
-            return this.analyzeMultipleSchemas(config, databaseServiceFactory.simple(config), progressListener);
+            return this.analyzeMultipleSchemas(config, databaseServiceFactory.forMultipleSchemas(config), progressListener);
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
-            return analyze(schema, config, outputDirectory, databaseServiceFactory.simple(config), progressListener);
+            return analyze(schema, config, false, outputDirectory, databaseServiceFactory.forSingleSchema(config), progressListener);
         }
     }
 
@@ -163,7 +161,7 @@ public class SchemaAnalyzer {
 
                 LOGGER.info("Analyzing '{}'", schema);
                 File outputDirForSchema = new File(outputDir, FileNameGenerator.generate(schema));
-                db = this.analyze(schema, config, outputDirForSchema, databaseService, progressListener);
+                db = this.analyze(schema, config, true, outputDirForSchema, databaseService, progressListener);
                 if (db == null) //if any of analysed schema returns null
                     return null;
                 mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
@@ -172,7 +170,7 @@ public class SchemaAnalyzer {
 
             prepareLayoutFiles(outputDir);
             DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
-            MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config, dataTableConfig);
+            MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, true, config, dataTableConfig);
             HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
             try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
                 htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta), writer);
@@ -198,7 +196,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    public Database analyze(String schema, Config config, File outputDir, DatabaseService databaseService, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyze(String schema, Config config, boolean multipleSchemas, File outputDir, DatabaseService databaseService, ProgressListener progressListener) throws SQLException, IOException {
         try {
             LOGGER.info("Starting schema analysis");
 
@@ -218,7 +216,7 @@ public class SchemaAnalyzer {
             catalog = new CatalogResolver(databaseMetaData).resolveCatalog(catalog);
             schema = new SchemaResolver(databaseMetaData).resolveSchema(schema);
 
-            SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, config.isOneOfMultipleSchemas());
+            SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, multipleSchemas);
             if (commandLineArguments.isHtmlEnabled()) {
                 FileUtils.forceMkdir(new File(outputDir, "tables"));
                 FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
@@ -242,13 +240,13 @@ public class SchemaAnalyzer {
 
             if (tables.isEmpty()) {
                 dumpNoTablesMessage(schema, config.getUser(), databaseMetaData, config.getTableInclusions() != null);
-                if (!config.isOneOfMultipleSchemas()) // don't bail if we're doing the whole enchilada
+                if (!multipleSchemas) // don't bail if we're doing the whole enchilada
                     throw new EmptySchemaException();
             }
 
             long duration = progressListener.startedGraphingSummaries();
             if (commandLineArguments.isHtmlEnabled()) {
-                generateHtmlDoc(config, commandLineArguments.useVizJS() , progressListener, outputDir, db, duration, tables);
+                generateHtmlDoc(config, multipleSchemas, commandLineArguments.useVizJS() , progressListener, outputDir, db, duration, tables);
             }
 
             outputProducers.forEach(
@@ -256,7 +254,7 @@ public class SchemaAnalyzer {
                         try {
                             outputProducer.generate(db, outputDir);
                         } catch (OutputException oe) {
-                            if (config.isOneOfMultipleSchemas()) {
+                            if (multipleSchemas) {
                                 LOGGER.warn("Failed to produce output", oe);
                             } else {
                                 throw oe;
@@ -303,7 +301,7 @@ public class SchemaAnalyzer {
         }
     }
 
-    private void generateHtmlDoc(Config config, boolean useVizJS, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
+    private void generateHtmlDoc(Config config, boolean multipleSchemas, boolean useVizJS, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
         LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/graphing summary");
 
@@ -342,7 +340,7 @@ public class SchemaAnalyzer {
             config.isRankDirBugEnabled(),
             "svg".equalsIgnoreCase(diagramFactory.getDiagramFormat()),
             config.isNumRowsEnabled(),
-            config.isOneOfMultipleSchemas()
+            multipleSchemas
         );
         DotFormatter dotProducer = new DotFormatter(dotConfig);
         MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(diagramFactory);
@@ -353,7 +351,7 @@ public class SchemaAnalyzer {
                 LOGGER.error("RelationShipDiagramError", exception)
         );
         DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), multipleSchemas, config, dataTableConfig);
 
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {
