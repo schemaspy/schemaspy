@@ -29,6 +29,7 @@ import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Included;
 import org.schemaspy.output.dot.schemaspy.edge.PairEdges;
 import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
+import org.schemaspy.output.dot.schemaspy.graph.Element;
 import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.Columns;
@@ -117,9 +118,6 @@ public class DotTableFormatter implements Relationships {
         Set<Table> tablesWritten = new HashSet<>();
         Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
-        dot.println("digraph \"" + graph.value() + "\" {");
-        dot.println(header.value());
-
         Factory factory = getFactory(table, true);
         Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
 
@@ -172,6 +170,8 @@ public class DotTableFormatter implements Relationships {
         // include the table itself
         nodes.put(table, new DotNode(table, false, new DotNodeConfig(true, true), dotConfig));
 
+        List<Element> elements = new LinkedList<>();
+
         edges.addAll(allCousinEdges);
         for (Edge edge : edges) {
             if (edge.isImplied()) {
@@ -182,14 +182,19 @@ public class DotTableFormatter implements Relationships {
                 if (node != null)
                     node.setShowImplied(true);
             }
-            dot.println(edge.toString());
+            elements.add(edge);
         }
 
         for (DotNode node : nodes.values()) {
-            dot.println(node.value());
+            elements.add(node);
             stats.wroteTable(node.getTable());
         }
 
+        dot.println("digraph \"" + graph.value() + "\" {");
+        dot.println(header.value());
+        for (Element element: elements) {
+            dot.println(element.value());
+        }
         dot.println("}");
 
         return skippedImpliedConstraints;
