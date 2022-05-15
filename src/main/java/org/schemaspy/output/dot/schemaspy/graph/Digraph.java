@@ -21,12 +21,12 @@ public final class Digraph implements Graph {
     @Override
     public String dot() {
         return String.format(
-                "digraph \"%s\" { %s %s }",
+                "digraph \"%s\" {%n%s%n%s%n}",
                 this.name.value(),
                 this.header.value(),
                 Arrays.stream(this.contents)
                         .map(Element::value)
-                        .collect(Collectors.joining(" "))
+                        .collect(Collectors.joining(System.lineSeparator()))
         );
     }
 }

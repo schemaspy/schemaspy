@@ -29,6 +29,7 @@ import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Included;
 import org.schemaspy.output.dot.schemaspy.edge.PairEdges;
 import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
+import org.schemaspy.output.dot.schemaspy.graph.Digraph;
 import org.schemaspy.output.dot.schemaspy.graph.Element;
 import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
@@ -190,12 +191,13 @@ public class DotTableFormatter implements Relationships {
             stats.wroteTable(node.getTable());
         }
 
-        dot.println("digraph \"" + graph.value() + "\" {");
-        dot.println(header.value());
-        for (Element element: elements) {
-            dot.println(element.value());
-        }
-        dot.println("}");
+        dot.println(
+            new Digraph(
+                graph,
+                header,
+                elements.stream().toArray(Element[]::new)
+            ).dot()
+        );
 
         return skippedImpliedConstraints;
     }
