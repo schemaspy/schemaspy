@@ -25,6 +25,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
+import org.schemaspy.output.dot.schemaspy.graph.Element;
 import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.view.WriteStats;
 
@@ -68,9 +69,7 @@ public class DotSummaryFormatter {
                         new DefaultName()
                 )
         );
-        dot.println("digraph \"" + name.value() + "\" {");
-        Header header = new DotConfigHeader(dotConfig, true);
-        dot.println(header.value());
+
 
         Map<Table, DotNode> nodes = new TreeMap<>();
 
@@ -92,18 +91,24 @@ public class DotSummaryFormatter {
 
         markExcludedColumns(nodes, stats.getExcludedColumns());
 
+        List<Element> elements = new LinkedList<>();
+
         for (DotNode node : nodes.values()) {
             Table table = node.getTable();
 
-            dot.println(node.value());
+            elements.add(node);
             stats.wroteTable(table);
             wroteImplied = wroteImplied || (includeImplied && table.isOrphan(false));
         }
 
-        for (Edge edge : edges) {
-            dot.println(edge.toString());
-        }
+        elements.addAll(edges);
 
+        dot.println("digraph \"" + name.value() + "\" {");
+        Header header = new DotConfigHeader(dotConfig, true);
+        dot.println(header.value());
+        for (Element element: elements) {
+            dot.println(element.value());
+        }
         dot.println("}");
         dot.flush();
         return wroteImplied;
