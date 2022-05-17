@@ -25,6 +25,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
+import org.schemaspy.output.dot.schemaspy.graph.Digraph;
 import org.schemaspy.output.dot.schemaspy.graph.Element;
 import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.view.WriteStats;
@@ -103,14 +104,15 @@ public class DotSummaryFormatter {
 
         elements.addAll(edges);
 
-        dot.println("digraph \"" + name.value() + "\" {");
-        Header header = new DotConfigHeader(dotConfig, true);
-        dot.println(header.value());
-        for (Element element: elements) {
-            dot.println(element.value());
-        }
-        dot.println("}");
+        dot.println(
+            new Digraph(
+                    name,
+                    new DotConfigHeader(dotConfig, true),
+                    elements.stream().toArray(Element[]::new)
+            ).dot()
+        );
         dot.flush();
+        
         return wroteImplied;
     }
 
