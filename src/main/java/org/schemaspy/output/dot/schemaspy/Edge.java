@@ -55,18 +55,20 @@ public class Edge implements Comparable<Edge>, Element {
         childTable = childColumn.getTable();
     }
 
-    /**
-     * Returns true if this edge logically "points to" the specified table
-     *
-     * @param possibleParentTable Table
-     * @return boolean
-     */
-    public boolean pointsTo(Table possibleParentTable) {
-        return possibleParentTable.equals(parentTable);
-    }
-
     public boolean isImplied() {
         return implied;
+    }
+
+    /**
+     * Connects the edge to the specified table's type column,
+     * should the edge logically "point to" it.
+     *
+     * @param possibleParent The table to consider.
+     */
+    public void connectToDetailsLogically(final Table possibleParent) {
+        if (possibleParent.equals(parentTable)) {
+            connectToParentDetails();
+        }
     }
 
     /**
@@ -75,7 +77,7 @@ public class Edge implements Comparable<Edge>, Element {
      *
      * Yes, I need to find a more appropriate name/metaphor for this method....
      */
-    public void connectToParentDetails() {
+    private void connectToParentDetails() {
         parentPort = parentColumn.getName() + ".type";
     }
 

@@ -271,11 +271,9 @@ public class DotTableFormatter implements Relationships {
             }
         }
 
-        // connect the edges that go directly to the target table
-        // so they go to the target table's type column instead
         for (Edge edge : edges) {
-            if (edge.pointsTo(table))
-                edge.connectToParentDetails();
+            edge.connectToDetailsLogically(table);
+
         }
     }
 
