@@ -267,6 +267,11 @@ public class DotTableFormatter implements Relationships {
                 DotNodeConfig nodeConfigurations = new DotNodeConfig(false, false);
                 DotNode node = new DotNode(relatedTable, false, nodeConfigurations, dotConfig);
                 nodes.put(relatedTable, node);
+            }
+        }
+
+        for (Table relatedTable : relatedTables) {
+            if (!tablesWritten.contains(relatedTable)) {
                 edges.addAll(new PairEdges(relatedTable, table, true, includeImplied).unique());
             }
         }
