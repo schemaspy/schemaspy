@@ -298,16 +298,17 @@ public class DotTableFormatter implements Relationships {
                     .filter(cousin -> !tablesWritten.contains(cousin))
                     .collect(Collectors.toList());
 
-            tablesWritten.addAll(missing);
-
             for (Table cousin : missing) {
                 final Set<Edge> edges = new PairEdges(cousin, relatedTable, false, includeImplied).unique();
                 allCousinEdges.addAll(edges);
+            }
 
+            for (Table cousin : missing) {
                 final DotNode node = new DotNode(cousin, false, new DotNodeConfig(), dotConfig);
                 nodes.put(cousin, node);
             }
 
+            tablesWritten.addAll(missing);
             allCousins.addAll(cousins);
         }
     }
