@@ -38,6 +38,7 @@ import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Format table data into .dot format to feed to Graphvis' dot program.
@@ -293,16 +294,18 @@ public class DotTableFormatter implements Relationships {
         for (Table relatedTable : relatedTables) {
             Set<Table> cousins = cousinsOf(relatedTable, skippedImpliedConstraints);
 
-            for (Table cousin : cousins) {
-                if (!tablesWritten.contains(cousin)) {
-                    tablesWritten.add(cousin);
+            final List<Table> missing = cousins.stream()
+                    .filter(cousin -> !tablesWritten.contains(cousin))
+                    .collect(Collectors.toList());
 
-                    final Set<Edge> edges = new PairEdges(cousin, relatedTable, false, includeImplied).unique();
-                    allCousinEdges.addAll(edges);
+            tablesWritten.addAll(missing);
 
-                    final DotNode node = new DotNode(cousin, false, new DotNodeConfig(), dotConfig);
-                    nodes.put(cousin, node);
-                }
+            for (Table cousin : missing) {
+                final Set<Edge> edges = new PairEdges(cousin, relatedTable, false, includeImplied).unique();
+                allCousinEdges.addAll(edges);
+
+                final DotNode node = new DotNode(cousin, false, new DotNodeConfig(), dotConfig);
+                nodes.put(cousin, node);
             }
 
             allCousins.addAll(cousins);
