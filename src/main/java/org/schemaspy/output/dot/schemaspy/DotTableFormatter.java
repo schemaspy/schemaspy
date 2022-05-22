@@ -262,34 +262,33 @@ public class DotTableFormatter implements Relationships {
         Map<Table, DotNode> nodes,
         Set<Edge> edges
     ) {
-        nodes.putAll(immediateRelativesNodes(relatedTables, tablesWritten));
-        edges.addAll(immediateRelativesEdges(relatedTables, tablesWritten));
+        final List<Table> missing = relatedTables.stream()
+                .filter(relative -> !tablesWritten.contains(relative))
+                .collect(Collectors.toList());
+        nodes.putAll(immediateRelativesNodes(missing));
+        edges.addAll(immediateRelativesEdges(missing));
         connectEdges(edges);
     }
 
-    private Map<Table, DotNode> immediateRelativesNodes(Set<Table> relatedTables, Set<Table> tablesWritten) {
+    private Map<Table, DotNode> immediateRelativesNodes(final List<Table> tables) {
         final Map<Table, DotNode> result = new HashMap<>();
-        for (Table relatedTable : relatedTables) {
-            if (!tablesWritten.contains(relatedTable)) {
-                DotNodeConfig nodeConfigurations = new DotNodeConfig(false, false);
-                DotNode node = new DotNode(relatedTable, false, nodeConfigurations, dotConfig);
-                result.put(relatedTable, node);
-            }
+        for (Table relatedTable : tables) {
+            DotNodeConfig nodeConfigurations = new DotNodeConfig(false, false);
+            DotNode node = new DotNode(relatedTable, false, nodeConfigurations, dotConfig);
+            result.put(relatedTable, node);
         }
         return result;
     }
 
-    private Set<Edge> immediateRelativesEdges(Set<Table> relatedTables, Set<Table> tablesWritten) {
+    private Set<Edge> immediateRelativesEdges(final List<Table> tables) {
         final Set<Edge> result = new HashSet<>();
-        for (Table relatedTable : relatedTables) {
-            if (!tablesWritten.contains(relatedTable)) {
-                result.addAll(new PairEdges(relatedTable, table, true, includeImplied).unique());
-            }
+        for (Table relatedTable : tables) {
+            result.addAll(new PairEdges(relatedTable, table, true, includeImplied).unique());
         }
         return result;
     }
 
-    private void connectEdges(Set<Edge> edges) {
+    private void connectEdges(final Set<Edge> edges) {
         for (Edge edge : edges) {
             edge.connectToDetailsLogically(table);
         }
