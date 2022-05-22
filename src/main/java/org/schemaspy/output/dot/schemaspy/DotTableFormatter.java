@@ -256,12 +256,21 @@ public class DotTableFormatter implements Relationships {
             }
         }
     }
-
     private void writeImmediateRelatives(
         Set<Table> relatedTables,
         Set<Table> tablesWritten,
         Map<Table, DotNode> nodes,
         Set<Edge> edges
+    ) {
+        writeImmediateRelatives1(relatedTables, tablesWritten, nodes);
+        writeImmediateRelatives2(relatedTables, tablesWritten, edges);
+        writeImmediateRelatives3(edges);
+    }
+
+    private void writeImmediateRelatives1(
+        Set<Table> relatedTables,
+        Set<Table> tablesWritten,
+        Map<Table, DotNode> nodes
     ) {
         for (Table relatedTable : relatedTables) {
             if (!tablesWritten.contains(relatedTable)) {
@@ -270,16 +279,24 @@ public class DotTableFormatter implements Relationships {
                 nodes.put(relatedTable, node);
             }
         }
+    }
 
+    private void writeImmediateRelatives2(
+            Set<Table> relatedTables,
+            Set<Table> tablesWritten,
+            Set<Edge> edges
+    ) {
         for (Table relatedTable : relatedTables) {
             if (!tablesWritten.contains(relatedTable)) {
                 edges.addAll(new PairEdges(relatedTable, table, true, includeImplied).unique());
             }
         }
-
+    }
+    private void writeImmediateRelatives3(
+            Set<Edge> edges
+    ) {
         for (Edge edge : edges) {
             edge.connectToDetailsLogically(table);
-
         }
     }
 
