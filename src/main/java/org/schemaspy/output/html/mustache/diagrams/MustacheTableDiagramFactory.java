@@ -72,7 +72,7 @@ public class MustacheTableDiagramFactory {
 
         Set<ForeignKeyConstraint> impliedConstraints;
 
-        WriteStats oneStats = new WriteStats(stats);
+        WriteStats oneStats = new WriteStats();
         try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
             impliedConstraints = dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
         }
@@ -81,7 +81,7 @@ public class MustacheTableDiagramFactory {
         diagrams.add(oneDiagram);
 
         if (degreeOfSeparation == 2) {
-            WriteStats twoStats = new WriteStats(stats);
+            WriteStats twoStats = new WriteStats();
             try (PrintWriter dotOut = Writers.newPrintWriter(twoDegreesDotFile)) {
                 impliedConstraints = dotProducer.writeTableRealRelationships(table, true, twoStats, dotOut);
             }
@@ -94,7 +94,7 @@ public class MustacheTableDiagramFactory {
         }
 
         if (notEmpty(impliedConstraints)) {
-            WriteStats oneImplied = new WriteStats(stats);
+            WriteStats oneImplied = new WriteStats();
             try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
                 dotProducer.writeTableAllRelationships(table, false, oneImplied, dotOut);
             }
@@ -103,7 +103,7 @@ public class MustacheTableDiagramFactory {
             diagrams.add(oneImpliedDiagram);
 
             if (degreeOfSeparation == 2) {
-                WriteStats twoImplied = new WriteStats(stats);
+                WriteStats twoImplied = new WriteStats();
                 try (PrintWriter dotOut = Writers.newPrintWriter(twoImpliedDotFile)) {
                     dotProducer.writeTableAllRelationships(table, true, twoImplied, dotOut);
                 }

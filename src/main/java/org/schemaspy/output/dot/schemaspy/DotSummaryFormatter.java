@@ -22,7 +22,6 @@ package org.schemaspy.output.dot.schemaspy;
 
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
 import org.schemaspy.output.dot.schemaspy.graph.Digraph;
@@ -90,8 +89,6 @@ public class DotSummaryFormatter {
             edges.addAll(new SimpleEdges(node.getTable(), includeImplied).unique());
         }
 
-        markExcludedColumns(nodes, stats.getExcludedColumns());
-
         List<Element> elements = new LinkedList<>();
 
         for (DotNode node : nodes.values()) {
@@ -114,14 +111,5 @@ public class DotSummaryFormatter {
         dot.flush();
         
         return wroteImplied;
-    }
-
-    private static void markExcludedColumns(Map<Table, DotNode> nodes, Set<TableColumn> excludedColumns) {
-        for (TableColumn column : excludedColumns) {
-            DotNode node = nodes.get(column.getTable());
-            if (node != null) {
-                node.excludeColumn(column);
-            }
-        }
     }
 }
