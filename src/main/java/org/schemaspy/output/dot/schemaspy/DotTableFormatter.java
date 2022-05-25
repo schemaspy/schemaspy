@@ -210,16 +210,7 @@ public class DotTableFormatter implements Relationships {
         Columns columns = factory.columns();
         Set<TableColumn> relatedColumns = new HashSet<>();
 
-        for (TableColumn column : columns.value()) {
-            Columns children = factory.children(column);
-
-            for (TableColumn childColumn : children.value()) {
-                ForeignKeyConstraint constraint = column.getChildConstraint(childColumn);
-                if (includeImplied || !constraint.isImplied()) {
-                    relatedColumns.add(childColumn);
-                }
-            }
-        }
+        getTableImmediateRelativesChildren(columns, factory, includeImplied, relatedColumns);
 
         for (TableColumn column : columns.value()) {
             Columns parents = factory.parents(column);
@@ -240,6 +231,25 @@ public class DotTableFormatter implements Relationships {
 
         return relatedTables;
     }
+
+    private static void getTableImmediateRelativesChildren(
+            Columns columns,
+            Factory factory,
+            boolean includeImplied,
+            Set<TableColumn> relatedColumns
+    ) {
+        for (TableColumn column : columns.value()) {
+            Columns children = factory.children(column);
+
+            for (TableColumn childColumn : children.value()) {
+                ForeignKeyConstraint constraint = column.getChildConstraint(childColumn);
+                if (includeImplied || !constraint.isImplied()) {
+                    relatedColumns.add(childColumn);
+                }
+            }
+        }
+    }
+
 
     private void writeImmediateRelatives(
         Set<Table> relatedTables,
