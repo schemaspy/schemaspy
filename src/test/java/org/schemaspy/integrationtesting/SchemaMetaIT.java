@@ -330,11 +330,11 @@ public class SchemaMetaIT {
 
         StringWriter withoutSchemaMetaOutput = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(withoutSchemaMetaOutput)) {
-            dotFormatter.writeTableAllRelationships(database.getTablesMap().get("COMPANY"), false, new WriteStats(database.getTables()), printWriter);
+            dotFormatter.writeTableAllRelationships(database.getTablesMap().get("COMPANY"), false, new WriteStats(), printWriter);
         }
         StringWriter withSchemaMetaOutput = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(withSchemaMetaOutput)){
-            dotFormatter.writeTableAllRelationships(databaseWithSchemaMeta.getTablesMap().get("COMPANY"), false, new WriteStats(databaseWithSchemaMeta.getTables()), printWriter);
+            dotFormatter.writeTableAllRelationships(databaseWithSchemaMeta.getTablesMap().get("COMPANY"), false, new WriteStats(), printWriter);
         }
         assertThat(withoutSchemaMetaOutput.toString()).contains("\"COUNTRY\":\"COUNTRYID\"");
         assertThat(withSchemaMetaOutput.toString()).doesNotContain("\"COUNTRY\":\"COUNTRYID\"");

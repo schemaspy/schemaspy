@@ -37,10 +37,10 @@ import java.lang.invoke.MethodHandles;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author John Currier
@@ -63,7 +63,7 @@ public class DotNode implements Node {
     private final String path;
     private final DotNodeConfig config;
     private final DotConfig dotConfig;
-    private final Set<TableColumn> excludedColumns = new HashSet<>();
+    private final Set<TableColumn> excludedColumns;
     private final String lineSeparator = System.getProperty("line.separator");
     private final String columnSpan;
 
@@ -75,6 +75,7 @@ public class DotNode implements Node {
         this.dotConfig = dotConfig;
         this.path = createPath(fromRoot);
         this.columnSpan = config.showColumnDetails ? "COLSPAN=\"2\" " : "COLSPAN=\"3\" ";
+        this.excludedColumns = table.getColumns().stream().filter(TableColumn::isExcluded).collect(Collectors.toSet());
     }
 
     private String createPath(boolean fromRoot) {

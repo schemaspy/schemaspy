@@ -72,7 +72,7 @@ public class MustacheSummaryDiagramFactory {
         List<OutputException> outputExceptions = new ArrayList<>();
         // generate the compact form of the relationships .dot file
 
-        WriteStats stats = new WriteStats(tables);
+        WriteStats stats = new WriteStats();
         File realCompactDot = summaryDir.resolve(FILE_PREFIX + ".real.compact.dot").toFile();
         try (PrintWriter out = Writers.newPrintWriter(realCompactDot)) {
             dotProducer.writeSummaryRealRelationships(database, tables, true, showDetailedTables, stats, out);

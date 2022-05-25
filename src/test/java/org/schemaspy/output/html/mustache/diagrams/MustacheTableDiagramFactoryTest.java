@@ -85,7 +85,7 @@ public class MustacheTableDiagramFactoryTest {
 
     @Test
     public void oneDiagrams() throws IOException {
-        WriteStats writeStats = new WriteStats(Collections.emptyList());
+        WriteStats writeStats = new WriteStats();
         Table tableNoRelationships = mock(Table.class);
         when(tableNoRelationships.getName()).thenReturn("noRelationship");
         when(tableNoRelationships.getMaxChildren()).thenReturn(0);
@@ -106,7 +106,7 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void onlyOneDiagram() throws IOException {
         File outputDir = temporaryFolder.newFolder("onediagram");
-        WriteStats writeStats = new WriteStats(Collections.emptyList());
+        WriteStats writeStats = new WriteStats();
 
         DotFormatter dotProducer = mock(DotFormatter.class);
         when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
@@ -126,7 +126,7 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void onlyTwoDiagram() throws IOException {
         File outputDir = temporaryFolder.newFolder("twodiagrams");
-        WriteStats writeStats = new WriteStats(Collections.emptyList());
+        WriteStats writeStats = new WriteStats();
 
         DotFormatter dotProducer = mock(DotFormatter.class);
         when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
@@ -147,7 +147,7 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void threeDiagramsOneIsImplied() throws IOException {
         File outputDir = temporaryFolder.newFolder("threediagrams");
-        WriteStats writeStats = new WriteStats(Collections.emptyList());
+        WriteStats writeStats = new WriteStats();
 
         DotFormatter dotProducer = mock(DotFormatter.class);
         when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
@@ -180,7 +180,7 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void fourDiagramsTwoIsImplied() throws IOException {
         File outputDir = temporaryFolder.newFolder("fourdiagrams");
-        WriteStats writeStats = new WriteStats(Collections.emptyList());
+        WriteStats writeStats = new WriteStats();
 
         DotFormatter dotProducer = mock(DotFormatter.class);
         when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))
@@ -215,7 +215,7 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void fourDiagramsTwoIsImpliedOnly1stDegreeOfSeparation() throws IOException {
         File outputDir = temporaryFolder.newFolder("fourdiagrams1degree");
-        WriteStats writeStats = new WriteStats(Collections.emptyList());
+        WriteStats writeStats = new WriteStats();
 
         DotFormatter dotProducer = mock(DotFormatter.class);
         when(dotProducer.writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class)))

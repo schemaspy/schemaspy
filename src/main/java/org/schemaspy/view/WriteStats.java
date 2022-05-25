@@ -20,11 +20,6 @@
 package org.schemaspy.view;
 
 import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Simple ugly hack that provides details of what was written.
@@ -34,23 +29,6 @@ import java.util.Set;
 public class WriteStats {
     private int numTables;
     private int numViews;
-    private final Set<TableColumn> excludedColumns;
-
-    public WriteStats(Collection<Table> tables) {
-        excludedColumns = new HashSet<>();
-
-        for (Table table : tables) {
-            for (TableColumn column : table.getColumns()) {
-                if (column.isExcluded()) {
-                    excludedColumns.add(column);
-                }
-            }
-        }
-    }
-
-    public WriteStats(WriteStats stats) {
-        excludedColumns = stats.excludedColumns;
-    }
 
     public void wroteTable(Table table) {
         if (table.isView())
@@ -67,7 +45,4 @@ public class WriteStats {
         return numViews;
     }
 
-    public Set<TableColumn> getExcludedColumns() {
-        return excludedColumns;
-    }
 }

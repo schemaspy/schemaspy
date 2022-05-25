@@ -24,6 +24,7 @@ import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.schemaspy.columnsfilter.Columns;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Default;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Included;
@@ -33,7 +34,6 @@ import org.schemaspy.output.dot.schemaspy.graph.Digraph;
 import org.schemaspy.output.dot.schemaspy.graph.Element;
 import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
-import org.schemaspy.output.dot.schemaspy.columnsfilter.Columns;
 import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
@@ -158,8 +158,6 @@ public class DotTableFormatter implements Relationships {
             }
         }
 
-        markExcludedColumns(nodes, stats.getExcludedColumns());
-
         // now directly connect the loose ends to the title of the
         // 2nd degree of separation tables
         for (Edge edge : allCousinEdges) {
@@ -248,14 +246,6 @@ public class DotTableFormatter implements Relationships {
         return relatedTables;
     }
 
-    private static void markExcludedColumns(Map<Table, DotNode> nodes, Set<TableColumn> excludedColumns) {
-        for (TableColumn column : excludedColumns) {
-            DotNode node = nodes.get(column.getTable());
-            if (node != null) {
-                node.excludeColumn(column);
-            }
-        }
-    }
     private void writeImmediateRelatives(
         Set<Table> relatedTables,
         Set<Table> tablesWritten,
