@@ -37,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,33 +68,32 @@ public class MustacheSummaryDiagramFactory {
             boolean showDetailedTables,
             ProgressListener progressListener
     ) throws IOException {
-        Files.createDirectories(summaryDir);
+        if (tables.isEmpty()) {
+            return new MustacheSummaryDiagramResults(Collections.emptyList(), new WriteStats(), false, Collections.emptyList(), Collections.emptyList());
+        }
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
         List<OutputException> outputExceptions = new ArrayList<>();
+        Files.createDirectories(summaryDir);
         // generate the compact form of the relationships .dot file
 
         WriteStats stats = new WriteStats();
-        File realCompactDot = summaryDir.resolve(FILE_PREFIX + ".real.compact.dot").toFile();
-        try (PrintWriter out = Writers.newPrintWriter(realCompactDot)) {
-            dotProducer.writeSummaryRealRelationships(database, tables, true, showDetailedTables, stats, out);
-        } catch (IOException ioexception) {
-            outputExceptions.add(new OutputException(FAILED_DOT + realCompactDot.toString(), ioexception));
-        }
-        boolean hasRealRelationships = stats.getNumTablesWritten() > 0 || stats.getNumViewsWritten() > 0;
 
+        boolean hasRealRelationships = database.getRemoteTables().size() > 0 || tables.stream().anyMatch(table -> !table.isOrphan(false));
 
         if (hasRealRelationships) {
-            try {
+            File realCompactDot = summaryDir.resolve(FILE_PREFIX + ".real.compact.dot").toFile();
+            try (PrintWriter out = Writers.newPrintWriter(realCompactDot)) {
+                dotProducer.writeSummaryRealRelationships(database, tables, true, showDetailedTables, stats, out);
                 MustacheTableDiagram realCompactDiagram = mustacheDiagramFactory.generateSummaryDiagram("Compact", realCompactDot, FILE_PREFIX + ".real.compact");
                 realCompactDiagram.setActive(true);
                 diagrams.add(realCompactDiagram);
+            } catch (IOException ioexception) {
+                outputExceptions.add(new OutputException(FAILED_DOT + realCompactDot.toString(), ioexception));
             } catch (DiagramException diagramException) {
                 outputExceptions.add(new OutputException(FAILED_DIAGRAM + realCompactDot.toString(), diagramException));
             }
             // real relationships exist so generate the 'big' form of the relationships .dot file
             generateRealLarge(database, tables, showDetailedTables, diagrams, outputExceptions, stats);
-        } else {
-            Files.deleteIfExists(realCompactDot.toPath());
         }
 
         // getting implied constraints has a side-effect of associating the parent/child tables, so don't do it
