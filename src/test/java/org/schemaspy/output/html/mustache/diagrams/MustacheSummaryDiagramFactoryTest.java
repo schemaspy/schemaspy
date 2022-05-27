@@ -108,8 +108,6 @@ public class MustacheSummaryDiagramFactoryTest {
                         any(WriteStats.class),
                         any(PrintWriter.class));
 
-        when(dotProducer.writeSummaryAllRelationships(any(Database.class), any(Collection.class), anyBoolean(), anyBoolean(), any(WriteStats.class), any(PrintWriter.class))).thenReturn(true);
-
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 

@@ -54,8 +54,8 @@ public class DotFormatter {
         dotSummaryFormatter.writeSummaryRealRelationships(db, tables, compact, showColumns, stats, dot);
     }
 
-    public boolean writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
-        return dotSummaryFormatter.writeSummaryAllRelationships(db, tables, compact, showColumns, stats, dot);
+    public void writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
+        dotSummaryFormatter.writeSummaryAllRelationships(db, tables, compact, showColumns, stats, dot);
     }
 
     public Set<ForeignKeyConstraint> writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
