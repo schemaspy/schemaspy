@@ -18,9 +18,12 @@
  */
 package org.schemaspy.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,21 +36,74 @@ public class TableTest {
     }
 
     @Test
-    public void containerIsSchema() {
+    void containerIsSchema() {
         Table table = new Table(database, "CATNAME", "SNAME", "table", null);
         assertThat(table.getContainer()).isEqualToIgnoringCase("SNAME");
     }
 
     @Test
-    public void containerIsCatalog() {
+    void containerIsCatalog() {
         Table table = new Table(database, "CATNAME", null, "table", null);
         assertThat(table.getContainer()).isEqualToIgnoringCase("CATNAME");
     }
 
     @Test
-    public void containerIsDatabaseName() {
+    void containerIsDatabaseName() {
         Table table = new Table(database, null, null, "table", null);
         assertThat(table.getContainer()).isEqualToIgnoringCase("DBNAME");
     }
 
+    @Test
+    void implied0DegreesIsFalse() {
+        Table table = new Table(database, null, null, "table", null);
+        assertThat(table.hasImpliedConstraints(0)).isFalse();
+    }
+
+    @Test
+    void noDirectImplied() {
+        Table table = new Table(database, null, null, "table", null);
+        assertThat(table.hasImpliedConstraints(1)).isFalse();
+    }
+
+    @Test
+    void noIndirectImplied() {
+        Table table = new Table(database, null, null, "table", null);
+        assertThat(table.hasImpliedConstraints(2)).isFalse();
+    }
+
+    @Test
+    void directImplied() {
+        Table table = new Table(database, null, null, "table", null);
+        TableColumn tableColumn = mock(TableColumn.class);
+        when(tableColumn.hasImpliedConstraint()).thenReturn(true);
+        table.columns.put("columnA", tableColumn);
+        assertThat(table.hasImpliedConstraints(1)).isTrue();
+    }
+
+    @Test
+    void directShortCutsMultipleDegreesImplied() {
+        Table table = new Table(database, null, null, "table", null);
+        TableColumn tableColumn = mock(TableColumn.class);
+        when(tableColumn.hasImpliedConstraint()).thenReturn(true);
+        table.columns.put("columnA", tableColumn);
+        assertThat(table.hasImpliedConstraints(2)).isTrue();
+    }
+
+    @Test
+    void indirectImplied() {
+        Table table = new Table(database, null, null, "table", null);
+        TableColumn tableColumn = mock(TableColumn.class);
+        when(tableColumn.hasImpliedConstraint()).thenReturn(false);
+
+        Table secondTable = mock(Table.class);
+        when(secondTable.hasImpliedConstraints(anyInt())).thenReturn(true);
+
+        TableColumn parentColumn = mock(TableColumn.class);
+        when(parentColumn.getTable()).thenReturn(secondTable);
+
+        when(tableColumn.getParents()).thenReturn(Collections.singleton(parentColumn));
+
+        table.columns.put("columnA", tableColumn);
+        assertThat(table.hasImpliedConstraints(2)).isTrue();
+    }
 }

@@ -18,7 +18,6 @@
  */
 package org.schemaspy.output.html.mustache.diagrams;
 
-import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
@@ -31,9 +30,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Nils Petzaell
@@ -70,11 +67,9 @@ public class MustacheTableDiagramFactory {
         Files.deleteIfExists(oneImpliedDotFile.toPath());
         Files.deleteIfExists(twoImpliedDotFile.toPath());
 
-        Set<ForeignKeyConstraint> impliedConstraints;
-
         WriteStats oneStats = new WriteStats();
         try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
-            impliedConstraints = dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
+            dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
         }
         MustacheTableDiagram oneDiagram = mustacheDiagramFactory.generateTableDiagram("One", oneDegreeDotFile, fileNameBase + ".1degree");
         oneDiagram.setActive(true);
@@ -83,7 +78,7 @@ public class MustacheTableDiagramFactory {
         if (degreeOfSeparation == 2) {
             WriteStats twoStats = new WriteStats();
             try (PrintWriter dotOut = Writers.newPrintWriter(twoDegreesDotFile)) {
-                impliedConstraints = dotProducer.writeTableRealRelationships(table, true, twoStats, dotOut);
+                dotProducer.writeTableRealRelationships(table, true, twoStats, dotOut);
             }
 
             if (sameWritten(oneStats, twoStats)) {
@@ -93,7 +88,7 @@ public class MustacheTableDiagramFactory {
             }
         }
 
-        if (notEmpty(impliedConstraints)) {
+        if (table.hasImpliedConstraints(degreeOfSeparation)) {
             WriteStats oneImplied = new WriteStats();
             try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
                 dotProducer.writeTableAllRelationships(table, false, oneImplied, dotOut);
@@ -119,10 +114,6 @@ public class MustacheTableDiagramFactory {
 
 
         return diagrams;
-    }
-
-    private static boolean notEmpty(Collection<?> collection) {
-        return !collection.isEmpty();
     }
 
     private static boolean sameWritten(WriteStats first, WriteStats second) {

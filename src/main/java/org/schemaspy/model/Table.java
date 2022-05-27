@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * A <code>Table</code> is one of the basic building blocks of SchemaSpy
@@ -702,6 +703,28 @@ public class Table implements Comparable<Table> {
             return 0;
 
         return getFullName().compareToIgnoreCase(other.getFullName());
+    }
+
+    public boolean hasImpliedConstraints(int degreesOfSeparation) {
+        if(degreesOfSeparation == 0) {
+            return false;
+        }
+
+        for (TableColumn tableColumn : columns.values()) {
+            if(tableColumn.hasImpliedConstraint()) {
+                return true;
+            }
+        }
+        if (degreesOfSeparation > 1) {
+            return columns.values().stream()
+                    .flatMap(tableColumn -> Stream.concat(
+                            tableColumn.getParents().stream(),
+                            tableColumn.getChildren().stream()))
+                    .map(TableColumn::getTable)
+                    .distinct()
+                    .anyMatch(table -> table.hasImpliedConstraints(degreesOfSeparation - 1));
+        }
+        return false;
     }
 
     /**

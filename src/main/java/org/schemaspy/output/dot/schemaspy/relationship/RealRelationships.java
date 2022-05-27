@@ -1,12 +1,11 @@
 package org.schemaspy.output.dot.schemaspy.relationship;
 
-import java.io.PrintWriter;
-import java.util.Set;
-import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.DotTableFormatter;
 import org.schemaspy.view.WriteStats;
+
+import java.io.PrintWriter;
 
 /**
  * Represents real relationships (excluding implied) associated with a table.
@@ -38,7 +37,7 @@ public final class RealRelationships implements Relationships {
     }
 
     @Override
-    public Set<ForeignKeyConstraint> write() {
-        return origin.write();
+    public void write() {
+        origin.write();
     }
 }

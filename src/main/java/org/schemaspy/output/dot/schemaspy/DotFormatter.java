@@ -21,7 +21,6 @@
 package org.schemaspy.output.dot.schemaspy;
 
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.relationship.ImpliedRelationships;
@@ -30,7 +29,6 @@ import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * Format table data into .dot format to feed to Graphvis' dot program.
@@ -58,8 +56,8 @@ public class DotFormatter {
         return dotSummaryFormatter.writeSummaryAllRelationships(db, tables, compact, showColumns, stats, dot);
     }
 
-    public Set<ForeignKeyConstraint> writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
-        return new RealRelationships(dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
+    public void writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
+        new RealRelationships(dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
 
     public void writeTableAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
