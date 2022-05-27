@@ -27,6 +27,7 @@ import org.schemaspy.input.dbms.xml.TableColumnMeta;
 import java.sql.DatabaseMetaData;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * @author John Currier
@@ -517,6 +518,11 @@ public class TableColumn {
     @Override
     public String toString() {
         return getName();
+    }
+
+    public boolean hasImpliedConstraint() {
+        return Stream.concat(parents.values().stream(), children.values().stream())
+                .anyMatch(ForeignKeyConstraint::isImplied);
     }
 
     /**

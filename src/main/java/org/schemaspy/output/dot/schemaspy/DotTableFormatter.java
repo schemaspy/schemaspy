@@ -108,20 +108,19 @@ public class DotTableFormatter implements Relationships {
     }
 
     @Override
-    public Set<ForeignKeyConstraint> write() {
-        return writeTableRelationships();
+    public void write() {
+        writeTableRelationships();
     }
 
     /**
      * Write relationships associated with the given table.<p>
      * Returns a set of the implied constraints that could have been included but weren't.
      */
-    private Set<ForeignKeyConstraint> writeTableRelationships() {
+    private void writeTableRelationships() {
         Set<Table> tablesWritten = new HashSet<>();
-        Set<ForeignKeyConstraint> skippedImpliedConstraints = new HashSet<>();
 
         Factory factory = getFactory(table, true);
-        Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied, skippedImpliedConstraints);
+        Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied);
 
         Set<Edge> edges = new TreeSet<>(new SimpleEdges(table, includeImplied).unique());
         tablesWritten.add(table);
@@ -136,7 +135,7 @@ public class DotTableFormatter implements Relationships {
 
         // next write 'cousins' (2nd degree of separation)
         if (twoDegreesOfSeparation) {
-            writeCousins(relatedTables, skippedImpliedConstraints, tablesWritten, allCousinEdges, nodes, allCousins);
+            writeCousins(relatedTables, tablesWritten, allCousinEdges, nodes, allCousins);
         }
 
         // glue together any 'participants' that aren't yet connected
@@ -197,8 +196,6 @@ public class DotTableFormatter implements Relationships {
                 elements.stream().toArray(Element[]::new)
             ).dot()
         );
-
-        return skippedImpliedConstraints;
     }
 
     private static Factory getFactory(Table table, boolean includeExcluded) {
@@ -209,7 +206,7 @@ public class DotTableFormatter implements Relationships {
         return factory;
     }
 
-    private static Set<Table> getTableImmediateRelatives(Table table, Factory factory, boolean includeImplied, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
+    private static Set<Table> getTableImmediateRelatives(Table table, Factory factory, boolean includeImplied) {
         Columns columns = factory.columns();
         Set<TableColumn> relatedColumns = new HashSet<>();
 
@@ -218,10 +215,9 @@ public class DotTableFormatter implements Relationships {
 
             for (TableColumn childColumn : children.value()) {
                 ForeignKeyConstraint constraint = column.getChildConstraint(childColumn);
-                if (includeImplied || !constraint.isImplied())
+                if (includeImplied || !constraint.isImplied()) {
                     relatedColumns.add(childColumn);
-                else
-                    skippedImpliedConstraints.add(constraint);
+                }
             }
         }
 
@@ -230,10 +226,9 @@ public class DotTableFormatter implements Relationships {
 
             for (TableColumn parentColumn : parents.value()) {
                 ForeignKeyConstraint constraint = column.getParentConstraint(parentColumn);
-                if (includeImplied || !constraint.isImplied())
+                if (includeImplied || !constraint.isImplied()) {
                     relatedColumns.add(parentColumn);
-                else
-                    skippedImpliedConstraints.add(constraint);
+                }
             }
         }
 
@@ -286,14 +281,13 @@ public class DotTableFormatter implements Relationships {
 
     private void writeCousins(
         Set<Table> relatedTables,
-        Set<ForeignKeyConstraint> skippedImpliedConstraints,
         Set<Table> tablesWritten,
         Set<Edge> allCousinEdges,
         Map<Table, DotNode> nodes,
         Set<Table> allCousins
     ) {
         for (Table relatedTable : relatedTables) {
-            Set<Table> cousins = cousinsOf(relatedTable, skippedImpliedConstraints);
+            Set<Table> cousins = cousinsOf(relatedTable);
 
             final List<Table> missing = cousins.stream()
                     .filter(cousin -> !tablesWritten.contains(cousin))
@@ -314,8 +308,8 @@ public class DotTableFormatter implements Relationships {
         }
     }
 
-    private Set<Table> cousinsOf(Table relatedTable, Set<ForeignKeyConstraint> skippedImpliedConstraints) {
+    private Set<Table> cousinsOf(Table relatedTable) {
         Factory cousinsFactory = getFactory(relatedTable, false);
-        return getTableImmediateRelatives(relatedTable, cousinsFactory, includeImplied, skippedImpliedConstraints);
+        return getTableImmediateRelatives(relatedTable, cousinsFactory, includeImplied);
     }
 }
