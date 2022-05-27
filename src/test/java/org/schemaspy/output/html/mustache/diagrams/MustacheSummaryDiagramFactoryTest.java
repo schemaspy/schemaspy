@@ -84,8 +84,6 @@ public class MustacheSummaryDiagramFactoryTest {
     public void realAndImpliedDiagrams() throws IOException {
         DotFormatter dotProducer = mock(DotFormatter.class);
 
-        when(dotProducer.writeSummaryAllRelationships(any(Database.class), any(Collection.class), anyBoolean(), anyBoolean(), any(WriteStats.class), any(PrintWriter.class))).thenReturn(true);
-
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 

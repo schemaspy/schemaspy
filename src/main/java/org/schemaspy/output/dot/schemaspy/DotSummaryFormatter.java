@@ -54,13 +54,12 @@ public class DotSummaryFormatter {
     /**
      * Returns <code>true</code> if it wrote any implied relationships
      */
-    public boolean writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
-        return writeRelationships(db, tables, compact, showColumns, true, stats, dot);
+    public void writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
+        writeRelationships(db, tables, compact, showColumns, true, stats, dot);
     }
 
-    private boolean writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, PrintWriter dot) {
+    private void writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, PrintWriter dot) {
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
-        boolean wroteImplied = false;
 
         final Name name = new Concatenation(
                 new Sized(compact),
@@ -96,7 +95,6 @@ public class DotSummaryFormatter {
 
             elements.add(node);
             stats.wroteTable(table);
-            wroteImplied = wroteImplied || (includeImplied && table.isOrphan(false));
         }
 
         elements.addAll(edges);
@@ -109,7 +107,5 @@ public class DotSummaryFormatter {
             ).dot()
         );
         dot.flush();
-        
-        return wroteImplied;
     }
 }
