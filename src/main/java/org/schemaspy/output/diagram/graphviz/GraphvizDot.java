@@ -99,7 +99,7 @@ public class GraphvizDot implements DiagramProducer {
                     "-T" + getDiagramFormat() + ':'
             };
             Process process = Runtime.getRuntime().exec(dotCommand);
-            try (Scanner scanner = new Scanner(new InputStreamReader(process.getErrorStream()))){
+            try (Scanner scanner = new Scanner(new InputStreamReader(process.getErrorStream()))) {
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
                     Matcher m = rendererPattern.matcher(line);
@@ -109,6 +109,9 @@ public class GraphvizDot implements DiagramProducer {
                 }
             }
             process.waitFor();
+        } catch (InterruptedException ie) {
+            LOGGER.error("Interrupted", ie);
+            Thread.currentThread().interrupt();
         } catch (Exception exc) {
             LOGGER.error("Error determining available renders",exc);
         }
