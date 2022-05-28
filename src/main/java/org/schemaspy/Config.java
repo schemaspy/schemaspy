@@ -70,6 +70,7 @@ import java.util.stream.Stream;
 
 /**
  * See https://github.com/schemaspy/schemaspy/projects/3
+ * @deprecated Move to jCommander
  */
 @Deprecated
 public final class Config implements HtmlConfig {
@@ -390,7 +391,9 @@ public final class Config implements HtmlConfig {
     public void setConnectionPropertiesFile(String propertiesFilename) throws IOException {
         if (userConnectionProperties == null)
             userConnectionProperties = new Properties();
-        userConnectionProperties.load(new FileInputStream(propertiesFilename));
+        try (InputStream inputStream = new FileInputStream(propertiesFilename)) {
+            userConnectionProperties.load(inputStream);
+        }
         userConnectionPropertiesFile = propertiesFilename;
     }
 
