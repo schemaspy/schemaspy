@@ -54,25 +54,25 @@ public class TableTest {
     }
 
     @Test
-    void implied0DegreesIsFalse() {
+    void hasImpliedWith0DegreesIsAlwaysFalse() {
         Table table = new Table(database, null, null, "table", null);
         assertThat(table.hasImpliedConstraints(0)).isFalse();
     }
 
     @Test
-    void noDirectImplied() {
+    void withNoDirectImpliedHasImpliedIsFalse() {
         Table table = new Table(database, null, null, "table", null);
         assertThat(table.hasImpliedConstraints(1)).isFalse();
     }
 
     @Test
-    void noIndirectImplied() {
+    void withNoIndirectImpliedHasImpliedISFalse() {
         Table table = new Table(database, null, null, "table", null);
         assertThat(table.hasImpliedConstraints(2)).isFalse();
     }
 
     @Test
-    void directImplied() {
+    void withDirectImpliedHasImpliedIsTrue() {
         Table table = new Table(database, null, null, "table", null);
         TableColumn tableColumn = mock(TableColumn.class);
         when(tableColumn.hasImpliedConstraint()).thenReturn(true);
@@ -81,7 +81,7 @@ public class TableTest {
     }
 
     @Test
-    void directShortCutsMultipleDegreesImplied() {
+    void withDirectImpliedShortCutsMultipleDegreesAndHasImpliedIsTrue() {
         Table table = new Table(database, null, null, "table", null);
         TableColumn tableColumn = mock(TableColumn.class);
         when(tableColumn.hasImpliedConstraint()).thenReturn(true);
@@ -90,7 +90,7 @@ public class TableTest {
     }
 
     @Test
-    void indirectImplied() {
+    void withIndirectImpliedHasImpliedIsTrue() {
         Table table = new Table(database, null, null, "table", null);
         TableColumn tableColumn = mock(TableColumn.class);
         when(tableColumn.hasImpliedConstraint()).thenReturn(false);

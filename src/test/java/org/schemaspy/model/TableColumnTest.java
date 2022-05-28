@@ -8,7 +8,7 @@ import static org.mockito.Mockito.mock;
 class TableColumnTest {
 
     @Test
-    void noImplied() {
+    void withNoImpliedHasImpliedIsFalse() {
         TableColumn tableColumn = new TableColumn(mock(Table.class));
         tableColumn.setName("middle");
 
@@ -24,7 +24,7 @@ class TableColumnTest {
     }
 
     @Test
-    void parentImplied() {
+    void withParentImpliedHasImpliedIsTrue() {
         TableColumn tableColumn = new TableColumn(mock(Table.class));
         tableColumn.setName("child");
         TableColumn parent = new TableColumn(mock(Table.class));
@@ -35,7 +35,7 @@ class TableColumnTest {
     }
 
     @Test
-    void childImplied() {
+    void withChildImpliedHasImpliedIsTrue() {
         TableColumn tableColumn = new TableColumn(mock(Table.class));
         tableColumn.setName("parent");
         TableColumn child = new TableColumn(mock(Table.class));
