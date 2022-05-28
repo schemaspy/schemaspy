@@ -32,6 +32,8 @@ import java.lang.invoke.MethodHandles;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -107,11 +109,16 @@ public class ResourceWriter {
                         FileUtils.forceMkdir(currentFile);
                     } else {
                         if (filter == null || filter.accept(currentFile)) {
-                            InputStream is = jarFile.getInputStream(jarEntry);
-                            OutputStream out = FileUtils.openOutputStream(currentFile);
-                            IOUtils.copy(is, out);
-                            is.close();
-                            out.close();
+                            try (
+                                    InputStream is = jarFile.getInputStream(jarEntry);
+                                    OutputStream out = Files.newOutputStream(
+                                            currentFile.toPath(),
+                                            StandardOpenOption.CREATE,
+                                            StandardOpenOption.WRITE,
+                                            StandardOpenOption.TRUNCATE_EXISTING)
+                            ) {
+                                IOUtils.copy(is, out);
+                            }
                         }
                     }
                 }
