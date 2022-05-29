@@ -424,7 +424,7 @@ public class SchemaAnalyzer {
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, commandLineArguments.getDegreeOfSeparation());
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, sqlAnalyzer);
         for (Table table : tables) {
-            List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table, results.getStats());
+            List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table);
             progressListener.graphingDetailsProgressed(table);
             LOGGER.debug("Writing details of {}", table.getName());
             try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("tables").resolve(FileNameGenerator.generate(table.getName()) + DOT_HTML).toFile())) {

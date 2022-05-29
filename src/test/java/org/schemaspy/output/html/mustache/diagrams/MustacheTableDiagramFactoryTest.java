@@ -70,7 +70,6 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void onlyOneDiagram() throws IOException {
         File outputDir = temporaryFolder.newFolder("onediagram");
-        WriteStats writeStats = new WriteStats();
         when(table.hasImpliedConstraints(1)).thenReturn(false);
         when(table.hasImpliedConstraints(2)).thenReturn(false);
 
@@ -88,7 +87,7 @@ public class MustacheTableDiagramFactoryTest {
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
-        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
+        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(1);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
@@ -97,7 +96,6 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void onlyTwoDiagram() throws IOException {
         File outputDir = temporaryFolder.newFolder("twodiagrams");
-        WriteStats writeStats = new WriteStats();
         when(table.hasImpliedConstraints(1)).thenReturn(false);
         when(table.hasImpliedConstraints(2)).thenReturn(false);
 
@@ -115,7 +113,7 @@ public class MustacheTableDiagramFactoryTest {
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
-        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
+        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(2);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
@@ -126,7 +124,6 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void threeDiagramsOneIsImplied() throws IOException {
         File outputDir = temporaryFolder.newFolder("threediagrams");
-        WriteStats writeStats = new WriteStats();
         when(table.hasImpliedConstraints(1)).thenReturn(true);
         when(table.hasImpliedConstraints(2)).thenReturn(true);
 
@@ -153,7 +150,7 @@ public class MustacheTableDiagramFactoryTest {
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
-        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
+        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(3);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
@@ -166,7 +163,6 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void fourDiagramsTwoAreImplied() throws IOException {
         File outputDir = temporaryFolder.newFolder("fourdiagrams");
-        WriteStats writeStats = new WriteStats();
         when(table.hasImpliedConstraints(1)).thenReturn(true);
         when(table.hasImpliedConstraints(2)).thenReturn(true);
 
@@ -194,7 +190,7 @@ public class MustacheTableDiagramFactoryTest {
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
-        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
+        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(4);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
@@ -209,7 +205,6 @@ public class MustacheTableDiagramFactoryTest {
     @Test
     public void twoDiagramOnly1stDegree() throws IOException {
         File outputDir = temporaryFolder.newFolder("fourdiagrams1degree");
-        WriteStats writeStats = new WriteStats();
         when(table.hasImpliedConstraints(1)).thenReturn(true);
         when(table.hasImpliedConstraints(2)).thenReturn(true);
 
@@ -227,7 +222,7 @@ public class MustacheTableDiagramFactoryTest {
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 1);
-        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table, writeStats);
+        List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList.size()).isEqualTo(2);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();

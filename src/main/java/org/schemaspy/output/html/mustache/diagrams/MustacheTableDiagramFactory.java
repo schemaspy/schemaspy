@@ -50,7 +50,7 @@ public class MustacheTableDiagramFactory {
         this.degreeOfSeparation = degreeOfSeparation;
     }
 
-    public List<MustacheTableDiagram> generateTableDiagrams(Table table, WriteStats stats) throws IOException {
+    public List<MustacheTableDiagram> generateTableDiagrams(Table table) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
 
         String fileNameBase = FileNameGenerator.generate(table.getName());
