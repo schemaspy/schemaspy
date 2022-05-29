@@ -120,7 +120,7 @@ public class DotTableFormatter implements Relationships {
         Set<Table> tablesWritten = new HashSet<>();
 
         Factory factory = getFactory(table, true);
-        Set<Table> relatedTables = getTableImmediateRelatives(table, factory, includeImplied);
+        Set<Table> relatedTables = immediateRelatives(table, factory, includeImplied);
 
         Set<Edge> edges = new TreeSet<>(new SimpleEdges(table, includeImplied).unique());
         tablesWritten.add(table);
@@ -206,53 +206,39 @@ public class DotTableFormatter implements Relationships {
         return factory;
     }
 
-    private static Set<Table> getTableImmediateRelatives(Table table, Factory factory, boolean includeImplied) {
-        Columns columns = factory.columns();
-        Set<TableColumn> relatedColumns = new HashSet<>();
-
-        relatedColumns.addAll(tableImmediateRelativesChildrenColumns(columns, factory, includeImplied));
-        relatedColumns.addAll(tableImmediateRelativesParentsColumns(columns, factory, includeImplied));
-
+    private static Set<Table> immediateRelatives(Table table, Factory factory, boolean includeImplied) {
         Set<Table> relatedTables = new HashSet<>();
-        for (TableColumn column : relatedColumns)
-            relatedTables.add(column.getTable());
-
+        relatedTables.addAll(childrenTables(factory, includeImplied));
+        relatedTables.addAll(parentsTables(factory, includeImplied));
         relatedTables.remove(table);
-
         return relatedTables;
     }
 
-    private static Set<TableColumn> tableImmediateRelativesChildrenColumns(
-            Columns columns,
-            Factory factory,
-            boolean includeImplied
-    ) {
-        Set<TableColumn> result = new HashSet<>();
+    private static Set<Table> childrenTables(Factory factory, boolean includeImplied) {
+        Columns columns = factory.columns();
+        Set<Table> result = new HashSet<>();
         for (TableColumn column : columns.value()) {
             Columns children = factory.children(column);
             for (TableColumn childColumn : children.value()) {
                 ForeignKeyConstraint constraint = column.getChildConstraint(childColumn);
                 if (includeImplied || !constraint.isImplied()) {
-                    result.add(childColumn);
+                    result.add(childColumn.getTable());
                 }
             }
         }
         return result;
     }
 
-    private static Set<TableColumn> tableImmediateRelativesParentsColumns(
-            Columns columns,
-            Factory factory,
-            boolean includeImplied
-    ) {
-        Set<TableColumn> result = new HashSet<>();
+    private static Set<Table> parentsTables(Factory factory, boolean includeImplied) {
+        Columns columns = factory.columns();
+        Set<Table> result = new HashSet<>();
         for (TableColumn column : columns.value()) {
             Columns parents = factory.parents(column);
 
             for (TableColumn parentColumn : parents.value()) {
                 ForeignKeyConstraint constraint = column.getParentConstraint(parentColumn);
                 if (includeImplied || !constraint.isImplied()) {
-                    result.add(parentColumn);
+                    result.add(parentColumn.getTable());
                 }
             }
         }
@@ -328,6 +314,6 @@ public class DotTableFormatter implements Relationships {
 
     private Set<Table> cousinsOf(Table relatedTable) {
         Factory cousinsFactory = getFactory(relatedTable, false);
-        return getTableImmediateRelatives(relatedTable, cousinsFactory, includeImplied);
+        return immediateRelatives(relatedTable, cousinsFactory, includeImplied);
     }
 }
