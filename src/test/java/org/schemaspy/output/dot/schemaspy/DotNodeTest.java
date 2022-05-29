@@ -22,14 +22,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.schemaspy.SimpleDotConfig;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ForeignKeyConstraint;
-import org.schemaspy.model.ImpliedForeignKeyConstraint;
-import org.schemaspy.model.LogicalTable;
-import org.schemaspy.model.RemoteTable;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.model.TableIndex;
+import org.schemaspy.model.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -306,6 +299,7 @@ public class DotNodeTest {
         TableColumn prim = createColumn(table, "prim");
         table.setPrimaryColumn(prim);
         TableColumn excl = createColumn(table, "excl");
+        excl.setExcluded(true);
         DotNode dotNode = new DotNode(
             table,
             false,
@@ -318,7 +312,6 @@ public class DotNodeTest {
                 false
             )
         );
-        dotNode.excludeColumn(excl);
         assertDotNode(dotNode, "excludedColumn.txt");
     }
 

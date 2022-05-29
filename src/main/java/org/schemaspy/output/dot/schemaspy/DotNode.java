@@ -40,7 +40,6 @@ import java.text.NumberFormat;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author John Currier
@@ -63,7 +62,6 @@ public class DotNode implements Node {
     private final String path;
     private final DotNodeConfig config;
     private final DotConfig dotConfig;
-    private final Set<TableColumn> excludedColumns;
     private final String lineSeparator = System.getProperty("line.separator");
     private final String columnSpan;
 
@@ -75,7 +73,6 @@ public class DotNode implements Node {
         this.dotConfig = dotConfig;
         this.path = createPath(fromRoot);
         this.columnSpan = config.showColumnDetails ? "COLSPAN=\"2\" " : "COLSPAN=\"3\" ";
-        this.excludedColumns = table.getColumns().stream().filter(TableColumn::isExcluded).collect(Collectors.toSet());
     }
 
     private String createPath(boolean fromRoot) {
@@ -95,10 +92,6 @@ public class DotNode implements Node {
 
     public Table getTable() {
         return table;
-    }
-
-    public void excludeColumn(TableColumn column) {
-        excludedColumns.add(column);
     }
 
     @Override
@@ -200,7 +193,7 @@ public class DotNode implements Node {
         StringBuilder buf = new StringBuilder();
         buf.append(INDENT_6 + Html.TR_START);
         buf.append("<TD PORT=\"" + escapeHtml(column.getName()) + "\" " + columnSpan);
-        if (excludedColumns.contains(column))
+        if (column.isExcluded())
             buf.append("BGCOLOR=\"" + CSS.getExcludedColumnBackgroundColor() + "\" ");
         else if (indexColumns.contains(column))
             buf.append("BGCOLOR=\"" + CSS.getIndexedColumnBackground() + "\" ");
