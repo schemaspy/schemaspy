@@ -11,11 +11,9 @@ import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.view.MustacheTableDiagram;
-import org.schemaspy.view.WriteStats;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +24,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class MustacheSummaryDiagramFactoryTest {
@@ -52,8 +51,6 @@ public class MustacheSummaryDiagramFactoryTest {
         assertThat(results.getDiagrams()).isEmpty();
         assertThat(results.hasRealRelationships()).isFalse();
         assertThat(results.getImpliedConstraints()).isEmpty();
-        assertThat(results.getStats().getNumTablesWritten()).isEqualTo(0);
-        assertThat(results.getStats().getNumViewsWritten()).isEqualTo(0);
     }
 
     @Test

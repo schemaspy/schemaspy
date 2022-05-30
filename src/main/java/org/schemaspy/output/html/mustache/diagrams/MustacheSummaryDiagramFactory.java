@@ -69,7 +69,7 @@ public class MustacheSummaryDiagramFactory {
             ProgressListener progressListener
     ) throws IOException {
         if (tables.isEmpty()) {
-            return new MustacheSummaryDiagramResults(Collections.emptyList(), new WriteStats(), false, Collections.emptyList(), Collections.emptyList());
+            return new MustacheSummaryDiagramResults(Collections.emptyList(), false, Collections.emptyList(), Collections.emptyList());
         }
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
         List<OutputException> outputExceptions = new ArrayList<>();
@@ -78,7 +78,7 @@ public class MustacheSummaryDiagramFactory {
 
         WriteStats stats = new WriteStats();
 
-        boolean hasRealRelationships = database.getRemoteTables().size() > 0 || tables.stream().anyMatch(table -> !table.isOrphan(false));
+        boolean hasRealRelationships = !database.getRemoteTables().isEmpty() || tables.stream().anyMatch(table -> !table.isOrphan(false));
 
         if (hasRealRelationships) {
             File realCompactDot = summaryDir.resolve(FILE_PREFIX + ".real.compact.dot").toFile();
@@ -110,7 +110,7 @@ public class MustacheSummaryDiagramFactory {
         if (!diagrams.isEmpty()) {
             diagrams.get(0).setActive(true);
         }
-        return new MustacheSummaryDiagramResults(diagrams, stats, hasRealRelationships, impliedConstraints, outputExceptions);
+        return new MustacheSummaryDiagramResults(diagrams, hasRealRelationships, impliedConstraints, outputExceptions);
     }
 
     private void generateRealLarge(Database database, Collection<Table> tables, boolean showDetailedTables, List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions, WriteStats stats) {
