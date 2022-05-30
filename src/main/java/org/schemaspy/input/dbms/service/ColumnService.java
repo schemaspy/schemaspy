@@ -137,7 +137,6 @@ public class ColumnService {
         sql.append(tableName);
 
         sql.append(" where 0 = 1");
-        //LOGGER.info("SQL:"+sql.toString());
         try (PreparedStatement stmt = sqlService.getDatabaseMetaData().getConnection().prepareStatement(sql.toString());
              ResultSet rs = stmt.executeQuery()) {
 
