@@ -21,7 +21,6 @@ package org.schemaspy.output.html.mustache.diagrams;
 import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.view.MustacheTableDiagram;
-import org.schemaspy.view.WriteStats;
 
 import java.util.List;
 
@@ -31,14 +30,12 @@ import java.util.List;
 public class MustacheSummaryDiagramResults {
 
     private final List<MustacheTableDiagram> diagrams;
-    private final WriteStats stats;
     private final boolean hasRealRelationships;
     private final List<ImpliedForeignKeyConstraint> impliedConstraints;
     private final List<OutputException> outputExceptions;
 
-    public MustacheSummaryDiagramResults(List<MustacheTableDiagram> diagrams, WriteStats stats, boolean hasRealRelationships, List<ImpliedForeignKeyConstraint> impliedConstraints, List<OutputException> outputExceptions) {
+    public MustacheSummaryDiagramResults(List<MustacheTableDiagram> diagrams, boolean hasRealRelationships, List<ImpliedForeignKeyConstraint> impliedConstraints, List<OutputException> outputExceptions) {
         this.diagrams = diagrams;
-        this.stats = stats;
         this.hasRealRelationships = hasRealRelationships;
         this.impliedConstraints = impliedConstraints;
         this.outputExceptions = outputExceptions;
@@ -46,10 +43,6 @@ public class MustacheSummaryDiagramResults {
 
     public List<MustacheTableDiagram> getDiagrams() {
         return diagrams;
-    }
-
-    public WriteStats getStats() {
-        return stats;
     }
 
     public boolean hasRealRelationships() {
