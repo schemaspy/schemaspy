@@ -168,9 +168,7 @@ public class DotTableFormatter implements Relationships {
 
         // include the table itself
         nodes.put(table, new DotNode(table, false, new DotNodeConfig(true, true), dotConfig));
-
-        List<Element> elements = new LinkedList<>();
-
+        
         edges.addAll(allCousinEdges);
         for (Edge edge : edges) {
             if (edge.isImplied()) {
@@ -181,6 +179,10 @@ public class DotTableFormatter implements Relationships {
                 if (node != null)
                     node.setShowImplied(true);
             }
+        }
+
+        List<Element> elements = new LinkedList<>();
+        for (Edge edge : edges) {
             elements.add(edge);
         }
 
