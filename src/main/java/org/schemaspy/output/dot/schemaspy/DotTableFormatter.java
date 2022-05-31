@@ -168,16 +168,23 @@ public class DotTableFormatter implements Relationships {
 
         // include the table itself
         nodes.put(table, new DotNode(table, false, new DotNodeConfig(true, true), dotConfig));
-        
+
         edges.addAll(allCousinEdges);
+        
         for (Edge edge : edges) {
             if (edge.isImplied()) {
                 DotNode node = nodes.get(edge.getParentTable());
-                if (node != null)
+                if (node != null) {
                     node.setShowImplied(true);
-                node = nodes.get(edge.getChildTable());
-                if (node != null)
+                }
+            }
+        }
+        for (Edge edge : edges) {
+            if (edge.isImplied()) {
+                DotNode node = nodes.get(edge.getChildTable());
+                if (node != null) {
                     node.setShowImplied(true);
+                }
             }
         }
 
