@@ -40,8 +40,6 @@ public class ConfigTest {
 
         Config config = new Config(args);
         assertThat(config.getSchemas().size()).isEqualTo(2);
-        assertThat(config.isHelpRequired()).isTrue();
-        assertThat(config.isDbHelpRequired()).isFalse();
         assertThat(config.getDbType()).isEqualToIgnoringCase("mssql05");
     }
 

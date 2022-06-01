@@ -83,8 +83,6 @@ public final class Config implements HtmlConfig {
     private static Config instance;
     private final List<String> options;
     private Map<String, String> dbSpecificOptions;
-    private boolean helpRequired;
-    private boolean dbHelpRequired;
     private String dbType;
     private List<String> schemas;
     private boolean oneOfMultipleSchemas;
@@ -150,16 +148,8 @@ public final class Config implements HtmlConfig {
      * @param argv
      */
     public Config(String... argv) {
-
         setInstance(this);
         options = fixupArgs(Arrays.asList(argv));
-        helpRequired = options.remove("-?") ||
-                options.remove("/?") ||
-                options.remove("?") ||
-                options.remove("-h") ||
-                options.remove("-help") ||
-                options.remove("--help");
-        dbHelpRequired = options.remove("-dbHelp") || options.remove("-dbhelp");
     }
 
     public static Config getInstance() {
@@ -881,20 +871,6 @@ public final class Config implements HtmlConfig {
             schemaSpec = pullParam("-schemaSpec");
 
         return schemaSpec;
-    }
-
-    /**
-     * Returns <code>true</code> if the options indicate that the user wants
-     * to see some help information.
-     *
-     * @return should we show help information
-     */
-    public boolean isHelpRequired() {
-        return helpRequired;
-    }
-
-    public boolean isDbHelpRequired() {
-        return dbHelpRequired;
     }
 
     /**
