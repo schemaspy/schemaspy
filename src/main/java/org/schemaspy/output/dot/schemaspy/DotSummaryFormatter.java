@@ -70,27 +70,27 @@ public class DotSummaryFormatter {
         );
 
 
-        Map<Table, DotNode> nodes = new TreeMap<>();
+        List<DotNode> nodes = new LinkedList<>();
 
         for (Table table : tables) {
             if (!table.isOrphan(includeImplied)) {
-                nodes.put(table, new DotNode(table, true, nodeConfig, dotConfig));
+                nodes.add(new DotNode(table, true, nodeConfig, dotConfig));
             }
         }
 
         for (Table table : db.getRemoteTables()) {
-            nodes.put(table, new DotNode(table, true, nodeConfig, dotConfig));
+            nodes.add(new DotNode(table, true, nodeConfig, dotConfig));
         }
 
         Set<Edge> edges = new TreeSet<>();
 
-        for (DotNode node : nodes.values()) {
+        for (DotNode node : nodes) {
             edges.addAll(new SimpleEdges(node.getTable(), includeImplied).unique());
         }
 
         List<Element> elements = new LinkedList<>();
 
-        for (DotNode node : nodes.values()) {
+        for (DotNode node : nodes) {
             Table table = node.getTable();
 
             elements.add(node);
