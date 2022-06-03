@@ -127,8 +127,14 @@ public class DotTableFormatter implements Relationships {
 
         Map<Table, DotNode> nodes = new TreeMap<>();
 
-        // Immediate relatives should be written first
-        writeImmediateRelatives(relatedTables, tablesWritten, nodes, edges);
+        // First, write immediate relatives
+        final List<Table> unwritten = relatedTables.stream()
+                .filter(relative -> !tablesWritten.contains(relative))
+                .collect(Collectors.toList());
+        nodes.putAll(immediateRelativesNodes(unwritten));
+        edges.addAll(immediateRelativesEdges(unwritten));
+
+        connectEdges(edges);
 
         Set<Table> allCousins = new HashSet<>();
         Set<Edge> allCousinEdges = new TreeSet<>();
@@ -252,20 +258,6 @@ public class DotTableFormatter implements Relationships {
             }
         }
         return result;
-    }
-
-    private void writeImmediateRelatives(
-        Set<Table> relatedTables,
-        Set<Table> tablesWritten,
-        Map<Table, DotNode> nodes,
-        Set<Edge> edges
-    ) {
-        final List<Table> missing = relatedTables.stream()
-                .filter(relative -> !tablesWritten.contains(relative))
-                .collect(Collectors.toList());
-        nodes.putAll(immediateRelativesNodes(missing));
-        edges.addAll(immediateRelativesEdges(missing));
-        connectEdges(edges);
     }
 
     private Map<Table, DotNode> immediateRelativesNodes(final List<Table> tables) {
