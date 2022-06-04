@@ -20,9 +20,9 @@ package org.schemaspy.view;
 
 public class FileNameGenerator {
 
-    private FileNameGenerator() {}
+    public FileNameGenerator() {}
 
-    public static String generate(final String original_name) {
+    public String generate(final String original_name) {
         String name = original_name.replaceAll("[^a-zA-Z0-9\\-_\\.]", "_");
         if (name.length() <= 40 && original_name.equalsIgnoreCase(name)) {
             return name;
