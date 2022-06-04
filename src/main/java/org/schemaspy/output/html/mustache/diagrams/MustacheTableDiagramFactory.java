@@ -53,7 +53,7 @@ public class MustacheTableDiagramFactory {
     public List<MustacheTableDiagram> generateTableDiagrams(Table table) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
 
-        String fileNameBase = FileNameGenerator.generate(table.getName());
+        String fileNameBase = new FileNameGenerator().generate(table.getName());
 
         File oneDegreeDotFile = new File(tableDir, fileNameBase + ".1degree.dot");
         File twoDegreesDotFile = new File(tableDir, fileNameBase + ".2degrees.dot");

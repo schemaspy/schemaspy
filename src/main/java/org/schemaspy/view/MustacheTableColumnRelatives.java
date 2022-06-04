@@ -41,7 +41,7 @@ public class MustacheTableColumnRelatives {
         this(constraint);
         this.column = column;
         this.table = column.getTable();
-        this.path = table.isRemote() ? ("../../" + FileNameGenerator.generate(table.getContainer()) + "/tables/") : "";
+        this.path = table.isRemote() ? ("../../" + new FileNameGenerator().generate(table.getContainer()) + "/tables/") : "";
     }
 
     public Table getTable() {

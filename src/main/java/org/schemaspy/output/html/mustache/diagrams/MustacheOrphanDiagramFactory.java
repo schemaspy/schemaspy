@@ -75,7 +75,7 @@ public class MustacheOrphanDiagramFactory {
 
         List<MustacheTableDiagram> mustacheTableDiagrams = new ArrayList<>();
         for(Table table : orphanTables) {
-            String dotBaseFilespec = FileNameGenerator.generate(table.getName());
+            String dotBaseFilespec = new FileNameGenerator().generate(table.getName());
 
             File dotFile = orphanDir.resolve(dotBaseFilespec + ".1degree.dot").toFile();
 

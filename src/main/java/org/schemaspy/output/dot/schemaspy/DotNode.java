@@ -77,12 +77,12 @@ public class DotNode implements Node {
 
     private String createPath(boolean fromRoot) {
         if (dotConfig.useRelativeLinks()) {
-            return (table.isRemote() ? "../../../" + FileNameGenerator.generate(table.getContainer()) : "../..") + TABLES_PATH;
+            return (table.isRemote() ? "../../../" + new FileNameGenerator().generate(table.getContainer()) : "../..") + TABLES_PATH;
         }
         if (fromRoot) {
-            return (table.isRemote() ? ("../" + FileNameGenerator.generate(table.getContainer()) + TABLES_PATH) : "tables/");
+            return (table.isRemote() ? ("../" + new FileNameGenerator().generate(table.getContainer()) + TABLES_PATH) : "tables/");
         }
-        return (table.isRemote() ? ("../../" + FileNameGenerator.generate(table.getContainer()) + TABLES_PATH) : "");
+        return (table.isRemote() ? ("../../" + new FileNameGenerator().generate(table.getContainer()) + TABLES_PATH) : "");
 
     }
 
@@ -130,7 +130,7 @@ public class DotNode implements Node {
 
         buf.append("    </TABLE>>" + lineSeparator);
         if (!table.isRemote() || dotConfig.isOneOfMultipleSchemas()) {
-            buf.append("    URL=\"" + path + urlEncodeLink(FileNameGenerator.generate(tableName)) + ".html\"" + lineSeparator);
+            buf.append("    URL=\"" + path + urlEncodeLink(new FileNameGenerator().generate(tableName)) + ".html\"" + lineSeparator);
             buf.append("    target=\"_top\"" + lineSeparator);
         }
         buf.append("    tooltip=\"" + escapeHtml(fqTableName) + "\"" + lineSeparator);
