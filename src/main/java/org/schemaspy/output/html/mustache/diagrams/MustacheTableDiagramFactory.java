@@ -52,20 +52,23 @@ public class MustacheTableDiagramFactory {
 
     public List<MustacheTableDiagram> generateTableDiagrams(Table table) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
+        diagrams.addAll(generateRealTableDiagrams(table));
+        diagrams.addAll(generateImpliedTableDiagrams(table));
+        return diagrams;
+    }
+
+    public List<MustacheTableDiagram> generateRealTableDiagrams(Table table) throws IOException {
+        List<MustacheTableDiagram> diagrams = new ArrayList<>();
 
         String fileNameBase = new FileNameGenerator().generate(table.getName());
 
         File oneDegreeDotFile = new File(tableDir, fileNameBase + ".1degree.dot");
         File twoDegreesDotFile = new File(tableDir, fileNameBase + ".2degrees.dot");
-        File oneImpliedDotFile = new File(tableDir, fileNameBase + ".implied1degrees.dot");
-        File twoImpliedDotFile = new File(tableDir, fileNameBase + ".implied2degrees.dot");
 
         // delete before we start because we'll use the existence of these files to determine
         // if they should be turned into pngs & presented
         Files.deleteIfExists(oneDegreeDotFile.toPath());
         Files.deleteIfExists(twoDegreesDotFile.toPath());
-        Files.deleteIfExists(oneImpliedDotFile.toPath());
-        Files.deleteIfExists(twoImpliedDotFile.toPath());
 
         WriteStats oneStats = new WriteStats();
         try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
@@ -87,6 +90,22 @@ public class MustacheTableDiagramFactory {
                 diagrams.add(mustacheDiagramFactory.generateTableDiagram("Two degrees", twoDegreesDotFile, fileNameBase + ".2degrees"));
             }
         }
+
+        return diagrams;
+    }
+
+    public List<MustacheTableDiagram> generateImpliedTableDiagrams(Table table) throws IOException {
+        List<MustacheTableDiagram> diagrams = new ArrayList<>();
+
+        String fileNameBase = new FileNameGenerator().generate(table.getName());
+
+        File oneImpliedDotFile = new File(tableDir, fileNameBase + ".implied1degrees.dot");
+        File twoImpliedDotFile = new File(tableDir, fileNameBase + ".implied2degrees.dot");
+
+        // delete before we start because we'll use the existence of these files to determine
+        // if they should be turned into pngs & presented
+        Files.deleteIfExists(oneImpliedDotFile.toPath());
+        Files.deleteIfExists(twoImpliedDotFile.toPath());
 
         if (table.hasImpliedConstraints(degreeOfSeparation)) {
             WriteStats oneImplied = new WriteStats();
