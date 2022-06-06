@@ -27,7 +27,6 @@ import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
 import org.schemaspy.output.dot.schemaspy.graph.Digraph;
 import org.schemaspy.output.dot.schemaspy.graph.Element;
 import org.schemaspy.output.dot.schemaspy.name.*;
-import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -47,18 +46,18 @@ public class DotSummaryFormatter {
         this.dotConfig = dotConfig;
     }
 
-    public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
-        writeRelationships(db, tables, compact, showColumns, false, stats, dot);
+    public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, PrintWriter dot) {
+        writeRelationships(db, tables, compact, showColumns, false, dot);
     }
 
     /**
      * Returns <code>true</code> if it wrote any implied relationships
      */
-    public void writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, WriteStats stats, PrintWriter dot) {
-        writeRelationships(db, tables, compact, showColumns, true, stats, dot);
+    public void writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, PrintWriter dot) {
+        writeRelationships(db, tables, compact, showColumns, true, dot);
     }
 
-    private void writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, WriteStats stats, PrintWriter dot) {
+    private void writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, PrintWriter dot) {
         DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
 
         final Name name = new Concatenation(
@@ -89,14 +88,7 @@ public class DotSummaryFormatter {
         }
 
         List<Element> elements = new LinkedList<>();
-
-        for (DotNode node : nodes) {
-            Table table = node.getTable();
-
-            elements.add(node);
-            stats.wroteTable(table);
-        }
-
+        elements.addAll(nodes);
         elements.addAll(edges);
 
         dot.println(
