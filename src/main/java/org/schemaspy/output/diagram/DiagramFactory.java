@@ -44,14 +44,6 @@ public class DiagramFactory {
         orphansDir.mkdirs();
     }
 
-    public String getImplementationDetails() {
-        return diagramProducer.getImplementationDetails();
-    }
-
-    public String getDiagramFormat() {
-        return diagramProducer.getDiagramFormat();
-    }
-
     public DiagramResults generateOrphanDiagram(File dotFile, String diagramName) {
         try {
             File diagramFile = new File(orphansDir, diagramName + "." + diagramProducer.getDiagramFormat());
