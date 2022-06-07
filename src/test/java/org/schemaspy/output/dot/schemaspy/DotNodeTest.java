@@ -38,7 +38,7 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Nils Petzaell
  */
-public class DotNodeTest {
+class DotNodeTest {
 
     private static final Path expectations = Paths.get("src", "test", "resources", "dotnode");
 
@@ -393,8 +393,8 @@ public class DotNodeTest {
     }
 
     @Test
-    void escapeHtml() {
-        Table table = new LogicalTable(database, "catalog", "schema", "<table>", "comment");
+    void escapeHtmlInTableName() {
+        Table table = new LogicalTable(database, "catalog", "schema", "<table>&", "comment");
         DotNode dotNode = new DotNode(
             table,
             false,
@@ -407,17 +407,47 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.value()).contains("tooltip=\"&lt;table&gt;");
+        assertThat(dotNode.value())
+                .contains("tooltip=\"&lt;table&gt;&amp;")
+                .contains("<B>&lt;table&gt;&amp;</B></TD><TD ALIGN=\"RIGHT\">[table]</TD>")
+        ;
     }
 
     @Test
-    void htmlEscapeShortType() {
+    void escapeHtmlInColumnName() {
         Table table = new LogicalTable(database, "catalog", "schema", "a table", "comment");
         TableColumn tableColumn = new TableColumn(table);
-        tableColumn.setName("<A>");
-        tableColumn.setShortType("<T>");
+        tableColumn.setName("<A>&");
+        tableColumn.setShortType("t");
         tableColumn.setDetailedSize(null);
-        table.getColumnsMap().put("<A>", tableColumn);
+        table.getColumnsMap().put("<A>&", tableColumn);
+        DotNode dotNode = new DotNode(
+                table,
+                false,
+                new DotNodeConfig(true, true),
+                new SimpleDotConfig(
+                        fontConfig,
+                        false,
+                        false,
+                        false,
+                        true
+                )
+        );
+        assertThat(dotNode.value())
+                .contains("<TD PORT=\"&lt;A&gt;&amp;\" COLSPAN=\"2\" ALIGN=\"LEFT\">")
+                .contains("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"42\" HEIGHT=\"16\">&lt;A&gt;&amp;</TD>")
+                .contains("<TD PORT=\"&lt;A&gt;&amp;.type\" ALIGN=\"LEFT\">")
+        ;
+    }
+
+    @Test
+    void escapeHtmlInShortType() {
+        Table table = new LogicalTable(database, "catalog", "schema", "a table", "comment");
+        TableColumn tableColumn = new TableColumn(table);
+        tableColumn.setName("A");
+        tableColumn.setShortType("<T>&");
+        tableColumn.setDetailedSize(null);
+        table.getColumnsMap().put("A", tableColumn);
         DotNode dotNode = new DotNode(
             table,
             false,
@@ -430,7 +460,7 @@ public class DotNodeTest {
                 true
             )
         );
-        assertThat(dotNode.value()).contains("<TD PORT=\"&lt;A&gt;.type\" ALIGN=\"LEFT\">&lt;t&gt;</TD>");
+        assertThat(dotNode.value()).contains("<TD PORT=\"A.type\" ALIGN=\"LEFT\">&lt;t&gt;&amp;</TD>");
     }
 
     @Test
