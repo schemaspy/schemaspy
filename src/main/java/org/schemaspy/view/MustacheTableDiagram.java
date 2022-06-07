@@ -18,6 +18,8 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.output.diagram.DiagramResults;
+
 /**
  * Created by rkasa on 2016-03-26.
  *
@@ -25,52 +27,35 @@ package org.schemaspy.view;
  */
 public class MustacheTableDiagram {
     private String name;
-    private String fileName;
-    private String map;
-    private String id;
-    private String mapName;
+    private DiagramResults diagram;
     private String active;
     private boolean isImplied;
-    private boolean isEmbed;
+
+    public MustacheTableDiagram() { }
+
+    public MustacheTableDiagram(final String diagramName, final DiagramResults diagram) {
+        this.name = diagramName;
+        this.diagram = diagram;
+    }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+        return diagram.getDiagramFile().getName();
     }
 
     public String getMap() {
-        return map;
-    }
-
-    public void setMap(String map) {
-        this.map = map;
+        return diagram.getDiagramMap();
     }
 
     public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        return name.replaceAll("\\s", "").toLowerCase() + "DegreeImg";
     }
 
     public String getMapName() {
-        return mapName;
-    }
-
-    public void setMapName(String mapName) {
-        this.mapName = mapName;
+        return diagram.getDiagramMapName();
     }
 
     public String getActive() {
@@ -90,10 +75,6 @@ public class MustacheTableDiagram {
     }
 
     public boolean isEmbed() {
-        return isEmbed;
-    }
-
-    public void setEmbed(boolean embed) {
-        isEmbed = embed;
+        return diagram.getImageFormat().equalsIgnoreCase("svg");
     }
 }
