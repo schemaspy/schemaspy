@@ -36,7 +36,6 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.testing.H2MemoryRule;
-import org.schemaspy.view.WriteStats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,6 +47,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.LongAdder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -122,12 +122,12 @@ public class SchemaMetaIT {
         );
         new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
-        assertThat(database.getTables().size()).isGreaterThan(0);
+        assertThat(database.getTables()).isNotEmpty();
         assertThat(database.getSchema().getComment()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
         assertThat(database.getTablesMap().get("ACCOUNT").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
         assertThat(database.getTablesMap().get("ACCOUNT").getColumn("name").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
 
-        assertThat(databaseWithSchemaMeta.getTables().size()).isGreaterThan(0);
+        assertThat(databaseWithSchemaMeta.getTables()).isNotEmpty();
         assertThat(databaseWithSchemaMeta.getSchema().getComment()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
         assertThat(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
         assertThat(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumn("name").getComments()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
@@ -153,10 +153,10 @@ public class SchemaMetaIT {
         );
         new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
-        assertThat(database.getTables().size()).isGreaterThan(0);
+        assertThat(database.getTables()).isNotEmpty();
         assertThat(database.getTablesMap().get("ACCOUNT").getColumn("accountId").getComments()).isNull();
 
-        assertThat(databaseWithSchemaMeta.getTables().size()).isGreaterThan(0);
+        assertThat(databaseWithSchemaMeta.getTables()).isNotEmpty();
         assertThat(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumn("accountId").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
     }
 
@@ -171,7 +171,7 @@ public class SchemaMetaIT {
         );
         new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, schemaMeta, progressListener);
 
-        assertThat(database.getTables().size()).isGreaterThan(0);
+        assertThat(database.getTables()).isNotEmpty();
         assertThat(database.getSchema().getComment()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
         assertThat(database.getTablesMap().get("ACCOUNT").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
         assertThat(database.getTablesMap().get("ACCOUNT").getColumn("name").getComments()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
@@ -196,7 +196,7 @@ public class SchemaMetaIT {
         );
         new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
-        assertThat(database.getRemoteTables().size()).isLessThan(databaseWithSchemaMeta.getRemoteTables().size());
+        assertThat(database.getRemoteTables()).hasSizeLessThan(databaseWithSchemaMeta.getRemoteTables().size());
         assertThat(database.getRemoteTablesMap().get("other.other.CONTRACT")).isNull();
         assertThat(databaseWithSchemaMeta.getRemoteTablesMap().get("other.other.CONTRACT")).isNotNull();
     }
@@ -243,8 +243,8 @@ public class SchemaMetaIT {
         );
         new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
-        assertThat(database.getTablesMap().get("ACCOUNT").getColumns().size())
-                .isLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumns().size());
+        assertThat(database.getTablesMap().get("ACCOUNT").getColumns())
+                .hasSizeLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumns().size());
     }
 
     @Test
@@ -330,11 +330,11 @@ public class SchemaMetaIT {
 
         StringWriter withoutSchemaMetaOutput = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(withoutSchemaMetaOutput)) {
-            dotFormatter.writeTableAllRelationships(database.getTablesMap().get("COMPANY"), false, new WriteStats(), printWriter);
+            dotFormatter.writeTableAllRelationships(database.getTablesMap().get("COMPANY"), false, new LongAdder(), printWriter);
         }
         StringWriter withSchemaMetaOutput = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(withSchemaMetaOutput)){
-            dotFormatter.writeTableAllRelationships(databaseWithSchemaMeta.getTablesMap().get("COMPANY"), false, new WriteStats(), printWriter);
+            dotFormatter.writeTableAllRelationships(databaseWithSchemaMeta.getTablesMap().get("COMPANY"), false, new LongAdder(), printWriter);
         }
         assertThat(withoutSchemaMetaOutput.toString()).contains("\"COUNTRY\":\"COUNTRYID\"");
         assertThat(withSchemaMetaOutput.toString()).doesNotContain("\"COUNTRY\":\"COUNTRYID\"");

@@ -26,13 +26,13 @@ import org.mockito.stubbing.Answer;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.view.MustacheTableDiagram;
-import org.schemaspy.view.WriteStats;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.LongAdder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -44,15 +44,14 @@ public class MustacheTableDiagramFactoryTest {
 
     private static final Answer ONE_WRITTEN = invocation -> {
         Table table1 = invocation.getArgument(0);
-        WriteStats writeStats1 = invocation.getArgument(2);
-        writeStats1.wroteTable(table1);
+        LongAdder writeStats1 = invocation.getArgument(2);
+        writeStats1.add(1);
         return Collections.emptySet();
     };
     private static final Answer TWO_WRITTEN = invocation -> {
         Table table1 = invocation.getArgument(0);
-        WriteStats writeStats1 = invocation.getArgument(2);
-        writeStats1.wroteTable(table1);
-        writeStats1.wroteTable(table1);
+        LongAdder writeStats1 = invocation.getArgument(2);
+        writeStats1.add(2);
         return Collections.emptySet();
     };
 
@@ -77,18 +76,18 @@ public class MustacheTableDiagramFactoryTest {
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(LongAdder.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
-        assertThat(mustacheTableDiagramList.size()).isEqualTo(1);
+        assertThat(mustacheTableDiagramList).hasSize(1);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
     }
@@ -103,18 +102,18 @@ public class MustacheTableDiagramFactoryTest {
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(LongAdder.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             TWO_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
-        assertThat(mustacheTableDiagramList.size()).isEqualTo(2);
+        assertThat(mustacheTableDiagramList).hasSize(2);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
         assertThat(mustacheTableDiagramList.get(1).getActive()).isNullOrEmpty();
@@ -131,27 +130,27 @@ public class MustacheTableDiagramFactoryTest {
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(LongAdder.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(LongAdder.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             TWO_WRITTEN.answer(invocation);
             return null;
         }).
-                when(dotProducer).writeTableAllRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
+                when(dotProducer).writeTableAllRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
-        assertThat(mustacheTableDiagramList.size()).isEqualTo(3);
+        assertThat(mustacheTableDiagramList).hasSize(3);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
         assertThat(mustacheTableDiagramList.get(1).getActive()).isNullOrEmpty();
@@ -170,28 +169,28 @@ public class MustacheTableDiagramFactoryTest {
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(LongAdder.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             TWO_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
         }).
-                when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+                when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(LongAdder.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             TWO_WRITTEN.answer(invocation);
             return null;
         }).
-                when(dotProducer).writeTableAllRelationships(eq(table), eq(true), any(WriteStats.class), any(PrintWriter.class));
+                when(dotProducer).writeTableAllRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
-        assertThat(mustacheTableDiagramList.size()).isEqualTo(4);
+        assertThat(mustacheTableDiagramList).hasSize(4);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
         assertThat(mustacheTableDiagramList.get(1).getActive()).isNullOrEmpty();
@@ -212,18 +211,18 @@ public class MustacheTableDiagramFactoryTest {
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableRealRelationships(eq(table), eq(false), any(LongAdder.class), any(PrintWriter.class));
         doAnswer(invocation -> {
             ONE_WRITTEN.answer(invocation);
             return null;
-        }).when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(WriteStats.class), any(PrintWriter.class));
+        }).when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(LongAdder.class), any(PrintWriter.class));
 
         MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
         when(mustacheDiagramFactory.generateTableDiagram(anyString(),any(File.class),anyString())).then(invocation -> new MustacheTableDiagram());
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, mustacheDiagramFactory, outputDir, 1);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
-        assertThat(mustacheTableDiagramList.size()).isEqualTo(2);
+        assertThat(mustacheTableDiagramList).hasSize(2);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
         assertThat(mustacheTableDiagramList.get(0).isImplied()).isFalse();
         assertThat(mustacheTableDiagramList.get(1).getActive()).isNullOrEmpty();
