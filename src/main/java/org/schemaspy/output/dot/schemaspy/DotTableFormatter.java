@@ -34,10 +34,10 @@ import org.schemaspy.output.dot.schemaspy.graph.Digraph;
 import org.schemaspy.output.dot.schemaspy.graph.Element;
 import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
-import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 
 /**
@@ -52,7 +52,7 @@ public class DotTableFormatter implements Relationships {
     private final DotConfig dotConfig;
     private final Table table;
     private final boolean twoDegreesOfSeparation;
-    private final WriteStats stats;
+    private final LongAdder stats;
     private final boolean includeImplied;
     private final PrintWriter dot;
     private final Header header;
@@ -62,7 +62,7 @@ public class DotTableFormatter implements Relationships {
             final DotConfig dotConfig,
             final Table table,
             final boolean twoDegreesOfSeparation,
-            final WriteStats stats,
+            final LongAdder stats,
             final boolean includeImplied,
             final PrintWriter dot
     ) {
@@ -91,7 +91,7 @@ public class DotTableFormatter implements Relationships {
         final DotConfig dotConfig,
         final Table table,
         final boolean twoDegreesOfSeparation,
-        final WriteStats stats,
+        final LongAdder stats,
         final boolean includeImplied,
         final PrintWriter dot,
         final Header header,
@@ -195,14 +195,9 @@ public class DotTableFormatter implements Relationships {
         }
 
         List<Element> elements = new LinkedList<>();
-        for (Edge edge : edges) {
-            elements.add(edge);
-        }
-
-        for (DotNode node : nodes.values()) {
-            elements.add(node);
-            stats.wroteTable(node.getTable());
-        }
+        elements.addAll(edges);
+        elements.addAll(nodes.values());
+        stats.add(nodes.size());
 
         dot.println(
             new Digraph(

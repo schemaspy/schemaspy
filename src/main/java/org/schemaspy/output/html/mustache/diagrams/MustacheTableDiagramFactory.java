@@ -23,7 +23,6 @@ import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.FileNameGenerator;
 import org.schemaspy.view.MustacheTableDiagram;
-import org.schemaspy.view.WriteStats;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +30,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * @author Nils Petzaell
@@ -70,7 +70,7 @@ public class MustacheTableDiagramFactory {
         Files.deleteIfExists(oneDegreeDotFile.toPath());
         Files.deleteIfExists(twoDegreesDotFile.toPath());
 
-        WriteStats oneStats = new WriteStats();
+        LongAdder oneStats = new LongAdder();
         try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
             dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
         }
@@ -79,7 +79,7 @@ public class MustacheTableDiagramFactory {
         diagrams.add(oneDiagram);
 
         if (degreeOfSeparation == 2) {
-            WriteStats twoStats = new WriteStats();
+            LongAdder twoStats = new LongAdder();
             try (PrintWriter dotOut = Writers.newPrintWriter(twoDegreesDotFile)) {
                 dotProducer.writeTableRealRelationships(table, true, twoStats, dotOut);
             }
@@ -108,7 +108,7 @@ public class MustacheTableDiagramFactory {
         Files.deleteIfExists(twoImpliedDotFile.toPath());
 
         if (table.hasImpliedConstraints(degreeOfSeparation)) {
-            WriteStats oneImplied = new WriteStats();
+            LongAdder oneImplied = new LongAdder();
             try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
                 dotProducer.writeTableAllRelationships(table, false, oneImplied, dotOut);
             }
@@ -117,7 +117,7 @@ public class MustacheTableDiagramFactory {
             diagrams.add(oneImpliedDiagram);
 
             if (degreeOfSeparation == 2) {
-                WriteStats twoImplied = new WriteStats();
+                LongAdder twoImplied = new LongAdder();
                 try (PrintWriter dotOut = Writers.newPrintWriter(twoImpliedDotFile)) {
                     dotProducer.writeTableAllRelationships(table, true, twoImplied, dotOut);
                 }
@@ -135,8 +135,8 @@ public class MustacheTableDiagramFactory {
         return diagrams;
     }
 
-    private static boolean sameWritten(WriteStats first, WriteStats second) {
-        return first.getNumTablesWritten() + first.getNumViewsWritten() == second.getNumTablesWritten() + second.getNumViewsWritten();
+    private static boolean sameWritten(LongAdder first, LongAdder second) {
+        return first.sum() == second.sum();
     }
 
 }

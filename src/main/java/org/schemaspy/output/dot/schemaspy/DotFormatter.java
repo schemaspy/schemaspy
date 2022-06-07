@@ -25,10 +25,10 @@ import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.relationship.ImpliedRelationships;
 import org.schemaspy.output.dot.schemaspy.relationship.RealRelationships;
-import org.schemaspy.view.WriteStats;
 
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Format table data into .dot format to feed to Graphvis' dot program.
@@ -56,11 +56,11 @@ public class DotFormatter {
         dotSummaryFormatter.writeSummaryAllRelationships(db, tables, compact, showColumns, dot);
     }
 
-    public void writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
+    public void writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, LongAdder stats, PrintWriter dot) {
         new RealRelationships(dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
 
-    public void writeTableAllRelationships(Table table, boolean twoDegreesOfSeparation, WriteStats stats, PrintWriter dot) {
+    public void writeTableAllRelationships(Table table, boolean twoDegreesOfSeparation, LongAdder stats, PrintWriter dot) {
         new ImpliedRelationships(dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
 }
