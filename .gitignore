@@ -12,3 +12,4 @@ bower_components/
 ext-lib/**/*.jar
 !/src/test/resources/target
 .java-version
+.sdkmanrc
