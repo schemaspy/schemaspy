@@ -37,28 +37,16 @@ public class MustacheDiagramFactory {
 
     public MustacheTableDiagram generateOrphanDiagram(String name, File dotFile, String diagramName) {
         DiagramResults results = diagramFactory.generateOrphanDiagram(dotFile, diagramName);
-        return createMustacheTableDiagram(name, results);
+        return new MustacheTableDiagram(name, results);
     }
 
     public MustacheTableDiagram generateTableDiagram(String name, File dotFile, String diagramName) {
         DiagramResults results = diagramFactory.generateTableDiagram(dotFile, diagramName);
-        return createMustacheTableDiagram(name, results);
+        return new MustacheTableDiagram(name, results);
     }
 
     public MustacheTableDiagram generateSummaryDiagram(String name, File dotFile, String diagramName) {
         DiagramResults results = diagramFactory.generateSummaryDiagram(dotFile, diagramName);
-        return createMustacheTableDiagram(name, results);
+        return new MustacheTableDiagram(name, results);
     }
-
-    private static MustacheTableDiagram createMustacheTableDiagram(String diagramName, DiagramResults diagramResults) {
-        MustacheTableDiagram mustacheTableDiagram = new MustacheTableDiagram();
-        mustacheTableDiagram.setName(diagramName);
-        mustacheTableDiagram.setId(diagramName.replaceAll("\\s", "").toLowerCase() + "DegreeImg");
-        mustacheTableDiagram.setFileName(diagramResults.getDiagramFile().getName());
-        mustacheTableDiagram.setMap(diagramResults.getDiagramMap());
-        mustacheTableDiagram.setMapName(diagramResults.getDiagramMapName());
-        mustacheTableDiagram.setEmbed(diagramResults.getImageFormat().equalsIgnoreCase("svg"));
-        return mustacheTableDiagram;
-    }
-
 }
