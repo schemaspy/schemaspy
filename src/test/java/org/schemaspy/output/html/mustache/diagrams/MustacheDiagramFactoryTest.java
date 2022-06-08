@@ -38,29 +38,11 @@ public class MustacheDiagramFactoryTest {
     private static final MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(DIAGRAM_FACTORY);
 
     @BeforeClass
-    public static void setupTable() {
-        File orphan = mock(File.class);
-        when(orphan.getName()).thenReturn("table.png");
-        DiagramResults results = new DiagramResults(orphan,"<map name=\"tableMap\">","png");
-        when(DIAGRAM_FACTORY.generateTableDiagram(any(File.class),anyString())).thenReturn(results);
-    }
-
-    @BeforeClass
     public static void setupSummary() {
         File orphan = mock(File.class);
         when(orphan.getName()).thenReturn("summary.png");
         DiagramResults results = new DiagramResults(orphan,"<map name=\"summaryMap\">", "png");
         when(DIAGRAM_FACTORY.generateSummaryDiagram(any(File.class),anyString())).thenReturn(results);
-    }
-
-    @Test
-    public void generateTableDiagram() {
-        MustacheTableDiagram mustacheTableDiagram = mustacheDiagramFactory.generateTableDiagram("Table 1", mock(File.class), "table");
-        assertThat(mustacheTableDiagram.getName()).isEqualTo("Table 1");
-        assertThat(mustacheTableDiagram.getId()).isEqualTo("table1DegreeImg");
-        assertThat(mustacheTableDiagram.getFileName()).isEqualTo("table.png");
-        assertThat(mustacheTableDiagram.getMapName()).isEqualTo("tableMap");
-        assertThat(mustacheTableDiagram.getMap()).isEqualTo("<map name=\"tableMap\">");
     }
 
     @Test

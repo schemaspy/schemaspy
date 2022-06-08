@@ -19,6 +19,8 @@
 package org.schemaspy.output.html.mustache.diagrams;
 
 import org.schemaspy.model.Table;
+import org.schemaspy.output.diagram.DiagramFactory;
+import org.schemaspy.output.diagram.DiagramResults;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.FileNameGenerator;
@@ -38,12 +40,14 @@ import java.util.concurrent.atomic.LongAdder;
 public class MustacheTableDiagramFactory {
 
     private final DotFormatter dotProducer;
+    private final DiagramFactory diagramFactory;
     private final MustacheDiagramFactory mustacheDiagramFactory;
     private final File tableDir;
     private final int degreeOfSeparation;
 
-    public MustacheTableDiagramFactory(DotFormatter dotProducer, MustacheDiagramFactory mustacheDiagramFactory, File outputDir, int degreeOfSeparation) {
+    public MustacheTableDiagramFactory(DotFormatter dotProducer, DiagramFactory diagramFactory, MustacheDiagramFactory mustacheDiagramFactory, File outputDir, int degreeOfSeparation) {
         this.dotProducer = dotProducer;
+        this.diagramFactory = diagramFactory;
         this.mustacheDiagramFactory = mustacheDiagramFactory;
         this.tableDir = outputDir.toPath().resolve("diagrams").resolve("tables").toFile();
         tableDir.mkdirs();
@@ -74,7 +78,8 @@ public class MustacheTableDiagramFactory {
         try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
             dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
         }
-        MustacheTableDiagram oneDiagram = mustacheDiagramFactory.generateTableDiagram("One", oneDegreeDotFile, fileNameBase + ".1degree");
+        DiagramResults results = diagramFactory.generateTableDiagram(oneDegreeDotFile, fileNameBase + ".1degree");
+        MustacheTableDiagram oneDiagram = new MustacheTableDiagram("One", results);
         oneDiagram.setActive(true);
         diagrams.add(oneDiagram);
 
@@ -87,7 +92,9 @@ public class MustacheTableDiagramFactory {
             if (sameWritten(oneStats, twoStats)) {
                 Files.deleteIfExists(twoDegreesDotFile.toPath()); // no different than before, so don't show it
             } else {
-                diagrams.add(mustacheDiagramFactory.generateTableDiagram("Two degrees", twoDegreesDotFile, fileNameBase + ".2degrees"));
+                DiagramResults resultsTwo = diagramFactory.generateTableDiagram(twoDegreesDotFile, fileNameBase + ".2degrees");
+                MustacheTableDiagram twoDiagram = new MustacheTableDiagram("Two degrees", resultsTwo);
+                diagrams.add(twoDiagram);
             }
         }
 
@@ -112,7 +119,9 @@ public class MustacheTableDiagramFactory {
             try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
                 dotProducer.writeTableAllRelationships(table, false, oneImplied, dotOut);
             }
-            MustacheTableDiagram oneImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("One implied", oneImpliedDotFile, fileNameBase + ".implied1degrees");
+
+            DiagramResults results = diagramFactory.generateTableDiagram(oneImpliedDotFile, fileNameBase + ".implied1degrees");
+            MustacheTableDiagram oneImpliedDiagram = new MustacheTableDiagram("One implied", results);
             oneImpliedDiagram.setIsImplied(true);
             diagrams.add(oneImpliedDiagram);
 
@@ -124,7 +133,8 @@ public class MustacheTableDiagramFactory {
                 if (sameWritten(oneImplied, twoImplied)) {
                     Files.deleteIfExists(twoImpliedDotFile.toPath());
                 } else {
-                    MustacheTableDiagram twoImpliedDiagram = mustacheDiagramFactory.generateTableDiagram("Two implied", twoImpliedDotFile, fileNameBase + ".implied2degrees");
+                    DiagramResults resultsTwo = diagramFactory.generateTableDiagram(twoImpliedDotFile, fileNameBase + ".implied2degrees");
+                    MustacheTableDiagram twoImpliedDiagram = new MustacheTableDiagram("Two implied", resultsTwo);
                     twoImpliedDiagram.setIsImplied(true);
                     diagrams.add(twoImpliedDiagram);
                 }
