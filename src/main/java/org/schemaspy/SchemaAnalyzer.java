@@ -343,9 +343,8 @@ public class SchemaAnalyzer {
         );
 
         DotFormatter dotProducer = new DotFormatter(dotConfig);
-        MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(
-                new DiagramFactory(diagramProducer, outputDir)
-        );
+        DiagramFactory diagramFactory = new DiagramFactory(diagramProducer, outputDir);
+        MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(diagramFactory);
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, impliedConstraintsFinder, outputDir);
         MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, includeImpliedConstraints, showDetailedTables, progressListener);
@@ -363,7 +362,7 @@ public class SchemaAnalyzer {
         progressListener.graphingSummaryProgressed();
 
         List<Table> orphans = DbAnalyzer.getOrphans(tables);
-        MustacheOrphanDiagramFactory mustacheOrphanDiagramFactory = new MustacheOrphanDiagramFactory(dotConfig, mustacheDiagramFactory, outputDir);
+        MustacheOrphanDiagramFactory mustacheOrphanDiagramFactory = new MustacheOrphanDiagramFactory(dotConfig, diagramFactory, outputDir);
         List<MustacheTableDiagram> orphanDiagrams = mustacheOrphanDiagramFactory.generateOrphanDiagrams(orphans);
         HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(mustacheCompiler);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("orphans.html").toFile())) {

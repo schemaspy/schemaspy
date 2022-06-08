@@ -35,11 +35,6 @@ public class MustacheDiagramFactory {
         this.diagramFactory = diagramFactory;
     }
 
-    public MustacheTableDiagram generateOrphanDiagram(String name, File dotFile, String diagramName) {
-        DiagramResults results = diagramFactory.generateOrphanDiagram(dotFile, diagramName);
-        return new MustacheTableDiagram(name, results);
-    }
-
     public MustacheTableDiagram generateTableDiagram(String name, File dotFile, String diagramName) {
         DiagramResults results = diagramFactory.generateTableDiagram(dotFile, diagramName);
         return new MustacheTableDiagram(name, results);
