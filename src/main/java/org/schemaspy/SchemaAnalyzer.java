@@ -47,7 +47,11 @@ import org.schemaspy.output.diagram.vizjs.VizJSDot;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
-import org.schemaspy.output.html.mustache.diagrams.*;
+import org.schemaspy.output.dot.schemaspy.OrphanGraph;
+import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramFactory;
+import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
+import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
+import org.schemaspy.output.html.mustache.diagrams.OrphanDiagram;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.util.*;
 import org.schemaspy.view.*;
@@ -137,7 +141,7 @@ public class SchemaAnalyzer {
                     schemaSpec = ".*";
                 LOGGER.info(
                         "Analyzing schemas that match regular expression '{}'. " +
-                        "(use -schemaSpec on command line or in .properties to exclude other schemas)",
+                                "(use -schemaSpec on command line or in .properties to exclude other schemas)",
                         schemaSpec);
                 schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false);
                 if (schemas.isEmpty())
@@ -249,7 +253,7 @@ public class SchemaAnalyzer {
 
             long duration = progressListener.startedGraphingSummaries();
             if (commandLineArguments.isHtmlEnabled()) {
-                generateHtmlDoc(config, commandLineArguments.useVizJS() , progressListener, outputDir, db, duration, tables);
+                generateHtmlDoc(config, commandLineArguments.useVizJS(), progressListener, outputDir, db, duration, tables);
             }
 
             outputProducers.forEach(
@@ -299,7 +303,7 @@ public class SchemaAnalyzer {
         }
 
         Collections.reverse(orderedTables);
-        try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "deletionOrder.txt"))){
+        try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "deletionOrder.txt"))) {
             TextFormatter.getInstance().write(orderedTables, false, out);
         }
     }
@@ -332,14 +336,14 @@ public class SchemaAnalyzer {
         if (config.isRailsEnabled())
             DbAnalyzer.getRailsConstraints(db.getTablesMap());
         DotConfig dotConfig = new SimpleDotConfig(
-            new DefaultFontConfig(
-                config.getFont(),
-                config.getFontSize()
-            ),
-            config.isRankDirBugEnabled(),
-            "svg".equalsIgnoreCase(diagramProducer.getDiagramFormat()),
-            config.isNumRowsEnabled(),
-            config.isOneOfMultipleSchemas()
+                new DefaultFontConfig(
+                        config.getFont(),
+                        config.getFontSize()
+                ),
+                config.isRankDirBugEnabled(),
+                "svg".equalsIgnoreCase(diagramProducer.getDiagramFormat()),
+                config.isNumRowsEnabled(),
+                config.isOneOfMultipleSchemas()
         );
 
         DotFormatter dotProducer = new DotFormatter(dotConfig);
@@ -360,12 +364,16 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        List<Table> orphans = DbAnalyzer.getOrphans(tables);
-        MustacheOrphanDiagramFactory mustacheOrphanDiagramFactory = new MustacheOrphanDiagramFactory(dotConfig, diagramFactory, outputDir);
-        List<MustacheTableDiagram> orphanDiagrams = mustacheOrphanDiagramFactory.generateOrphanDiagrams(orphans);
-        HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(mustacheCompiler);
+        HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(
+                mustacheCompiler,
+                new OrphanDiagram(
+                        new OrphanGraph(dotConfig, tables),
+                        diagramProducer,
+                        outputDir
+                )
+        );
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("orphans.html").toFile())) {
-            htmlOrphansPage.write(orphanDiagrams, orphanDiagrams.size() == orphans.size(), writer);
+            htmlOrphansPage.write(writer);
         }
 
         progressListener.graphingSummaryProgressed();
@@ -434,7 +442,7 @@ public class SchemaAnalyzer {
     private static void markDownRegistryPages(Collection<Table> tables) {
         tables.stream()
                 .filter(table -> !table.isLogical())
-                .forEach( table -> {
+                .forEach(table -> {
                     String tablePath = "tables/" + new FileNameGenerator().generate(table.getName()) + DOT_HTML;
                     Markdown.registryPage(table.getName(), tablePath);
                 });
@@ -496,18 +504,18 @@ public class SchemaAnalyzer {
         } else if (schemas.contains(schema)) {
             LOGGER.error(
                     "The schema exists in the database, but the user you specified '{}'" +
-                    "might not have rights to read its contents.",
+                            "might not have rights to read its contents.",
                     user);
             if (specifiedInclusions) {
                 LOGGER.error(
                         "Another possibility is that the regular expression that you specified " +
-                        "for what to include (via -i) didn't match any tables.");
+                                "for what to include (via -i) didn't match any tables.");
             }
         } else {
             LOGGER.error(
                     "The schema '{}' could not be read/found, schema is specified using the -s option." +
-                    "Make sure user '{}' has the correct privileges to read the schema." +
-                    "Also not that schema names are usually case sensitive.",
+                            "Make sure user '{}' has the correct privileges to read the schema." +
+                            "Also not that schema names are usually case sensitive.",
                     schema, user);
             LOGGER.info(
                     "Available schemas(Some of these may be user or system schemas):{}{}",

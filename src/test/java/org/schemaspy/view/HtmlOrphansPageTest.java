@@ -18,31 +18,43 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Test;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.util.DataTableConfig;
+import org.junit.jupiter.api.Test;
+import org.schemaspy.output.html.HtmlException;
+import org.schemaspy.testing.TestMustacheCompiler;
 
-import java.io.StringWriter;
-import java.util.Collections;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-public class HtmlOrphansPageTest {
+class HtmlOrphansPageTest {
 
     @Test
-    public void showError() {
-        HtmlConfig htmlConfig = mock(HtmlConfig.class);
-        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isOneOfMultipleSchemas()).thenReturn(false);
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new DefaultMustacheCompiler("errorInOrpahns", htmlConfig, dataTableConfig);
-        HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(mustacheCompiler);
-        StringWriter writer = new StringWriter();
-        htmlOrphansPage.write(Collections.emptyList(), false, writer);
-        assertThat(writer.toString()).contains("Not all diagrams were created");
+    void orphanPageUsesCorrectTemplateName() {
+        TestMustacheCompiler mustacheCompiler = new TestMustacheCompiler();
+        new HtmlOrphansPage(mustacheCompiler, () -> "").write(null);
+        assertThat(mustacheCompiler.pageData().getTemplateName()).isEqualTo("orphans.html");
     }
 
+    @Test
+    void orphanPageIncludesDiagram() {
+        TestMustacheCompiler mustacheCompiler = new TestMustacheCompiler();
+
+        new HtmlOrphansPage(mustacheCompiler, () -> "yes it does").write(null);
+        assertThat(mustacheCompiler.pageData().getScope()).containsEntry("diagram", "yes it does");
+    }
+
+    @Test
+    void throwsHtmlExceptionInsteadOfIOException() throws IOException {
+        MustacheCompiler mustacheCompiler = mock(MustacheCompiler.class);
+
+        doThrow(new IOException("failed")).when(mustacheCompiler).write(any(PageData.class), any());
+        HtmlOrphansPage htmlOrphansPage =new HtmlOrphansPage(mustacheCompiler, () -> "yes it does");
+        assertThatThrownBy(() ->
+                htmlOrphansPage.write(null)
+        ).isInstanceOf(HtmlException.class).hasCauseInstanceOf(IOException.class);
+    }
 }
