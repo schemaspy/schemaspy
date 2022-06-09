@@ -346,7 +346,7 @@ public class SchemaAnalyzer {
         DiagramFactory diagramFactory = new DiagramFactory(diagramProducer, outputDir);
         MustacheDiagramFactory mustacheDiagramFactory = new MustacheDiagramFactory(diagramFactory);
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, impliedConstraintsFinder, outputDir);
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, diagramFactory, impliedConstraintsFinder, outputDir);
         MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, includeImpliedConstraints, showDetailedTables, progressListener);
         results.getOutputExceptions().stream().forEachOrdered(exception ->
                 LOGGER.error("RelationShipDiagramError", exception)
