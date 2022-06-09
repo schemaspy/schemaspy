@@ -19,6 +19,7 @@
 package org.schemaspy.output;
 
 /**
+ * Runtime exception to extend for different output producers
  * @author Nils Petzaell
  */
 public class OutputException extends RuntimeException {

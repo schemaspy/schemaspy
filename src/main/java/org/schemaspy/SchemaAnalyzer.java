@@ -47,7 +47,11 @@ import org.schemaspy.output.diagram.vizjs.VizJSDot;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
-import org.schemaspy.output.html.mustache.diagrams.*;
+import org.schemaspy.output.dot.schemaspy.OrphanGraph;
+import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramFactory;
+import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
+import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
+import org.schemaspy.output.html.mustache.diagrams.OrphanDiagram;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.util.*;
 import org.schemaspy.view.*;
@@ -360,12 +364,16 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        List<Table> orphans = DbAnalyzer.getOrphans(tables);
-        MustacheOrphanDiagramFactory mustacheOrphanDiagramFactory = new MustacheOrphanDiagramFactory(dotConfig, diagramFactory, outputDir);
-        List<MustacheTableDiagram> orphanDiagrams = mustacheOrphanDiagramFactory.generateOrphanDiagrams(orphans);
-        HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(mustacheCompiler);
+        HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(
+                mustacheCompiler,
+                new OrphanDiagram(
+                        new OrphanGraph(dotConfig, tables),
+                        diagramProducer,
+                        outputDir
+                )
+        );
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("orphans.html").toFile())) {
-            htmlOrphansPage.write(orphanDiagrams, orphanDiagrams.size() == orphans.size(), writer);
+            htmlOrphansPage.write(writer);
         }
 
         progressListener.graphingSummaryProgressed();

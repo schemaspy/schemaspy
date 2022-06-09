@@ -24,13 +24,11 @@
  */
 package org.schemaspy.view;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.schemaspy.output.html.HtmlException;
+import org.schemaspy.output.html.mustache.DiagramElement;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.invoke.MethodHandles;
-import java.util.List;
 
 /**
  * The page that contains the all tables that aren't related to others (orphans)
@@ -44,30 +42,30 @@ import java.util.List;
  */
 public class HtmlOrphansPage {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private final MustacheCompiler mustacheCompiler;
+    private final DiagramElement diagramElement;
 
-    public HtmlOrphansPage(MustacheCompiler mustacheCompiler) {
+    public HtmlOrphansPage(
+            MustacheCompiler mustacheCompiler,
+            DiagramElement diagramElement
+    ) {
         this.mustacheCompiler = mustacheCompiler;
+        this.diagramElement = diagramElement;
     }
 
-    public void write(
-            List<MustacheTableDiagram> orphanDiagrams,
-            boolean allWritten,
-            Writer writer
-    ) {
-
-        PageData pageData = new PageData.Builder()
-                .templateName("orphans.html")
-                .addToScope("diagrams", orphanDiagrams)
-                .addToScope("allWritten", allWritten)
-                .getPageData();
-
+    public void write(Writer writer) {
+        PageData pageData = createPageData();
         try {
             mustacheCompiler.write(pageData, writer);
         } catch (IOException e) {
-            LOGGER.error("Failed to write orphans page", e);
+            throw new HtmlException("Failed to write orphans page", e);
         }
+    }
+
+    private PageData createPageData() {
+        return new PageData.Builder()
+            .templateName("orphans.html")
+            .addToScope("diagram", diagramElement.html())
+            .getPageData();
     }
 }
