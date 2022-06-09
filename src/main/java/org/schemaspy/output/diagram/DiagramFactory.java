@@ -44,31 +44,31 @@ public class DiagramFactory {
         orphansDir.mkdirs();
     }
 
-    public DiagramResults generateOrphanDiagram(File dotFile, String diagramName) {
+    public DiagramResult generateOrphanDiagram(File dotFile, String diagramName) {
         try {
             File diagramFile = new File(orphansDir, diagramName + "." + diagramProducer.getDiagramFormat());
             String diagramMap = diagramProducer.generateDiagram(dotFile, diagramFile);
-            return new DiagramResults(diagramFile, diagramMap, diagramProducer.getDiagramFormat());
+            return new DiagramResult(diagramFile.getName(), diagramMap, diagramProducer.getDiagramFormat());
         } catch (DiagramException diagramException) {
             throw new DiagramException("Failed to generate Orphan diagram", diagramException);
         }
     }
 
-    public DiagramResults generateTableDiagram(File dotFile, String diagramName) {
+    public DiagramResult generateTableDiagram(File dotFile, String diagramName) {
         try {
             File diagramFile = new File(tablesDir, diagramName + "." + diagramProducer.getDiagramFormat());
             String diagramMap = diagramProducer.generateDiagram(dotFile, diagramFile);
-            return new DiagramResults(diagramFile, diagramMap, diagramProducer.getDiagramFormat());
+            return new DiagramResult(diagramFile.getName(), diagramMap, diagramProducer.getDiagramFormat());
         } catch (DiagramException diagramException) {
             throw new DiagramException("Failed to generate Table diagram", diagramException);
         }
     }
 
-    public DiagramResults generateSummaryDiagram(File dotFile, String diagramName) {
+    public DiagramResult generateSummaryDiagram(File dotFile, String diagramName) {
         try {
             File diagramFile = new File(summaryDir, diagramName + "." + diagramProducer.getDiagramFormat());
             String diagramMap = diagramProducer.generateDiagram(dotFile, diagramFile);
-            return new DiagramResults(diagramFile, diagramMap, diagramProducer.getDiagramFormat());
+            return new DiagramResult(diagramFile.getName(), diagramMap, diagramProducer.getDiagramFormat());
         } catch (DiagramException diagramException) {
             throw new DiagramException("Failed to generate summary diagram", diagramException);
         }

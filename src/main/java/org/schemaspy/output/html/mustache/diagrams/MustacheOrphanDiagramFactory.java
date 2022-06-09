@@ -21,7 +21,7 @@ package org.schemaspy.output.html.mustache.diagrams;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.diagram.DiagramFactory;
-import org.schemaspy.output.diagram.DiagramResults;
+import org.schemaspy.output.diagram.DiagramResult;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.*;
 import org.schemaspy.output.dot.schemaspy.graph.Orphan;
@@ -95,7 +95,7 @@ public class MustacheOrphanDiagramFactory {
                 dotOut.println(graph.dot());
                 dotOut.flush();
 
-                DiagramResults results = diagramFactory.generateOrphanDiagram(dotFile, dotBaseFilespec + ".1degree");
+                DiagramResult results = diagramFactory.generateOrphanDiagram(dotFile, dotBaseFilespec + ".1degree");
                 MustacheTableDiagram diagram = new MustacheTableDiagram(dotBaseFilespec, results, false);
                 mustacheTableDiagrams.add(diagram);
             } catch (IOException e) {

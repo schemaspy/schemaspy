@@ -18,7 +18,7 @@
  */
 package org.schemaspy.view;
 
-import org.schemaspy.output.diagram.DiagramResults;
+import org.schemaspy.output.diagram.DiagramResult;
 
 /**
  * Created by rkasa on 2016-03-26.
@@ -27,11 +27,11 @@ import org.schemaspy.output.diagram.DiagramResults;
  */
 public class MustacheTableDiagram {
     private final String name;
-    private final DiagramResults diagram;
+    private final DiagramResult diagram;
     private final boolean isImplied;
     private String active;
 
-    public MustacheTableDiagram(final String diagramName, final DiagramResults diagram, final boolean isImplied) {
+    public MustacheTableDiagram(final String diagramName, final DiagramResult diagram, final boolean isImplied) {
         this.name = diagramName;
         this.diagram = diagram;
         this.isImplied = isImplied;
@@ -42,11 +42,11 @@ public class MustacheTableDiagram {
     }
 
     public String getFileName() {
-        return diagram.getDiagramFile().getName();
+        return diagram.getFileName();
     }
 
     public String getMap() {
-        return diagram.getDiagramMap();
+        return diagram.getMap();
     }
 
     public String getId() {
@@ -54,7 +54,7 @@ public class MustacheTableDiagram {
     }
 
     public String getMapName() {
-        return diagram.getDiagramMapName();
+        return diagram.getMapName();
     }
 
     public String getActive() {
@@ -70,6 +70,6 @@ public class MustacheTableDiagram {
     }
 
     public boolean isEmbed() {
-        return diagram.getImageFormat().equalsIgnoreCase("svg");
+        return diagram.isEmbed();
     }
 }

@@ -20,7 +20,7 @@ package org.schemaspy.output.html.mustache.diagrams;
 
 import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramFactory;
-import org.schemaspy.output.diagram.DiagramResults;
+import org.schemaspy.output.diagram.DiagramResult;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.FileNameGenerator;
@@ -76,7 +76,7 @@ public class MustacheTableDiagramFactory {
         try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
             dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
         }
-        DiagramResults results = diagramFactory.generateTableDiagram(oneDegreeDotFile, fileNameBase + ".1degree");
+        DiagramResult results = diagramFactory.generateTableDiagram(oneDegreeDotFile, fileNameBase + ".1degree");
         MustacheTableDiagram oneDiagram = new MustacheTableDiagram("One", results, false);
         oneDiagram.setActive(true);
         diagrams.add(oneDiagram);
@@ -90,7 +90,7 @@ public class MustacheTableDiagramFactory {
             if (sameWritten(oneStats, twoStats)) {
                 Files.deleteIfExists(twoDegreesDotFile.toPath()); // no different than before, so don't show it
             } else {
-                DiagramResults resultsTwo = diagramFactory.generateTableDiagram(twoDegreesDotFile, fileNameBase + ".2degrees");
+                DiagramResult resultsTwo = diagramFactory.generateTableDiagram(twoDegreesDotFile, fileNameBase + ".2degrees");
                 MustacheTableDiagram twoDiagram = new MustacheTableDiagram("Two degrees", resultsTwo, false);
                 diagrams.add(twoDiagram);
             }
@@ -118,7 +118,7 @@ public class MustacheTableDiagramFactory {
                 dotProducer.writeTableAllRelationships(table, false, oneImplied, dotOut);
             }
 
-            DiagramResults results = diagramFactory.generateTableDiagram(oneImpliedDotFile, fileNameBase + ".implied1degrees");
+            DiagramResult results = diagramFactory.generateTableDiagram(oneImpliedDotFile, fileNameBase + ".implied1degrees");
             MustacheTableDiagram oneImpliedDiagram = new MustacheTableDiagram("One implied", results, true);
             diagrams.add(oneImpliedDiagram);
 
@@ -130,7 +130,7 @@ public class MustacheTableDiagramFactory {
                 if (sameWritten(oneImplied, twoImplied)) {
                     Files.deleteIfExists(twoImpliedDotFile.toPath());
                 } else {
-                    DiagramResults resultsTwo = diagramFactory.generateTableDiagram(twoImpliedDotFile, fileNameBase + ".implied2degrees");
+                    DiagramResult resultsTwo = diagramFactory.generateTableDiagram(twoImpliedDotFile, fileNameBase + ".implied2degrees");
                     MustacheTableDiagram twoImpliedDiagram = new MustacheTableDiagram("Two implied", resultsTwo, true);
                     diagrams.add(twoImpliedDiagram);
                 }
