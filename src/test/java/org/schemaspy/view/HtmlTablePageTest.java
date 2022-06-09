@@ -39,7 +39,7 @@ public class HtmlTablePageTest {
         when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new DefaultMustacheCompiler("table_noRowsFalse", htmlConfig, dataTableConfig);
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
 
@@ -59,7 +59,7 @@ public class HtmlTablePageTest {
         when(htmlConfig.isNumRowsEnabled()).thenReturn(false);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new DefaultMustacheCompiler("table_noRowsFalse", htmlConfig, dataTableConfig);
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
 

@@ -173,7 +173,7 @@ public class SchemaAnalyzer {
 
             prepareLayoutFiles(outputDir);
             DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
-            MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config, dataTableConfig);
+            MustacheCompiler mustacheCompiler = new DefaultMustacheCompiler(dbName, config, dataTableConfig);
             HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
             try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
                 htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta), writer);
@@ -351,7 +351,7 @@ public class SchemaAnalyzer {
                 LOGGER.error("RelationShipDiagramError", exception)
         );
         DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new DefaultMustacheCompiler(db.getName(), config, dataTableConfig);
 
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {

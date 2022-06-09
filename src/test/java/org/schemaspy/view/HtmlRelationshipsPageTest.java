@@ -41,7 +41,7 @@ public class HtmlRelationshipsPageTest {
         when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new DefaultMustacheCompiler("htmlTablePage_error", htmlConfig, dataTableConfig);
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler);
         StringWriter writer = new StringWriter();
         MustacheSummaryDiagramResults mustacheSummaryDiagramResults = new MustacheSummaryDiagramResults(Collections.emptyList(),true, Collections.emptyList(),Collections.singletonList(new OutputException("ERROR")));
