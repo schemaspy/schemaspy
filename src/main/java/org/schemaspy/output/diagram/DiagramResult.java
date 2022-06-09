@@ -18,7 +18,6 @@
  */
 package org.schemaspy.output.diagram;
 
-import java.io.File;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,48 +25,42 @@ import java.util.regex.Pattern;
 /**
  * @author Nils Petzaell
  */
-public class DiagramResults {
+public class DiagramResult {
 
     private static final Pattern MAP_NAME_PATTERN = Pattern.compile("<map.*name=\"([\\w\\s]+).*");
-
-    private final File diagramFile;
-    private final String diagramMapName;
-    private final String diagramMap;
+    private final String fileName;
+    private final String map;
     private final String imageFormat;
 
-    public DiagramResults(File diagramFile, String diagramMap, String imageFormat) {
-        this.diagramFile = diagramFile;
-        if (Objects.nonNull(diagramMap)) {
-            this.diagramMapName = diagramMapName(diagramMap);
-            this.diagramMap = diagramMap.trim();
-        } else {
-            this.diagramMapName = "";
-            this.diagramMap = "";
-        }
+    public DiagramResult(String fileName, String map, String imageFormat) {
+        this.fileName = fileName;
+        this.map = map;
         this.imageFormat = imageFormat;
     }
 
-    private static String diagramMapName(String diagramMap) {
-        Matcher matcher = MAP_NAME_PATTERN.matcher(diagramMap);
-        if (matcher.find()) {
-            return matcher.group(1);
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String getMapName() {
+        if (Objects.nonNull(map)) {
+            Matcher matcher = MAP_NAME_PATTERN.matcher(map);
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
         }
         return "";
     }
 
-    public File getDiagramFile() {
-        return diagramFile;
-    }
-
-    public String getDiagramMapName() {
-        return diagramMapName;
-    }
-
-    public String getDiagramMap() {
-        return diagramMap;
+    public String getMap() {
+        return Objects.isNull(map) ? "" : map.trim();
     }
 
     public String getImageFormat() {
         return imageFormat;
+    }
+
+    public boolean isEmbed() {
+        return "svg".equalsIgnoreCase(imageFormat);
     }
 }
