@@ -41,14 +41,12 @@ public class MustacheTableDiagramFactory {
 
     private final DotFormatter dotProducer;
     private final DiagramFactory diagramFactory;
-    private final MustacheDiagramFactory mustacheDiagramFactory;
     private final File tableDir;
     private final int degreeOfSeparation;
 
-    public MustacheTableDiagramFactory(DotFormatter dotProducer, DiagramFactory diagramFactory, MustacheDiagramFactory mustacheDiagramFactory, File outputDir, int degreeOfSeparation) {
+    public MustacheTableDiagramFactory(DotFormatter dotProducer, DiagramFactory diagramFactory, File outputDir, int degreeOfSeparation) {
         this.dotProducer = dotProducer;
         this.diagramFactory = diagramFactory;
-        this.mustacheDiagramFactory = mustacheDiagramFactory;
         this.tableDir = outputDir.toPath().resolve("diagrams").resolve("tables").toFile();
         tableDir.mkdirs();
         this.degreeOfSeparation = degreeOfSeparation;

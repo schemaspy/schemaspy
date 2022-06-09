@@ -86,9 +86,8 @@ public class MustacheTableDiagramFactoryTest {
 
         DiagramFactory diagramFactory = mock(DiagramFactory.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResults.class));
-        MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, mustacheDiagramFactory, outputDir, 2);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList).hasSize(1);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -113,9 +112,8 @@ public class MustacheTableDiagramFactoryTest {
 
         DiagramFactory diagramFactory = mock(DiagramFactory.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResults.class));
-        MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, mustacheDiagramFactory, outputDir, 2);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList).hasSize(2);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -151,9 +149,8 @@ public class MustacheTableDiagramFactoryTest {
 
         DiagramFactory diagramFactory = mock(DiagramFactory.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResults.class));
-        MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, mustacheDiagramFactory, outputDir, 2);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList).hasSize(3);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -192,9 +189,8 @@ public class MustacheTableDiagramFactoryTest {
 
         DiagramFactory diagramFactory = mock(DiagramFactory.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResults.class));
-        MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, mustacheDiagramFactory, outputDir, 2);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 2);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList).hasSize(4);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
@@ -225,9 +221,8 @@ public class MustacheTableDiagramFactoryTest {
 
         DiagramFactory diagramFactory = mock(DiagramFactory.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResults.class));
-        MustacheDiagramFactory mustacheDiagramFactory = mock(MustacheDiagramFactory.class);
 
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, mustacheDiagramFactory, outputDir, 1);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 1);
         List<MustacheTableDiagram> mustacheTableDiagramList = mustacheTableDiagramFactory.generateTableDiagrams(table);
         assertThat(mustacheTableDiagramList).hasSize(2);
         assertThat(mustacheTableDiagramList.get(0).getActive()).isNotEmpty();
