@@ -77,7 +77,7 @@ public class MustacheTableDiagramFactory {
             dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
         }
         DiagramResults results = diagramFactory.generateTableDiagram(oneDegreeDotFile, fileNameBase + ".1degree");
-        MustacheTableDiagram oneDiagram = new MustacheTableDiagram("One", results);
+        MustacheTableDiagram oneDiagram = new MustacheTableDiagram("One", results, false);
         oneDiagram.setActive(true);
         diagrams.add(oneDiagram);
 
@@ -91,7 +91,7 @@ public class MustacheTableDiagramFactory {
                 Files.deleteIfExists(twoDegreesDotFile.toPath()); // no different than before, so don't show it
             } else {
                 DiagramResults resultsTwo = diagramFactory.generateTableDiagram(twoDegreesDotFile, fileNameBase + ".2degrees");
-                MustacheTableDiagram twoDiagram = new MustacheTableDiagram("Two degrees", resultsTwo);
+                MustacheTableDiagram twoDiagram = new MustacheTableDiagram("Two degrees", resultsTwo, false);
                 diagrams.add(twoDiagram);
             }
         }
@@ -119,8 +119,7 @@ public class MustacheTableDiagramFactory {
             }
 
             DiagramResults results = diagramFactory.generateTableDiagram(oneImpliedDotFile, fileNameBase + ".implied1degrees");
-            MustacheTableDiagram oneImpliedDiagram = new MustacheTableDiagram("One implied", results);
-            oneImpliedDiagram.setIsImplied(true);
+            MustacheTableDiagram oneImpliedDiagram = new MustacheTableDiagram("One implied", results, true);
             diagrams.add(oneImpliedDiagram);
 
             if (degreeOfSeparation == 2) {
@@ -132,8 +131,7 @@ public class MustacheTableDiagramFactory {
                     Files.deleteIfExists(twoImpliedDotFile.toPath());
                 } else {
                     DiagramResults resultsTwo = diagramFactory.generateTableDiagram(twoImpliedDotFile, fileNameBase + ".implied2degrees");
-                    MustacheTableDiagram twoImpliedDiagram = new MustacheTableDiagram("Two implied", resultsTwo);
-                    twoImpliedDiagram.setIsImplied(true);
+                    MustacheTableDiagram twoImpliedDiagram = new MustacheTableDiagram("Two implied", resultsTwo, true);
                     diagrams.add(twoImpliedDiagram);
                 }
             }

@@ -24,7 +24,8 @@ public class MustacheTableDiagramTest {
 
         MustacheTableDiagram mustacheTableDiagram = new MustacheTableDiagram(
                 "Orphan 1",
-                results
+                results,
+                false
         );
         assertThat(mustacheTableDiagram.getName()).isEqualTo("Orphan 1");
         assertThat(mustacheTableDiagram.getId()).isEqualTo("orphan1DegreeImg");
