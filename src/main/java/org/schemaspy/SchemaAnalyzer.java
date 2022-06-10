@@ -347,7 +347,17 @@ public class SchemaAnalyzer {
         );
 
         DotFormatter dotProducer = new DotFormatter(dotConfig);
-        DiagramFactory diagramFactory = new DiagramFactory(diagramProducer, outputDir);
+
+        File diagramDir = new File(outputDir, "diagrams");
+        diagramDir.mkdirs();
+        File orphansDir = new File(diagramDir, "orphans");
+        orphansDir.mkdirs();
+        File tablesDir = new File(diagramDir, "tables");
+        tablesDir.mkdirs();
+        File summaryDir = new File(diagramDir, "summary");
+        summaryDir.mkdirs();
+        DiagramFactory diagramFactory = new DiagramFactory(diagramProducer, orphansDir, tablesDir, summaryDir);
+
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, diagramFactory, impliedConstraintsFinder, outputDir);
         MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, includeImpliedConstraints, showDetailedTables, progressListener);
