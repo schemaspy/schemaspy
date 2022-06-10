@@ -23,25 +23,20 @@ import java.io.File;
 public class DiagramFactory {
 
     private final DiagramProducer diagramProducer;
-    private final File diagramDir;
+    private final File orphansDir;
     private final File tablesDir;
     private final File summaryDir;
-    private final File orphansDir;
 
-    public DiagramFactory(DiagramProducer diagramProducer, File outputDir) {
+    public DiagramFactory(
+            final DiagramProducer diagramProducer,
+            final File orphansDir,
+            final File tablesDir,
+            final File summaryDir
+    ) {
         this.diagramProducer = diagramProducer;
-        this.diagramDir = new File(outputDir, "diagrams");
-        this.tablesDir = new File(diagramDir, "tables");
-        this.summaryDir = new File(diagramDir, "summary");
-        this.orphansDir = new File(diagramDir, "orphans");
-        createDirs();
-    }
-
-    private void createDirs() {
-        diagramDir.mkdirs();
-        tablesDir.mkdirs();
-        summaryDir.mkdirs();
-        orphansDir.mkdirs();
+        this.orphansDir = orphansDir;
+        this.tablesDir = tablesDir;
+        this.summaryDir = summaryDir;
     }
 
     public DiagramResult generateOrphanDiagram(File dotFile, String diagramName) {
