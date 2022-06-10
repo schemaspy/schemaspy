@@ -96,7 +96,7 @@ public class MustacheOrphanDiagramFactory {
                 dotOut.flush();
 
                 DiagramResults results = diagramFactory.generateOrphanDiagram(dotFile, dotBaseFilespec + ".1degree");
-                MustacheTableDiagram diagram = new MustacheTableDiagram(dotBaseFilespec, results);
+                MustacheTableDiagram diagram = new MustacheTableDiagram(dotBaseFilespec, results, false);
                 mustacheTableDiagrams.add(diagram);
             } catch (IOException e) {
                 LOGGER.error("Failed to produce dot: {}", dotFile, e);

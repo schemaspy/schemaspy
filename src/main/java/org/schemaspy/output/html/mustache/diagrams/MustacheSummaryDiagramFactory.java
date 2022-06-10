@@ -83,7 +83,7 @@ public class MustacheSummaryDiagramFactory {
             try (PrintWriter out = Writers.newPrintWriter(realCompactDot)) {
                 dotProducer.writeSummaryRealRelationships(database, tables, true, showDetailedTables, out);
                 DiagramResults results = diagramFactory.generateSummaryDiagram(realCompactDot, FILE_PREFIX + ".real.compact");
-                MustacheTableDiagram realCompactDiagram = new MustacheTableDiagram("Compact", results);
+                MustacheTableDiagram realCompactDiagram = new MustacheTableDiagram("Compact", results, false);
                 realCompactDiagram.setActive(true);
                 diagrams.add(realCompactDiagram);
             } catch (IOException ioexception) {
@@ -117,7 +117,7 @@ public class MustacheSummaryDiagramFactory {
         try (PrintWriter out = Writers.newPrintWriter(realLargeDot)) {
             dotProducer.writeSummaryRealRelationships(database, tables, false, showDetailedTables, out);
             DiagramResults results = diagramFactory.generateSummaryDiagram(realLargeDot, FILE_PREFIX + ".real.large");
-            MustacheTableDiagram realLargeDiagram = new MustacheTableDiagram("Large", results);
+            MustacheTableDiagram realLargeDiagram = new MustacheTableDiagram("Large", results, false);
             diagrams.add(realLargeDiagram);
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + realLargeDot.toString(), ioexception));
@@ -131,8 +131,7 @@ public class MustacheSummaryDiagramFactory {
         try (PrintWriter out = Writers.newPrintWriter(impliedCompactDot)) {
             dotProducer.writeSummaryAllRelationships(database, tables, true, showDetailedTables, out);
             DiagramResults results = diagramFactory.generateSummaryDiagram(impliedCompactDot, FILE_PREFIX + ".implied.compact");
-            MustacheTableDiagram impliedCompactDiagram = new MustacheTableDiagram("Compact Implied", results);
-            impliedCompactDiagram.setIsImplied(true);
+            MustacheTableDiagram impliedCompactDiagram = new MustacheTableDiagram("Compact Implied", results, true);
             diagrams.add(impliedCompactDiagram);
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + impliedCompactDot.toString(), ioexception));
@@ -146,8 +145,7 @@ public class MustacheSummaryDiagramFactory {
         try (PrintWriter out = Writers.newPrintWriter(impliedLargeDot)) {
             dotProducer.writeSummaryAllRelationships(database, tables, false, showDetailedTables, out);
             DiagramResults results = diagramFactory.generateSummaryDiagram(impliedLargeDot, FILE_PREFIX + ".implied.large");
-            MustacheTableDiagram impliedLargeDiagram = new MustacheTableDiagram("Large Implied", results);
-            impliedLargeDiagram.setIsImplied(true);
+            MustacheTableDiagram impliedLargeDiagram = new MustacheTableDiagram("Large Implied", results, true);
             diagrams.add(impliedLargeDiagram);
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + impliedLargeDot.toString(), ioexception));

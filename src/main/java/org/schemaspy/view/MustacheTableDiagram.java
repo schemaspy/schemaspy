@@ -26,16 +26,15 @@ import org.schemaspy.output.diagram.DiagramResults;
  * @author Rafal Kasa
  */
 public class MustacheTableDiagram {
-    private String name;
-    private DiagramResults diagram;
+    private final String name;
+    private final DiagramResults diagram;
+    private final boolean isImplied;
     private String active;
-    private boolean isImplied;
 
-    public MustacheTableDiagram() { }
-
-    public MustacheTableDiagram(final String diagramName, final DiagramResults diagram) {
+    public MustacheTableDiagram(final String diagramName, final DiagramResults diagram, final boolean isImplied) {
         this.name = diagramName;
         this.diagram = diagram;
+        this.isImplied = isImplied;
     }
 
     public String getName() {
@@ -68,10 +67,6 @@ public class MustacheTableDiagram {
 
     public boolean isImplied() {
         return isImplied;
-    }
-
-    public void setIsImplied(boolean isImplied) {
-        this.isImplied = isImplied;
     }
 
     public boolean isEmbed() {
