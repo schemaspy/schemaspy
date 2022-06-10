@@ -20,8 +20,8 @@ package org.schemaspy.output.html.mustache.diagrams;
 
 import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
-import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramResult;
+import org.schemaspy.output.diagram.OrphanDiagram;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.*;
 import org.schemaspy.output.dot.schemaspy.graph.Orphan;
@@ -50,12 +50,12 @@ public class MustacheOrphanDiagramFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final DotConfig dotConfig;
-    private final DiagramFactory diagramFactory;
+    private final OrphanDiagram orphan;
     private final Path orphanDir;
 
-    public MustacheOrphanDiagramFactory(DotConfig dotConfig, DiagramFactory diagramFactory, File outputDir) {
+    public MustacheOrphanDiagramFactory(DotConfig dotConfig, OrphanDiagram orphan, File outputDir) {
         this.dotConfig = dotConfig;
-        this.diagramFactory = diagramFactory;
+        this.orphan = orphan;
         orphanDir = outputDir.toPath().resolve("diagrams").resolve("orphans");
     }
 
@@ -95,7 +95,7 @@ public class MustacheOrphanDiagramFactory {
                 dotOut.println(graph.dot());
                 dotOut.flush();
 
-                DiagramResult results = diagramFactory.generateOrphanDiagram(dotFile, dotBaseFilespec + ".1degree");
+                DiagramResult results = orphan.generateOrphanDiagram(dotFile, dotBaseFilespec + ".1degree");
                 MustacheTableDiagram diagram = new MustacheTableDiagram(dotBaseFilespec, results, false);
                 mustacheTableDiagrams.add(diagram);
             } catch (IOException e) {

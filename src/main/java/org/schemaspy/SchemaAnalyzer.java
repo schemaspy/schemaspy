@@ -350,13 +350,11 @@ public class SchemaAnalyzer {
 
         File diagramDir = new File(outputDir, "diagrams");
         diagramDir.mkdirs();
-        File orphansDir = new File(diagramDir, "orphans");
-        orphansDir.mkdirs();
         File tablesDir = new File(diagramDir, "tables");
         tablesDir.mkdirs();
         File summaryDir = new File(diagramDir, "summary");
         summaryDir.mkdirs();
-        DiagramFactory diagramFactory = new DiagramFactory(diagramProducer, orphansDir, tablesDir, summaryDir);
+        DiagramFactory diagramFactory = new DiagramFactory(diagramProducer, tablesDir, summaryDir);
 
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, diagramFactory, impliedConstraintsFinder, outputDir);
