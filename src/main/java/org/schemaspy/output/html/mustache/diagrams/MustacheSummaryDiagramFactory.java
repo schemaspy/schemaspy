@@ -25,8 +25,8 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.diagram.DiagramException;
-import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramResult;
+import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.MustacheTableDiagram;
@@ -50,11 +50,11 @@ public class MustacheSummaryDiagramFactory {
     private static final String FAILED_DOT = "Failed to produce dot: ";
     private static final String FAILED_DIAGRAM = "Failed to produce diagram for: ";
     private final DotFormatter dotProducer;
-    private final DiagramFactory diagramFactory;
+    private final SummaryDiagram diagramFactory;
     private final ImpliedConstraintsFinder impliedConstraintsFinder;
     private final Path summaryDir;
 
-    public MustacheSummaryDiagramFactory(DotFormatter dotProducer, DiagramFactory diagramFactory, ImpliedConstraintsFinder impliedConstraintsFinder, File outputDir) {
+    public MustacheSummaryDiagramFactory(DotFormatter dotProducer, SummaryDiagram diagramFactory, ImpliedConstraintsFinder impliedConstraintsFinder, File outputDir) {
         this.dotProducer = dotProducer;
         this.diagramFactory = diagramFactory;
         this.impliedConstraintsFinder = impliedConstraintsFinder;

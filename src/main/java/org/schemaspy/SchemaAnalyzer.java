@@ -40,8 +40,8 @@ import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.model.*;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
-import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.diagram.TableDiagram;
 import org.schemaspy.output.diagram.graphviz.GraphvizDot;
 import org.schemaspy.output.diagram.vizjs.VizJSDot;
@@ -353,10 +353,10 @@ public class SchemaAnalyzer {
         diagramDir.mkdirs();
         File summaryDir = new File(diagramDir, "summary");
         summaryDir.mkdirs();
-        DiagramFactory diagramFactory = new DiagramFactory(diagramProducer, summaryDir);
+        SummaryDiagram summaryDiagram = new SummaryDiagram(diagramProducer, summaryDir);
 
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, diagramFactory, impliedConstraintsFinder, outputDir);
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, impliedConstraintsFinder, outputDir);
         MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, includeImpliedConstraints, showDetailedTables, progressListener);
         results.getOutputExceptions().stream().forEachOrdered(exception ->
                 LOGGER.error("RelationShipDiagramError", exception)

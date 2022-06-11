@@ -11,6 +11,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramResult;
+import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class MustacheSummaryDiagramFactoryTest {
     @Test
     public void noDiagrams() throws IOException {
         DotFormatter dotProducer = mock(DotFormatter.class);
-        DiagramFactory mustacheDiagramFactory = mock(DiagramFactory.class);
+        SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory,null, temporaryFolder.newFolder("noDiagrams"));
 
@@ -58,7 +59,7 @@ public class MustacheSummaryDiagramFactoryTest {
     public void realDiagrams() throws IOException {
         DotFormatter dotProducer = mock(DotFormatter.class);
 
-        DiagramFactory mustacheDiagramFactory = mock(DiagramFactory.class);
+        SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory,null, temporaryFolder.newFolder("noDiagrams"));
 
@@ -82,7 +83,7 @@ public class MustacheSummaryDiagramFactoryTest {
     public void realAndImpliedDiagrams() throws IOException {
         DotFormatter dotProducer = mock(DotFormatter.class);
 
-        DiagramFactory mustacheDiagramFactory = mock(DiagramFactory.class);
+        SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
 
         ImpliedConstraintsFinder impliedConstraintsFinder = mock(ImpliedConstraintsFinder.class);
@@ -114,7 +115,7 @@ public class MustacheSummaryDiagramFactoryTest {
     @Test
     public void exceptionsAreCaught() throws IOException {
         assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
-        DiagramFactory mustacheDiagramFactory = mock(DiagramFactory.class);
+        SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         doThrow(new DiagramException("byDesign")).
                 when(mustacheDiagramFactory)
                 .generateSummaryDiagram(
