@@ -19,8 +19,8 @@
 package org.schemaspy.output.html.mustache.diagrams;
 
 import org.schemaspy.model.Table;
-import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramResult;
+import org.schemaspy.output.diagram.TableDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.FileNameGenerator;
@@ -40,11 +40,11 @@ import java.util.concurrent.atomic.LongAdder;
 public class MustacheTableDiagramFactory {
 
     private final DotFormatter dotProducer;
-    private final DiagramFactory diagramFactory;
+    private final TableDiagram diagramFactory;
     private final File tableDir;
     private final int degreeOfSeparation;
 
-    public MustacheTableDiagramFactory(DotFormatter dotProducer, DiagramFactory diagramFactory, File outputDir, int degreeOfSeparation) {
+    public MustacheTableDiagramFactory(DotFormatter dotProducer, TableDiagram diagramFactory, File outputDir, int degreeOfSeparation) {
         this.dotProducer = dotProducer;
         this.diagramFactory = diagramFactory;
         this.tableDir = outputDir.toPath().resolve("diagrams").resolve("tables").toFile();

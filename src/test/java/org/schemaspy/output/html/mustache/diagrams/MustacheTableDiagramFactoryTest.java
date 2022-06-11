@@ -24,8 +24,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.stubbing.Answer;
 import org.schemaspy.model.Table;
-import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramResult;
+import org.schemaspy.output.diagram.TableDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.view.MustacheTableDiagram;
 
@@ -84,7 +84,7 @@ public class MustacheTableDiagramFactoryTest {
             return null;
         }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
 
-        DiagramFactory diagramFactory = mock(DiagramFactory.class);
+        TableDiagram diagramFactory = mock(TableDiagram.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 2);
@@ -110,7 +110,7 @@ public class MustacheTableDiagramFactoryTest {
             return null;
         }).when(dotProducer).writeTableRealRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
 
-        DiagramFactory diagramFactory = mock(DiagramFactory.class);
+        TableDiagram diagramFactory = mock(TableDiagram.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 2);
@@ -147,7 +147,7 @@ public class MustacheTableDiagramFactoryTest {
         }).
                 when(dotProducer).writeTableAllRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
 
-        DiagramFactory diagramFactory = mock(DiagramFactory.class);
+        TableDiagram diagramFactory = mock(TableDiagram.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 2);
@@ -187,7 +187,7 @@ public class MustacheTableDiagramFactoryTest {
         }).
                 when(dotProducer).writeTableAllRelationships(eq(table), eq(true), any(LongAdder.class), any(PrintWriter.class));
 
-        DiagramFactory diagramFactory = mock(DiagramFactory.class);
+        TableDiagram diagramFactory = mock(TableDiagram.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 2);
@@ -219,7 +219,7 @@ public class MustacheTableDiagramFactoryTest {
             return null;
         }).when(dotProducer).writeTableAllRelationships(eq(table), eq(false), any(LongAdder.class), any(PrintWriter.class));
 
-        DiagramFactory diagramFactory = mock(DiagramFactory.class);
+        TableDiagram diagramFactory = mock(TableDiagram.class);
         when(diagramFactory.generateTableDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
 
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, 1);

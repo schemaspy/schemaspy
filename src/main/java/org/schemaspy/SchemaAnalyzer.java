@@ -42,6 +42,7 @@ import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.output.diagram.TableDiagram;
 import org.schemaspy.output.diagram.graphviz.GraphvizDot;
 import org.schemaspy.output.diagram.vizjs.VizJSDot;
 import org.schemaspy.output.dot.DotConfig;
@@ -350,11 +351,9 @@ public class SchemaAnalyzer {
 
         File diagramDir = new File(outputDir, "diagrams");
         diagramDir.mkdirs();
-        File tablesDir = new File(diagramDir, "tables");
-        tablesDir.mkdirs();
         File summaryDir = new File(diagramDir, "summary");
         summaryDir.mkdirs();
-        DiagramFactory diagramFactory = new DiagramFactory(diagramProducer, tablesDir, summaryDir);
+        DiagramFactory diagramFactory = new DiagramFactory(diagramProducer, summaryDir);
 
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, diagramFactory, impliedConstraintsFinder, outputDir);
@@ -435,7 +434,11 @@ public class SchemaAnalyzer {
         LOGGER.info("Completed summary in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/diagramming details");
         SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getIdentifierQuoteString(), db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
-        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, diagramFactory, outputDir, commandLineArguments.getDegreeOfSeparation());
+
+        File tablesDir = new File(diagramDir, "tables");
+        tablesDir.mkdirs();
+        TableDiagram tableDiagram = new TableDiagram(diagramProducer, tablesDir);
+        MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, tableDiagram, outputDir, commandLineArguments.getDegreeOfSeparation());
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, sqlAnalyzer);
         for (Table table : tables) {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table);
