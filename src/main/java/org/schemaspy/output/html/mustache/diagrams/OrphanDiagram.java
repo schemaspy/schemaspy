@@ -22,7 +22,7 @@ import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.diagram.Renderer;
 import org.schemaspy.output.dot.schemaspy.graph.Graph;
 import org.schemaspy.output.html.HtmlException;
-import org.schemaspy.output.html.mustache.DiagramElement;
+import org.schemaspy.output.html.mustache.Diagram;
 import org.schemaspy.output.html.mustache.ImgDiagram;
 import org.schemaspy.output.html.mustache.SvgDiagram;
 import org.schemaspy.util.Writers;
@@ -37,7 +37,7 @@ import java.nio.file.Path;
  *
  * @author Nils Petzaell
  */
-public class OrphanDiagram implements DiagramElement {
+public class OrphanDiagram implements Diagram {
 
     private static final String NAME = "orphans";
     private final Graph graph;
@@ -67,7 +67,7 @@ public class OrphanDiagram implements DiagramElement {
         return dotFile;
     }
 
-    private DiagramElement writeDiagram(Path dotFile) {
+    private Diagram writeDiagram(Path dotFile) {
         try {
             Path diagramFile = outputDir.resolve(fileName(renderer.format()));
             String diagramMap = renderer.render(dotFile.toFile(), diagramFile.toFile());

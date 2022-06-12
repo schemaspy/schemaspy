@@ -25,7 +25,7 @@
 package org.schemaspy.view;
 
 import org.schemaspy.output.html.HtmlException;
-import org.schemaspy.output.html.mustache.DiagramElement;
+import org.schemaspy.output.html.mustache.Diagram;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -43,14 +43,14 @@ import java.io.Writer;
 public class HtmlOrphansPage {
 
     private final MustacheCompiler mustacheCompiler;
-    private final DiagramElement diagramElement;
+    private final Diagram diagram;
 
     public HtmlOrphansPage(
             MustacheCompiler mustacheCompiler,
-            DiagramElement diagramElement
+            Diagram diagram
     ) {
         this.mustacheCompiler = mustacheCompiler;
-        this.diagramElement = diagramElement;
+        this.diagram = diagram;
     }
 
     public void write(Writer writer) {
@@ -65,7 +65,7 @@ public class HtmlOrphansPage {
     private PageData createPageData() {
         return new PageData.Builder()
             .templateName("orphans.html")
-            .addToScope("diagram", diagramElement.html())
+            .addToScope("diagram", diagram.html())
             .getPageData();
     }
 }
