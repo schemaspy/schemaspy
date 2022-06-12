@@ -40,7 +40,7 @@ import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.model.*;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
-import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.output.diagram.Renderer;
 import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.diagram.TableDiagram;
 import org.schemaspy.output.diagram.graphviz.GraphvizDot;
@@ -316,7 +316,7 @@ public class SchemaAnalyzer {
         markDownRegistryPages(tables);
 
         prepareLayoutFiles(outputDir);
-        DiagramProducer diagramProducer = useVizJS ? new VizJSDot() : new GraphvizDot(commandLineArguments.getGraphVizConfig());
+        Renderer renderer = useVizJS ? new VizJSDot() : new GraphvizDot(commandLineArguments.getGraphVizConfig());
 
         Path htmlInfoFile = outputDir.toPath().resolve("info-html.txt");
         Files.deleteIfExists(htmlInfoFile);
@@ -324,7 +324,7 @@ public class SchemaAnalyzer {
         writeInfo("os", System.getProperty("os.name") + " " + System.getProperty("os.version"), htmlInfoFile);
         writeInfo("schemaspy-version", ManifestUtils.getImplementationVersion(), htmlInfoFile);
         writeInfo("schemaspy-build", ManifestUtils.getImplementationBuild(), htmlInfoFile);
-        writeInfo("diagramImplementation", diagramProducer.getImplementationDetails(), htmlInfoFile);
+        writeInfo("renderer", renderer.identifier(), htmlInfoFile);
         progressListener.graphingSummaryProgressed();
 
         boolean showDetailedTables = tables.size() <= config.getMaxDetailedTables();
@@ -342,7 +342,7 @@ public class SchemaAnalyzer {
                 config.getFontSize()
             ),
             config.isRankDirBugEnabled(),
-            "svg".equalsIgnoreCase(diagramProducer.getDiagramFormat()),
+            "svg".equalsIgnoreCase(renderer.format()),
             config.isNumRowsEnabled(),
             config.isOneOfMultipleSchemas()
         );
@@ -353,7 +353,7 @@ public class SchemaAnalyzer {
         diagramDir.mkdirs();
         File summaryDir = new File(diagramDir, "summary");
         summaryDir.mkdirs();
-        SummaryDiagram summaryDiagram = new SummaryDiagram(diagramProducer, summaryDir);
+        SummaryDiagram summaryDiagram = new SummaryDiagram(renderer, summaryDir);
 
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, impliedConstraintsFinder, outputDir);
@@ -375,7 +375,7 @@ public class SchemaAnalyzer {
                 mustacheCompiler,
                 new OrphanDiagram(
                         new OrphanGraph(dotConfig, tables),
-                        diagramProducer,
+                        renderer,
                         outputDir
                 )
         );
@@ -437,7 +437,7 @@ public class SchemaAnalyzer {
 
         File tablesDir = new File(diagramDir, "tables");
         tablesDir.mkdirs();
-        TableDiagram tableDiagram = new TableDiagram(diagramProducer, tablesDir);
+        TableDiagram tableDiagram = new TableDiagram(renderer, tablesDir);
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, tableDiagram, outputDir, commandLineArguments.getDegreeOfSeparation());
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, sqlAnalyzer);
         for (Table table : tables) {

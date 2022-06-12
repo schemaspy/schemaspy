@@ -19,7 +19,7 @@
 package org.schemaspy.output.html.mustache.diagrams;
 
 import org.schemaspy.output.diagram.DiagramException;
-import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.output.diagram.Renderer;
 import org.schemaspy.output.dot.schemaspy.graph.Graph;
 import org.schemaspy.output.html.HtmlException;
 import org.schemaspy.output.html.mustache.DiagramElement;
@@ -41,12 +41,12 @@ public class OrphanDiagram implements DiagramElement {
 
     private static final String NAME = "orphans";
     private final Graph graph;
-    private final DiagramProducer diagramProducer;
+    private final Renderer renderer;
     private final Path outputDir;
 
-    public OrphanDiagram(Graph graph, DiagramProducer diagramProducer, File outputDir) {
+    public OrphanDiagram(Graph graph, Renderer renderer, File outputDir) {
         this.graph = graph;
-        this.diagramProducer = diagramProducer;
+        this.renderer = renderer;
         this.outputDir = outputDir.toPath().resolve("diagrams").resolve(NAME);
     }
 
@@ -69,10 +69,10 @@ public class OrphanDiagram implements DiagramElement {
 
     private DiagramElement writeDiagram(Path dotFile) {
         try {
-            Path diagramFile = outputDir.resolve(fileName(diagramProducer.getDiagramFormat()));
-            String diagramMap = diagramProducer.generateDiagram(dotFile.toFile(), diagramFile.toFile());
+            Path diagramFile = outputDir.resolve(fileName(renderer.format()));
+            String diagramMap = renderer.render(dotFile.toFile(), diagramFile.toFile());
             String diagramSource = "diagrams/orphans/" + diagramFile.getFileName().toString();
-            if ("svg".equalsIgnoreCase(diagramProducer.getDiagramFormat())) {
+            if ("svg".equalsIgnoreCase(renderer.format())) {
                 return new SvgDiagram(NAME, diagramSource);
             }
             return new ImgDiagram(NAME, diagramSource, diagramMap);

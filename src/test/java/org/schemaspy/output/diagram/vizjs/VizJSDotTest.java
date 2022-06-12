@@ -18,8 +18,6 @@
  */
 package org.schemaspy.output.diagram.vizjs;
 
-import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -34,7 +32,7 @@ import java.nio.file.Paths;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.linesOf;
 
-public class VizJSDotTest {
+class VizJSDotTest {
 
     private static Path input = Paths.get("src", "test", "resources", "vizjs");
 
@@ -59,7 +57,7 @@ public class VizJSDotTest {
         File dotFile = input.resolve(name + ".dot").toFile();
         File expect = input.resolve(name + ".svg").toFile();
         File actual = Files.createFile(tempDir.resolve(name + ".svg")).toFile();
-        javaDotViz.generateDiagram(dotFile, actual);
+        javaDotViz.render(dotFile, actual);
         assertThat(linesOf(actual, StandardCharsets.UTF_8))
             .isEqualTo(linesOf(expect, StandardCharsets.UTF_8));
     }
