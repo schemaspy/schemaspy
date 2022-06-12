@@ -189,18 +189,6 @@ public class DbAnalyzer {
         return constraints;
     }
 
-    public static List<Table> getOrphans(Collection<Table> tables) {
-        List<Table> orphans = new ArrayList<>();
-
-        for (Table table : tables) {
-            if (table.isOrphan(false) && !table.isView()) {
-                orphans.add(table);
-            }
-        }
-
-        return sortTablesByName(orphans);
-    }
-
     /**
      * Return a list of <code>Table</code>s that have neither an index nor a primary key.
      */
