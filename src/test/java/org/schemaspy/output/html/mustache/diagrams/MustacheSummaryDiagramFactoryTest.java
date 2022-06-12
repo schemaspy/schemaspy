@@ -9,7 +9,6 @@ import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramException;
-import org.schemaspy.output.diagram.DiagramFactory;
 import org.schemaspy.output.diagram.DiagramResult;
 import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
