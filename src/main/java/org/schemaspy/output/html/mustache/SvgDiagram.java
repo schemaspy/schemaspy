@@ -1,6 +1,6 @@
 package org.schemaspy.output.html.mustache;
 
-public class SvgDiagram implements DiagramElement {
+public class SvgDiagram implements Diagram {
 
     private static final String SVG_TEMPLATE =
         "<object type=\"image/svg+xml\" id=\"%s\" data=\"%s\" style=\"max-width:100%%;\" border=\"0\" align=\"top\"></object>";

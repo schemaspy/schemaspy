@@ -6,7 +6,7 @@ import org.schemaspy.output.diagram.DiagramException;
 import org.schemaspy.output.diagram.Renderer;
 import org.schemaspy.output.dot.schemaspy.graph.Graph;
 import org.schemaspy.output.html.HtmlException;
-import org.schemaspy.output.html.mustache.DiagramElement;
+import org.schemaspy.output.html.mustache.Diagram;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ class OrphanDiagramTest {
         when(renderer.render(any(File.class), any(File.class))).thenReturn("");
         when(renderer.format()).thenReturn("svg");
 
-        assertThat(new OrphanDiagram(graph, renderer, outputDir)).isInstanceOf(DiagramElement.class);
+        assertThat(new OrphanDiagram(graph, renderer, outputDir)).isInstanceOf(Diagram.class);
     }
 
     @Test

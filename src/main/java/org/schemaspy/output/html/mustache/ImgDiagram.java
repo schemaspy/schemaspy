@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ImgDiagram implements DiagramElement{
+public class ImgDiagram implements Diagram {
 
     private static final Pattern MAP_NAME_PATTERN = Pattern.compile("<map.*name=\"([\\w\\s]+).*");
     private static final String PNG_TEMPLATE =
