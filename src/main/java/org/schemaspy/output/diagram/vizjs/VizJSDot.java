@@ -20,7 +20,7 @@ package org.schemaspy.output.diagram.vizjs;
 
 import org.apache.commons.io.IOUtils;
 import org.schemaspy.output.diagram.DiagramException;
-import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.output.diagram.Renderer;
 import org.schemaspy.util.Writers;
 
 import javax.script.ScriptContext;
@@ -32,7 +32,7 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-public class VizJSDot implements DiagramProducer {
+public class VizJSDot implements Renderer {
 
     private static final String ICON_SIZE = " , width: \"261px\" , height: \"261px\"";
     private static final int MB_64 = 1024 * 1024 * 64;
@@ -53,16 +53,16 @@ public class VizJSDot implements DiagramProducer {
     }
 
     @Override
-    public String getImplementationDetails() {
+    public String identifier() {
         return "Viz.js 1.7.1 (Graphviz 2.40.1, Expat 2.1.0, Emscripten 1.37.9)";
     }
 
     @Override
-    public String getDiagramFormat() {
+    public String format() {
         return "svg";
     }
 
-    public String generateDiagram(File dotFile, File diagramFile) {
+    public String render(File dotFile, File diagramFile) {
         try {
             String dotSource = IOUtils.toString(dotFile.toURI().toURL(), StandardCharsets.UTF_8);
             String svg = toSvg(dotSource, MB_64);

@@ -3,7 +3,7 @@ package org.schemaspy.output.html.mustache.diagrams;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.schemaspy.output.diagram.DiagramException;
-import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.output.diagram.Renderer;
 import org.schemaspy.output.dot.schemaspy.graph.Graph;
 import org.schemaspy.output.html.HtmlException;
 import org.schemaspy.output.html.mustache.DiagramElement;
@@ -25,11 +25,11 @@ class OrphanDiagramTest {
     @Test
     void createDiagramElementForAGraph() {
         Graph graph = () -> "this is  a graph";
-        DiagramProducer diagramProducer = mock(DiagramProducer.class);
-        when(diagramProducer.generateDiagram(any(File.class), any(File.class))).thenReturn("");
-        when(diagramProducer.getDiagramFormat()).thenReturn("svg");
+        Renderer renderer = mock(Renderer.class);
+        when(renderer.render(any(File.class), any(File.class))).thenReturn("");
+        when(renderer.format()).thenReturn("svg");
 
-        assertThat(new OrphanDiagram(graph, diagramProducer, outputDir)).isInstanceOf(DiagramElement.class);
+        assertThat(new OrphanDiagram(graph, renderer, outputDir)).isInstanceOf(DiagramElement.class);
     }
 
     @Test
@@ -41,19 +41,19 @@ class OrphanDiagramTest {
         dotFile.getParent().toFile().mkdirs();
         dotFile.toFile().createNewFile();
         dotFile.toFile().setWritable(false);
-        DiagramProducer diagramProducer = mock(DiagramProducer.class);
-        OrphanDiagram orphanDiagram = new OrphanDiagram(() -> "Mocked", diagramProducer, outputDir);
+        Renderer renderer = mock(Renderer.class);
+        OrphanDiagram orphanDiagram = new OrphanDiagram(() -> "Mocked", renderer, outputDir);
 
         assertThatThrownBy(() -> orphanDiagram.html())
                 .isInstanceOf(HtmlException.class);
-        verify(diagramProducer, never()).generateDiagram(any(), any());
+        verify(renderer, never()).render(any(), any());
     }
 
     @Test
     void wrapAsHtmlExceptionOnExceptionWithDiagram() {
-        DiagramProducer diagramProducer = mock(DiagramProducer.class);
-        when(diagramProducer.generateDiagram(any(), any())).thenThrow(new DiagramException("Mocked", null));
-        OrphanDiagram orphanDiagram = new OrphanDiagram(() -> "test", diagramProducer, outputDir);
+        Renderer renderer = mock(Renderer.class);
+        when(renderer.render(any(), any())).thenThrow(new DiagramException("Mocked", null));
+        OrphanDiagram orphanDiagram = new OrphanDiagram(() -> "test", renderer, outputDir);
 
         assertThatThrownBy(() -> orphanDiagram.html())
                 .isInstanceOf(HtmlException.class);

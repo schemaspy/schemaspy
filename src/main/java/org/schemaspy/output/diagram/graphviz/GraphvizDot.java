@@ -19,7 +19,7 @@
 package org.schemaspy.output.diagram.graphviz;
 
 import org.schemaspy.output.diagram.DiagramException;
-import org.schemaspy.output.diagram.DiagramProducer;
+import org.schemaspy.output.diagram.Renderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  * @author Nils Petzaell
  * @author Daniel Watt
  */
-public class GraphvizDot implements DiagramProducer {
+public class GraphvizDot implements Renderer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final GraphvizConfig graphvizConfig;
@@ -92,11 +92,11 @@ public class GraphvizDot implements DiagramProducer {
         if (!isValid()) {
             return;
         }
-        Pattern rendererPattern = Pattern.compile(getDiagramFormat()+"(:[^\"][a-zA-Z]*)");
+        Pattern rendererPattern = Pattern.compile(format() + "(:[^\"][a-zA-Z]*)");
         try {
             String[] dotCommand = new String[]{
                     getExe(),
-                    "-T" + getDiagramFormat() + ':'
+                "-T" + format() + ':'
             };
             Process process = Runtime.getRuntime().exec(dotCommand);
             try (Scanner scanner = new Scanner(new InputStreamReader(process.getErrorStream()))) {
@@ -150,7 +150,7 @@ public class GraphvizDot implements DiagramProducer {
         return EMPTY_RENDERER;
     }
 
-    public String getImplementationDetails() {
+    public String identifier() {
         return "Graphviz dot " + getGraphvizVersion().toString();
     }
 
@@ -165,7 +165,7 @@ public class GraphvizDot implements DiagramProducer {
      *
      * @return image format to generate
      */
-    public String getDiagramFormat() {
+    public String format() {
         return Objects.isNull(graphvizConfig.getImageFormat()) ? "png": graphvizConfig.getImageFormat();
     }
 
@@ -193,7 +193,7 @@ public class GraphvizDot implements DiagramProducer {
     /**
      * Using the specified .dot file generates an image returning the image's image map.
      */
-    public String generateDiagram(File dotFile, File diagramFile) {
+    public String render(File dotFile, File diagramFile) {
         if (!isValid()) {
             throw new DiagramException("Dot missing or invalid version");
         }
@@ -201,14 +201,14 @@ public class GraphvizDot implements DiagramProducer {
 
         ArrayList<String> dotCommands = new ArrayList<>();
         dotCommands.add(getExe());
-        if ("svg".equalsIgnoreCase(getDiagramFormat())) {
+        if ("svg".equalsIgnoreCase(format())) {
             dotCommands.add("-Tsvg");
         } else {
-            dotCommands.add("-T" + getDiagramFormat() + effectiveRenderer);
+            dotCommands.add("-T" + format() + effectiveRenderer);
         }
         dotCommands.add(dotFile.getName());
         dotCommands.add("-o" + diagramFile.getName());
-        if (!"svg".equalsIgnoreCase(getDiagramFormat())) {
+        if (!"svg".equalsIgnoreCase(format())) {
             dotCommands.add("-Tcmapx");
         }
         // this one is for executing.  it can (hopefully) deal with funky things in filenames.

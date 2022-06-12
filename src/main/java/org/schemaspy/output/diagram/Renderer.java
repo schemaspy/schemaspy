@@ -22,11 +22,28 @@ package org.schemaspy.output.diagram;
 import java.io.File;
 
 /**
+ * Abstraction for rendering graphics from dot-language
  * @author Nils Petzaell
  */
-public interface DiagramProducer {
+public interface Renderer {
 
-    String getImplementationDetails();
-    String generateDiagram(File dotFile, File diagramFile);
-    String getDiagramFormat();
+    /**
+     * Textual identifier of implementation
+     * @return String
+     */
+    String identifier();
+
+    /**
+     * Render file written in dot language to graphics
+     * @param dotFile file written in dot language
+     * @param diagramFile destination for graphics
+     * @return html map for use with image
+     */
+    String render(File dotFile, File diagramFile);
+
+    /**
+     * Graphics format of output
+     * @return
+     */
+    String format();
 }
