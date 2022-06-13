@@ -23,7 +23,6 @@ public interface DotConfig {
     String getFont();
     int getFontSize();
     int getTextWidth(String text);
-    boolean useRelativeLinks();
     boolean isNumRowsEnabled();
     boolean isOneOfMultipleSchemas();
 }

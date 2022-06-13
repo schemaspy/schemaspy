@@ -101,7 +101,6 @@ class DotNodeTest {
                 fontConfig,
                 false,
                 false,
-                false,
                 true
             )
         );
@@ -121,7 +120,6 @@ class DotNodeTest {
                 fontConfig,
                 false,
                 false,
-                false,
                 true
             )
         );
@@ -136,7 +134,6 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleDotConfig(
                 fontConfig,
-                false,
                 false,
                 false,
                 true
@@ -157,7 +154,6 @@ class DotNodeTest {
                 fontConfig,
                 false,
                 false,
-                false,
                 true
             )
         );
@@ -174,7 +170,6 @@ class DotNodeTest {
                 true),
             new SimpleDotConfig(
                 fontConfig,
-                false,
                 false,
                 false,
                 false
@@ -194,7 +189,6 @@ class DotNodeTest {
                 fontConfig,
                 false,
                 false,
-                false,
                 false
             )
         ), "trivialNoDetails.txt");
@@ -210,7 +204,6 @@ class DotNodeTest {
                 false),
             new SimpleDotConfig(
                 fontConfig,
-                false,
                 false,
                 false,
                 false
@@ -230,7 +223,6 @@ class DotNodeTest {
                 fontConfig,
                 false,
                 false,
-                false,
                 false
             )
         ), "noTrivialAndDetails.txt");
@@ -246,7 +238,6 @@ class DotNodeTest {
                 true),
             new SimpleDotConfig(
                 fontConfig,
-                false,
                 false,
                 false,
                 false
@@ -270,7 +261,6 @@ class DotNodeTest {
             new SimpleDotConfig(
                 fontConfig,
                 true,
-                false,
                 true,
                 false
             )
@@ -304,7 +294,6 @@ class DotNodeTest {
             new SimpleDotConfig(
                 fontConfig,
                 true,
-                false,
                 true,
                 false
             )
@@ -325,7 +314,6 @@ class DotNodeTest {
             new SimpleDotConfig(
                 fontConfig,
                 true,
-                false,
                 true,
                 false
             )
@@ -347,7 +335,6 @@ class DotNodeTest {
                 fontConfig,
                 true,
                 false,
-                false,
                 false
             )
         );
@@ -364,7 +351,6 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleDotConfig(
                 fontConfig,
-                false,
                 false,
                 false,
                 true
@@ -390,7 +376,6 @@ class DotNodeTest {
                 new DotNodeConfig(true, true),
                 new SimpleDotConfig(
                         fontConfig,
-                        false,
                         false,
                         false,
                         true
@@ -419,7 +404,6 @@ class DotNodeTest {
                 fontConfig,
                 false,
                 false,
-                false,
                 true
             )
         );
@@ -440,7 +424,6 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleDotConfig(
                 fontConfig,
-                false,
                 false,
                 false,
                 true

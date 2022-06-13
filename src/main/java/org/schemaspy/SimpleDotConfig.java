@@ -25,14 +25,12 @@ public class SimpleDotConfig implements DotConfig {
 
     private final FontConfig fontConfig;
     private final boolean rankDirBugEnabled;
-    private final boolean relativeLinks;
     private final boolean numRowsEnabled;
     private final boolean multiSchema;
 
-    public SimpleDotConfig(FontConfig fontConfig, boolean rankDirBugEnabled, boolean relativeLinks, boolean numRowsEnabled, boolean multiSchema) {
+    public SimpleDotConfig(FontConfig fontConfig, boolean rankDirBugEnabled, boolean numRowsEnabled, boolean multiSchema) {
         this.fontConfig = fontConfig;
         this.rankDirBugEnabled = rankDirBugEnabled;
-        this.relativeLinks = relativeLinks;
         this.numRowsEnabled = numRowsEnabled;
         this.multiSchema = multiSchema;
     }
@@ -54,11 +52,6 @@ public class SimpleDotConfig implements DotConfig {
 
     public int getTextWidth(String text) {
         return fontConfig.widthOfText(text);
-    }
-
-    @Override
-    public boolean useRelativeLinks() {
-        return relativeLinks;
     }
 
     @Override

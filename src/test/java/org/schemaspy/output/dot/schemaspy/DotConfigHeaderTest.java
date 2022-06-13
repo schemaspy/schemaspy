@@ -5,7 +5,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import org.schemaspy.output.dot.DotConfig;
 
-public class DotConfigHeaderTest {
+class DotConfigHeaderTest {
 
     /**
      * Given the name of a font,
@@ -35,11 +35,6 @@ public class DotConfigHeaderTest {
                             @Override
                             public int getTextWidth(String text) {
                                 return 0;
-                            }
-
-                            @Override
-                            public boolean useRelativeLinks() {
-                                return false;
                             }
 
                             @Override
@@ -86,11 +81,6 @@ public class DotConfigHeaderTest {
                             @Override
                             public int getTextWidth(String text) {
                                 return 0;
-                            }
-
-                            @Override
-                            public boolean useRelativeLinks() {
-                                return false;
                             }
 
                             @Override
