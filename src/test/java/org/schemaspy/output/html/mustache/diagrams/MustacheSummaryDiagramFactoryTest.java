@@ -41,17 +41,16 @@ public class MustacheSummaryDiagramFactoryTest {
         DotFormatter dotProducer = mock(DotFormatter.class);
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory,null, temporaryFolder.newFolder("noDiagrams"));
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory,false, temporaryFolder.newFolder("noDiagrams"));
 
         Database database = mock(Database.class);
         List<Table> noTables = Collections.emptyList();
         ProgressListener progressListener = mock(ProgressListener.class);
 
 
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, noTables, false, true, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, noTables, true, progressListener);
         assertThat(results.getDiagrams()).isEmpty();
         assertThat(results.hasRealRelationships()).isFalse();
-        assertThat(results.getImpliedConstraints()).isEmpty();
     }
 
     @Test
@@ -60,7 +59,7 @@ public class MustacheSummaryDiagramFactoryTest {
 
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory,null, temporaryFolder.newFolder("noDiagrams"));
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory,false, temporaryFolder.newFolder("noDiagrams"));
 
         Database database = mock(Database.class);
         when(database.getRemoteTables()).thenReturn(Collections.emptyList());
@@ -70,12 +69,11 @@ public class MustacheSummaryDiagramFactoryTest {
         ProgressListener progressListener = mock(ProgressListener.class);
 
 
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, false, true, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, true, progressListener);
         assertThat(results.getDiagrams()).hasSize(2);
         assertThat(results.getDiagrams().get(0).getActive()).isNotEmpty();
         assertThat(results.getDiagrams().get(1).getActive()).isNullOrEmpty();
         assertThat(results.hasRealRelationships()).isTrue();
-        assertThat(results.getImpliedConstraints()).isEmpty();
     }
 
     @Test
@@ -85,13 +83,7 @@ public class MustacheSummaryDiagramFactoryTest {
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
 
-        ImpliedConstraintsFinder impliedConstraintsFinder = mock(ImpliedConstraintsFinder.class);
-        when(impliedConstraintsFinder.find(any(Collection.class))).then(invocation -> {
-            ImpliedForeignKeyConstraint impliedForeignKeyConstraint = mock(ImpliedForeignKeyConstraint.class);
-            return Collections.singletonList(impliedForeignKeyConstraint);
-        });
-
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, impliedConstraintsFinder, temporaryFolder.newFolder("noDiagrams"));
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, true, temporaryFolder.newFolder("noDiagrams"));
 
         Database database = mock(Database.class);
         when(database.getRemoteTables()).thenReturn(Collections.emptyList());
@@ -101,14 +93,13 @@ public class MustacheSummaryDiagramFactoryTest {
         ProgressListener progressListener = mock(ProgressListener.class);
 
 
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, true, true, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, true, progressListener);
         assertThat(results.getDiagrams()).hasSize(4);
         assertThat(results.getDiagrams().get(0).getActive()).isNotEmpty();
         assertThat(results.getDiagrams().get(1).getActive()).isNullOrEmpty();
         assertThat(results.getDiagrams().get(2).getActive()).isNullOrEmpty();
         assertThat(results.getDiagrams().get(3).getActive()).isNullOrEmpty();
         assertThat(results.hasRealRelationships()).isTrue();
-        assertThat(results.getImpliedConstraints()).hasSize(1);
     }
 
     @Test
@@ -121,11 +112,7 @@ public class MustacheSummaryDiagramFactoryTest {
                         any(File.class),
                         anyString());
 
-        ImpliedConstraintsFinder impliedConstraintsFinder = mock(ImpliedConstraintsFinder.class);
-        when(impliedConstraintsFinder.find(any(Collection.class))).then(invocation -> {
-            ImpliedForeignKeyConstraint impliedForeignKeyConstraint = mock(ImpliedForeignKeyConstraint.class);
-            return Collections.singletonList(impliedForeignKeyConstraint);
-        });
+
         File outputDir = temporaryFolder.newFolder("noDiagrams");
 
         Path summaryPath = outputDir.toPath().resolve("diagrams").resolve("summary");
@@ -134,7 +121,7 @@ public class MustacheSummaryDiagramFactoryTest {
         Files.createFile(summaryPath.resolve(FILE_PREFIX + ".implied.compact.dot"), PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r--r--r--")));
         Files.createFile(summaryPath.resolve(FILE_PREFIX + ".implied.large.dot"), PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r--r--r--")));
 
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(mock(DotFormatter.class), mustacheDiagramFactory, impliedConstraintsFinder, outputDir);
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(mock(DotFormatter.class), mustacheDiagramFactory, true, outputDir);
 
         Database database = mock(Database.class);
         when(database.getRemoteTables()).thenReturn(Collections.emptyList());
@@ -144,7 +131,7 @@ public class MustacheSummaryDiagramFactoryTest {
         ProgressListener progressListener = mock(ProgressListener.class);
 
 
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, true, true, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, true, progressListener);
         assertThat(results.getDiagrams()).isEmpty();
         assertThat(results.getOutputExceptions()).hasSize(4);
     }

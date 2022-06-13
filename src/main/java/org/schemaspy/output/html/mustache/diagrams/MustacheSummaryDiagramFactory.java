@@ -18,9 +18,7 @@
  */
 package org.schemaspy.output.html.mustache.diagrams;
 
-import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.OutputException;
@@ -51,25 +49,24 @@ public class MustacheSummaryDiagramFactory {
     private static final String FAILED_DIAGRAM = "Failed to produce diagram for: ";
     private final DotFormatter dotProducer;
     private final SummaryDiagram diagramFactory;
-    private final ImpliedConstraintsFinder impliedConstraintsFinder;
+    private final boolean hasImpliedConstraints;
     private final Path summaryDir;
 
-    public MustacheSummaryDiagramFactory(DotFormatter dotProducer, SummaryDiagram diagramFactory, ImpliedConstraintsFinder impliedConstraintsFinder, File outputDir) {
+    public MustacheSummaryDiagramFactory(DotFormatter dotProducer, SummaryDiagram diagramFactory, boolean hasImpliedConstraints, File outputDir) {
         this.dotProducer = dotProducer;
         this.diagramFactory = diagramFactory;
-        this.impliedConstraintsFinder = impliedConstraintsFinder;
+        this.hasImpliedConstraints = hasImpliedConstraints;
         this.summaryDir = outputDir.toPath().resolve("diagrams").resolve("summary");
     }
 
     public MustacheSummaryDiagramResults generateSummaryDiagrams(
             Database database,
             Collection<Table> tables,
-            boolean includeImpliedConstraints,
             boolean showDetailedTables,
             ProgressListener progressListener
     ) throws IOException {
         if (tables.isEmpty()) {
-            return new MustacheSummaryDiagramResults(Collections.emptyList(), false, Collections.emptyList(), Collections.emptyList());
+            return new MustacheSummaryDiagramResults(Collections.emptyList(), false, Collections.emptyList());
         }
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
         List<OutputException> outputExceptions = new ArrayList<>();
@@ -95,21 +92,17 @@ public class MustacheSummaryDiagramFactory {
             generateRealLarge(database, tables, showDetailedTables, diagrams, outputExceptions);
         }
 
-        // getting implied constraints has a side-effect of associating the parent/child tables, so don't do it
-        // here unless they want that behavior
-        List<ImpliedForeignKeyConstraint> impliedConstraints = new ArrayList<>();
-        if (includeImpliedConstraints)
-            impliedConstraints.addAll(impliedConstraintsFinder.find(tables));
+
 
         progressListener.graphingSummaryProgressed();
-        if (!impliedConstraints.isEmpty()) {
+        if (hasImpliedConstraints) {
             generateImpliedCompact(database, tables, showDetailedTables, diagrams, outputExceptions);
             generateImpliedLarge(database, tables, showDetailedTables, diagrams, outputExceptions);
         }
         if (!diagrams.isEmpty()) {
             diagrams.get(0).setActive(true);
         }
-        return new MustacheSummaryDiagramResults(diagrams, hasRealRelationships, impliedConstraints, outputExceptions);
+        return new MustacheSummaryDiagramResults(diagrams, hasRealRelationships, outputExceptions);
     }
 
     private void generateRealLarge(Database database, Collection<Table> tables, boolean showDetailedTables, List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions) {

@@ -43,9 +43,11 @@ public class HtmlRelationshipsPage {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MustacheCompiler mustacheCompiler;
+    private final boolean hasImpliedConstraints;
 
-    public HtmlRelationshipsPage(MustacheCompiler mustacheCompiler) {
+    public HtmlRelationshipsPage(MustacheCompiler mustacheCompiler, boolean hasImpliedConstraints) {
         this.mustacheCompiler = mustacheCompiler;
+        this.hasImpliedConstraints = hasImpliedConstraints;
     }
 
     public boolean write(
@@ -71,11 +73,11 @@ public class HtmlRelationshipsPage {
         }
     }
 
-    private static boolean hasOnlyImpliedRelationships(MustacheSummaryDiagramResults results) {
-        return !results.hasRealRelationships() && !results.getImpliedConstraints().isEmpty();
+    private boolean hasOnlyImpliedRelationships(MustacheSummaryDiagramResults results) {
+        return !results.hasRealRelationships() && hasImpliedConstraints;
     }
 
-    private static boolean anyRelationships(MustacheSummaryDiagramResults results) {
-        return !results.hasRealRelationships() && results.getImpliedConstraints().isEmpty();
+    private boolean anyRelationships(MustacheSummaryDiagramResults results) {
+        return !results.hasRealRelationships() && !hasImpliedConstraints;
     }
 }
