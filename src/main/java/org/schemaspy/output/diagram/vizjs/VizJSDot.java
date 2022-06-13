@@ -19,7 +19,7 @@
 package org.schemaspy.output.diagram.vizjs;
 
 import org.apache.commons.io.IOUtils;
-import org.schemaspy.output.diagram.DiagramException;
+import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.Renderer;
 import org.schemaspy.util.Writers;
 
@@ -71,7 +71,7 @@ public class VizJSDot implements Renderer {
             }
             return "";
         } catch (Exception e) {
-            throw new DiagramException(e.getMessage());
+            throw new RenderException(e.getMessage());
         }
     }
 

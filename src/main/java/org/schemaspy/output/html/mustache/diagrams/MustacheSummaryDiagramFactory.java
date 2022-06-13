@@ -24,7 +24,7 @@ import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.OutputException;
-import org.schemaspy.output.diagram.DiagramException;
+import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.DiagramResult;
 import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
@@ -88,8 +88,8 @@ public class MustacheSummaryDiagramFactory {
                 diagrams.add(realCompactDiagram);
             } catch (IOException ioexception) {
                 outputExceptions.add(new OutputException(FAILED_DOT + realCompactDot.toString(), ioexception));
-            } catch (DiagramException diagramException) {
-                outputExceptions.add(new OutputException(FAILED_DIAGRAM + realCompactDot.toString(), diagramException));
+            } catch (RenderException renderException) {
+                outputExceptions.add(new OutputException(FAILED_DIAGRAM + realCompactDot.toString(), renderException));
             }
             // real relationships exist so generate the 'big' form of the relationships .dot file
             generateRealLarge(database, tables, showDetailedTables, diagrams, outputExceptions);
@@ -121,8 +121,8 @@ public class MustacheSummaryDiagramFactory {
             diagrams.add(realLargeDiagram);
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + realLargeDot.toString(), ioexception));
-        } catch (DiagramException diagramException) {
-            outputExceptions.add(new OutputException(FAILED_DIAGRAM + realLargeDot.toString(), diagramException));
+        } catch (RenderException renderException) {
+            outputExceptions.add(new OutputException(FAILED_DIAGRAM + realLargeDot.toString(), renderException));
         }
     }
 
@@ -135,8 +135,8 @@ public class MustacheSummaryDiagramFactory {
             diagrams.add(impliedCompactDiagram);
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + impliedCompactDot.toString(), ioexception));
-        } catch (DiagramException diagramException) {
-            outputExceptions.add(new OutputException(FAILED_DIAGRAM + impliedCompactDot.toString(), diagramException));
+        } catch (RenderException renderException) {
+            outputExceptions.add(new OutputException(FAILED_DIAGRAM + impliedCompactDot.toString(), renderException));
         }
     }
 
@@ -149,8 +149,8 @@ public class MustacheSummaryDiagramFactory {
             diagrams.add(impliedLargeDiagram);
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + impliedLargeDot.toString(), ioexception));
-        } catch (DiagramException diagramException) {
-            outputExceptions.add(new OutputException(FAILED_DIAGRAM + impliedLargeDot.toString(), diagramException));
+        } catch (RenderException renderException) {
+            outputExceptions.add(new OutputException(FAILED_DIAGRAM + impliedLargeDot.toString(), renderException));
         }
     }
 }

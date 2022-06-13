@@ -20,8 +20,8 @@ public class TableDiagram {
             File diagramFile = new File(tablesDir, diagramName + "." + renderer.format());
             String diagramMap = renderer.render(dotFile, diagramFile);
             return new DiagramResult(diagramFile.getName(), diagramMap, renderer.format());
-        } catch (DiagramException diagramException) {
-            throw new DiagramException("Failed to generate Table diagram", diagramException);
+        } catch (RenderException diagramException) {
+            throw new RenderException("Failed to generate Table diagram", diagramException);
         }
     }
 }

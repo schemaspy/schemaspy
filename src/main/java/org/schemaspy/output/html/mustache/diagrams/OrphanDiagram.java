@@ -18,7 +18,7 @@
  */
 package org.schemaspy.output.html.mustache.diagrams;
 
-import org.schemaspy.output.diagram.DiagramException;
+import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.Renderer;
 import org.schemaspy.output.dot.schemaspy.graph.Graph;
 import org.schemaspy.output.html.HtmlException;
@@ -76,8 +76,8 @@ public class OrphanDiagram implements Diagram {
                 return new SvgDiagram(NAME, diagramSource);
             }
             return new ImgDiagram(NAME, diagramSource, diagramMap);
-        } catch (DiagramException diagramException) {
-            throw new HtmlException("Failed to generate Orphan diagram", diagramException);
+        } catch (RenderException renderException) {
+            throw new HtmlException("Failed to generate Orphan diagram", renderException);
         }
     }
 

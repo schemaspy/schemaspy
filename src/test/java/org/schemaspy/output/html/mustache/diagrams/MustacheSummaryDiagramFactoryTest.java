@@ -8,7 +8,7 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
-import org.schemaspy.output.diagram.DiagramException;
+import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.DiagramResult;
 import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
@@ -115,7 +115,7 @@ public class MustacheSummaryDiagramFactoryTest {
     public void exceptionsAreCaught() throws IOException {
         assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
-        doThrow(new DiagramException("byDesign")).
+        doThrow(new RenderException("byDesign")).
                 when(mustacheDiagramFactory)
                 .generateSummaryDiagram(
                         any(File.class),
