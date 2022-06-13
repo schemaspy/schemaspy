@@ -19,12 +19,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy;
+package org.schemaspy.analyzer;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.Table;
@@ -35,27 +32,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
-/**
- * @author Rafal Kasa
- * @author Ismail Simsek
- * @author Thomas Traude
- * @author Mårten Bohlin
- */
-public class DbAnalyzerTest {
-    private String catalog;
-    private String schema;
-    private Database database;
-
-    @Before
-    public void setUp() throws Exception {
-        catalog = "test";
-        schema = "dbo";
-        database = Mockito.mock(Database.class);
-    }
+class ImpliedConstraintsFinderTest {
+    private String catalog = "test";
+    private String schema = "dbo";
+    private Database database  = mock(Database.class);
 
     @Test
-    public void testGetImpliedConstraints() throws Exception {
+    void testGetImpliedConstraints() throws Exception {
         Table album = createAlbumTable();
         Table track = createTrackTable();
         Table artist = createArtistTable();
@@ -67,7 +52,8 @@ public class DbAnalyzerTest {
         tables.add(track);
         tables.add(invoiceLine);
 
-        List<ImpliedForeignKeyConstraint> impliedForeignKeyConstraintList = DbAnalyzer.getImpliedConstraints(tables);
+        ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
+        List<ImpliedForeignKeyConstraint> impliedForeignKeyConstraintList = impliedConstraintsFinder.find(tables);
 
         ImpliedForeignKeyConstraint invoiceLineTrackId = new ImpliedForeignKeyConstraint(track.getColumn("Id"), invoiceLine.getColumn("TrackId"));
         ImpliedForeignKeyConstraint trackAlbumId = new ImpliedForeignKeyConstraint(album.getColumn("Id"), track.getColumn("AlbumId"));
@@ -75,8 +61,9 @@ public class DbAnalyzerTest {
 
         assertThat(impliedForeignKeyConstraintList).containsExactlyInAnyOrder(invoiceLineTrackId, trackAlbumId, albumArtistId);
     }
+
     @Test
-    public void testGetImpliedConstraintsWithObscureTableAndColumnNames() throws Exception {
+    void testGetImpliedConstraintsWithObscureTableAndColumnNames() throws Exception {
         // Given
         Table parent = createTableWithObscureNamesParent();
         Table child = createTableWithObscureNamesChild1();
@@ -84,9 +71,10 @@ public class DbAnalyzerTest {
         List<Table> tables = new ArrayList<>();
         tables.add(parent);
         tables.add(child);
+        ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
 
         // When
-        List<ImpliedForeignKeyConstraint> impliedForeignKeyConstraintList = DbAnalyzer.getImpliedConstraints(tables);
+        List<ImpliedForeignKeyConstraint> impliedForeignKeyConstraintList = impliedConstraintsFinder.find(tables);
 
         // Then
         ImpliedForeignKeyConstraint obscureId = new ImpliedForeignKeyConstraint(parent.getColumn("{ColumnName}"), child.getColumn("ObscureParentTable{ColumnName}"));
@@ -328,10 +316,4 @@ public class DbAnalyzerTest {
 
         return table;
     }
-
-    @Test
-    public void testGetRailsConstraints() throws Exception {
-        Assert.assertTrue(true);
-    }
-
 }

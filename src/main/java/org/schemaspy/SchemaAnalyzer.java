@@ -323,14 +323,24 @@ public class SchemaAnalyzer {
         progressListener.graphingSummaryProgressed();
 
         boolean showDetailedTables = tables.size() <= config.getMaxDetailedTables();
-        final boolean includeImpliedConstraints = commandLineArguments.withImpliedRelationships();
+        boolean hasRealConstraints = !db.getRemoteTables().isEmpty() || tables.stream().anyMatch(table -> !table.isOrphan(false));
 
         // if evaluating a 'ruby on rails-based' database then connect the columns
         // based on RoR conventions
         // note that this is done before 'hasRealRelationships' gets evaluated so
         // we get a relationships ER diagram
-        if (config.isRailsEnabled())
+        if (config.isRailsEnabled()) {
             DbAnalyzer.getRailsConstraints(db.getTablesMap());
+        }
+
+        ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
+        // getting implied constraints has a side-effect of associating the parent/child tables, so don't do it
+        // here unless they want that behavior
+        List<ImpliedForeignKeyConstraint> impliedConstraints =
+         commandLineArguments.withImpliedRelationships()
+         ? impliedConstraintsFinder.find(tables)
+         : Collections.emptyList();
+
         DotConfig dotConfig = new SimpleDotConfig(
             new DefaultFontConfig(
                 config.getFont(),
@@ -350,16 +360,16 @@ public class SchemaAnalyzer {
         summaryDir.mkdirs();
         SummaryDiagram summaryDiagram = new SummaryDiagram(renderer, summaryDir);
 
-        ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, impliedConstraintsFinder, outputDir);
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, includeImpliedConstraints, showDetailedTables, progressListener);
+
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, !impliedConstraints.isEmpty() , outputDir);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, showDetailedTables, progressListener);
         results.getOutputExceptions().stream().forEachOrdered(exception ->
                 LOGGER.error("RelationShipDiagramError", exception)
         );
         DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
         MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config, dataTableConfig);
 
-        HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler);
+        HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler, !impliedConstraints.isEmpty());
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {
             htmlRelationshipsPage.write(results, writer);
         }
@@ -382,7 +392,7 @@ public class SchemaAnalyzer {
 
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config.getDescription());
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
-            htmlMainIndexPage.write(db, tables, results.getImpliedConstraints(), writer);
+            htmlMainIndexPage.write(db, tables, impliedConstraints, writer);
         }
 
         progressListener.graphingSummaryProgressed();
@@ -398,7 +408,7 @@ public class SchemaAnalyzer {
 
         HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("anomalies.html").toFile())) {
-            htmlAnomaliesPage.write(tables, results.getImpliedConstraints(), writer);
+            htmlAnomaliesPage.write(tables, impliedConstraints, writer);
         }
 
         progressListener.graphingSummaryProgressed();

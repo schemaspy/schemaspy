@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.DbAnalyzer;
 import org.schemaspy.SimpleDotConfig;
+import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -266,8 +267,8 @@ public class SchemaMetaIT {
         );
         new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
-        DbAnalyzer.getImpliedConstraints(database.getTables());
-        DbAnalyzer.getImpliedConstraints(databaseWithSchemaMeta.getTables());
+        new ImpliedConstraintsFinder().find(database.getTables());
+        new ImpliedConstraintsFinder().find(databaseWithSchemaMeta.getTables());
 
         assertThat(database.getTablesMap().get("ACCOUNT").getNumChildren())
                 .isGreaterThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getNumChildren());
