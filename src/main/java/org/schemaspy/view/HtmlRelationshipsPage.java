@@ -43,10 +43,12 @@ public class HtmlRelationshipsPage {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MustacheCompiler mustacheCompiler;
+    private final boolean hasRealConstraints;
     private final boolean hasImpliedConstraints;
 
-    public HtmlRelationshipsPage(MustacheCompiler mustacheCompiler, boolean hasImpliedConstraints) {
+    public HtmlRelationshipsPage(MustacheCompiler mustacheCompiler, boolean hasRealConstraints, boolean hasImpliedConstraints) {
         this.mustacheCompiler = mustacheCompiler;
+        this.hasRealConstraints = hasRealConstraints;
         this.hasImpliedConstraints = hasImpliedConstraints;
     }
 
@@ -58,8 +60,8 @@ public class HtmlRelationshipsPage {
             PageData pageData = new PageData.Builder()
                     .templateName("relationships.html")
                     .scriptName("relationships.js")
-                    .addToScope("hasOnlyImpliedRelationships", hasOnlyImpliedRelationships(results))
-                    .addToScope("anyRelationships", anyRelationships(results))
+                    .addToScope("hasOnlyImpliedRelationships", hasOnlyImpliedRelationships())
+                    .addToScope("anyRelationships", anyRelationships())
                     .addToScope("diagrams", results.getDiagrams())
                     .addToScope("diagramErrors", results.getOutputExceptions())
                     .depth(0)
@@ -73,11 +75,11 @@ public class HtmlRelationshipsPage {
         }
     }
 
-    private boolean hasOnlyImpliedRelationships(MustacheSummaryDiagramResults results) {
-        return !results.hasRealRelationships() && hasImpliedConstraints;
+    private boolean hasOnlyImpliedRelationships() {
+        return !hasRealConstraints && hasImpliedConstraints;
     }
 
-    private boolean anyRelationships(MustacheSummaryDiagramResults results) {
-        return !results.hasRealRelationships() && !hasImpliedConstraints;
+    private boolean anyRelationships() {
+        return !hasRealConstraints && !hasImpliedConstraints;
     }
 }
