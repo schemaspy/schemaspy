@@ -20,8 +20,8 @@ public class SummaryDiagram {
             File diagramFile = new File(summaryDir, diagramName + "." + renderer.format());
             String diagramMap = renderer.render(dotFile, diagramFile);
             return new DiagramResult(diagramFile.getName(), diagramMap, renderer.format());
-        } catch (DiagramException diagramException) {
-            throw new DiagramException("Failed to generate summary diagram", diagramException);
+        } catch (RenderException diagramException) {
+            throw new RenderException("Failed to generate summary diagram", diagramException);
         }
     }
 }

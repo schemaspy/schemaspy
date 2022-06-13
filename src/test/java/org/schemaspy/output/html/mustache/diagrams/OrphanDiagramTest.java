@@ -2,7 +2,7 @@ package org.schemaspy.output.html.mustache.diagrams;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.schemaspy.output.diagram.DiagramException;
+import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.Renderer;
 import org.schemaspy.output.dot.schemaspy.graph.Graph;
 import org.schemaspy.output.html.HtmlException;
@@ -52,7 +52,7 @@ class OrphanDiagramTest {
     @Test
     void wrapAsHtmlExceptionOnExceptionWithDiagram() {
         Renderer renderer = mock(Renderer.class);
-        when(renderer.render(any(), any())).thenThrow(new DiagramException("Mocked", null));
+        when(renderer.render(any(), any())).thenThrow(new RenderException("Mocked", null));
         OrphanDiagram orphanDiagram = new OrphanDiagram(() -> "test", renderer, outputDir);
 
         assertThatThrownBy(() -> orphanDiagram.html())

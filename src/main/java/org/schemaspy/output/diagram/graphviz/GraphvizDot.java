@@ -18,7 +18,7 @@
  */
 package org.schemaspy.output.diagram.graphviz;
 
-import org.schemaspy.output.diagram.DiagramException;
+import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.Renderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -195,7 +195,7 @@ public class GraphvizDot implements Renderer {
      */
     public String render(File dotFile, File diagramFile) {
         if (!isValid()) {
-            throw new DiagramException("Dot missing or invalid version");
+            throw new RenderException("Dot missing or invalid version");
         }
         StringBuilder mapBuffer = new StringBuilder(1024);
 
@@ -229,22 +229,22 @@ public class GraphvizDot implements Renderer {
             }
             int rc = process.waitFor();
             if (rc != 0)
-                throw new DiagramException("'" + commandLine + "' failed with return code " + rc);
+                throw new RenderException("'" + commandLine + "' failed with return code " + rc);
             if (!diagramFile.exists())
-                throw new DiagramException("'" + commandLine + "' failed to create output file");
+                throw new RenderException("'" + commandLine + "' failed to create output file");
 
             // dot generates post-HTML 4.0.1 output...convert trailing />'s to >'s
             return mapBuffer.toString().replace("/>", ">");
         } catch (InterruptedException interrupted) {
             Thread.currentThread().interrupt();
-            throw new DiagramException("Interrupted during execution", interrupted);
-        } catch (DiagramException | IOException exception) {
+            throw new RenderException("Interrupted during execution", interrupted);
+        } catch (RenderException | IOException exception) {
             try {
                 Files.deleteIfExists(diagramFile.toPath());
             } catch (IOException ioexception) {
                 LOGGER.debug("Failed to delete '{}'", diagramFile, ioexception);
             }
-            throw new DiagramException("'" + commandLine + "' failed with exception " + exception);
+            throw new RenderException("'" + commandLine + "' failed with exception " + exception);
         }
     }
 

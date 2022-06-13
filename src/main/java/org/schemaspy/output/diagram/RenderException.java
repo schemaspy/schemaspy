@@ -21,15 +21,16 @@ package org.schemaspy.output.diagram;
 import org.schemaspy.output.OutputException;
 
 /**
+ * Runtime Exception for usage in rendering
  * @author Nils Petzaell
  */
-public class DiagramException extends OutputException {
+public class RenderException extends OutputException {
 
-    public DiagramException(String message) {
+    public RenderException(String message) {
         super(message);
     }
 
-    public DiagramException(String message, Throwable cause) {
+    public RenderException(String message, Throwable cause) {
         super(message, cause);
     }
 }
