@@ -49,10 +49,10 @@ import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.output.dot.schemaspy.OrphanGraph;
+import org.schemaspy.output.html.mustache.GraphDiagram;
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramFactory;
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
 import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
-import org.schemaspy.output.html.mustache.diagrams.OrphanDiagram;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.util.*;
 import org.schemaspy.view.*;
@@ -227,7 +227,6 @@ public class SchemaAnalyzer {
             SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, config.isOneOfMultipleSchemas());
             if (commandLineArguments.isHtmlEnabled()) {
                 FileUtils.forceMkdir(new File(outputDir, "tables"));
-                FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
                 LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
 
@@ -349,11 +348,7 @@ public class SchemaAnalyzer {
 
         DotFormatter dotProducer = new DotFormatter(dotConfig);
 
-        File diagramDir = new File(outputDir, "diagrams");
-        diagramDir.mkdirs();
-        File summaryDir = new File(diagramDir, "summary");
-        summaryDir.mkdirs();
-        SummaryDiagram summaryDiagram = new SummaryDiagram(diagramProducer, summaryDir);
+        SummaryDiagram summaryDiagram = new SummaryDiagram(diagramProducer, outputDir);
 
         ImpliedConstraintsFinder impliedConstraintsFinder = new ImpliedConstraintsFinder();
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, impliedConstraintsFinder, outputDir);
@@ -373,10 +368,11 @@ public class SchemaAnalyzer {
 
         HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(
                 mustacheCompiler,
-                new OrphanDiagram(
+                new GraphDiagram(
                         new OrphanGraph(dotConfig, tables),
                         diagramProducer,
-                        outputDir
+                        outputDir.toPath(),
+                        "orphans"
                 )
         );
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("orphans.html").toFile())) {
@@ -435,7 +431,7 @@ public class SchemaAnalyzer {
         LOGGER.info("Writing/diagramming details");
         SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getIdentifierQuoteString(), db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
 
-        File tablesDir = new File(diagramDir, "tables");
+        File tablesDir = new File(outputDir,"tables");
         tablesDir.mkdirs();
         TableDiagram tableDiagram = new TableDiagram(diagramProducer, tablesDir);
         MustacheTableDiagramFactory mustacheTableDiagramFactory = new MustacheTableDiagramFactory(dotProducer, tableDiagram, outputDir, commandLineArguments.getDegreeOfSeparation());

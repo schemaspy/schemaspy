@@ -92,43 +92,6 @@ class DotNodeTest {
     }
 
     @Test
-    void pathRelativeLinksLocal() {
-        DotNode dotNode = new DotNode(
-            localTable,
-            false,
-            new DotNodeConfig(true, true),
-            new SimpleDotConfig(
-                fontConfig,
-                false,
-                false,
-                false,
-                true
-            )
-        );
-        assertThat(dotNode.value()).contains("URL=\"a_table_4867c34f.html\"");
-    }
-
-    @Test
-    void pathRelativeLinksRemote() {
-        DotNode dotNode = new DotNode(
-            remoteTable,
-            false,
-            new DotNodeConfig(
-                true,
-                true
-            ),
-            new SimpleDotConfig(
-                fontConfig,
-                false,
-                true,
-                false,
-                true
-            )
-        );
-        assertThat(dotNode.value()).contains("URL=\"../../../schema/tables/a_table_4867c34f.html\"");
-    }
-
-    @Test
     void pathFromRootLocal() {
         DotNode dotNode = new DotNode(
             localTable,

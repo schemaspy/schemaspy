@@ -58,7 +58,7 @@ public class MustacheSummaryDiagramFactory {
         this.dotProducer = dotProducer;
         this.diagramFactory = diagramFactory;
         this.impliedConstraintsFinder = impliedConstraintsFinder;
-        this.summaryDir = outputDir.toPath().resolve("diagrams").resolve("summary");
+        this.summaryDir = outputDir.toPath();
     }
 
     public MustacheSummaryDiagramResults generateSummaryDiagrams(
