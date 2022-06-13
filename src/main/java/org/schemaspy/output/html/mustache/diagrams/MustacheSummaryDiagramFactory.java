@@ -49,12 +49,14 @@ public class MustacheSummaryDiagramFactory {
     private static final String FAILED_DIAGRAM = "Failed to produce diagram for: ";
     private final DotFormatter dotProducer;
     private final SummaryDiagram diagramFactory;
+    private final boolean hasRealConstraints;
     private final boolean hasImpliedConstraints;
     private final Path summaryDir;
 
-    public MustacheSummaryDiagramFactory(DotFormatter dotProducer, SummaryDiagram diagramFactory, boolean hasImpliedConstraints, File outputDir) {
+    public MustacheSummaryDiagramFactory(DotFormatter dotProducer, SummaryDiagram diagramFactory,boolean hasRealConstraints, boolean hasImpliedConstraints, File outputDir) {
         this.dotProducer = dotProducer;
         this.diagramFactory = diagramFactory;
+        this.hasRealConstraints = hasRealConstraints;
         this.hasImpliedConstraints = hasImpliedConstraints;
         this.summaryDir = outputDir.toPath().resolve("diagrams").resolve("summary");
     }
@@ -66,16 +68,14 @@ public class MustacheSummaryDiagramFactory {
             ProgressListener progressListener
     ) throws IOException {
         if (tables.isEmpty()) {
-            return new MustacheSummaryDiagramResults(Collections.emptyList(), false, Collections.emptyList());
+            return new MustacheSummaryDiagramResults(Collections.emptyList(), Collections.emptyList());
         }
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
         List<OutputException> outputExceptions = new ArrayList<>();
         Files.createDirectories(summaryDir);
         // generate the compact form of the relationships .dot file
 
-        boolean hasRealRelationships = !database.getRemoteTables().isEmpty() || tables.stream().anyMatch(table -> !table.isOrphan(false));
-
-        if (hasRealRelationships) {
+        if (hasRealConstraints) {
             File realCompactDot = summaryDir.resolve(FILE_PREFIX + ".real.compact.dot").toFile();
             try (PrintWriter out = Writers.newPrintWriter(realCompactDot)) {
                 dotProducer.writeSummaryRealRelationships(database, tables, true, showDetailedTables, out);
@@ -92,8 +92,6 @@ public class MustacheSummaryDiagramFactory {
             generateRealLarge(database, tables, showDetailedTables, diagrams, outputExceptions);
         }
 
-
-
         progressListener.graphingSummaryProgressed();
         if (hasImpliedConstraints) {
             generateImpliedCompact(database, tables, showDetailedTables, diagrams, outputExceptions);
@@ -102,7 +100,7 @@ public class MustacheSummaryDiagramFactory {
         if (!diagrams.isEmpty()) {
             diagrams.get(0).setActive(true);
         }
-        return new MustacheSummaryDiagramResults(diagrams, hasRealRelationships, outputExceptions);
+        return new MustacheSummaryDiagramResults(diagrams, outputExceptions);
     }
 
     private void generateRealLarge(Database database, Collection<Table> tables, boolean showDetailedTables, List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions) {

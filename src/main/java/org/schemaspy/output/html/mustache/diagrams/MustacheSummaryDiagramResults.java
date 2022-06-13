@@ -29,21 +29,15 @@ import java.util.List;
 public class MustacheSummaryDiagramResults {
 
     private final List<MustacheTableDiagram> diagrams;
-    private final boolean hasRealRelationships;
     private final List<OutputException> outputExceptions;
 
-    public MustacheSummaryDiagramResults(List<MustacheTableDiagram> diagrams, boolean hasRealRelationships, List<OutputException> outputExceptions) {
+    public MustacheSummaryDiagramResults(List<MustacheTableDiagram> diagrams, List<OutputException> outputExceptions) {
         this.diagrams = diagrams;
-        this.hasRealRelationships = hasRealRelationships;
         this.outputExceptions = outputExceptions;
     }
 
     public List<MustacheTableDiagram> getDiagrams() {
         return diagrams;
-    }
-
-    public boolean hasRealRelationships() {
-        return hasRealRelationships;
     }
 
     public List<OutputException> getOutputExceptions() {

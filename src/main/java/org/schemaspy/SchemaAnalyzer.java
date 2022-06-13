@@ -364,7 +364,7 @@ public class SchemaAnalyzer {
         SummaryDiagram summaryDiagram = new SummaryDiagram(renderer, summaryDir);
 
 
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, !impliedConstraints.isEmpty() , outputDir);
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, hasRealConstraints, !impliedConstraints.isEmpty() , outputDir);
         MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, showDetailedTables, progressListener);
         results.getOutputExceptions().stream().forEachOrdered(exception ->
                 LOGGER.error("RelationShipDiagramError", exception)
@@ -372,7 +372,7 @@ public class SchemaAnalyzer {
         DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
         MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config, dataTableConfig);
 
-        HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler, !impliedConstraints.isEmpty());
+        HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler, hasRealConstraints, !impliedConstraints.isEmpty());
         try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {
             htmlRelationshipsPage.write(results, writer);
         }
