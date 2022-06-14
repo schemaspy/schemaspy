@@ -32,6 +32,7 @@ import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.CaseInsensitiveMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,9 +70,9 @@ public class DbAnalyzerTest {
 
         List<ImpliedForeignKeyConstraint> impliedForeignKeyConstraintList = DbAnalyzer.getImpliedConstraints(tables);
 
-        ImpliedForeignKeyConstraint invoiceLineTrackId = new ImpliedForeignKeyConstraint(track.getColumn("Id"), invoiceLine.getColumn("TrackId"));
-        ImpliedForeignKeyConstraint trackAlbumId = new ImpliedForeignKeyConstraint(album.getColumn("Id"), track.getColumn("AlbumId"));
-        ImpliedForeignKeyConstraint albumArtistId = new ImpliedForeignKeyConstraint(artist.getColumn("Id"), album.getColumn("ArtistId"));
+        ImpliedForeignKeyConstraint invoiceLineTrackId = new ImpliedForeignKeyConstraint(Arrays.asList(track.getColumn("Id")), Arrays.asList(invoiceLine.getColumn("TrackId")));
+        ImpliedForeignKeyConstraint trackAlbumId = new ImpliedForeignKeyConstraint(Arrays.asList(album.getColumn("Id")), Arrays.asList(track.getColumn("AlbumId")));
+        ImpliedForeignKeyConstraint albumArtistId = new ImpliedForeignKeyConstraint(Arrays.asList(artist.getColumn("Id")), Arrays.asList(album.getColumn("ArtistId")));
 
         assertThat(impliedForeignKeyConstraintList).containsExactlyInAnyOrder(invoiceLineTrackId, trackAlbumId, albumArtistId);
     }
@@ -89,7 +90,7 @@ public class DbAnalyzerTest {
         List<ImpliedForeignKeyConstraint> impliedForeignKeyConstraintList = DbAnalyzer.getImpliedConstraints(tables);
 
         // Then
-        ImpliedForeignKeyConstraint obscureId = new ImpliedForeignKeyConstraint(parent.getColumn("{ColumnName}"), child.getColumn("ObscureParentTable{ColumnName}"));
+        ImpliedForeignKeyConstraint obscureId = new ImpliedForeignKeyConstraint(Arrays.asList(parent.getColumn("{ColumnName}")), Arrays.asList(child.getColumn("ObscureParentTable{ColumnName}")));
 
         assertThat(impliedForeignKeyConstraintList).containsExactlyInAnyOrder(obscureId);
     }

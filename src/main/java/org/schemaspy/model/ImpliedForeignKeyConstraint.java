@@ -19,16 +19,18 @@
  */
 package org.schemaspy.model;
 
+import java.util.List;
+
 /**
  * @author John Currier
  */
 public class ImpliedForeignKeyConstraint extends ForeignKeyConstraint {
     /**
-     * @param parentColumn
-     * @param childColumn
+     * @param parentColumns
+     * @param childColumns
      */
-    public ImpliedForeignKeyConstraint(TableColumn parentColumn, TableColumn childColumn) {
-        super(parentColumn, childColumn);
+    public ImpliedForeignKeyConstraint(List<TableColumn> parentColumns, List<TableColumn> childColumns) {
+        super(parentColumns, childColumns);
     }
 
     /**
@@ -54,13 +56,9 @@ public class ImpliedForeignKeyConstraint extends ForeignKeyConstraint {
     public String toString() {
         StringBuilder buf = new StringBuilder();
 
-        buf.append(getChildTable());
-        buf.append(".");
-        buf.append(toString(getChildColumns()));
+        buf.append(toString(getChildTable(), getChildColumns()));
         buf.append("'s name implies that it's a child of ");
-        buf.append(getParentTable());
-        buf.append(".");
-        buf.append(toString(getParentColumns()));
+        buf.append(toString(getParentTable(), getParentColumns()));
         buf.append(", but it doesn't reference that column.");
         return buf.toString();
     }

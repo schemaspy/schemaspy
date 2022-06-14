@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -73,18 +74,45 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      * found in the system.  One impact of using this constructor is that it will
      * "glue" the two tables together through their columns.
      *
+     * @param parentColumns
+     * @param childColumns
+     */
+    public ForeignKeyConstraint(List<TableColumn> parentColumns, List<TableColumn> childColumns,
+                                int updateRule, int deleteRule) {
+        this(childColumns.get(0).getTable(), null, updateRule, deleteRule);
+
+        for (int i = 0; i < Math.min(childColumns.size(), parentColumns.size()); i++) {
+            TableColumn childColumn = childColumns.get(i);
+            TableColumn parentColumn = parentColumns.get(i);
+            addChildColumn(childColumn);
+            addParentColumn(parentColumn);
+            childColumn.addParent(parentColumn, this);
+            parentColumn.addChild(childColumn, this);
+        }
+    }
+
+    /**
+     * Same as {@link #ForeignKeyConstraint(List, List, int, int)},
+     * but defaults updateRule and deleteRule to
+     * {@link java.sql.DatabaseMetaData#importedKeyNoAction}.
+     *
+     * @param parentColumns
+     * @param childColumns
+     */
+    public ForeignKeyConstraint(List<TableColumn> parentColumns, List<TableColumn> childColumns) {
+        this(parentColumns, childColumns, importedKeyNoAction, importedKeyNoAction);
+    }
+
+    /**
+     * Same as {@link #ForeignKeyConstraint(List, List, int, int)},
+     * but with single-column foreign/primary keys
+     *
      * @param parentColumn
      * @param childColumn
      */
     public ForeignKeyConstraint(TableColumn parentColumn, TableColumn childColumn,
                                 int updateRule, int deleteRule) {
-        this(childColumn.getTable(), null, updateRule, deleteRule);
-
-        addChildColumn(childColumn);
-        addParentColumn(parentColumn);
-
-        childColumn.addParent(parentColumn, this);
-        parentColumn.addChild(childColumn, this);
+        this(Arrays.asList(parentColumn), Arrays.asList(childColumn), updateRule, deleteRule);
     }
 
     /**
@@ -328,10 +356,25 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      * @param columns
      * @return
      */
-    public static String toString(List<TableColumn> columns) {
-        if (columns.size() == 1)
-            return columns.iterator().next().toString();
-        return columns.toString();
+    public static String toString(Table table, List<TableColumn> columns) {
+        StringBuilder buf = new StringBuilder();
+        if (table.isRemote()) {
+            buf.append(table.getContainer());
+            buf.append('.');
+        }
+        buf.append(table.getName());
+        buf.append('.');
+        if (columns.size() > 1)
+            buf.append('[');
+        for (int i = 0; i < columns.size(); i++) {
+            buf.append(columns.get(i).toString());
+            if (i != columns.size() - 1) {
+                buf.append(", ");
+            }
+        }
+        if (columns.size() > 1)
+            buf.append(']');
+        return buf.toString();
     }
 
     /**
@@ -342,17 +385,9 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(childTable.getName());
-        buf.append('.');
-        buf.append(toString(childColumns));
+        buf.append(toString(childTable, childColumns));
         buf.append(" references ");
-        if (parentTable.isRemote()) {
-            buf.append(parentTable.getContainer());
-            buf.append('.');
-        }
-        buf.append(parentTable.getName());
-        buf.append('.');
-        buf.append(toString(parentColumns));
+        buf.append(toString(parentTable, parentColumns));
         if (name != null) {
             buf.append(" via ");
             buf.append(name);
