@@ -59,7 +59,7 @@ public class DotNode implements Node {
     private static final String TABLES_PATH = "/tables/"; //NOSONAR
 
     private final Table table;
-    private final String path;
+    private final boolean fromRoot;
     private final DotNodeConfig config;
     private final DotConfig dotConfig;
     private final String lineSeparator = System.getProperty("line.separator");
@@ -69,21 +69,10 @@ public class DotNode implements Node {
 
     public DotNode(Table table, boolean fromRoot, DotNodeConfig config, DotConfig dotConfig) {
         this.table = table;
+        this.fromRoot = fromRoot;
         this.config = config;
         this.dotConfig = dotConfig;
-        this.path = createPath(fromRoot);
         this.columnSpan = config.showColumnDetails ? "COLSPAN=\"2\" " : "COLSPAN=\"3\" ";
-    }
-
-    private String createPath(boolean fromRoot) {
-        if (dotConfig.useRelativeLinks()) {
-            return (table.isRemote() ? "../../../" + new FileNameGenerator().generate(table.getContainer()) : "../..") + TABLES_PATH;
-        }
-        if (fromRoot) {
-            return (table.isRemote() ? ("../" + new FileNameGenerator().generate(table.getContainer()) + TABLES_PATH) : "tables/");
-        }
-        return (table.isRemote() ? ("../../" + new FileNameGenerator().generate(table.getContainer()) + TABLES_PATH) : "");
-
     }
 
     public void setShowImplied(boolean showImplied) {
@@ -130,13 +119,21 @@ public class DotNode implements Node {
 
         buf.append("    </TABLE>>" + lineSeparator);
         if (!table.isRemote() || dotConfig.isOneOfMultipleSchemas()) {
-            buf.append("    URL=\"" + path + urlEncodeLink(new FileNameGenerator().generate(tableName)) + ".html\"" + lineSeparator);
+            buf.append("    URL=\"" + path() + urlEncodeLink(new FileNameGenerator().generate(tableName)) + ".html\"" + lineSeparator);
             buf.append("    target=\"_top\"" + lineSeparator);
         }
         buf.append("    tooltip=\"" + escapeHtml(fqTableName) + "\"" + lineSeparator);
         buf.append("  ];");
 
         return buf.toString();
+    }
+
+    private String path() {
+        if (fromRoot) {
+            return (table.isRemote() ? ("../" + new FileNameGenerator().generate(table.getContainer()) + TABLES_PATH) : "tables/");
+        }
+        return (table.isRemote() ? ("../../" + new FileNameGenerator().generate(table.getContainer()) + TABLES_PATH) : "");
+
     }
 
     private String columnsToString() {
@@ -202,9 +199,9 @@ public class DotNode implements Node {
         buf.append("<TR ALIGN=\"LEFT\">");
         buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"15\" HEIGHT=\"16\">");
         if (column.isPrimary()) {
-            buf.append("<IMG SRC=\"../../images/primaryKeys.png\"/>");
+            buf.append("<IMG SRC=\""+ imagePath() + "primaryKeys.png\"/>");
         } else if (column.isForeignKey()) {
-            buf.append("<IMG SRC=\"../../images/foreignKeys.png\"/>");
+            buf.append("<IMG SRC=\""+ imagePath() +"foreignKeys.png\"/>");
         }
         buf.append(Html.TD_END);
         buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxWidth + "\" HEIGHT=\"16\">");
@@ -228,6 +225,10 @@ public class DotNode implements Node {
         }
         buf.append(Html.TR_END + lineSeparator);
         return buf.toString();
+    }
+
+    private String imagePath() {
+        return fromRoot ? "images/" : "../images/";
     }
 
     private String tableToString() {

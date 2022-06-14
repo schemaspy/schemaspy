@@ -32,10 +32,10 @@
                                         {{/hasOnlyImpliedRelationships}}{{/isImplied}}
                                         {{{map}}}
                                         {{#isEmbed}}
-                                        <a name='diagram'><object type="image/svg+xml" id="{{id}}" data="diagrams/summary/{{fileName}}" class="diagram" border="0" align="left"></object></a>
+                                        <a name='diagram'><object type="image/svg+xml" id="{{id}}" data="{{fileName}}" class="diagram" border="0" align="left"></object></a>
                                         {{/isEmbed}}
                                         {{^isEmbed}}
-                                        <a name='diagram'><img id="{{id}}" src="diagrams/summary/{{fileName}}" usemap="#{{mapName}}" class="diagram" border="0" align="left"></a>
+                                        <a name='diagram'><img id="{{id}}" src="{{fileName}}" usemap="#{{mapName}}" class="diagram" border="0" align="left"></a>
                                         {{/isEmbed}}
                                     </div>
                                     {{/diagrams}}

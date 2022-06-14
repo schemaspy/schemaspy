@@ -23,7 +23,6 @@ class OrphanGraphTest {
                                 new TestFontConfig(),
                                 true,
                                 false,
-                                false,
                                 false
                         ),
                         Arrays.asList(mockView(),realTable(), mockNotOrphan())
