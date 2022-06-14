@@ -96,11 +96,16 @@ public class SchemaAnalyzer {
 
     private final OutputProducer outputProducer;
 
-    public SchemaAnalyzer(SqlService sqlService, CommandLineArguments commandLineArguments) {
+    public SchemaAnalyzer(
+            final SqlService sqlService,
+            final DatabaseServiceFactory databaseServiceFactory,
+            final CommandLineArguments commandLineArguments,
+            final OutputProducer outputProducer
+    ) {
         this.sqlService = Objects.requireNonNull(sqlService);
-        this.databaseServiceFactory = new DatabaseServiceFactory(sqlService);
+        this.databaseServiceFactory = databaseServiceFactory;
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
-        outputProducer = new XmlProducerUsingDOM();
+        this.outputProducer = outputProducer;
     }
 
     public Database analyze(Config config) throws SQLException, IOException {
