@@ -94,13 +94,13 @@ public class SchemaAnalyzer {
 
     private final CommandLineArguments commandLineArguments;
 
-    private final List<OutputProducer> outputProducers = new ArrayList<>();
+    private final OutputProducer outputProducer;
 
     public SchemaAnalyzer(SqlService sqlService, CommandLineArguments commandLineArguments) {
         this.sqlService = Objects.requireNonNull(sqlService);
         this.databaseServiceFactory = new DatabaseServiceFactory(sqlService);
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
-        outputProducers.add(new XmlProducerUsingDOM());
+        outputProducer = new XmlProducerUsingDOM();
     }
 
     public Database analyze(Config config) throws SQLException, IOException {
@@ -252,18 +252,15 @@ public class SchemaAnalyzer {
                 generateHtmlDoc(config, commandLineArguments.useVizJS() , progressListener, outputDir, db, duration, tables);
             }
 
-            outputProducers.forEach(
-                    outputProducer -> {
-                        try {
-                            outputProducer.generate(db, outputDir);
-                        } catch (OutputException oe) {
-                            if (config.isOneOfMultipleSchemas()) {
-                                LOGGER.warn("Failed to produce output", oe);
-                            } else {
-                                throw oe;
-                            }
-                        }
-                    });
+            try {
+                outputProducer.generate(db, outputDir);
+            } catch (OutputException oe) {
+                if (config.isOneOfMultipleSchemas()) {
+                    LOGGER.warn("Failed to produce output", oe);
+                } else {
+                    throw oe;
+                }
+            }
 
             List<ForeignKeyConstraint> recursiveConstraints = new ArrayList<>();
 
