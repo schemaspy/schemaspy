@@ -100,12 +100,7 @@ public class SchemaAnalyzer {
         this.sqlService = Objects.requireNonNull(sqlService);
         this.databaseServiceFactory = new DatabaseServiceFactory(sqlService);
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
-        addOutputProducer(new XmlProducerUsingDOM());
-    }
-
-    public SchemaAnalyzer addOutputProducer(OutputProducer outputProducer) {
-        outputProducers.add(outputProducer);
-        return this;
+        outputProducers.add(new XmlProducerUsingDOM());
     }
 
     public Database analyze(Config config) throws SQLException, IOException {
