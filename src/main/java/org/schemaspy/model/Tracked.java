@@ -32,75 +32,75 @@ import java.util.Collection;
  */
 public class Tracked implements ProgressListener {
 
-	private long startedAt;
-	private long startedGatheringAt;
-	private long startedConnectingAt;
-	private long startedGraphingSummariesAt;
-	private long startedGraphingDetailsAt;
-	private long finishedAt;
+    private long startedAt;
+    private long startedGatheringAt;
+    private long startedConnectingAt;
+    private long startedGraphingSummariesAt;
+    private long startedGraphingDetailsAt;
+    private long finishedAt;
 
     public Tracked() {
         startedAt = System.currentTimeMillis();
     }
 
-	@Override
-	public long startedGatheringDetails() {
+    @Override
+    public long startedGatheringDetails() {
         startedGatheringAt = System.currentTimeMillis();
         return startedAt - startedGatheringAt;
-	}
+    }
 
-	@Override
-	public void gatheringDetailsProgressed(Table table) { }
+    @Override
+    public void gatheringDetailsProgressed(Table table) { }
 
-	@Override
-	public long startedConnectingTables() {
+    @Override
+    public long startedConnectingTables() {
         startedConnectingAt = System.currentTimeMillis();
         return startedConnectingAt - startedGatheringAt;
-	}
+    }
 
-	@Override
-	public void connectingTablesProgressed(Table table) { }
+    @Override
+    public void connectingTablesProgressed(Table table) { }
 
-	@Override
-	public long startedGraphingSummaries() {
+    @Override
+    public long startedGraphingSummaries() {
         startedGraphingSummariesAt = System.currentTimeMillis();
         return startedGraphingSummariesAt - startedConnectingAt;
-	}
+    }
 
-	@Override
-	public void graphingSummaryProgressed() { }
+    @Override
+    public void graphingSummaryProgressed() { }
 
-	@Override
-	public long startedGraphingDetails() {
-		startedGraphingDetailsAt = System.currentTimeMillis();
-		return startedGraphingDetailsAt - startedGraphingSummariesAt;
-	}
+    @Override
+    public long startedGraphingDetails() {
+        startedGraphingDetailsAt = System.currentTimeMillis();
+        return startedGraphingDetailsAt - startedGraphingSummariesAt;
+    }
 
-	@Override
-	public void graphingDetailsProgressed(Table table) { }
+    @Override
+    public void graphingDetailsProgressed(Table table) { }
 
-	@Override
-	public long finishedGatheringDetails() {
-		finishedAt = System.currentTimeMillis();
-		return finishedAt - startedGraphingDetailsAt;
-	}
+    @Override
+    public long finishedGatheringDetails() {
+        finishedAt = System.currentTimeMillis();
+        return finishedAt - startedGraphingDetailsAt;
+    }
 
-	@Override
-	public long finished(Collection<Table> tables, Config config) {
-		finishedAt = System.currentTimeMillis();
-		return finishedAt - startedAt;
-	}
+    @Override
+    public long finished(Collection<Table> tables, Config config) {
+        finishedAt = System.currentTimeMillis();
+        return finishedAt - startedAt;
+    }
 
-	@Override
-	public String recoverableExceptionEncountered(String msg, Exception exc, String sql) {
+    @Override
+    public String recoverableExceptionEncountered(String msg, Exception exc, String sql) {
         System.out.println();
         System.out.flush();
 
         String text = msg + ": " + exc;
         if (sql != null) {
-        	text += ": " + sql;
+            text += ": " + sql;
         }
 
         return text;
-	}
+    }
 }
