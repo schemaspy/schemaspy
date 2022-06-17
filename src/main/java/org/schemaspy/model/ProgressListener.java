@@ -27,7 +27,6 @@ import java.util.Collection;
  * Listener of schema analysis and ERD generation progress.
  * Overall intent is to allow various views to render progress details appropriately.
  *
- * @see ConsoleProgressListener
  * @author John Currier
  */
 public interface ProgressListener {

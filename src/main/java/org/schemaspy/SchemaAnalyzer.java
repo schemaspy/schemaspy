@@ -38,6 +38,7 @@ import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.model.*;
+import org.schemaspy.model.Console;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.diagram.Renderer;
@@ -53,7 +54,6 @@ import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramFactory
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
 import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
 import org.schemaspy.output.html.mustache.diagrams.OrphanDiagram;
-import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.util.*;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
@@ -109,11 +109,12 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze(Config config) throws SQLException, IOException {
+        ProgressListener progressListener = new Tracked();
         // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
         // and not already logging fine details (to keep from obfuscating those)
-
-        boolean render = commandLineArguments.isHtmlEnabled();
-        ProgressListener progressListener = new ConsoleProgressListener(render, commandLineArguments);
+        if (commandLineArguments.isHtmlEnabled()) {
+            progressListener = new Console(commandLineArguments, progressListener);
+        }
 
         // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
         List<String> schemas = config.getSchemas();
