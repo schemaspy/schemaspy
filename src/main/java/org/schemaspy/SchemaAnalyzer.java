@@ -115,12 +115,9 @@ public class SchemaAnalyzer {
         if (commandLineArguments.isHtmlEnabled()) {
             progressListener = new Console(commandLineArguments, progressListener);
         }
-
-        // if -all(evaluteAll) or -schemas given then analyzeMultipleSchemas
-        List<String> schemas = config.getSchemas();
-        if (schemas != null || config.isEvaluateAllEnabled()) {
-            // set flag which later on used for generation rootPathtoHome link.
-            config.setOneOfMultipleSchemas(true);
+        
+        if (config.isEvaluateAllEnabled() || config.getSchemas() != null) {
+            config.setOneOfMultipleSchemas(true); // used later for generation rootPathtoHome link.
             return this.analyzeMultipleSchemas(config, databaseServiceFactory.simple(config), progressListener);
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
