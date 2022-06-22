@@ -18,11 +18,20 @@
  */
 package org.schemaspy.integrationtesting.h2;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -31,81 +40,56 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.testing.H2MemoryRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class H2PrimaryKeySeqnoIT {
 
-    @ClassRule
-    public static H2MemoryRule h2MemoryRule = new H2MemoryRule("pkorder").addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/pkordering.sql");
+	@ClassRule
+	public static H2MemoryRule h2MemoryRule = new H2MemoryRule("pkorder")
+			.addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/pkordering.sql");
 
-    @Autowired
-    private SqlService sqlService;
+	private SqlService sqlService;
 
-    @Mock
-    private ProgressListener progressListener;
+	@Mock
+	private ProgressListener progressListener;
 
-    @MockBean
-    private CommandLineArguments arguments;
+	@Mock
+	private CommandLineArguments arguments;
 
-    @MockBean
-    private CommandLineRunner commandLineRunner;
+	private static Database database;
 
-    private static Database database;
+	@Before
+	public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
+		MockitoAnnotations.openMocks(this);
+		sqlService = new SqlService();
+		if (database == null) {
+			doCreateDatabaseRepresentation();
+		}
+	}
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
+	private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "src/test/resources/integrationTesting/dbTypes/h2memory", "-db", "pkorder", "-s",
+				"pkorder", "-o", "target/testout/integrationtesting/h2/pkorder", "-u", "sa" };
+		given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/h2/pkorder"));
+		given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
+		given(arguments.getUser()).willReturn("sa");
+		given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());
+		given(arguments.getSchema()).willReturn(h2MemoryRule.getConnection().getSchema());
+		given(arguments.getDatabaseName()).willReturn("pkorder");
+		Config config = new Config(args);
+		sqlService.connect(config);
+		Database database = new Database(sqlService.getDbmsMeta(), arguments.getDatabaseName(), arguments.getCatalog(),
+				arguments.getSchema());
+		new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+		H2PrimaryKeySeqnoIT.database = database;
+	}
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
-                "-db", "pkorder",
-                "-s", "pkorder",
-                "-o", "target/testout/integrationtesting/h2/pkorder",
-                "-u", "sa"
-        };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/h2/pkorder"));
-        given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
-        given(arguments.getUser()).willReturn("sa");
-        given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());
-        given(arguments.getSchema()).willReturn(h2MemoryRule.getConnection().getSchema());
-        given(arguments.getDatabaseName()).willReturn("pkorder");
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
-        H2PrimaryKeySeqnoIT.database = database;
-    }
-
-    @Test
-    public void primaryKeysShouldBeInCorrectOrder() {
-        List<String> pkcolumnNames = database.getTablesMap().get("TABLE1").getPrimaryColumns().stream().map(TableColumn::getName).collect(Collectors.toList());
-        assertThat(pkcolumnNames).containsExactly("ZZ", "AA", "BB");
-    }
+	@Test
+	public void primaryKeysShouldBeInCorrectOrder() {
+		List<String> pkcolumnNames = database.getTablesMap().get("TABLE1").getPrimaryColumns().stream()
+				.map(TableColumn::getName).collect(Collectors.toList());
+		assertThat(pkcolumnNames).containsExactly("ZZ", "AA", "BB");
+	}
 }

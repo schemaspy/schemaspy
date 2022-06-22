@@ -198,10 +198,20 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
+            <!-- Without Spring Boot this must be explicit -->
+            <version>2.2</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <!-- Without Spring Boot this must be explicit -->
+            <version>4.6.1</version>
+        </dependency>
+        <!-- Necessary for Mockito -->
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.12.10</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -237,6 +247,9 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
+            <!-- Without Spring Boot this must be explicit -->
+            <!-- 2.1.2xx is available but tests will fail because tables are not created. -->
+            <version>1.4.200</version>
         </dependency>
         <dependency>
             <groupId>com.beust</groupId>

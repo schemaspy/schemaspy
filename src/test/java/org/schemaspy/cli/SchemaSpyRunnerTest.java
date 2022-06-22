@@ -18,72 +18,75 @@
  */
 package org.schemaspy.cli;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.Config;
-import org.schemaspy.SchemaAnalyzer;
-import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.EmptySchemaException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.IOException;
-import java.sql.SQLException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.schemaspy.Config;
+import org.schemaspy.SchemaAnalyzer;
+import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.EmptySchemaException;
+import org.springframework.boot.logging.LoggingSystem;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SchemaSpyRunnerTest {
 
-    private static final String[] args = {
-            "-t","mysql",
-            "-o","target/tmp",
-            "-sso"};
+	private static final String[] args = { "-t", "mysql", "-o", "target/tmp", "-sso" };
 
-    @MockBean
-    private SchemaAnalyzer schemaAnalyzer;
+	@Mock
+	private SchemaAnalyzer schemaAnalyzer;
 
-    @Autowired
-    private SchemaSpyRunner schemaSpyRunner;
+	@Test
+	@DirtiesContext
+	public void ioExceptionExitCode_1() throws IOException, SQLException {
+		final SchemaSpyRunner schemaSpyRunner = createRunner();
+		when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new IOException("file permission error"));
+		schemaSpyRunner.run(args);
+		assertThat(schemaSpyRunner.getExitCode()).isEqualTo(1);
+	}
 
-    @Test
-    @DirtiesContext
-    public void ioExceptionExitCode_1() throws IOException, SQLException {
-        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new IOException("file permission error"));
-        schemaSpyRunner.run(args);
-        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(1);
-    }
+	@Test
+	@DirtiesContext
+	public void emptySchemaExitCode_2() throws IOException, SQLException {
+		final SchemaSpyRunner schemaSpyRunner = createRunner();
+		when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new EmptySchemaException());
+		schemaSpyRunner.run(args);
+		assertThat(schemaSpyRunner.getExitCode()).isEqualTo(2);
+	}
 
-    @Test
-    @DirtiesContext
-    public void emptySchemaExitCode_2() throws IOException, SQLException {
-        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new EmptySchemaException());
-        schemaSpyRunner.run(args);
-        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(2);
-    }
+	@Test
+	@DirtiesContext
+	public void connectionFailureExitCode_3() throws IOException, SQLException {
+		final SchemaSpyRunner schemaSpyRunner = createRunner();
+		when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new ConnectionFailure("failed to connect"));
+		schemaSpyRunner.run(args);
+		assertThat(schemaSpyRunner.getExitCode()).isEqualTo(3);
+	}
 
-    @Test
-    @DirtiesContext
-    public void connectionFailureExitCode_3() throws IOException, SQLException {
-        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new ConnectionFailure("failed to connect"));
-        schemaSpyRunner.run(args);
-        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(3);
-    }
+	@Test
+	@DirtiesContext
+	public void returnsNoneNullExitCode_0() throws IOException, SQLException {
+		final SchemaSpyRunner schemaSpyRunner = createRunner();
+		Database database = mock(Database.class);
+		when(schemaAnalyzer.analyze(any(Config.class))).thenReturn(database);
+		schemaSpyRunner.run(args);
+		assertThat(schemaSpyRunner.getExitCode()).isEqualTo(0);
+	}
 
-    @Test
-    @DirtiesContext
-    public void returnsNoneNullExitCode_0() throws IOException, SQLException {
-        Database database = mock(Database.class);
-        when(schemaAnalyzer.analyze(any(Config.class))).thenReturn(database);
-        schemaSpyRunner.run(args);
-        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(0);
-    }
+	private SchemaSpyRunner createRunner() {
+		return new SchemaSpyRunner(Mockito.mock(LoggingSystem.class), ctx -> schemaAnalyzer);
+	}
 }
