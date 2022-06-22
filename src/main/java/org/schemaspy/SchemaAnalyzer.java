@@ -61,7 +61,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -174,7 +173,7 @@ public class SchemaAnalyzer {
                 mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
             }
 
-            prepareLayoutFiles(outputDir);
+            new LayoutFiles(SchemaAnalyzer.class.getClassLoader(), notHtml(), outputDir).prepare();
             DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
             MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config, dataTableConfig);
             HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
@@ -310,7 +309,7 @@ public class SchemaAnalyzer {
 
         markDownRegistryPages(tables);
 
-        prepareLayoutFiles(outputDir);
+        new LayoutFiles(SchemaAnalyzer.class.getClassLoader(), notHtml(), outputDir).prepare();
         Renderer renderer = useVizJS ? new VizJSDot() : new GraphvizDot(commandLineArguments.getGraphVizConfig());
 
         Path htmlInfoFile = outputDir.toPath().resolve("info-html.txt");
@@ -454,25 +453,9 @@ public class SchemaAnalyzer {
                 });
     }
 
-    /**
-     * This method is responsible to copy layout folder to destination directory and not copy template .html files
-     *
-     * @param outputDir File
-     * @throws IOException when not possible to copy layout files to outputDir
-     */
-    private static void prepareLayoutFiles(File outputDir) throws IOException {
-        URL url = null;
-        Enumeration<URL> possibleResources = SchemaAnalyzer.class.getClassLoader().getResources("layout");
-        while (possibleResources.hasMoreElements() && Objects.isNull(url)) {
-            URL possibleResource = possibleResources.nextElement();
-            if (!possibleResource.getPath().contains("test-classes")) {
-                url = possibleResource;
-            }
-        }
-
+    private FileFilter notHtml() {
         IOFileFilter notHtmlFilter = FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter(DOT_HTML));
-        FileFilter filter = FileFilterUtils.and(notHtmlFilter);
-        ResourceWriter.copyResources(url, outputDir, filter);
+        return FileFilterUtils.and(notHtmlFilter);
     }
 
     private static void writeInfo(String key, String value, Path infoFile) {
