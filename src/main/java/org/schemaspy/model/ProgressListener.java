@@ -63,13 +63,4 @@ public interface ProgressListener {
 	 * @return overall duration duration in milliseconds
 	 */
 	long finished(Collection<Table> tables, Config config);
-
-	/**
-	 * Ran into a recoverable exception. Returns a string to be logged or <code>null</code> if it shouldn't be logged.
-	 * @param msg
-	 * @param exc
-	 * @param sql
-	 * @return
-	 */
-	public String recoverableExceptionEncountered(String msg, Exception exc, String sql);
 }

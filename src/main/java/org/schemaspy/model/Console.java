@@ -100,9 +100,4 @@ public class Console implements ProgressListener {
         System.out.println("View the results by opening " + new File(commandLineArguments.getOutputDirectory(), "index.html"));
         return result;
     }
-
-    @Override
-    public String recoverableExceptionEncountered(String msg, Exception exc, String sql) {
-        return origin.recoverableExceptionEncountered(msg, exc, sql);
-    }
 }
