@@ -90,17 +90,4 @@ public class Tracked implements ProgressListener {
         finishedAt = System.currentTimeMillis();
         return finishedAt - startedAt;
     }
-
-    @Override
-    public String recoverableExceptionEncountered(String msg, Exception exc, String sql) {
-        System.out.println();
-        System.out.flush();
-
-        String text = msg + ": " + exc;
-        if (sql != null) {
-            text += ": " + sql;
-        }
-
-        return text;
-    }
 }
