@@ -36,7 +36,6 @@ import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.ExitCodeGenerator;
 
 import com.beust.jcommander.IDefaultProvider;
 import com.beust.jcommander.ParameterException;
@@ -44,7 +43,7 @@ import com.beust.jcommander.ParameterException;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 
-public class SchemaSpyRunner implements ExitCodeGenerator {
+public class SchemaSpyRunner {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -138,7 +137,6 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
 		}
 	}
 
-	@Override
 	public int getExitCode() {
 		return exitCode;
 	}

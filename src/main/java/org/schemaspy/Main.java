@@ -31,7 +31,6 @@ import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.logging.StackTraceOmitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author John Currier
@@ -42,7 +41,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-@SpringBootApplication
 public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

@@ -43,7 +43,6 @@ import org.schemaspy.integrationtesting.MssqlServerSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.containers.MSSQLContainer;
 
 import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
@@ -54,7 +53,6 @@ import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
  */
 public class MSSQLServerCommentsIT {
 
-	@Autowired
 	private SqlService sqlService = new SqlService();
 
 	@Mock
