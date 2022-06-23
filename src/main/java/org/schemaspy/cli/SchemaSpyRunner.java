@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -36,11 +37,12 @@ import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ExitCodeGenerator;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
 
 import com.beust.jcommander.IDefaultProvider;
 import com.beust.jcommander.ParameterException;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 
 public class SchemaSpyRunner implements ExitCodeGenerator {
 
@@ -54,19 +56,16 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
 
 	private final ContextFixture fixture = new ContextFixture();
 
-	private LoggingSystem loggingSystem;
-
 	private int exitCode = EXIT_CODE_OK;
 
 	private final Function<ContextFixture, SchemaAnalyzer> analyzerFactory;
 
-	public SchemaSpyRunner(LoggingSystem loggingSystem) {
-		this(loggingSystem, ctx -> new SchemaAnalyzer(ctx.sqlService(), new DatabaseServiceFactory(ctx.sqlService()),
+	public SchemaSpyRunner() {
+		this(ctx -> new SchemaAnalyzer(ctx.sqlService(), new DatabaseServiceFactory(ctx.sqlService()),
 				ctx.commandLineArguments(), new XmlProducerUsingDOM()));
 	}
 
-	public SchemaSpyRunner(LoggingSystem loggingSystem, Function<ContextFixture, SchemaAnalyzer> analyzerFactory) {
-		this.loggingSystem = loggingSystem;
+	public SchemaSpyRunner(Function<ContextFixture, SchemaAnalyzer> analyzerFactory) {
 		this.analyzerFactory = analyzerFactory;
 	}
 
@@ -102,7 +101,11 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
 	}
 
 	public void enableDebug() {
-		loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
+		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+		List<ch.qos.logback.classic.Logger> loggerList = loggerContext.getLoggerList();
+		loggerList.stream().filter(logger -> "org.schemaspy".equals(logger.getName())).findFirst()
+				.ifPresent(logger -> logger.setLevel(Level.DEBUG));
+
 		LOGGER.debug("Debug enabled");
 	}
 

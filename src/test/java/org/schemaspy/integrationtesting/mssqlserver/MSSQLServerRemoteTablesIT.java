@@ -18,14 +18,24 @@
  */
 package org.schemaspy.integrationtesting.mssqlserver;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+
+import javax.script.ScriptException;
+
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.IntegrationTestFixture;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -33,84 +43,59 @@ import org.schemaspy.integrationtesting.MssqlServerSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MSSQLContainer;
 
-import javax.script.ScriptException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Rafal Kasa
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class MSSQLServerRemoteTablesIT {
-    @Autowired
-    private SqlService sqlService;
 
-    @Mock
-    private ProgressListener progressListener;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	private IntegrationTestFixture fixture;
 
-    private static Database database;
+	private static Database database;
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MSSQLContainer>(
-                    MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_remote_tables.sql")
-            );
+	@SuppressWarnings("unchecked")
+	@ClassRule
+	public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule = new SuiteOrTestJdbcContainerRule<MSSQLContainer>(
+			MssqlServerSuite.jdbcContainerRule,
+			new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME)).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent())
+					.withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_remote_tables.sql"));
 
-    @Before
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            createDatabaseRepresentation();
-        }
-    }
+	@Before
+	public synchronized void gatheringSchemaDetailsTest()
+			throws SQLException, IOException, ScriptException, URISyntaxException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			createDatabaseRepresentation();
+		}
+	}
 
-    private void createDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "mssql17",
-                "-db", "ACME",
-                "-o", "target/testout/integrationtesting/mssql/remote_table",
-                "-u", "schemaspy",
-                "-p", "qwerty123!",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(1433).toString()
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        DatabaseMetaData databaseMetaData = sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                databaseMetaData.getConnection().getCatalog(),
-                databaseMetaData.getConnection().getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
-        MSSQLServerRemoteTablesIT.database = database;
-    }
+	private void createDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "mssql17", "-db", "ACME", "-o", "target/testout/integrationtesting/mssql/remote_table",
+				"-u", "schemaspy", "-p", "qwerty123!", "-host",
+				jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getMappedPort(1433).toString() };
+		fixture = IntegrationTestFixture.fromArgs(args);
+		CommandLineArguments arguments = fixture.commandLineArguments();
+		final SqlService sqlService = fixture.sqlService();
 
-    @Test
-    public void databaseShouldHaveZeroRemoteTables() {
-        assertThat(database.getRemoteTables()).isEmpty();
-    }
+		Config config = new Config(args);
+		DatabaseMetaData databaseMetaData = sqlService.connect(config);
+		Database database = new Database(sqlService.getDbmsMeta(), arguments.getDatabaseName(),
+				databaseMetaData.getConnection().getCatalog(), databaseMetaData.getConnection().getSchema());
+		new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+		MSSQLServerRemoteTablesIT.database = database;
+	}
+
+	@Test
+	public void databaseShouldHaveZeroRemoteTables() {
+		assertThat(database.getRemoteTables()).isEmpty();
+	}
 }

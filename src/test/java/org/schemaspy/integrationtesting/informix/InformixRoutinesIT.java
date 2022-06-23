@@ -18,16 +18,22 @@
  */
 package org.schemaspy.integrationtesting.informix;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.function.Supplier;
+
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.IntegrationTestFixture;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -36,98 +42,74 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.schemaspy.testing.SQLScriptsRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.InformixContainer;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.function.Supplier;
-
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class InformixRoutinesIT {
-    @Autowired
-    private SqlService sqlService;
 
-    @Mock
-    private ProgressListener progressListener;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	private IntegrationTestFixture fixture;
 
-    private static Database database;
+	private static Database database;
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
+	public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
 
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
-            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitFunctions(new SQLScriptsRunner("integrationTesting/informix/dbScripts/informixroutines.sql", "\n\n\n"));
+	@SuppressWarnings("unchecked")
+	public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule = new JdbcContainerRule<>(
+			(Supplier<InformixContainer<?>>) InformixContainer::new).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent()).withInitFunctions(new SQLScriptsRunner(
+							"integrationTesting/informix/dbScripts/informixroutines.sql", "\n\n\n"));
 
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
+	@ClassRule
+	public static final TestRule chain = RuleChain.outerRule(jdbcContainerRule).around(jdbcDriverClassPresentRule);
 
-    @Before
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
-        if (database == null) {
-            createDatabaseRepresentation();
-        }
-    }
+	@Before
+	public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			createDatabaseRepresentation();
+		}
+	}
 
-    private void createDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "informix",
-                "-db", "test",
-                "-s", "informix",
-                "-cat", "test",
-                "-server", "dev",
-                "-o", "target/testout/integrationtesting/informix/routines",
-                "-u", jdbcContainerRule.getContainer().getUsername(),
-                "-p", jdbcContainerRule.getContainer().getPassword(),
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getJdbcPort().toString()
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
-        InformixRoutinesIT.database = database;
-    }
+	private void createDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "informix", "-db", "test", "-s", "informix", "-cat", "test", "-server", "dev", "-o",
+				"target/testout/integrationtesting/informix/routines", "-u",
+				jdbcContainerRule.getContainer().getUsername(), "-p", jdbcContainerRule.getContainer().getPassword(),
+				"-host", jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getJdbcPort().toString() };
+		fixture = IntegrationTestFixture.fromArgs(args);
+		CommandLineArguments arguments = fixture.commandLineArguments();
+		final SqlService sqlService = fixture.sqlService();
 
-    @Test
-    public void databaseShouldBePopulatedWithTableTest() {
-        Table table = getTable("test");
-        assertThat(table).isNotNull();
-    }
+		Config config = new Config(args);
+		sqlService.connect(config);
+		Database database = new Database(sqlService.getDbmsMeta(), arguments.getDatabaseName(), arguments.getCatalog(),
+				arguments.getSchema());
+		new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+		InformixRoutinesIT.database = database;
+	}
 
-    @Test
-    public void databaseShouldHaveCompleteRoutineDefinition() {
-        String expecting = "CREATE FUNCTION gc_comb(partial1 LVARCHAR, partial2 LVARCHAR) RETURNING LVARCHAR; IF partial1 IS NULL OR partial1 = '' THEN RETURN partial2; ELIF partial2 IS NULL OR partial2 = '' THEN RETURN partial1; ELSE RETURN partial1 || ',' || partial2; END IF; END FUNCTION;";
-        String actual = database.getRoutinesMap().get("gc_comb(lvarchar,lvarchar)").getDefinition().replaceAll("(\r\n|\r|\n)", " ").replaceAll("\\s\\s+", " ");
-        assertThat(actual).isEqualToIgnoringCase(expecting);
-    }
+	@Test
+	public void databaseShouldBePopulatedWithTableTest() {
+		Table table = getTable("test");
+		assertThat(table).isNotNull();
+	}
 
-    private Table getTable(String tableName) {
-        return database.getTablesMap().get(tableName);
-    }
+	@Test
+	public void databaseShouldHaveCompleteRoutineDefinition() {
+		String expecting = "CREATE FUNCTION gc_comb(partial1 LVARCHAR, partial2 LVARCHAR) RETURNING LVARCHAR; IF partial1 IS NULL OR partial1 = '' THEN RETURN partial2; ELIF partial2 IS NULL OR partial2 = '' THEN RETURN partial1; ELSE RETURN partial1 || ',' || partial2; END IF; END FUNCTION;";
+		String actual = database.getRoutinesMap().get("gc_comb(lvarchar,lvarchar)").getDefinition()
+				.replaceAll("(\r\n|\r|\n)", " ").replaceAll("\\s\\s+", " ");
+		assertThat(actual).isEqualToIgnoringCase(expecting);
+	}
+
+	private Table getTable(String tableName) {
+		return database.getTablesMap().get(tableName);
+	}
 }

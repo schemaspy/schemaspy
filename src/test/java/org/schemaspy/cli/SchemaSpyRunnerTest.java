@@ -26,22 +26,16 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.schemaspy.Config;
 import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
-import org.springframework.boot.logging.LoggingSystem;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class SchemaSpyRunnerTest {
 
 	private static final String[] args = { "-t", "mysql", "-o", "target/tmp", "-sso" };
@@ -49,8 +43,12 @@ public class SchemaSpyRunnerTest {
 	@Mock
 	private SchemaAnalyzer schemaAnalyzer;
 
+	@Before
+	public void initMocks() {
+		MockitoAnnotations.openMocks(this);
+	}
+
 	@Test
-	@DirtiesContext
 	public void ioExceptionExitCode_1() throws IOException, SQLException {
 		final SchemaSpyRunner schemaSpyRunner = createRunner();
 		when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new IOException("file permission error"));
@@ -59,7 +57,6 @@ public class SchemaSpyRunnerTest {
 	}
 
 	@Test
-	@DirtiesContext
 	public void emptySchemaExitCode_2() throws IOException, SQLException {
 		final SchemaSpyRunner schemaSpyRunner = createRunner();
 		when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new EmptySchemaException());
@@ -68,7 +65,6 @@ public class SchemaSpyRunnerTest {
 	}
 
 	@Test
-	@DirtiesContext
 	public void connectionFailureExitCode_3() throws IOException, SQLException {
 		final SchemaSpyRunner schemaSpyRunner = createRunner();
 		when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new ConnectionFailure("failed to connect"));
@@ -77,7 +73,6 @@ public class SchemaSpyRunnerTest {
 	}
 
 	@Test
-	@DirtiesContext
 	public void returnsNoneNullExitCode_0() throws IOException, SQLException {
 		final SchemaSpyRunner schemaSpyRunner = createRunner();
 		Database database = mock(Database.class);
@@ -87,6 +82,6 @@ public class SchemaSpyRunnerTest {
 	}
 
 	private SchemaSpyRunner createRunner() {
-		return new SchemaSpyRunner(Mockito.mock(LoggingSystem.class), ctx -> schemaAnalyzer);
+		return new SchemaSpyRunner(ctx -> schemaAnalyzer);
 	}
 }

@@ -18,48 +18,38 @@
  */
 package org.schemaspy.logging;
 
-import ch.qos.logback.classic.PatternLayout;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ch.qos.logback.classic.pattern.ThrowableProxyConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.CoreConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationStartingEvent;
-import org.springframework.context.ApplicationListener;
-
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Nils Petzaell
  */
-public class StackTraceOmitter extends ThrowableProxyConverter implements ApplicationListener<ApplicationStartingEvent> { //NOSONAR
+public class StackTraceOmitter extends ThrowableProxyConverter { // NOSONAR
 
-    private static final Logger SCHEMA_SPY_LOGGER = LoggerFactory.getLogger("org.schemaspy");
+	private static final Logger SCHEMA_SPY_LOGGER = LoggerFactory.getLogger("org.schemaspy");
 
-    private static AtomicBoolean omittedStackTrace = new AtomicBoolean(false);
+	private static AtomicBoolean omittedStackTrace = new AtomicBoolean(false);
 
-    public void register() {
-        PatternLayout.defaultConverterMap.put("debugEx", StackTraceOmitter.class.getName());
-    }
+	public static boolean hasOmittedStackTrace() {
+		return omittedStackTrace.get();
+	}
 
-    public static boolean hasOmittedStackTrace() {
-        return omittedStackTrace.get();
-    }
+	@Override
+	public String convert(ILoggingEvent event) {
+		if (SCHEMA_SPY_LOGGER.isDebugEnabled())
+			return super.convert(event);
+		if (Objects.nonNull(event.getThrowableProxy())) {
+			omittedStackTrace.set(true);
+			return event.getThrowableProxy().getMessage() + CoreConstants.LINE_SEPARATOR;
+		}
+		return CoreConstants.EMPTY_STRING;
+	}
 
-    @Override
-    public String convert(ILoggingEvent event) {
-        if (SCHEMA_SPY_LOGGER.isDebugEnabled())
-            return super.convert(event);
-        if (Objects.nonNull(event.getThrowableProxy())) {
-            omittedStackTrace.set(true);
-            return event.getThrowableProxy().getMessage() + CoreConstants.LINE_SEPARATOR;
-        }
-        return CoreConstants.EMPTY_STRING;
-    }
-
-    @Override
-    public void onApplicationEvent(ApplicationStartingEvent event) {
-        register();
-    }
 }

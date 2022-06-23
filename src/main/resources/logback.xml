@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <conversionRule conversionWord="ex" converterClass="org.schemaspy.logging.StackTraceOmitter" /> 
+    
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-5level - %msg%n%ex</pattern>
+        </encoder>
+    </appender>
+
+	<logger name="org.schemaspy" level="INFO" />
+	
+    <root level="WARN">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

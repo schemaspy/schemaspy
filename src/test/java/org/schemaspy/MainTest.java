@@ -1,41 +1,34 @@
 package org.schemaspy;
 
-import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.testing.ExitCodeRule;
-import org.schemaspy.testing.ResettingOutputCapture;
-import org.springframework.test.context.junit4.SpringRunner;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Paths;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Rule;
+import org.junit.Test;
+import org.schemaspy.testing.ExitCodeRule;
+import org.schemaspy.testing.Logger;
+import org.schemaspy.testing.LoggingRule;
 
-@RunWith(SpringRunner.class)
 public class MainTest {
+	@Rule
+	public LoggingRule loggingRule = new LoggingRule();
 
-    @Rule
-    public ResettingOutputCapture resettingOutputCapture = new ResettingOutputCapture();
+	@Rule
+	public ExitCodeRule exitCodeRule = new ExitCodeRule();
 
-    @Rule
-    public ExitCodeRule exitCodeRule = new ExitCodeRule();
-
-    @Test
-    public void callsSystemExit() {
-        resettingOutputCapture.expect(Matchers.containsString("StackTraces have been omitted"));
-        try {
-            Main.main(
-                    "-t", "mysql",
-                    "-sso",
-                    "-o", "target/tmp",
-                    "-host", "localhost",
-                    "-port", "123154",
-                    "-db", "qwerty",
-                    "--logging.config="+ Paths.get("src","test","resources","logback-debugEx.xml").toString()
-            );
-        } catch (SecurityException ignore) { }
-        assertThat(exitCodeRule.getExitCode()).isEqualTo(3);
-    }
+	@Test
+	@Logger(value = Main.class)
+	public void callsSystemExit() {
+		try {
+			Main.main("-t", "mysql", "-sso", "-o", "target/tmp", "-host", "localhost", "-port", "123154", "-db",
+					"qwerty",
+					"--logging.config=" + Paths.get("src", "test", "resources", "logback-debugEx.xml").toString());
+		} catch (SecurityException ignore) {
+		}
+		assertThat(exitCodeRule.getExitCode()).isEqualTo(3);
+		String log = loggingRule.getLog();
+		assertThat(log).contains("StackTraces have been omitted");
+	}
 
 }

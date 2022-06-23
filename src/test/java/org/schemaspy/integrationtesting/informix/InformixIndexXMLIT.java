@@ -18,26 +18,8 @@
  */
 package org.schemaspy.integrationtesting.informix;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-import org.schemaspy.cli.SchemaSpyRunner;
-import org.schemaspy.testing.AssumeClassIsPresentRule;
-import org.schemaspy.testing.IgnoreNonPrintedInCData;
-import org.schemaspy.testing.IgnoreUsingXPath;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.testcontainers.containers.InformixContainer;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.builder.Input;
-import org.xmlunit.diff.Diff;
-import org.xmlunit.diff.DifferenceEvaluators;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,78 +29,84 @@ import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
+import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.testing.AssumeClassIsPresentRule;
+import org.schemaspy.testing.IgnoreNonPrintedInCData;
+import org.schemaspy.testing.IgnoreUsingXPath;
+import org.testcontainers.containers.InformixContainer;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.DifferenceEvaluators;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class InformixIndexXMLIT {
 
-    private static URL expectedXML = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/test.informix.xml");
-    private static URL expectedDeletionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/deletionOrder.txt");
-    private static URL expectedInsertionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/insertionOrder.txt");
+	private static URL expectedXML = InformixIndexXMLIT.class
+			.getResource("/integrationTesting/informix/expecting/test.informix.xml");
+	private static URL expectedDeletionOrder = InformixIndexXMLIT.class
+			.getResource("/integrationTesting/informix/expecting/deletionOrder.txt");
+	private static URL expectedInsertionOrder = InformixIndexXMLIT.class
+			.getResource("/integrationTesting/informix/expecting/insertionOrder.txt");
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
+	public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
 
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
-            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/informix/dbScripts/informix.sql");
+	@SuppressWarnings("unchecked")
+	public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule = new JdbcContainerRule<>(
+			(Supplier<InformixContainer<?>>) InformixContainer::new).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent())
+					.withInitScript("integrationTesting/informix/dbScripts/informix.sql");
 
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
+	@ClassRule
+	public static final TestRule chain = RuleChain.outerRule(jdbcContainerRule).around(jdbcDriverClassPresentRule);
 
-    @Autowired
-    private SchemaSpyRunner schemaSpyRunner;
+	private SchemaSpyRunner schemaSpyRunner = new SchemaSpyRunner();
 
-    private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
+	private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
-    @Before
-    public void createXML() {
-        if (shouldRun.get()) {
-            String[] args = {
-                    "-t", "informix",
-                    "-db", "test",
-                    "-s", "informix",
-                    "-cat", "test",
-                    "-server", "dev",
-                    "-o", "target/testout/integrationtesting/informix/xml",
-                    "-u", jdbcContainerRule.getContainer().getUsername(),
-                    "-p", jdbcContainerRule.getContainer().getPassword(),
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                    "-port", jdbcContainerRule.getContainer().getJdbcPort().toString(),
-                    "-nohtml"
-            };
-            schemaSpyRunner.run(args);
-            shouldRun.set(false);
-        }
-    }
+	@Before
+	public void createXML() {
+		if (shouldRun.get()) {
+			String[] args = { "-t", "informix", "-db", "test", "-s", "informix", "-cat", "test", "-server", "dev", "-o",
+					"target/testout/integrationtesting/informix/xml", "-u",
+					jdbcContainerRule.getContainer().getUsername(), "-p",
+					jdbcContainerRule.getContainer().getPassword(), "-host",
+					jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+					jdbcContainerRule.getContainer().getJdbcPort().toString(), "-nohtml" };
+			schemaSpyRunner.run(args);
+			shouldRun.set(false);
+		}
+	}
 
-    @Test
-    public void verifyXML() {
-        Diff d = DiffBuilder.compare(Input.fromURL(expectedXML))
-                .withTest(Input.fromFile("target/testout/integrationtesting/informix/xml/test.informix.xml"))
-                .withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, new IgnoreUsingXPath("/database[1]/@type"), new IgnoreNonPrintedInCData()))
-                .build();
-        assertThat(d.getDifferences()).isEmpty();
-    }
+	@Test
+	public void verifyXML() {
+		Diff d = DiffBuilder.compare(Input.fromURL(expectedXML))
+				.withTest(Input.fromFile("target/testout/integrationtesting/informix/xml/test.informix.xml"))
+				.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default,
+						new IgnoreUsingXPath("/database[1]/@type"), new IgnoreNonPrintedInCData()))
+				.build();
+		assertThat(d.getDifferences()).isEmpty();
+	}
 
-    @Test
-    public void verifyDeletionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/informix/xml/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
-    }
+	@Test
+	public void verifyDeletionOrder() throws IOException {
+		assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/informix/xml/deletionOrder.txt"),
+				StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
+	}
 
-    @Test
-    public void verifyInsertionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/informix/xml/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
-    }
+	@Test
+	public void verifyInsertionOrder() throws IOException {
+		assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/informix/xml/insertionOrder.txt"),
+				StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
+	}
 
 }

@@ -18,125 +18,109 @@
  */
 package org.schemaspy.integrationtesting.informix;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.model.*;
-import org.schemaspy.testing.AssumeClassIsPresentRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.InformixContainer;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.function.Supplier;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.schemaspy.Config;
+import org.schemaspy.IntegrationTestFixture;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
+import org.schemaspy.input.dbms.service.SqlService;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+import org.schemaspy.model.TableIndex;
+import org.schemaspy.testing.AssumeClassIsPresentRule;
+import org.testcontainers.containers.InformixContainer;
+
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class InformixIndexIT {
-    @Autowired
-    private SqlService sqlService;
+	private IntegrationTestFixture fixture;
 
-    @Mock
-    private ProgressListener progressListener;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	private static Database database;
 
-    private static Database database;
+	public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
+	@SuppressWarnings("unchecked")
+	public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule = new JdbcContainerRule<>(
+			(Supplier<InformixContainer<?>>) InformixContainer::new).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent())
+					.withInitScript("integrationTesting/informix/dbScripts/informix.sql");
 
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
-            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/informix/dbScripts/informix.sql");
+	@ClassRule
+	public static final TestRule chain = RuleChain.outerRule(jdbcContainerRule).around(jdbcDriverClassPresentRule);
 
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
+	@Before
+	public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			createDatabaseRepresentation();
+		}
+	}
 
-    @Before
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
-        if (database == null) {
-            createDatabaseRepresentation();
-        }
-    }
+	private void createDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "informix", "-db", "test", "-s", "informix", "-cat", "test", "-server", "dev", "-o",
+				"target/testout/integrationtesting/informix/index", "-u",
+				jdbcContainerRule.getContainer().getUsername(), "-p", jdbcContainerRule.getContainer().getPassword(),
+				"-host", jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getJdbcPort().toString() };
+		fixture = IntegrationTestFixture.fromArgs(args);
+		CommandLineArguments arguments = fixture.commandLineArguments();
+		final SqlService sqlService = fixture.sqlService();
 
-    private void createDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "informix",
-                "-db", "test",
-                "-s", "informix",
-                "-cat", "test",
-                "-server", "dev",
-                "-o", "target/testout/integrationtesting/informix/index",
-                "-u", jdbcContainerRule.getContainer().getUsername(),
-                "-p", jdbcContainerRule.getContainer().getPassword(),
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getJdbcPort().toString()
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
-        InformixIndexIT.database = database;
-    }
+		Config config = new Config(args);
+		sqlService.connect(config);
+		Database database = new Database(sqlService.getDbmsMeta(), arguments.getDatabaseName(), arguments.getCatalog(),
+				arguments.getSchema());
+		new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+		InformixIndexIT.database = database;
+	}
 
-    @Test
-    public void databaseShouldBePopulatedWithTableTest() {
-        Table table = getTable("test");
-        assertThat(table).isNotNull();
-    }
+	@Test
+	public void databaseShouldBePopulatedWithTableTest() {
+		Table table = getTable("test");
+		assertThat(table).isNotNull();
+	}
 
-    @Test
-    public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
-        Table table = getTable("test");
-        TableColumn column = table.getColumn("firstname");
-        assertThat(column).isNotNull();
-    }
+	@Test
+	public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
+		Table table = getTable("test");
+		TableColumn column = table.getColumn("firstname");
+		assertThat(column).isNotNull();
+	}
 
-    @Test
-    public void tableTestShouldHaveTwoIndexes() {
-        Table table = getTable("test");
-        assertThat(table.getIndexes().size()).isEqualTo(2);
-    }
+	@Test
+	public void tableTestShouldHaveTwoIndexes() {
+		Table table = getTable("test");
+		assertThat(table.getIndexes().size()).isEqualTo(2);
+	}
 
-    @Test
-    public void tableTestIndex_test_index_shouldHaveThreeColumns() {
-        TableIndex index = getTable("test").getIndex("test_index");
-        assertThat(index.getColumns().size()).isEqualTo(3);
-    }
+	@Test
+	public void tableTestIndex_test_index_shouldHaveThreeColumns() {
+		TableIndex index = getTable("test").getIndex("test_index");
+		assertThat(index.getColumns().size()).isEqualTo(3);
+	}
 
-    private Table getTable(String tableName) {
-        return database.getTablesMap().get(tableName);
-    }
+	private Table getTable(String tableName) {
+		return database.getTablesMap().get(tableName);
+	}
 }

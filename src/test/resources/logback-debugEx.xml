@@ -17,9 +17,11 @@
   ~ along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
   -->
 <configuration>
+    <conversionRule conversionWord="ex" converterClass="org.schemaspy.logging.StackTraceOmitter" />
+    
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%msg%n%debugEx</pattern>
+            <pattern>%msg%n%ex</pattern>
         </encoder>
     </appender>
 

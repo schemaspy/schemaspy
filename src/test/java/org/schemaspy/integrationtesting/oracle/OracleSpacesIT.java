@@ -18,14 +18,25 @@
  */
 package org.schemaspy.integrationtesting.oracle;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+
+import javax.script.ScriptException;
+
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -34,100 +45,68 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.OracleContainer;
 
-import javax.script.ScriptException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.SQLException;
-
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class OracleSpacesIT {
 
-    private static final Path outputPath = Paths.get("target","testout","integrationtesting","oracle","spaces");
+	private static final Path outputPath = Paths.get("target", "testout", "integrationtesting", "oracle", "spaces");
 
-    @Autowired
-    private SqlService sqlService;
+	private SqlService sqlService = new SqlService();
 
-    @Mock
-    private ProgressListener progressListener;
+	@Mock
+	private ProgressListener progressListener;
 
-    @MockBean
-    private CommandLineArguments arguments;
+	@Mock
+	private CommandLineArguments arguments;
 
-    @MockBean
-    private CommandLineRunner commandLineRunner;
+	private static Database database;
 
-    private static Database database;
+	@SuppressWarnings("unchecked")
+	public static JdbcContainerRule<OracleContainer> jdbcContainerRule = new JdbcContainerRule<>(
+			() -> new OracleContainer("gvenzl/oracle-xe:11-slim").usingSid()).assumeDockerIsPresent()
+					.withAssumptions(assumeDriverIsPresent())
+					.withInitScript("integrationTesting/oracle/dbScripts/spaces_in_table_names.sql");
 
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer("gvenzl/oracle-xe:11-slim").usingSid())
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitScript("integrationTesting/oracle/dbScripts/spaces_in_table_names.sql");
+	public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+	@ClassRule
+	public static final TestRule chain = RuleChain.outerRule(jdbcContainerRule).around(jdbcDriverClassPresentRule);
 
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
+	@Before
+	public synchronized void gatheringSchemaDetailsTest()
+			throws SQLException, IOException, ScriptException, URISyntaxException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			createDatabaseRepresentation();
+		}
+	}
 
-    @Before
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            createDatabaseRepresentation();
-        }
-    }
+	private void createDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "orathin", "-db", jdbcContainerRule.getContainer().getSid(), "-s", "ORASPACEIT", "-cat",
+				"%", "-o", outputPath.toString(), "-u", "oraspaceit", "-p", "oraspaceit123", "-host",
+				jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getOraclePort().toString() };
+		given(arguments.getOutputDirectory()).willReturn(outputPath.toFile());
+		given(arguments.getDatabaseType()).willReturn("orathin");
+		given(arguments.getUser()).willReturn("orait");
+		given(arguments.getSchema()).willReturn("ORASPACEIT");
+		given(arguments.getCatalog()).willReturn("%");
+		given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
+		Config config = new Config(args);
+		sqlService.connect(config);
+		Database database = new Database(sqlService.getDbmsMeta(), arguments.getDatabaseName(), arguments.getCatalog(),
+				arguments.getSchema());
+		new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+		OracleSpacesIT.database = database;
+	}
 
-    private void createDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "orathin",
-                "-db", jdbcContainerRule.getContainer().getSid(),
-                "-s", "ORASPACEIT",
-                "-cat", "%",
-                "-o", outputPath.toString(),
-                "-u", "oraspaceit",
-                "-p", "oraspaceit123",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
-        };
-        given(arguments.getOutputDirectory()).willReturn(outputPath.toFile());
-        given(arguments.getDatabaseType()).willReturn("orathin");
-        given(arguments.getUser()).willReturn("orait");
-        given(arguments.getSchema()).willReturn("ORASPACEIT");
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
-        OracleSpacesIT.database = database;
-    }
-
-    @Test
-    public void databaseShouldHaveTableWithSpaces() {
-        assertThat(database.getTables()).extracting(Table::getName).contains("test 1.0");
-    }
+	@Test
+	public void databaseShouldHaveTableWithSpaces() {
+		assertThat(database.getTables()).extracting(Table::getName).contains("test 1.0");
+	}
 }

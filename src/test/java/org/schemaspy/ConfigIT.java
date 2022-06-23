@@ -18,25 +18,28 @@
  */
 package org.schemaspy;
 
-import org.hamcrest.Matchers;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Rule;
 import org.junit.Test;
-import org.schemaspy.testing.ResettingOutputCapture;
+import org.schemaspy.testing.Logger;
+import org.schemaspy.testing.LoggingRule;
+import org.schemaspy.util.DbSpecificConfig;
 
 /**
  * @author Nils Petzaell
  */
 public class ConfigIT {
+	@Rule
+	public LoggingRule loggingRule = new LoggingRule();
 
-    @Rule
-    public ResettingOutputCapture outputCapture = new ResettingOutputCapture();
-
-    @Test
-    public void onlyOutputSelectedDatabaseTypeWhenDbSpecific() {
-        outputCapture.expect(Matchers.containsString("MySQL"));
-        outputCapture.expect(Matchers.not(Matchers.containsString("Microsoft SQL Server")));
-        Config config = new Config("-t", "mysql");
-        config.dumpUsage("Test", true);
-    }
+	@Test
+	@Logger(DbSpecificConfig.class)
+	public void onlyOutputSelectedDatabaseTypeWhenDbSpecific() {
+		Config config = new Config("-t", "mysql");
+		config.dumpUsage("Test", true);
+		assertThat(loggingRule.getLog()).contains("MySQL");
+		assertThat(loggingRule.getLog()).doesNotContain("Microsoft SQL Server");
+	}
 
 }

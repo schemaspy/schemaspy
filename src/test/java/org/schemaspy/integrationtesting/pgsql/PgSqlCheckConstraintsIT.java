@@ -18,14 +18,21 @@
  */
 package org.schemaspy.integrationtesting.pgsql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
+import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.IntegrationTestFixture;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -34,90 +41,63 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.SQLScriptsRunner;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.SQLException;
+import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.assertj.core.api.Assertions.assertThat;
-
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class PgSqlCheckConstraintsIT {
 
-    private static final Path outputPath = Paths.get("target","testout","integrationtesting","pgsql","check_constraints");
+	private static final Path outputPath = Paths.get("target", "testout", "integrationtesting", "pgsql",
+			"check_constraints");
 
-    @Autowired
-    private SqlService sqlService;
+	@Mock
+	private ProgressListener progressListener;
 
-    @Mock
-    private ProgressListener progressListener;
+	private IntegrationTestFixture fixture;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+	private static Database database;
 
-    private static Database database;
+	@SuppressWarnings("unchecked")
+	@ClassRule
+	public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule = new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
+			PgSqlSuite.jdbcContainerRule,
+			new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
+					.assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent()).withInitFunctions(
+							new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/dvdrental.sql", "\n\n\n")));
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
-                    PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/dvdrental.sql", "\n\n\n"))
-            );
+	@Before
+	public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
+		MockitoAnnotations.openMocks(this);
+		if (database == null) {
+			doCreateDatabaseRepresentation();
+		}
+	}
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
+	private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+		String[] args = { "-t", "pgsql", "-db", "test", "-s", "public", "-cat", "%", "-o", outputPath.toString(), "-u",
+				"test", "-p", "test", "-host", jdbcContainerRule.getContainer().getContainerIpAddress(), "-port",
+				jdbcContainerRule.getContainer().getMappedPort(5432).toString() };
+		fixture = IntegrationTestFixture.fromArgs(args);
+		CommandLineArguments arguments = fixture.commandLineArguments();
+		final SqlService sqlService = fixture.sqlService();
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-        String[] args = {
-                "-t", "pgsql",
-                "-db", "test",
-                "-s", "public",
-                "-cat", "%",
-                "-o", outputPath.toString(),
-                "-u", "test",
-                "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
-        };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
-        Config config = new Config(args);
-        sqlService.connect(config);
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
-        PgSqlCheckConstraintsIT.database = database;
-    }
+		Config config = new Config(args);
+		sqlService.connect(config);
+		Database database = new Database(sqlService.getDbmsMeta(), arguments.getDatabaseName(), arguments.getCatalog(),
+				arguments.getSchema());
+		new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+		PgSqlCheckConstraintsIT.database = database;
+	}
 
-    @Test
-    public void databaseShouldExist() {
-        assertThat(database).isNotNull();
-        assertThat(database.getName()).isEqualToIgnoringCase("test");
-    }
+	@Test
+	public void databaseShouldExist() {
+		assertThat(database).isNotNull();
+		assertThat(database.getName()).isEqualToIgnoringCase("test");
+	}
 
-    @Test
-    public void checkConstraintExists() {
-        assertThat(database.getTablesMap().get("cctest")).isNotNull();
-        assertThat(database.getTablesMap().get("cctest").getCheckConstraints().get("cctest_ctype_cc")).isNotNull();
-    }
+	@Test
+	public void checkConstraintExists() {
+		assertThat(database.getTablesMap().get("cctest")).isNotNull();
+		assertThat(database.getTablesMap().get("cctest").getCheckConstraints().get("cctest_ctype_cc")).isNotNull();
+	}
 }
