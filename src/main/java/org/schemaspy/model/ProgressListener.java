@@ -33,7 +33,7 @@ public interface ProgressListener {
 	/**
 	 * @return startup / connection duration in milliseconds
 	 */
-	long startedGatheringDetails();
+	void startedGatheringDetails();
 	void gatheringDetailsProgressed(Table table);
 
 	/**

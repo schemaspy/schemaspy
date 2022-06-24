@@ -44,9 +44,8 @@ public class Tracked implements ProgressListener {
     }
 
     @Override
-    public long startedGatheringDetails() {
+    public void startedGatheringDetails() {
         startedGatheringAt = System.currentTimeMillis();
-        return startedAt - startedGatheringAt;
     }
 
     @Override
