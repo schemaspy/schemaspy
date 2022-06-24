@@ -20,10 +20,9 @@ public class Console implements ProgressListener {
     }
 
     @Override
-    public long startedGatheringDetails() {
-        long result = origin.startedGatheringDetails();
+    public void startedGatheringDetails() {
+        origin.startedGatheringDetails();
         System.out.print("Gathering schema details...");
-        return result;
     }
 
     @Override
