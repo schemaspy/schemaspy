@@ -19,8 +19,6 @@
  */
 package org.schemaspy.model;
 
-import org.schemaspy.Config;
-
 import java.util.Collection;
 
 /**
@@ -62,5 +60,5 @@ public interface ProgressListener {
 	/**
 	 * @return overall duration duration in milliseconds
 	 */
-	long finished(Collection<Table> tables, Config config);
+	long finished(Collection<Table> tables);
 }

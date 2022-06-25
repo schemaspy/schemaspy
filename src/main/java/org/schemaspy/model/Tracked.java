@@ -20,8 +20,6 @@
  */
 package org.schemaspy.model;
 
-import org.schemaspy.Config;
-
 import java.util.Collection;
 
 /**
@@ -85,7 +83,7 @@ public class Tracked implements ProgressListener {
     }
 
     @Override
-    public long finished(Collection<Table> tables, Config config) {
+    public long finished(Collection<Table> tablesg) {
         finishedAt = System.currentTimeMillis();
         return finishedAt - startedAt;
     }
