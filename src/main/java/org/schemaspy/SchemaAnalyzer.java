@@ -276,7 +276,7 @@ public class SchemaAnalyzer {
             writeOrders(outputDir, orderedTables);
 
             duration = progressListener.finishedGatheringDetails();
-            long overallDuration = progressListener.finished(tables, config);
+            long overallDuration = progressListener.finished(tables);
 
             if (commandLineArguments.isHtmlEnabled()) {
                 LOGGER.info("Wrote table details in {} seconds", duration / SECONDS_IN_MS);

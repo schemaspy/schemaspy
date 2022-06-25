@@ -1,6 +1,5 @@
 package org.schemaspy.model;
 
-import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArguments;
 
 import java.io.File;
@@ -91,8 +90,8 @@ public class Console implements ProgressListener {
     }
 
     @Override
-    public long finished(Collection<Table> tables, Config config) {
-        long result = origin.finished(tables, config);
+    public long finished(Collection<Table> tables) {
+        long result = origin.finished(tables);
         System.err.flush();
         System.out.flush();
         System.out.println("Wrote relationship details of " + tables.size() + " tables/views to directory '" + commandLineArguments.getOutputDirectory() + "' in " + result / 1000 + " seconds.");
