@@ -23,7 +23,7 @@ package org.schemaspy.model;
 import java.util.Collection;
 
 /**
- * Implementation of {@link ProgressListener} that sends its output to the console.
+ * Implementation of {@link ProgressListener}.
  *
  * @author John Currier
  * @author Thomas Traude
@@ -49,6 +49,9 @@ public class Tracked implements ProgressListener {
     @Override
     public void gatheringDetailsProgressed(Table table) { }
 
+    /**
+     * Assumes <code>startedGatheringDetails</code> has already been called.
+     */
     @Override
     public long startedConnectingTables() {
         startedConnectingAt = System.currentTimeMillis();
@@ -58,6 +61,9 @@ public class Tracked implements ProgressListener {
     @Override
     public void connectingTablesProgressed(Table table) { }
 
+    /**
+     * Assumes <code>startedConnectingTables</code> has already been called.
+     */
     @Override
     public long startedGraphingSummaries() {
         startedGraphingSummariesAt = System.currentTimeMillis();
@@ -67,6 +73,9 @@ public class Tracked implements ProgressListener {
     @Override
     public void graphingSummaryProgressed() { }
 
+    /**
+     * Assumes <code>startedGraphingSummaries</code> has already been called.
+     */
     @Override
     public long startedGraphingDetails() {
         startedGraphingDetailsAt = System.currentTimeMillis();
@@ -76,6 +85,9 @@ public class Tracked implements ProgressListener {
     @Override
     public void graphingDetailsProgressed(Table table) { }
 
+    /**
+     * Assumes <code>startedGraphingDetails</code> has already been called.
+     */
     @Override
     public long finishedGatheringDetails() {
         finishedAt = System.currentTimeMillis();
