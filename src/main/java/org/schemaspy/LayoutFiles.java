@@ -39,6 +39,6 @@ public class LayoutFiles {
             }
         }
 
-        ResourceWriter.copyResources(url, outputDir, filter);
+        new ResourceWriter().copyResources(url, outputDir, filter);
     }
 }

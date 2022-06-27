@@ -47,7 +47,7 @@ import java.util.jar.JarFile;
 public class ResourceWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private ResourceWriter() {}
+    public ResourceWriter() {}
 
     /**
      * Copies resources to target folder.
@@ -56,7 +56,7 @@ public class ResourceWriter {
      * @param targetPath
      * @return
      */
-    public static void copyResources(URL resourceUrl, File targetPath, FileFilter filter) throws IOException {
+    public void copyResources(URL resourceUrl, File targetPath, FileFilter filter) throws IOException {
         if (resourceUrl == null) {
             return;
         }
@@ -85,7 +85,7 @@ public class ResourceWriter {
      * @param jarConnection
      * @param destPath destination file or directory
      */
-    private static void copyJarResourceToPath(JarURLConnection jarConnection, File destPath, FileFilter filter) {
+    private void copyJarResourceToPath(JarURLConnection jarConnection, File destPath, FileFilter filter) {
         try {
             JarFile jarFile = jarConnection.getJarFile();
             String jarConnectionEntryName = jarConnection.getEntryName();
