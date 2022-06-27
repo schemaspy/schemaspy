@@ -95,16 +95,20 @@ public class SchemaAnalyzer {
 
     private final OutputProducer outputProducer;
 
+    private final LayoutFolder layoutFolder;
+
     public SchemaAnalyzer(
             final SqlService sqlService,
             final DatabaseServiceFactory databaseServiceFactory,
             final CommandLineArguments commandLineArguments,
-            final OutputProducer outputProducer
+            final OutputProducer outputProducer,
+            final LayoutFolder layoutFolder
     ) {
         this.sqlService = Objects.requireNonNull(sqlService);
         this.databaseServiceFactory = databaseServiceFactory;
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
         this.outputProducer = outputProducer;
+        this.layoutFolder = layoutFolder;
     }
 
     public Database analyze(Config config) throws SQLException, IOException {
@@ -114,19 +118,33 @@ public class SchemaAnalyzer {
         if (commandLineArguments.isHtmlEnabled()) {
             progressListener = new Console(commandLineArguments, progressListener);
         }
-        
+
         if (config.isEvaluateAllEnabled() || config.getSchemas() != null) {
             config.setOneOfMultipleSchemas(true); // used later for generation rootPathtoHome link.
-            return this.analyzeMultipleSchemas(config, databaseServiceFactory.simple(config), progressListener);
+            return this.analyzeMultipleSchemas(
+                    config,
+                    databaseServiceFactory.simple(config),
+                    progressListener
+            );
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
-            return analyze(schema, config, outputDirectory, databaseServiceFactory.simple(config), progressListener);
+            return analyze(
+                    schema,
+                    config,
+                    outputDirectory,
+                    databaseServiceFactory.simple(config),
+                    progressListener
+            );
         }
     }
 
-    public Database analyzeMultipleSchemas(Config config, DatabaseService databaseService, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyzeMultipleSchemas(
+            Config config,
+            DatabaseService databaseService,
+            ProgressListener progressListener
+    ) throws SQLException, IOException {
         try {
             List<String> schemas = config.getSchemas();
             Database db = null;
@@ -173,7 +191,8 @@ public class SchemaAnalyzer {
                 mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
             }
 
-            new LayoutFiles(SchemaAnalyzer.class.getClassLoader(), notHtml(), outputDir).prepare();
+            new ResourceWriter().copyResources(layoutFolder.url(), outputDir, notHtml());
+
             DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
             MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config, dataTableConfig);
             HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
@@ -201,7 +220,13 @@ public class SchemaAnalyzer {
         }
     }
 
-    public Database analyze(String schema, Config config, File outputDir, DatabaseService databaseService, ProgressListener progressListener) throws SQLException, IOException {
+    public Database analyze(
+            String schema,
+            Config config,
+            File outputDir,
+            DatabaseService databaseService,
+            ProgressListener progressListener
+    ) throws SQLException, IOException {
         try {
             LOGGER.info("Starting schema analysis");
 
@@ -251,7 +276,15 @@ public class SchemaAnalyzer {
 
             long duration = progressListener.startedGraphingSummaries();
             if (commandLineArguments.isHtmlEnabled()) {
-                generateHtmlDoc(config, commandLineArguments.useVizJS() , progressListener, outputDir, db, duration, tables);
+                generateHtmlDoc(
+                        config,
+                        commandLineArguments.useVizJS(),
+                        progressListener,
+                        outputDir,
+                        db,
+                        duration,
+                        tables
+                );
             }
 
             try {
@@ -303,13 +336,22 @@ public class SchemaAnalyzer {
         }
     }
 
-    private void generateHtmlDoc(Config config, boolean useVizJS, ProgressListener progressListener, File outputDir, Database db, long duration, Collection<Table> tables) throws IOException {
+    private void generateHtmlDoc(
+            Config config,
+            boolean useVizJS,
+            ProgressListener progressListener,
+            File outputDir,
+            Database db,
+            long duration,
+            Collection<Table> tables
+    ) throws IOException {
         LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/graphing summary");
 
         markDownRegistryPages(tables);
 
-        new LayoutFiles(SchemaAnalyzer.class.getClassLoader(), notHtml(), outputDir).prepare();
+        new ResourceWriter().copyResources(layoutFolder.url(), outputDir, notHtml());
+
         Renderer renderer = useVizJS ? new VizJSDot() : new GraphvizDot(commandLineArguments.getGraphVizConfig());
 
         Path htmlInfoFile = outputDir.toPath().resolve("info-html.txt");

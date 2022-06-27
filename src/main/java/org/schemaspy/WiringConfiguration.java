@@ -42,7 +42,8 @@ public class WiringConfiguration {
                 sqlService,
                 new DatabaseServiceFactory(sqlService),
                 commandLineArguments,
-                new XmlProducerUsingDOM()
+                new XmlProducerUsingDOM(),
+                new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
         );
     }
 
