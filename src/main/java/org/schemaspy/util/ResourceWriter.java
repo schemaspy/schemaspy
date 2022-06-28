@@ -23,20 +23,13 @@
 package org.schemaspy.util;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.lang.invoke.MethodHandles;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 /**
  * @author john Currier
@@ -45,7 +38,6 @@ import java.util.jar.JarFile;
  * @author Daniel Watt
  */
 public class ResourceWriter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public ResourceWriter() {}
 
@@ -67,7 +59,7 @@ public class ResourceWriter {
          * Copy resources either from inside jar or from project folder.
          */
         if (urlConnection instanceof JarURLConnection) {
-            copyJarResourceToPath((JarURLConnection) urlConnection, targetPath, filter);
+            new Jar((JarURLConnection) urlConnection, targetPath, filter).copyJarResourceToPath();
         } else {
             File file = new File(resourceUrl.getPath());
             if (file.isDirectory()) {
@@ -75,56 +67,6 @@ public class ResourceWriter {
             } else {
                 FileUtils.copyFile(file, targetPath);
             }
-        }
-    }
-
-    /**
-     * Copies resources from the jar file of the current thread and extract it
-     * to the destination path.
-     *
-     * @param jarConnection
-     * @param destPath destination file or directory
-     */
-    private void copyJarResourceToPath(JarURLConnection jarConnection, File destPath, FileFilter filter) {
-        try {
-            JarFile jarFile = jarConnection.getJarFile();
-            String jarConnectionEntryName = jarConnection.getEntryName();
-
-            /**
-             * Iterate all entries in the jar file.
-             */
-            for (Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements();) {
-                JarEntry jarEntry = e.nextElement(); //NOSONAR
-                String jarEntryName = jarEntry.getName();
-
-                /**
-                 * Extract files only if they match the path.
-                 */
-                if (jarEntryName.startsWith(jarConnectionEntryName + "/")) {
-                    String filename = jarEntryName.substring(jarConnectionEntryName.length());
-                    File currentFile = new File(destPath, filename);
-
-
-                    if (jarEntry.isDirectory()) {
-                        FileUtils.forceMkdir(currentFile);
-                    } else {
-                        if (filter == null || filter.accept(currentFile)) {
-                            try (
-                                    InputStream is = jarFile.getInputStream(jarEntry);
-                                    OutputStream out = Files.newOutputStream(
-                                            currentFile.toPath(),
-                                            StandardOpenOption.CREATE,
-                                            StandardOpenOption.WRITE,
-                                            StandardOpenOption.TRUNCATE_EXISTING)
-                            ) {
-                                IOUtils.copy(is, out);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.warn(e.getMessage(),e);
         }
     }
 }
