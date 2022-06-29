@@ -307,7 +307,7 @@ public class SchemaAnalyzer {
             // also populates the recursiveConstraints collection
             List<Table> orderedTables = orderer.getTablesOrderedByRI(db.getTables(), recursiveConstraints);
 
-            writeOrders(outputDir, orderedTables);
+            OrderingReport.write(outputDir, orderedTables);
 
             duration = progressListener.finishedGatheringDetails();
             long overallDuration = progressListener.finished(tables);
@@ -323,17 +323,6 @@ public class SchemaAnalyzer {
         } catch (Config.MissingRequiredParameterException missingParam) {
             config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
             return null;
-        }
-    }
-
-    private static void writeOrders(File outputDir, List<Table> orderedTables) throws IOException {
-        try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "insertionOrder.txt"))) {
-            TextFormatter.getInstance().write(orderedTables, false, out);
-        }
-
-        Collections.reverse(orderedTables);
-        try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "deletionOrder.txt"))){
-            TextFormatter.getInstance().write(orderedTables, false, out);
         }
     }
 
