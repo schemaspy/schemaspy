@@ -307,7 +307,7 @@ public class SchemaAnalyzer {
             // also populates the recursiveConstraints collection
             List<Table> orderedTables = orderer.getTablesOrderedByRI(db.getTables(), recursiveConstraints);
 
-            OrderingReport.write(outputDir, orderedTables);
+            new OrderingReport(outputDir, orderedTables).write();
 
             duration = progressListener.finishedGatheringDetails();
             long overallDuration = progressListener.finished(tables);

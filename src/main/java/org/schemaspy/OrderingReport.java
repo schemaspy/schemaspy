@@ -12,14 +12,22 @@ import java.util.List;
 
 public class OrderingReport {
 
-    public static void write(File outputDir, List<Table> orderedTables) throws IOException {
+    private final File outputDir;
+    private final List<Table> tables;
+
+    public OrderingReport(final File outputDir, final List<Table> orderedTables) {
+        this.outputDir = outputDir;
+        this.tables = orderedTables;
+    }
+
+    public void write() throws IOException {
         try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "insertionOrder.txt"))) {
-            TextFormatter.getInstance().write(orderedTables, false, out);
+            TextFormatter.getInstance().write(tables, false, out);
         }
 
-        Collections.reverse(orderedTables);
+        Collections.reverse(tables);
         try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "deletionOrder.txt"))){
-            TextFormatter.getInstance().write(orderedTables, false, out);
+            TextFormatter.getInstance().write(tables, false, out);
         }
     }
 }
