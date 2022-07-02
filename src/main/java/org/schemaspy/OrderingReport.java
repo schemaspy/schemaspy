@@ -1,7 +1,7 @@
 package org.schemaspy;
 
 import org.schemaspy.model.Table;
-import org.schemaspy.util.Writers;
+import org.schemaspy.util.DefaultPrintWriter;
 import org.schemaspy.view.TextFormatter;
 
 import java.io.File;
@@ -21,12 +21,12 @@ public class OrderingReport {
     }
 
     public void write() throws IOException {
-        try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "insertionOrder.txt"))) {
+        try (PrintWriter out = new DefaultPrintWriter(new File(outputDir, "insertionOrder.txt"))) {
             TextFormatter.getInstance().write(tables, false, out);
         }
 
         Collections.reverse(tables);
-        try (PrintWriter out = Writers.newPrintWriter(new File(outputDir, "deletionOrder.txt"))){
+        try (PrintWriter out = new DefaultPrintWriter(new File(outputDir, "deletionOrder.txt"))){
             TextFormatter.getInstance().write(tables, false, out);
         }
     }

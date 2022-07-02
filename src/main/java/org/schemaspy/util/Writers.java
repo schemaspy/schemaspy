@@ -21,7 +21,6 @@ package org.schemaspy.util;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -29,10 +28,6 @@ import java.nio.file.StandardOpenOption;
 public class Writers {
 
     private Writers() {}
-
-    public static PrintWriter newPrintWriter(File file) throws IOException {
-        return new PrintWriter(Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
-    }
 
     public static BufferedWriter newBufferedWriter(File file) throws IOException {
         return Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);

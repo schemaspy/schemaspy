@@ -25,6 +25,7 @@ import org.schemaspy.output.html.HtmlException;
 import org.schemaspy.output.html.mustache.Diagram;
 import org.schemaspy.output.html.mustache.ImgDiagram;
 import org.schemaspy.output.html.mustache.SvgDiagram;
+import org.schemaspy.util.DefaultPrintWriter;
 import org.schemaspy.util.Writers;
 
 import java.io.File;
@@ -58,7 +59,7 @@ public class OrphanDiagram implements Diagram {
 
     private Path writeDot() {
         Path dotFile = outputDir.resolve(fileName("dot"));
-        try (PrintWriter dotOut = Writers.newPrintWriter(dotFile.toFile())) {
+        try (PrintWriter dotOut = new DefaultPrintWriter(dotFile.toFile())) {
             dotOut.println(graph.dot());
             dotOut.flush();
         } catch (IOException e) {

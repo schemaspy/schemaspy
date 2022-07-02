@@ -22,6 +22,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramResult;
 import org.schemaspy.output.diagram.TableDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
+import org.schemaspy.util.DefaultPrintWriter;
 import org.schemaspy.util.Writers;
 import org.schemaspy.view.FileNameGenerator;
 import org.schemaspy.view.MustacheTableDiagram;
@@ -73,7 +74,7 @@ public class MustacheTableDiagramFactory {
         Files.deleteIfExists(twoDegreesDotFile.toPath());
 
         LongAdder oneStats = new LongAdder();
-        try (PrintWriter dotOut = Writers.newPrintWriter(oneDegreeDotFile)) {
+        try (PrintWriter dotOut = new DefaultPrintWriter(oneDegreeDotFile)) {
             dotProducer.writeTableRealRelationships(table, false, oneStats, dotOut);
         }
         DiagramResult results = diagramFactory.generateTableDiagram(oneDegreeDotFile, fileNameBase + ".1degree");
@@ -83,7 +84,7 @@ public class MustacheTableDiagramFactory {
 
         if (degreeOfSeparation == 2) {
             LongAdder twoStats = new LongAdder();
-            try (PrintWriter dotOut = Writers.newPrintWriter(twoDegreesDotFile)) {
+            try (PrintWriter dotOut = new DefaultPrintWriter(twoDegreesDotFile)) {
                 dotProducer.writeTableRealRelationships(table, true, twoStats, dotOut);
             }
 
@@ -114,7 +115,7 @@ public class MustacheTableDiagramFactory {
 
         if (table.hasImpliedConstraints(degreeOfSeparation)) {
             LongAdder oneImplied = new LongAdder();
-            try (PrintWriter dotOut = Writers.newPrintWriter(oneImpliedDotFile)) {
+            try (PrintWriter dotOut = new DefaultPrintWriter(oneImpliedDotFile)) {
                 dotProducer.writeTableAllRelationships(table, false, oneImplied, dotOut);
             }
 
@@ -124,7 +125,7 @@ public class MustacheTableDiagramFactory {
 
             if (degreeOfSeparation == 2) {
                 LongAdder twoImplied = new LongAdder();
-                try (PrintWriter dotOut = Writers.newPrintWriter(twoImpliedDotFile)) {
+                try (PrintWriter dotOut = new DefaultPrintWriter(twoImpliedDotFile)) {
                     dotProducer.writeTableAllRelationships(table, true, twoImplied, dotOut);
                 }
                 if (sameWritten(oneImplied, twoImplied)) {
