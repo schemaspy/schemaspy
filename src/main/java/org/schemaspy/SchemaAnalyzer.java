@@ -197,7 +197,7 @@ public class SchemaAnalyzer {
             DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
             MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config, dataTableConfig);
             HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
-            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
+            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
                 htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta), writer);
             }
             return db;
@@ -401,7 +401,7 @@ public class SchemaAnalyzer {
         MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config, dataTableConfig);
 
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler, hasRealConstraints, !impliedConstraints.isEmpty());
-        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {
             htmlRelationshipsPage.write(results, writer);
         }
 
@@ -415,14 +415,14 @@ public class SchemaAnalyzer {
                         outputDir
                 )
         );
-        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("orphans.html").toFile())) {
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("orphans.html").toFile())) {
             htmlOrphansPage.write(writer);
         }
 
         progressListener.graphingSummaryProgressed();
 
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config.getDescription());
-        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
             htmlMainIndexPage.write(db, tables, impliedConstraints, writer);
         }
 
@@ -431,34 +431,34 @@ public class SchemaAnalyzer {
         List<ForeignKeyConstraint> constraints = DbAnalyzer.getForeignKeyConstraints(tables);
 
         HtmlConstraintsPage htmlConstraintsPage = new HtmlConstraintsPage(mustacheCompiler);
-        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("constraints.html").toFile())) {
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("constraints.html").toFile())) {
             htmlConstraintsPage.write(constraints, tables, writer);
         }
 
         progressListener.graphingSummaryProgressed();
 
         HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
-        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("anomalies.html").toFile())) {
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("anomalies.html").toFile())) {
             htmlAnomaliesPage.write(tables, impliedConstraints, writer);
         }
 
         progressListener.graphingSummaryProgressed();
 
         HtmlColumnsPage htmlColumnsPage = new HtmlColumnsPage(mustacheCompiler);
-        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("columns.html").toFile())) {
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("columns.html").toFile())) {
             htmlColumnsPage.write(tables, writer);
         }
 
         progressListener.graphingSummaryProgressed();
 
         HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
-        try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines.html").toFile())) {
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("routines.html").toFile())) {
             htmlRoutinesPage.write(db.getRoutines(), writer);
         }
 
         HtmlRoutinePage htmlRoutinePage = new HtmlRoutinePage(mustacheCompiler);
         for (Routine routine : db.getRoutines()) {
-            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("routines").resolve(new FileNameGenerator().generate(routine.getName()) + DOT_HTML).toFile())) {
+            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("routines").resolve(new FileNameGenerator().generate(routine.getName()) + DOT_HTML).toFile())) {
                 htmlRoutinePage.write(routine, writer);
             }
         }
@@ -480,7 +480,7 @@ public class SchemaAnalyzer {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table);
             progressListener.graphingDetailsProgressed(table);
             LOGGER.debug("Writing details of {}", table.getName());
-            try (Writer writer = Writers.newPrintWriter(outputDir.toPath().resolve("tables").resolve(new FileNameGenerator().generate(table.getName()) + DOT_HTML).toFile())) {
+            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("tables").resolve(new FileNameGenerator().generate(table.getName()) + DOT_HTML).toFile())) {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
             }
         }
