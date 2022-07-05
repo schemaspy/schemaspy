@@ -18,19 +18,8 @@
  */
 package org.schemaspy.util;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-
 public class Writers {
 
     private Writers() {}
-
-    public static BufferedWriter newBufferedWriter(File file) throws IOException {
-        return Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-    }
 
 }
