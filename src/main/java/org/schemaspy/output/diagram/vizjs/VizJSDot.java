@@ -21,7 +21,7 @@ package org.schemaspy.output.diagram.vizjs;
 import org.apache.commons.io.IOUtils;
 import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.Renderer;
-import org.schemaspy.util.Writers;
+import org.schemaspy.util.DefaultBufferedWriter;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -66,7 +66,7 @@ public class VizJSDot implements Renderer {
         try {
             String dotSource = IOUtils.toString(dotFile.toURI().toURL(), StandardCharsets.UTF_8);
             String svg = toSvg(dotSource, MB_64);
-            try (Writer diagramWriter = Writers.newBufferedWriter(diagramFile)){
+            try (Writer diagramWriter = new DefaultBufferedWriter(diagramFile)){
                 IOUtils.write(svg, diagramWriter);
             }
             return "";
