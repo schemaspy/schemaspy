@@ -26,7 +26,6 @@ import org.schemaspy.output.html.mustache.Diagram;
 import org.schemaspy.output.html.mustache.ImgDiagram;
 import org.schemaspy.output.html.mustache.SvgDiagram;
 import org.schemaspy.util.DefaultPrintWriter;
-import org.schemaspy.util.Writers;
 
 import java.io.File;
 import java.io.IOException;
