@@ -27,7 +27,6 @@ import org.schemaspy.output.diagram.DiagramResult;
 import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.DefaultPrintWriter;
-import org.schemaspy.util.Writers;
 import org.schemaspy.view.MustacheTableDiagram;
 
 import java.io.File;
