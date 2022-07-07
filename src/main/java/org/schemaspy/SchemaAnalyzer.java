@@ -338,7 +338,7 @@ public class SchemaAnalyzer {
         LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/graphing summary");
 
-        markDownRegistryPages(tables);
+        Markdown.registryPage(tables);
 
         new ResourceWriter().copyResources(layoutFolder.url(), outputDir, notHtml());
 
@@ -484,15 +484,6 @@ public class SchemaAnalyzer {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
             }
         }
-    }
-
-    private static void markDownRegistryPages(Collection<Table> tables) {
-        tables.stream()
-                .filter(table -> !table.isLogical())
-                .forEach( table -> {
-                    String tablePath = "tables/" + new FileNameGenerator().generate(table.getName()) + DOT_HTML;
-                    Markdown.registryPage(table.getName(), tablePath);
-                });
     }
 
     private FileFilter notHtml() {

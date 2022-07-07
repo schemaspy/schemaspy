@@ -25,8 +25,11 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.profiles.pegdown.Extensions;
 import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.options.DataHolder;
+import org.schemaspy.model.Table;
+import org.schemaspy.view.FileNameGenerator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -62,8 +65,14 @@ public class Markdown {
         return text;
     }
 
-    public static void registryPage(String name, String path) {
-        pages.put(name, path);
+    public static void registryPage(final Collection<Table> tables) {
+        final String DOT_HTML = ".html";
+        tables.stream()
+                .filter(table -> !table.isLogical())
+                .forEach( table -> {
+                    String tablePath = "tables/" + new FileNameGenerator().generate(table.getName()) + DOT_HTML;
+                    pages.put(table.getName(), tablePath);
+                });
     }
 
     public static String pagePath(String page) {
