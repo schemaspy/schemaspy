@@ -56,7 +56,7 @@ public class HtmlRoutinesPage {
                 .templateName("routines.html")
                 .scriptName("routines.js")
                 .addToScope("routines", routines)
-                .addToScope("md2html", (Function<String,String>) md -> Markdown.toHtml(md, mustacheCompiler.getRootPath(0)))
+                .addToScope("md2html", (Function<String,String>) md -> new Markdown().toHtml(md, mustacheCompiler.getRootPath(0)))
                 .getPageData();
 
         try {

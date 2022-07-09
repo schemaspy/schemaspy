@@ -9,14 +9,14 @@ public class MarkdownTest {
     @Test
     public void willNotReplaceDirectNewLineToBR() {
         String sourceMarkdown = "Line\n with\n no\n hardbreak\n";
-        String renderedMarkdown = Markdown.toHtml(sourceMarkdown, ".");
+        String renderedMarkdown = new Markdown().toHtml(sourceMarkdown, ".");
         assertThat(renderedMarkdown).doesNotContain("<br />");
     }
 
     @Test
     public void willReplaceNewLineWhenPrecededByTwoSpacesAsBR() {
         String sourceMarkdown = "Line  \n with  \n no  \n hardbreak  \n";
-        String renderedMarkdown = Markdown.toHtml(sourceMarkdown, ".");
+        String renderedMarkdown = new Markdown().toHtml(sourceMarkdown, ".");
         assertThat(renderedMarkdown).contains("<br />");
     }
 

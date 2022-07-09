@@ -51,9 +51,9 @@ public class Markdown {
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
     private static final HashMap<String, String> pages = new HashMap<>();
 
-    private Markdown() {}
+    public Markdown() {}
 
-    public static String toHtml(String markdownText, String rootPath) {
+    public String toHtml(String markdownText, String rootPath) {
         String text = markdownText;
 
         if (text != null) {
@@ -79,7 +79,7 @@ public class Markdown {
         return pages.get(page);
     }
 
-    private static String addReferenceLink(String markdownText, String rootPath) {
+    private String addReferenceLink(String markdownText, String rootPath) {
         StringBuilder text = new StringBuilder(markdownText);
         String newLine = "\r\n";
 
