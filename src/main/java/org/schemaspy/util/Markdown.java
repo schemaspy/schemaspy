@@ -19,7 +19,6 @@
  */
 package org.schemaspy.util;
 
-import com.vladsch.flexmark.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.profiles.pegdown.Extensions;
@@ -50,20 +49,22 @@ public class Markdown {
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
     private static final HashMap<String, String> pages = new HashMap<>();
+    private final String markdownText;
+    private final String rootPath;
 
-    public Markdown() {}
+    public Markdown(final String markdownText, final String rootPath) {
+        this.markdownText = markdownText;
+        this.rootPath = rootPath;
+    }
 
-    public String toHtml(String markdownText, String rootPath) {
+    public String toHtml() {
         if (markdownText == null) {
             return null;
         }
 
         return RENDERER.render(
                 PARSER.parse(
-                        addReferenceLink(
-                                markdownText,
-                                rootPath
-                        )
+                        addReferenceLink()
                 )
         ).trim();
     }
@@ -82,7 +83,7 @@ public class Markdown {
         return pages.get(page);
     }
 
-    private String addReferenceLink(String markdownText, String rootPath) {
+    private String addReferenceLink() {
         StringBuilder text = new StringBuilder(markdownText);
         String newLine = "\r\n";
 
