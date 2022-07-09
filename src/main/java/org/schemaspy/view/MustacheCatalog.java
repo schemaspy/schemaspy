@@ -32,7 +32,7 @@ public class MustacheCatalog {
 
     public MustacheCatalog(Catalog catalog,String rootPath) {
         this.name = catalog.getName();
-        this.comment = new Markdown().toHtml(catalog.getComment(), rootPath);
+        this.comment = new Markdown(catalog.getComment(), rootPath).toHtml();
     }
 	
     public String getComment() {

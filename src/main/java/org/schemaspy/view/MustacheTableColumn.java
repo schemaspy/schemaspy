@@ -150,7 +150,7 @@ public class MustacheTableColumn {
 
     public String getComments() {
         String comments = column.getComments();
-        comments = new Markdown().toHtml(comments, rootPath);
+        comments = new Markdown(comments, rootPath).toHtml();
         return comments;
     }
 

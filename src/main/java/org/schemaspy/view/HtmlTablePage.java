@@ -84,7 +84,7 @@ public class HtmlTablePage {
                 .templateName("tables/table.html")
                 .scriptName("table.js")
                 .addToScope("table", table)
-                .addToScope("comments", new Markdown().toHtml(table.getComments(), mustacheCompiler.getRootPath(1)))
+                .addToScope("comments", new Markdown(table.getComments(), mustacheCompiler.getRootPath(1)).toHtml())
                 .addToScope("primaries", primaries)
                 .addToScope("columns", tableColumns)
                 .addToScope("indexes", indexedColumns)
