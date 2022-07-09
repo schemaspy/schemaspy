@@ -150,7 +150,7 @@ public class SchemaAnalyzer {
             List<String> schemas = config.getSchemas();
             Database db = null;
             String schemaSpec = config.getSchemaSpec();
-            Connection connection = getConnection(config);
+            Connection connection = new DbDriverLoader().getConnection(config);
             DatabaseMetaData meta = connection.getMetaData();
             //-all(evaluteAll) given then get list of the database schemas
             if (schemas == null || config.isEvaluateAllEnabled()) {
@@ -497,11 +497,6 @@ public class SchemaAnalyzer {
         } catch (IOException e) {
             LOGGER.error("Failed to write '{}', to '{}'", key + "=" + value, infoFile, e);
         }
-    }
-
-    private static Connection getConnection(Config config) throws IOException {
-        DbDriverLoader driverLoader = new DbDriverLoader();
-        return driverLoader.getConnection(config);
     }
 
     /**
