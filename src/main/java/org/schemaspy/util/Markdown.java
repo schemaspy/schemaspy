@@ -54,15 +54,18 @@ public class Markdown {
     public Markdown() {}
 
     public String toHtml(String markdownText, String rootPath) {
-        String text = markdownText;
-
-        if (text != null) {
-            text = addReferenceLink(text, rootPath);
-            Node content = PARSER.parse(text);
-            text = RENDERER.render(content).trim();
+        if (markdownText == null) {
+            return null;
         }
 
-        return text;
+        return RENDERER.render(
+                PARSER.parse(
+                        addReferenceLink(
+                                markdownText,
+                                rootPath
+                        )
+                )
+        ).trim();
     }
 
     public static void registryPage(final Collection<Table> tables) {
