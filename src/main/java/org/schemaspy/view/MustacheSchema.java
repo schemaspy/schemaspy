@@ -34,7 +34,7 @@ public class MustacheSchema {
 
     public MustacheSchema(Schema schema,String rootPath) {
         this.name = schema.getName();
-        this.comment = Markdown.toHtml(schema.getComment(), rootPath); 
+        this.comment = new Markdown().toHtml(schema.getComment(), rootPath);
     }
 
     public String getName() {

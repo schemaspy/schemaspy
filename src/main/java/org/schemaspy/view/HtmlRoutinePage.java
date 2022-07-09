@@ -47,7 +47,7 @@ public class HtmlRoutinePage {
                 .templateName("routines/routine.html")
                 .scriptName("routine.js")
                 .addToScope("routineName", routine.getName())
-                .addToScope("routineComment", Markdown.toHtml(routine.getComment(), mustacheCompiler.getRootPath(1)))
+                .addToScope("routineComment", new Markdown().toHtml(routine.getComment(), mustacheCompiler.getRootPath(1)))
                 .addToScope("routineParameters",routine.getParameters())
                 .addToScope("routineDefinition",routine.getDefinition())
                 .depth(1)

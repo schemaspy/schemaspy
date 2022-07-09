@@ -67,7 +67,7 @@ public class HtmlMainIndexPage {
 
         for(Table table: tables) {
             columnsAmount += table.getColumns().size();
-            String comments = Markdown.toHtml(table.getComments(), "");
+            String comments = new Markdown().toHtml(table.getComments(), "");
             MustacheTable mustacheTable = new MustacheTable(table, "");
             mustacheTable.setComments(comments);
             mustacheTables.add(mustacheTable);
@@ -90,7 +90,7 @@ public class HtmlMainIndexPage {
                 .addToScope("anomaliesAmount", anomaliesAmount)
                 .addToScope("tables", mustacheTables)
                 .addToScope("database", database)
-                .addToScope("description", Markdown.toHtml(description, ""))
+                .addToScope("description", new Markdown().toHtml(description, ""))
                 .addToScope("schema", new MustacheSchema(database.getSchema(), ""))
                 .addToScope("catalog", new MustacheCatalog(database.getCatalog(), ""))
                 .addToScope("xmlName", getXmlName(database))
