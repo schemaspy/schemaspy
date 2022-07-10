@@ -42,19 +42,42 @@ import java.util.regex.Pattern;
  */
 public class Markdown {
 
-    private static final DataHolder OPTIONS = PegdownOptionsAdapter.flexmarkOptions(true,
-            Extensions.ALL ^ Extensions.HARDWRAPS
-    );
-
-    private static final Parser PARSER = Parser.builder(OPTIONS).build();
-    private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
     private static final HashMap<String, String> pages = new HashMap<>();
+
     private final String markdownText;
     private final String rootPath;
+    private final Parser parser;
+    private final HtmlRenderer renderer;
 
     public Markdown(final String markdownText, final String rootPath) {
+        this(
+                markdownText,
+                rootPath,
+                PegdownOptionsAdapter.flexmarkOptions(true,
+                        Extensions.ALL ^ Extensions.HARDWRAPS
+                )
+        );
+    }
+
+    public Markdown(final String markdownText, final String rootPath, final DataHolder options) {
+        this(
+                markdownText,
+                rootPath,
+                Parser.builder(options).build(),
+                HtmlRenderer.builder(options).build()
+        );
+    }
+
+    public Markdown(
+            final String markdownText,
+            final String rootPath,
+            final Parser parser,
+            final HtmlRenderer renderer
+    ) {
         this.markdownText = markdownText;
         this.rootPath = rootPath;
+        this.parser = parser;
+        this.renderer = renderer;
     }
 
     public String toHtml() {
@@ -62,8 +85,8 @@ public class Markdown {
             return null;
         }
 
-        return RENDERER.render(
-                PARSER.parse(
+        return renderer.render(
+                parser.parse(
                         addReferenceLink()
                 )
         ).trim();
@@ -112,8 +135,8 @@ public class Markdown {
 
             String path = rootPath+pagePath(pageLink);
             if (!"".equals(anchorLink)) {
-				path = path + "#" + anchorLink;
-			}
+                path = path + "#" + anchorLink;
+            }
             text.append("[").append(link).append("]: ./").append(path).append(newLine);
         }
 
