@@ -55,13 +55,13 @@ import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults
 import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
 import org.schemaspy.output.html.mustache.diagrams.OrphanDiagram;
 import org.schemaspy.util.*;
+import org.schemaspy.util.naming.FileNameGenerator;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;

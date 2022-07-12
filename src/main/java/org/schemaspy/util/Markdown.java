@@ -25,7 +25,7 @@ import com.vladsch.flexmark.profiles.pegdown.Extensions;
 import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.options.DataHolder;
 import org.schemaspy.model.Table;
-import org.schemaspy.view.FileNameGenerator;
+import org.schemaspy.util.naming.FileNameGenerator;
 
 import java.util.ArrayList;
 import java.util.Collection;

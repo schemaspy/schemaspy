@@ -28,7 +28,7 @@ import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
 import org.schemaspy.output.dot.DotConfig;
-import org.schemaspy.view.FileNameGenerator;
+import org.schemaspy.util.naming.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
