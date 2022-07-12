@@ -23,7 +23,7 @@ import org.schemaspy.output.diagram.DiagramResult;
 import org.schemaspy.output.diagram.TableDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.util.DefaultPrintWriter;
-import org.schemaspy.view.FileNameGenerator;
+import org.schemaspy.util.naming.FileNameGenerator;
 import org.schemaspy.view.MustacheTableDiagram;
 
 import java.io.File;

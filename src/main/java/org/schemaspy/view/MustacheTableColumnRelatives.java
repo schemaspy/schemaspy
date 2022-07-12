@@ -21,6 +21,7 @@ package org.schemaspy.view;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
+import org.schemaspy.util.naming.FileNameGenerator;
 
 /**
  * Created by rkasa on 2016-03-24.

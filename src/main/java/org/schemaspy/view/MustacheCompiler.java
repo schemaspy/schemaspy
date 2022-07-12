@@ -26,6 +26,7 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import org.schemaspy.util.DataTableConfig;
+import org.schemaspy.util.naming.FileNameGenerator;
 
 import java.io.IOException;
 import java.io.StringWriter;
