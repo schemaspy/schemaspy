@@ -18,8 +18,6 @@
  */
 package org.schemaspy.util.naming;
 
-import org.schemaspy.output.dot.schemaspy.name.Name;
-
 public class FileNameGenerator implements Name {
 
     private final String original_name;

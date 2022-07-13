@@ -1,5 +1,7 @@
 package org.schemaspy.output.dot.schemaspy.name;
 
+import org.schemaspy.util.naming.Name;
+
 public final class Implied implements Name {
 
     private final boolean isImplied;

@@ -1,5 +1,7 @@
 package org.schemaspy.output.dot.schemaspy.name;
 
+import org.schemaspy.util.naming.Name;
+
 /**
  * Provides a default name for a graph.
  */
