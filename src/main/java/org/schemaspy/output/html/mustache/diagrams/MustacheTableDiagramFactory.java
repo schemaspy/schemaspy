@@ -62,7 +62,7 @@ public class MustacheTableDiagramFactory {
     public List<MustacheTableDiagram> generateRealTableDiagrams(Table table) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
 
-        String fileNameBase = new FileNameGenerator().generate(table.getName());
+        String fileNameBase = new FileNameGenerator(table.getName()).value();
 
         File oneDegreeDotFile = new File(tableDir, fileNameBase + ".1degree.dot");
         File twoDegreesDotFile = new File(tableDir, fileNameBase + ".2degrees.dot");
@@ -102,7 +102,7 @@ public class MustacheTableDiagramFactory {
     public List<MustacheTableDiagram> generateImpliedTableDiagrams(Table table) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
 
-        String fileNameBase = new FileNameGenerator().generate(table.getName());
+        String fileNameBase = new FileNameGenerator(table.getName()).value();
 
         File oneImpliedDotFile = new File(tableDir, fileNameBase + ".implied1degrees.dot");
         File twoImpliedDotFile = new File(tableDir, fileNameBase + ".implied2degrees.dot");

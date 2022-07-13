@@ -184,7 +184,7 @@ public class SchemaAnalyzer {
                     config.setDb(schema);
 
                 LOGGER.info("Analyzing '{}'", schema);
-                File outputDirForSchema = new File(outputDir, new FileNameGenerator().generate(schema));
+                File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
                 db = this.analyze(schema, config, outputDirForSchema, databaseService, progressListener);
                 if (db == null) //if any of analysed schema returns null
                     return null;
@@ -458,7 +458,7 @@ public class SchemaAnalyzer {
 
         HtmlRoutinePage htmlRoutinePage = new HtmlRoutinePage(mustacheCompiler);
         for (Routine routine : db.getRoutines()) {
-            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("routines").resolve(new FileNameGenerator().generate(routine.getName()) + DOT_HTML).toFile())) {
+            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("routines").resolve(new FileNameGenerator(routine.getName()).value() + DOT_HTML).toFile())) {
                 htmlRoutinePage.write(routine, writer);
             }
         }
@@ -480,7 +480,7 @@ public class SchemaAnalyzer {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table);
             progressListener.graphingDetailsProgressed(table);
             LOGGER.debug("Writing details of {}", table.getName());
-            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("tables").resolve(new FileNameGenerator().generate(table.getName()) + DOT_HTML).toFile())) {
+            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("tables").resolve(new FileNameGenerator(table.getName()).value() + DOT_HTML).toFile())) {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
             }
         }

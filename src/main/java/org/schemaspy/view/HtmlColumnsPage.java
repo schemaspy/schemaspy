@@ -76,7 +76,7 @@ public class HtmlColumnsPage {
         tableColumns.forEach(mc -> {
             columns.put(switchToLinkedHashMap(new JSONObject())
                 .put("tableName", valueOrEmptyString(mc.getColumn().getTable().getName()))
-                .put("tableFileName", valueOrEmptyString(new FileNameGenerator().generate(mc.getColumn().getTable().getName())))
+                .put("tableFileName", valueOrEmptyString(new FileNameGenerator(mc.getColumn().getTable().getName()).value()))
                 .put("tableType", valueOrEmptyString(mc.getColumn().getTable().getType()))
                 .put("keyClass", valueOrEmptyString(mc.getKeyClass()))
                 .put("keyTitle", valueOrEmptyString(mc.getKeyTitle()))
