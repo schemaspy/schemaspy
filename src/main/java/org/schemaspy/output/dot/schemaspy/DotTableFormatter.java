@@ -34,6 +34,8 @@ import org.schemaspy.output.dot.schemaspy.graph.Digraph;
 import org.schemaspy.output.dot.schemaspy.graph.Element;
 import org.schemaspy.output.dot.schemaspy.name.*;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
+import org.schemaspy.util.naming.Concatenation;
+import org.schemaspy.util.naming.Name;
 
 import java.io.PrintWriter;
 import java.util.*;

@@ -1,4 +1,4 @@
-package org.schemaspy.output.dot.schemaspy.name;
+package org.schemaspy.util.naming;
 
 import org.junit.Test;
 

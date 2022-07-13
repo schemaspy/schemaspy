@@ -1,5 +1,7 @@
 package org.schemaspy.output.dot.schemaspy.name;
 
+import org.schemaspy.util.naming.Name;
+
 /**
  * Encapsulates what name to use based on number of degrees of separation.
  */

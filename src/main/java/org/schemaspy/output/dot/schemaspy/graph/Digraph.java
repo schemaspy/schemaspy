@@ -1,7 +1,7 @@
 package org.schemaspy.output.dot.schemaspy.graph;
 
 import org.schemaspy.output.dot.schemaspy.Header;
-import org.schemaspy.output.dot.schemaspy.name.Name;
+import org.schemaspy.util.naming.Name;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
