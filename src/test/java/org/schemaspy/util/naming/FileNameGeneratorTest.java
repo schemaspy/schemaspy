@@ -27,14 +27,14 @@ public class FileNameGeneratorTest {
     @Test
     public void nameShorterOrEqualTo40ReturnIt() {
         String name = "1234567890123456789012345678901234567890";
-        String fileName = new FileNameGenerator().generate(name);
+        String fileName = new FileNameGenerator(name).value();
         assertThat(fileName).isEqualToIgnoringCase(name);
     }
 
     @Test
     public void nameLongerThan40ShortenItTo40() {
         String name= "12345678901234567890123456789012345678901";
-        String fileName = new FileNameGenerator().generate(name);
+        String fileName = new FileNameGenerator(name).value();
         assertThat(fileName.length()).isLessThanOrEqualTo(40);
     }
 
@@ -42,13 +42,13 @@ public class FileNameGeneratorTest {
     public void wontGenerateSameNameForTwoDifferentNames() {
         String nameOne = "98765432109876543210987654321098765432109876543210";
         String nameTwo = "12345678901234567890123456789012345678901234567890";
-        assertThat(new FileNameGenerator().generate(nameOne)).isNotEqualToIgnoringCase(new FileNameGenerator().generate(nameTwo));
+        assertThat(new FileNameGenerator(nameOne).value()).isNotEqualToIgnoringCase(new FileNameGenerator(nameTwo).value());
     }
 
     @Test
     public void willReplaceIllegalCharsWithUnderscoreAndAddHashAsHex() {
         String name = "Test\tif/name/is#fixed or not";
-        String fileName = new FileNameGenerator().generate(name);
+        String fileName = new FileNameGenerator(name).value();
         assertThat(fileName).isEqualToIgnoringCase("Test_if_name_is_fixed_or_not_f9e4eeb2");
     }
 
@@ -56,13 +56,13 @@ public class FileNameGeneratorTest {
     public void wontGenerateSameForSimilar() {
         String nameOne = "Test\tif/name/is#fixed or not";
         String nameTwo = "Test\tif\tname/is#fixed or not";
-        assertThat(new FileNameGenerator().generate(nameOne)).isNotEqualToIgnoringCase(new FileNameGenerator().generate(nameTwo));
+        assertThat(new FileNameGenerator(nameOne).value()).isNotEqualToIgnoringCase(new FileNameGenerator(nameTwo).value());
     }
 
     @Test
     public void withJapanese() {
         String name = "こんにちは";
-        String fileName = new FileNameGenerator().generate(name);
+        String fileName = new FileNameGenerator(name).value();
         assertThat(fileName).isEqualToIgnoringCase("______bfca3f39");
     }
 }

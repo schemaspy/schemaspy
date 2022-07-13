@@ -18,11 +18,18 @@
  */
 package org.schemaspy.util.naming;
 
-public class FileNameGenerator {
+import org.schemaspy.output.dot.schemaspy.name.Name;
 
-    public FileNameGenerator() {}
+public class FileNameGenerator implements Name {
 
-    public String generate(final String original_name) {
+    private final String original_name;
+
+    public FileNameGenerator(final String original_name) {
+        this.original_name = original_name;
+    }
+
+    @Override
+    public String value() {
         String name = original_name.replaceAll("[^a-zA-Z0-9\\-_\\.]", "_");
         if (name.length() <= 40 && original_name.equalsIgnoreCase(name)) {
             return name;

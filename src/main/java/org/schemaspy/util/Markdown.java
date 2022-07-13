@@ -97,7 +97,7 @@ public class Markdown {
         tables.stream()
                 .filter(table -> !table.isLogical())
                 .forEach( table -> {
-                    String tablePath = "tables/" + new FileNameGenerator().generate(table.getName()) + DOT_HTML;
+                    String tablePath = "tables/" + new FileNameGenerator(table.getName()).value() + DOT_HTML;
                     pages.put(table.getName(), tablePath);
                 });
     }
