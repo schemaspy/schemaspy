@@ -75,7 +75,7 @@ public class GraphvizDot implements Renderer {
             LOGGER.trace("GraphvizVersion: \"{}\"", versionLine);
 
             // look for a number followed numbers or dots
-            Matcher matcher = Pattern.compile("[0-9]+\\.[0-9]+[^\\.]").matcher(versionLine);
+            Matcher matcher = Pattern.compile("([0-9]+\\.)+[0-9]+[^.]").matcher(versionLine);
             if (matcher.find()) {
                 versionText = matcher.group();
             } else {
