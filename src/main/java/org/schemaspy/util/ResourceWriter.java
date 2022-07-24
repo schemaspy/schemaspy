@@ -60,13 +60,6 @@ public class ResourceWriter {
          */
         if (urlConnection instanceof JarURLConnection) {
             new Jar((JarURLConnection) urlConnection, targetPath, filter).copyJarResourceToPath();
-        } else {
-            File file = new File(resourceUrl.getPath());
-            if (file.isDirectory()) {
-                FileUtils.copyDirectory(file, targetPath, filter);
-            } else {
-                FileUtils.copyFile(file, targetPath);
-            }
         }
     }
 }
