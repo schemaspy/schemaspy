@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.net.JarURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Enumeration;
@@ -17,14 +19,22 @@ import java.util.jar.JarFile;
 /**
  * Represents JAR file resources.
  */
-class Jar {
+public class Jar {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final JarURLConnection jarConnection;
     private final File destPath;
     private final FileFilter filter;
 
-    Jar(JarURLConnection jarConnection, File destPath, FileFilter filter) {
+    public Jar(URL resourceUrl, File targetPath, FileFilter filter) throws IOException {
+        this(resourceUrl.openConnection(), targetPath, filter);
+    }
+
+    public Jar(URLConnection urlConnection, File targetPath, FileFilter filter) {
+        this((JarURLConnection) urlConnection, targetPath, filter);
+    }
+
+    public Jar(JarURLConnection jarConnection, File destPath, FileFilter filter) {
         this.jarConnection = jarConnection;
         this.destPath = destPath;
         this.filter = filter;
