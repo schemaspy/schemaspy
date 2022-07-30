@@ -192,7 +192,7 @@ public class SchemaAnalyzer {
                 mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
             }
 
-            new ResourceWriter().copyResources(layoutFolder.url(), outputDir, notHtml());
+            new Jar(layoutFolder.url(), outputDir, notHtml()).copyJarResourceToPath();
 
             DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
             MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config, dataTableConfig);
@@ -340,7 +340,7 @@ public class SchemaAnalyzer {
 
         Markdown.registryPage(tables);
 
-        new ResourceWriter().copyResources(layoutFolder.url(), outputDir, notHtml());
+        new Jar(layoutFolder.url(), outputDir, notHtml()).copyJarResourceToPath();
 
         Renderer renderer = useVizJS ? new VizJSDot() : new GraphvizDot(commandLineArguments.getGraphVizConfig());
 
