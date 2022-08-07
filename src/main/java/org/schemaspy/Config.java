@@ -99,7 +99,6 @@ public final class Config implements HtmlConfig {
     private Pattern tableExclusions;
     private Pattern columnExclusions;
     private Pattern indirectColumnExclusions;
-    private String userConnectionPropertiesFile;
     private Properties userConnectionProperties;
     private Integer maxDbThreads;
     private Integer maxDetailedTables;
@@ -365,10 +364,6 @@ public final class Config implements HtmlConfig {
         return maxDetailedTables;
     }
 
-    public String getConnectionPropertiesFile() {
-        return userConnectionPropertiesFile;
-    }
-
     /**
      * Properties from this file (in key=value pair format) are passed to the
      * database connection.<br>
@@ -384,7 +379,6 @@ public final class Config implements HtmlConfig {
         try (InputStream inputStream = new FileInputStream(propertiesFilename)) {
             userConnectionProperties.load(inputStream);
         }
-        userConnectionPropertiesFile = propertiesFilename;
     }
 
     /**
