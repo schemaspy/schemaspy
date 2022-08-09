@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - multi-arch
     paths-ignore:
       - '*.md'
       - 'docs/**'
