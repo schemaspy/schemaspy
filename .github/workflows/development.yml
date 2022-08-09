@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    if: ${{ github.repository_owner == 'schemaspy' }}
+
     runs-on: ubuntu-latest
 
     steps:
