@@ -1,4 +1,6 @@
-package org.schemaspy;
+package org.schemaspy.connection;
+
+import org.schemaspy.Config;
 
 import java.io.FileInputStream;
 import java.io.IOException;
