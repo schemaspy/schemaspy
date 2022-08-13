@@ -2,9 +2,7 @@ package org.schemaspy.connection;
 
 import org.schemaspy.Config;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 public class ConnectionProperties {
@@ -22,7 +20,7 @@ public class ConnectionProperties {
 
     /**
      * Returns a {@link Properties} populated either from the properties file specified
-     * by {@link #setConnectionPropertiesFile(String)}, the properties specified by
+     * by {@link PropertiesFromFile}, the properties specified by
      * {@link SemicolonSeparated} or not populated.
      *
      * @return connection properties to use when connecting
@@ -34,7 +32,7 @@ public class ConnectionProperties {
                 if (connprops.contains(ESCAPED_EQUALS)) {
                     userConnectionProperties = new SemicolonSeparated(connprops).setConnectionProperties();
                 } else {
-                    setConnectionPropertiesFile(connprops);
+                    userConnectionProperties = new PropertiesFromFile(connprops).setConnectionPropertiesFile();
                 }
             } else {
                 userConnectionProperties = new Properties();
@@ -42,22 +40,5 @@ public class ConnectionProperties {
         }
 
         return userConnectionProperties;
-    }
-
-    /**
-     * Properties from this file (in key=value pair format) are passed to the
-     * database connection.<br>
-     * user (from -u) and password (from -p) will be passed in the
-     * connection properties if specified.
-     *
-     * @param propertiesFilename file to use for connection properties
-     * @throws IOException if we have problems reading the file
-     */
-    private void setConnectionPropertiesFile(String propertiesFilename) throws IOException {
-        if (userConnectionProperties == null)
-            userConnectionProperties = new Properties();
-        try (InputStream inputStream = new FileInputStream(propertiesFilename)) {
-            userConnectionProperties.load(inputStream);
-        }
     }
 }
