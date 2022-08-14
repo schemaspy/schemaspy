@@ -5,16 +5,16 @@ import org.schemaspy.Config;
 import java.io.IOException;
 import java.util.Properties;
 
-public class ConnectionProperties {
+public class ConnectionPropertiesFactory {
     private final String connprops;
     private Properties userConnectionProperties;
     private static final String ESCAPED_EQUALS = "\\=";
 
-    public ConnectionProperties(Config config) {
+    public ConnectionPropertiesFactory(Config config) {
         this(config.connprops());
     }
 
-    public ConnectionProperties(String connprops) {
+    public ConnectionPropertiesFactory(String connprops) {
         this.connprops = connprops;
     }
 
