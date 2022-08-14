@@ -24,7 +24,7 @@
 package org.schemaspy.input.dbms;
 
 import org.schemaspy.Config;
-import org.schemaspy.connection.ConnectionProperties;
+import org.schemaspy.connection.ConnectionPropertiesFactory;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +81,7 @@ public class DbDriverLoader {
 
         loadJDBCJars = config.isLoadJDBCJarsEnabled();
 
-        Properties connectionProperties = new ConnectionProperties(config).getConnectionProperties();
+        Properties connectionProperties = new ConnectionPropertiesFactory(config).getConnectionProperties();
         if (config.getUser() != null) {
             connectionProperties.put("user", config.getUser());
         }
