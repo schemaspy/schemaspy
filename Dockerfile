@@ -45,4 +45,4 @@ WORKDIR /
 ENV SCHEMASPY_DRIVERS=/drivers
 ENV SCHEMASPY_OUTPUT=/output
 
-ENTRYPOINT ["/usr/local/bin/schemaspy"]
+ENTRYPOINT ["/usr/local/bin/schemaspy.sh"]
