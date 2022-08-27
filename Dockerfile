@@ -36,8 +36,8 @@ RUN set -x && \
     chown -R jboss /output
 
 
-ADD target/schema*-app.jar /usr/local/lib/schemaspy/
-ADD docker/schemaspy.sh /usr/local/bin/schemaspy
+ADD target/schema*.jar /usr/local/lib/schemaspy/
+ADD docker/schemaspy.sh /usr/local/bin/schemaspy.sh
 
 USER jboss
 WORKDIR /
