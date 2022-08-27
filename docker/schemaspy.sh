@@ -1,4 +1,16 @@
 #!/bin/sh
+
+if [ x"${RUN_WHEN_EXISTS}" == "x" ]; then 
+     echo "RUN_WHEN_EXISTS not set"
+else
+  if [ -f "$FILE" ]; then
+     echo "$RUN_WHEN_EXISTS exists, running..."
+  else
+     echo "$RUN_WHEN_EXISTS not found"
+     exit 1
+  fi   
+fi
+
 [ -d $SCHEMASPY_DRIVERS ] && export DRIVER_PATH=$SCHEMASPY_DRIVERS || export DRIVER_PATH=/drivers_inc/
 echo -n "Using drivers:"
 ls -Ax $DRIVER_PATH | sed -e 's/  */, /g'
