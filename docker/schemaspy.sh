@@ -19,3 +19,7 @@ exec java -jar /usr/local/lib/schemaspy/schemaspy*.jar \
   -host $SQL_HOST -port $SQL_PORT \
   -u $SQL_USER -p $SQL_PASSWORD \
   -o $SCHEMASPY_OUTPUT
+
+if [ -f "$RUN_WHEN_EXISTS" ]; then
+  rm $RUN_WHEN_EXISTS
+fi    
