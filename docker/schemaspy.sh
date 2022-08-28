@@ -3,7 +3,7 @@
 if [ x"${RUN_WHEN_EXISTS}" == "x" ]; then 
      echo "RUN_WHEN_EXISTS not set"
 else
-  if [ -f "$FILE" ]; then
+  if [ -f "$RUN_WHEN_EXISTS" ]; then
      echo "$RUN_WHEN_EXISTS exists, running..."
   else
      echo "$RUN_WHEN_EXISTS not found"
