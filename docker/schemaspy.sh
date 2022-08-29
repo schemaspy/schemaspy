@@ -1,12 +1,12 @@
 #!/bin/sh
 
-if [ x"${RUN_WHEN_EXISTS}" == "x" ]; then 
-     echo "RUN_WHEN_EXISTS not set"
+if [ x"${SCHEMASPY_RUN_WHEN_EXISTS}" == "x" ]; then 
+     echo "SCHEMASPY_RUN_WHEN_EXISTS not set"
 else
-  if [ -f "$RUN_WHEN_EXISTS" ]; then
-     echo "$RUN_WHEN_EXISTS exists, running..."
+  if [ -f "$SCHEMASPY_RUN_WHEN_EXISTS" ]; then
+     echo "$SCHEMASPY_RUN_WHEN_EXISTS exists, running..."
   else
-     echo "$RUN_WHEN_EXISTS not found"
+     echo "$SCHEMASPY_RUN_WHEN_EXISTS not found"
      exit 1
   fi   
 fi
@@ -20,6 +20,6 @@ exec java -jar /usr/local/lib/schemaspy/schemaspy*.jar \
   -u $SQL_USER -p $SQL_PASSWORD \
   -o $SCHEMASPY_OUTPUT
 
-if [ -f "$RUN_WHEN_EXISTS" ]; then
-  rm $RUN_WHEN_EXISTS
+if [ -f "$SCHEMASPY_RUN_WHEN_EXISTS" ]; then
+  rm $SCHEMASPY_RUN_WHEN_EXISTS
 fi    
