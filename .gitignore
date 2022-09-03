@@ -14,3 +14,4 @@ ext-lib/**/*.jar
 .java-version
 .sdkmanrc
 output/
+.vscode/
