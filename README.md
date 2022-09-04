@@ -122,6 +122,7 @@ The resulting documentation can be found in `docs/build/html`
 SchemaSpy is maintained by:
 * [Rafał Kasa](https://github.com/rafalkasa) 
 * [Nils Petzäll](https://github.com/npetzall)
+* [Jesper Olsson](https://github.com/jesperolsson-se)
 
 with SchemaSpy community support please contact with us if you have some question or proposition.
 
