@@ -25,7 +25,7 @@ public class PropertiesFromFile {
     /**
      * @throws IOException if we have problems reading the file
      */
-    public Properties setConnectionPropertiesFile() throws IOException {
+    public Properties connectionProperties() throws IOException {
         Properties result = new Properties();
         try (InputStream inputStream = new FileInputStream(propertiesFilename)) {
             result.load(inputStream);
