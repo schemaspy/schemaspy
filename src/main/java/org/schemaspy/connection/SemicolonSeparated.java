@@ -22,7 +22,7 @@ public class SemicolonSeparated {
         this.properties = properties;
     }
 
-    public Properties setConnectionProperties() {
+    public Properties connectionProperties() {
         Properties result = new Properties();
         StringTokenizer tokenizer = new StringTokenizer(properties, ";");
         while (tokenizer.hasMoreElements()) {

@@ -30,9 +30,9 @@ public class ConnectionPropertiesFactory {
         if (userConnectionProperties == null) {
             if (connprops != null) {
                 if (connprops.contains(ESCAPED_EQUALS)) {
-                    userConnectionProperties = new SemicolonSeparated(connprops).setConnectionProperties();
+                    userConnectionProperties = new SemicolonSeparated(connprops).connectionProperties();
                 } else {
-                    userConnectionProperties = new PropertiesFromFile(connprops).setConnectionPropertiesFile();
+                    userConnectionProperties = new PropertiesFromFile(connprops).connectionProperties();
                 }
             } else {
                 userConnectionProperties = new Properties();
