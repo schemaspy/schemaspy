@@ -39,7 +39,7 @@ It will look for:
 Layout
 ------
 
-It can contain wast amount of properties so we will break it down.
+It can contain wast amounts of properties so we will break it down.
 The Properties-file can contain instructions.
 
 extends

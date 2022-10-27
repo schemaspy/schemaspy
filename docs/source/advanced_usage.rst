@@ -17,7 +17,7 @@ Supply Connection-properties
 As an example running mysql with a new driver you'll get warning
     According to MySQL 5.5.45+, 5.6.26+ and 5.7.6+ requirements SSL connection must be established by default if explicit option isn't set. For compliance with existing applications not using SSL the verifyServerCertificate property is set to 'false'. You need either to explicitly disable SSL by setting useSSL=false, or set useSSL=true and provide truststore for server certificate verification.
 
-This can be omited by addind connection property ``useSSL=false``
+This can be omitted by adding connection property ``useSSL=false``.
 
 To add this connection property add following to commandline:
 ``-connprops useSSL\=false``
@@ -33,12 +33,12 @@ Create your own DB type
 As an example we will add the connection property from above to the mysql db-type
 
 #. Create a new file in same directory as the schemaspy-jar, let's call it mysql-nossl.properties
-#. Add the following content to mysql-nossl.properies::
+#. Add the following content to mysql-nossl.properties::
 
     extends=mysql
     connectionSpec=jdbc:mysql://<hostOptionalPort>/<db>?useSSL=false
 
-#. Now you can run schamaspy with -t mysql-nossl
+#. Now you can run SchemaSpy with ``-t mysql-nossl``
 
 If you want to have a closer look at the db-types you can find them at `github <https://github.com/schemaspy/schemaspy/tree/master/src/main/resources/org/schemaspy/types>`_
 
@@ -87,7 +87,7 @@ Now we are going to connect to mysql thru unix socket, put on your helmets
 
 #. Now run schemaspy with the following options::
 
-    java -jar [schemaspy.jar] -t my-mysq-socket \
+    java -jar [schemaspy.jar] -t my-mysql-socket \
     -dp lib/mysql-connector-java-[version].jar \
     -loadjars \
     -db [DBName] \
