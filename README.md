@@ -25,7 +25,7 @@ In new **SchemaSpy 6.0** version you will find:
 
 1. Absolutely new amazing look and feel generated content
 
-2. You can very easily change SchemaSpy theme because all of the logic was moved outside the Java code
+2. You can very easily change SchemaSpy theme because all the logic was moved outside the Java code
 
 3. Speed of database generation improved a little
 
