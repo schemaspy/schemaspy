@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -17,7 +18,7 @@ public class SemicolonSeparatedTest {
      * Then it should respond an object containing those properties.
      */
     @Test
-    public void parse() {
+    public void parse() throws IOException {
         final Properties result = new SemicolonSeparated(
                 "key1\\=value1;key2\\=value2"
         ).connectionProperties();

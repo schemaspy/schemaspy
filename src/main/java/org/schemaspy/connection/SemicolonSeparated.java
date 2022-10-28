@@ -1,5 +1,7 @@
 package org.schemaspy.connection;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -13,7 +15,6 @@ import java.util.StringTokenizer;
 public class SemicolonSeparated {
 
     private final String properties;
-    private static final String ESCAPED_EQUALS = "\\=";
 
     /**
      * @param properties string with key\\=value pairs separated by ; of connection properties
@@ -22,18 +23,14 @@ public class SemicolonSeparated {
         this.properties = properties;
     }
 
-    public Properties connectionProperties() {
+    public Properties connectionProperties() throws IOException {
         Properties result = new Properties();
-        StringTokenizer tokenizer = new StringTokenizer(properties, ";");
-        while (tokenizer.hasMoreElements()) {
-            String pair = tokenizer.nextToken();
-            int index = pair.indexOf(ESCAPED_EQUALS);
-            if (index != -1) {
-                String key = pair.substring(0, index);
-                String value = pair.substring(index + ESCAPED_EQUALS.length());
-                result.put(key, value);
-            }
-        }
+        result.load(
+            new StringReader(
+                properties.replace(';','\n')
+                    .replace("\\=", "=")
+            )
+        );
         return result;
     }
 }
