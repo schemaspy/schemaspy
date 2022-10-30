@@ -11,7 +11,7 @@ import java.util.Properties;
  * user (from -u) and password (from -p) will be passed in the
  * connection properties if specified.
  */
-public class PropertiesFromFile {
+public class PropertiesFromFile implements Connection {
 
     private final String propertiesFilename;
 
@@ -22,10 +22,8 @@ public class PropertiesFromFile {
         this.propertiesFilename = propertiesFilename;
     }
 
-    /**
-     * @throws IOException if we have problems reading the file
-     */
-    public Properties connectionProperties() throws IOException {
+    @Override
+    public Properties properties() throws IOException {
         Properties result = new Properties();
         try (InputStream inputStream = new FileInputStream(propertiesFilename)) {
             result.load(inputStream);
