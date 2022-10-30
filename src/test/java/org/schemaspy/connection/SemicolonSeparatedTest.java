@@ -21,7 +21,7 @@ public class SemicolonSeparatedTest {
     public void parse() throws IOException {
         final Properties result = new SemicolonSeparated(
                 "key1\\=value1;key2\\=value2"
-        ).connectionProperties();
+        ).properties();
         assertThat(result.containsKey("key1")).isTrue();
         assertThat(result.containsValue("value1")).isTrue();
         assertThat(result.containsKey("key2")).isTrue();

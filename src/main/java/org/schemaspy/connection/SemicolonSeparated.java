@@ -3,7 +3,6 @@ package org.schemaspy.connection;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 /**
  * Specifies connection properties to use in the format:
@@ -12,7 +11,7 @@ import java.util.StringTokenizer;
  * connection properties if specified.<p>
  * This is an alternative form of passing connection properties than by file
  */
-public class SemicolonSeparated {
+public class SemicolonSeparated implements Connection {
 
     private final String properties;
 
@@ -23,7 +22,8 @@ public class SemicolonSeparated {
         this.properties = properties;
     }
 
-    public Properties connectionProperties() throws IOException {
+    @Override
+    public Properties properties() throws IOException {
         Properties result = new Properties();
         result.load(
             new StringReader(
