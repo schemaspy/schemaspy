@@ -81,7 +81,7 @@ public class DbDriverLoader {
 
         loadJDBCJars = config.isLoadJDBCJarsEnabled();
 
-        Properties connectionProperties = new ConnectionPropertiesFactory(config).getConnectionProperties();
+        Properties connectionProperties = new ConnectionPropertiesFactory(config).getConnectionProperties().properties();
         if (config.getUser() != null) {
             connectionProperties.put("user", config.getUser());
         }
