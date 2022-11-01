@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class ConnectionPropertiesFactory {
     private final String connprops;
-    private Properties userConnectionProperties;
+    private Connection userConnection;
     private static final String ESCAPED_EQUALS = "\\=";
 
     public ConnectionPropertiesFactory(Config config) {
@@ -19,26 +19,26 @@ public class ConnectionPropertiesFactory {
     }
 
     /**
-     * Returns a {@link Properties} populated either from the properties file specified
+     * Returns a {@link Connection} populated either from the properties file specified
      * by {@link PropertiesFromFile}, the properties specified by
      * {@link SemicolonSeparated} or not populated.
      *
      * @return connection properties to use when connecting
      * @throws IOException if we a have problems reading the properties file if -connprops is a file
      */
-    public Properties getConnectionProperties() throws IOException {
-        if (userConnectionProperties == null) {
+    public Connection getConnectionProperties() throws IOException {
+        if (userConnection == null) {
             if (connprops != null) {
                 if (connprops.contains(ESCAPED_EQUALS)) {
-                    userConnectionProperties = new SemicolonSeparated(connprops).properties();
+                    userConnection = new SemicolonSeparated(connprops);
                 } else {
-                    userConnectionProperties = new PropertiesFromFile(connprops).properties();
+                    userConnection = new PropertiesFromFile(connprops);
                 }
             } else {
-                userConnectionProperties = new Properties();
+                userConnection = Properties::new;
             }
         }
 
-        return userConnectionProperties;
+        return userConnection;
     }
 }
