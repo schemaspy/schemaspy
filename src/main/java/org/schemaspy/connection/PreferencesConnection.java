@@ -5,16 +5,19 @@ import org.schemaspy.Config;
 import java.io.IOException;
 import java.util.Properties;
 
-public class ConnectionPropertiesFactory {
+/**
+ * Encapsulates what connection to use based on user preferences.
+ */
+public class PreferencesConnection implements Connection {
     private final String connprops;
-    private Connection userConnection;
+    private Connection origin;
     private static final String ESCAPED_EQUALS = "\\=";
 
-    public ConnectionPropertiesFactory(Config config) {
+    public PreferencesConnection(Config config) {
         this(config.connprops());
     }
 
-    public ConnectionPropertiesFactory(String connprops) {
+    public PreferencesConnection(String connprops) {
         this.connprops = connprops;
     }
 
@@ -26,19 +29,20 @@ public class ConnectionPropertiesFactory {
      * @return connection properties to use when connecting
      * @throws IOException if we a have problems reading the properties file if -connprops is a file
      */
-    public Connection getConnectionProperties() throws IOException {
-        if (userConnection == null) {
+    @Override
+    public Properties properties() throws IOException {
+        if (origin == null) {
             if (connprops != null) {
                 if (connprops.contains(ESCAPED_EQUALS)) {
-                    userConnection = new SemicolonSeparated(connprops);
+                    origin = new SemicolonSeparated(connprops);
                 } else {
-                    userConnection = new PropertiesFromFile(connprops);
+                    origin = new PropertiesFromFile(connprops);
                 }
             } else {
-                userConnection = Properties::new;
+                origin = Properties::new;
             }
         }
 
-        return userConnection;
+        return origin.properties();
     }
 }
