@@ -25,6 +25,7 @@ package org.schemaspy.input.dbms;
 
 import org.schemaspy.Config;
 import org.schemaspy.connection.PreferencesConnection;
+import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
@@ -82,14 +83,13 @@ public class DbDriverLoader {
 
         loadJDBCJars = config.isLoadJDBCJarsEnabled();
 
-        Properties connectionProperties = new WithUser(
+        final Properties connectionProperties = new WithPassword(
             config,
-            new PreferencesConnection(config)
+            new WithUser(
+                config,
+                new PreferencesConnection(config)
+            )
         ).properties();
-
-        if (config.getPassword() != null) {
-            connectionProperties.put("password", config.getPassword());
-        }
 
         Connection connection;
         try {
