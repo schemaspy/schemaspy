@@ -44,6 +44,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -809,7 +810,14 @@ public final class Config implements HtmlConfig {
      * @return jar that we have been started from
      */
     public static String getLoadedFromJar() {
-        String loadedFrom = Config.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        String path = Config.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        String loadedFrom = "";
+        try {
+            loadedFrom = URLDecoder.decode(path, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.warn("Could not decode path {}", path);
+        }
+
         if (loadedFrom.contains("!/BOOT-INF")) {
             try {
                 loadedFrom = new URL(loadedFrom).getFile();
