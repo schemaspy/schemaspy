@@ -45,7 +45,7 @@ public class VizJSDot implements Renderer {
                 throw new IllegalArgumentException("viz.js not found");
             }
             ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-            scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
+            scriptEngine = scriptEngineManager.getEngineByName("nashorn");
             scriptEngine.eval(IOUtils.toString(vizJs, StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new IllegalArgumentException("viz.js", e);
