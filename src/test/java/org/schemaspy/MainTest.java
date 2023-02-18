@@ -5,7 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.testing.ExitCodeRule;
-import org.schemaspy.testing.ResettingOutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.nio.file.Paths;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MainTest {
 
     @Rule
-    public ResettingOutputCapture resettingOutputCapture = new ResettingOutputCapture();
+    public OutputCaptureRule resettingOutputCapture = new OutputCaptureRule();
 
     @Rule
     public ExitCodeRule exitCodeRule = new ExitCodeRule();
