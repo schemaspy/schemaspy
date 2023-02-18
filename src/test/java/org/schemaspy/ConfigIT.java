@@ -21,7 +21,7 @@ package org.schemaspy;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
-import org.schemaspy.testing.ResettingOutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 
 /**
  * @author Nils Petzaell
@@ -29,7 +29,7 @@ import org.schemaspy.testing.ResettingOutputCapture;
 public class ConfigIT {
 
     @Rule
-    public ResettingOutputCapture outputCapture = new ResettingOutputCapture();
+    public OutputCaptureRule outputCapture = new OutputCaptureRule();
 
     @Test
     public void onlyOutputSelectedDatabaseTypeWhenDbSpecific() {
