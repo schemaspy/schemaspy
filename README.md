@@ -49,6 +49,12 @@ java -jar ~/Downloads/schemaspy.jar \
     -o DIRECTORY
 ```
 
+If you aren't using PostgreSQL, don't panic! Out of the box, SchemaSpy supports
+over a dozen different databases. List them by using `-dbhelp`. Still not enough?
+As long as your database has a JBDC driver you can
+[plug it in](https://schemaspy.readthedocs.io/en/latest/configuration/databaseType.html)
+to SchemaSpy.
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
