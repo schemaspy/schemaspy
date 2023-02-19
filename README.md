@@ -108,6 +108,20 @@ For perpetuating SchemaSpy ever since:
 * [Nils Petzäll](https://github.com/npetzall), and
 * [Jesper Olsson](https://github.com/jesperolsson-se)
 
+For creating tutorials and guides for the community:
+* :fr: :arrow_forward: [Une DOC AUTOMATIQUE avec SchemaSpy (et SYMFONY et GITLAB)](https://youtu.be/Ehw1t2S4APQ?t=602) by YoanDev
+* :de: :arrow_forward: [Datenbank-Analyse mit SchemaSpy](https://www.jentsch.io/datenbank-analyse-mit-schemaspy/) by Michael Jentsch
+* :es: :arrow_forward: [Ejemplo de Uso de schemaspy](https://www.youtube.com/watch?v=13MMSeDaWao) by MGS Educación, Tecnología y Juventud
+* :es: :arrow_forward: [Generar modelo desde una base de datos con schemaSpy](https://youtu.be/RoTITyGJ07Y) by Inforgledys
+* :open_book: [Java Power Tools](https://www.goodreads.com/en/book/show/2631468) by John Ferguson Smart
+* [Documenting your database with SchemaSpy](https://robintegg.com/2019/01/29/documenting-your-database-with-schemaspy.html) by Robin Tegg
+* [How to Document a Database With SchemaSpy](https://levelup.gitconnected.com/database-documentation-with-schemaspy-e9071eecd45a) by Data 4 Everyone!
+* [How to use SchemaSpy to document your database](https://medium.com/@gustavo.ponce.ch/how-to-use-schemaspy-to-document-your-database-4046fdecfe83) by Gustavo Ponce
+* [Installing SchemaSpy to document you database](http://www.goring.org/resources/schemaspy_tutorial.html) by @SimonGoring
+* [SchemaSpy-HOWTO](https://gist.github.com/dpapathanasiou/c9c6236a410e9d018ae0) by @dpapathanasiou
+* [Simple database documentation with SchemaSpy](https://rieckpil.de/howto-simple-database-documentation-with-schemaspy/) by @rieckpil
+* [Use cases of data and Schemaspy: Database Management](https://juileetalele.medium.com/use-cases-of-data-and-schemaspy-database-management-6e4c43c383e2) by Juilee Talele
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
