@@ -23,6 +23,32 @@ curl -L https://github.com/schemaspy/schemaspy/releases/download/v6.1.0/schemasp
     --output ~/Downloads/schemaspy.jar
 ```
 
+# Quick start
+
+Let's assume you're using PostgreSQL (11 or later).
+First, download their JBDC driver.
+
+```
+curl -L https://jdbc.postgresql.org/download/postgresql-42.5.4.jar \
+    --output ~/Downloads/jbdc-driver.jar
+```
+
+Then run SchemaSpy against your database and you're ready to browse it in
+`DIRECTORY/index.html`.
+
+```
+java -jar ~/Downloads/schemaspy.jar \
+    --database-type pgsql11 \
+    --driverPath ~/Downloads/jbdc-driver.jar \
+    -db DATABASE \
+    -host SERVER \
+    -port 5432 \
+    --schema dbo \
+    -u USER \
+    -p PASSWORD \
+    -o DIRECTORY
+```
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
