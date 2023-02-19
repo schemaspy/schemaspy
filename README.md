@@ -98,6 +98,11 @@ more people, asked their companies to provide financial aid, or decided to impro
 the software. We wish we had the space to thank each of you individually because
 every Github star, tweet or other activity reminds us that our work is appreciated.
 
+## Special thanks
+
+For creating the first five versions of SchemaSpy:
+* [John Currier](http://schemaspy.sourceforge.net/)
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
