@@ -11,6 +11,18 @@
 
 [![SchemaSpy sample](http://schemaspy.org/img/example_page_table_relationships.png)](http://schemaspy.org/sample/index.html)
 
+# Installation
+
+SchemaSpy is a stand alone tool. Just download the lastest
+[JAR file](https://github.com/schemaspy/schemaspy/releases/download/v6.1.0/schemaspy-6.1.0.jar)
+or [Docker image](https://hub.docker.com/r/schemaspy/schemaspy/) and you're
+ready to go!
+
+```
+curl -L https://github.com/schemaspy/schemaspy/releases/download/v6.1.0/schemaspy-6.1.0.jar \
+    --output ~/Downloads/schemaspy.jar
+```
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
