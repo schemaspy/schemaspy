@@ -103,6 +103,11 @@ every Github star, tweet or other activity reminds us that our work is appreciat
 For creating the first five versions of SchemaSpy:
 * [John Currier](http://schemaspy.sourceforge.net/)
 
+For perpetuating SchemaSpy ever since:
+* [Rafał Kasa](https://github.com/rafalkasa),
+* [Nils Petzäll](https://github.com/npetzall), and
+* [Jesper Olsson](https://github.com/jesperolsson-se)
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
