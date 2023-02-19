@@ -16,10 +16,12 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
+import os
+import sys
 # sys.path.insert(0, os.path.abspath('.'))
 import sphinx_rtd_theme
+
+sys.path.append(os.path.abspath("./_ext"))
 
 
 # -- General configuration ------------------------------------------------
@@ -31,7 +33,7 @@ import sphinx_rtd_theme
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+extensions = ["sphinx_rtd_theme",'schemaspy_database_types']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -64,7 +66,7 @@ release = u'6.0.0'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
