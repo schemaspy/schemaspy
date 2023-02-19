@@ -55,6 +55,12 @@ As long as your database has a JBDC driver you can
 [plug it in](https://schemaspy.readthedocs.io/en/latest/configuration/databaseType.html)
 to SchemaSpy.
 
+# Documentation and FAQs
+
+We host our [documentation](https://schemaspy.readthedocs.io/en/latest/) on Read the Docs.
+Be sure to check out the section on
+[troubleshooting common problems](https://schemaspy.readthedocs.io/en/latest/faq.html).
+
 # Main use cases
 
 SchemaSpy covers a lot of use cases for database analysis and documentation.
@@ -133,12 +139,6 @@ We are proud to note that SchemaSpy assists researchers in their work.
 * [Methodology of integration of a clinical data warehouse with a clinical information system: the HEGP case](https://doi.org/10.3233/978-1-60750-588-4-193) by Eric Zapletal et al.
 * [Predicting Hospital Readmission by Analyzing Patient EHR Records](https://doi.org/10.1007/978-1-4842-7086-8_3) by Anshik
 * [Processes, Motivations, and Issues for Migrating to Microservices Architectures: An Empirical Investigation](https://doi.org/10.1109/MCC.2017.4250931) by Davide Taibi et al.
-
-# Documentation
-
-If you need more info about how to use or install SchemaSpy please read the last documentation at Read the Docs.
-
-[Documentation](https://schemaspy.readthedocs.io/en/latest/)
 
 # Latest Build
 
