@@ -69,6 +69,12 @@ they rarely stay up-to-date. With SchemaSpy, this is no longer a problem.
 The diagrams can be generated quickly and even as a part of your CI/CD workflow
 to ensure it's always up to date.
 
+## Your database in numbers
+
+SchemaSpy can collect various kinds of interesting statistics to describe the shape
+and form of your database's structure. Drill down deeper into these statistics
+directly in the report or export them to excel or CSV for further QA analysis.
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
