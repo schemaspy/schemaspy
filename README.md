@@ -75,6 +75,12 @@ SchemaSpy can collect various kinds of interesting statistics to describe the sh
 and form of your database's structure. Drill down deeper into these statistics
 directly in the report or export them to excel or CSV for further QA analysis.
 
+## Keep the data confidential
+
+Nowadays, a company's data can be their most valuable asset. Since SchemaSpy only
+reads structural information, it works just as well on an empty database replica.
+This means that the report can be shared for third party analysis without fear.
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
