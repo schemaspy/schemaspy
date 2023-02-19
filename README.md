@@ -81,6 +81,12 @@ Nowadays, a company's data can be their most valuable asset. Since SchemaSpy onl
 reads structural information, it works just as well on an empty database replica.
 This means that the report can be shared for third party analysis without fear.
 
+## Detect sub-optimal constructs
+
+SchemaSpy incorporates knowledge about best practices in database design. It can
+locate and report anomalies such as missing indexes, implied relationships, and
+orphan tables.
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
