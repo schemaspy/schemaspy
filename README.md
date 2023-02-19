@@ -122,6 +122,18 @@ For creating tutorials and guides for the community:
 * [Simple database documentation with SchemaSpy](https://rieckpil.de/howto-simple-database-documentation-with-schemaspy/) by @rieckpil
 * [Use cases of data and Schemaspy: Database Management](https://juileetalele.medium.com/use-cases-of-data-and-schemaspy-database-management-6e4c43c383e2) by Juilee Talele
 
+## Scientific usage
+
+We are proud to note that SchemaSpy assists researchers in their work.
+
+* [EpiSurf: metadata-driven search server for analyzing amino acid changes within epitopes of SARS-CoV-2 and other viral species](https://doi.org/10.1093/database/baab059) by Anna Bernasconi et al.
+* [Experiences from performing software quality evaluations via combining benchmark-based metrics analysis, software visualization, and expert assessment](https://doi.org/10.1109/ICSM.2015.7332493) by Aiko Yamashita
+* [FOCUSPEARL version 5.5.5 - technical description of database and interface](https://library.wur.nl/WebQuery/wurpubs/608609) by Maarten C Braakhekke et al.
+* [From monolithic systems to microservices: A decomposition framework based on process mining](https://doi.org/10.5220/0007755901530164) by Davide Taibi and Kari Systä
+* [Methodology of integration of a clinical data warehouse with a clinical information system: the HEGP case](https://doi.org/10.3233/978-1-60750-588-4-193) by Eric Zapletal et al.
+* [Predicting Hospital Readmission by Analyzing Patient EHR Records](https://doi.org/10.1007/978-1-4842-7086-8_3) by Anshik
+* [Processes, Motivations, and Issues for Migrating to Microservices Architectures: An Empirical Investigation](https://doi.org/10.1109/MCC.2017.4250931) by Davide Taibi et al.
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
