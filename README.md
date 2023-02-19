@@ -55,6 +55,11 @@ As long as your database has a JBDC driver you can
 [plug it in](https://schemaspy.readthedocs.io/en/latest/configuration/databaseType.html)
 to SchemaSpy.
 
+# Main use cases
+
+SchemaSpy covers a lot of use cases for database analysis and documentation.
+Be sure to check out the guides provided by the community later in this README.
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
