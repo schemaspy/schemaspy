@@ -23,6 +23,8 @@ curl -L https://github.com/schemaspy/schemaspy/releases/download/v6.1.0/schemasp
     --output ~/Downloads/schemaspy.jar
 ```
 
+> For unreleased bug fixes and features-in-progress, download our [snapshot JAR](https://schemaspy.org/schemaspy/download.html) or use Docker tag `snapshot`
+
 # Quick start
 
 Let's assume you're using PostgreSQL (11 or later).
@@ -139,12 +141,6 @@ We are proud to note that SchemaSpy assists researchers in their work.
 * [Methodology of integration of a clinical data warehouse with a clinical information system: the HEGP case](https://doi.org/10.3233/978-1-60750-588-4-193) by Eric Zapletal et al.
 * [Predicting Hospital Readmission by Analyzing Patient EHR Records](https://doi.org/10.1007/978-1-4842-7086-8_3) by Anshik
 * [Processes, Motivations, and Issues for Migrating to Microservices Architectures: An Empirical Investigation](https://doi.org/10.1109/MCC.2017.4250931) by Davide Taibi et al.
-
-# Latest Build
-
-To verify fixes and new features you can download our latest build.
-
-[schemaspy@latest](https://schemaspy.org/schemaspy/download.html)
 
 # Build Instructions
 ## Application
