@@ -60,6 +60,15 @@ to SchemaSpy.
 SchemaSpy covers a lot of use cases for database analysis and documentation.
 Be sure to check out the guides provided by the community later in this README.
 
+## On-demand database documentation
+
+The prefered way to document databases is through entity-relationship (ER) diagrams.
+However, drawing these diagrams manually is such a time-consuming and error-prone
+process that we hardly ever draw them in practice. When the diagrams *are* drawn,
+they rarely stay up-to-date. With SchemaSpy, this is no longer a problem.
+The diagrams can be generated quickly and even as a part of your CI/CD workflow
+to ensure it's always up to date.
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
