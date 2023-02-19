@@ -87,6 +87,17 @@ SchemaSpy incorporates knowledge about best practices in database design. It can
 locate and report anomalies such as missing indexes, implied relationships, and
 orphan tables.
 
+# Community
+
+Welcome to the SchemaSpy community! Just reading this file or using the tool means
+that you're a part of our community and contributing to the future of the project.
+We're grateful to have you with us!
+
+Some of our community members have put extra effort into sharing SchemaSpy with
+more people, asked their companies to provide financial aid, or decided to improve
+the software. We wish we had the space to thank each of you individually because
+every Github star, tweet or other activity reminds us that our work is appreciated.
+
 > Please support the project by simply putting a Github star. 
 Share this library with friends on Twitter and everywhere else you can.
 
