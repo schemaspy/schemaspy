@@ -1,4 +1,4 @@
-# [Schema Spy](http://schemaspy.org/) -  [schemaspy.org](http://schemaspy.org/)
+[![Logotype](https://github.com/schemaspy/schemaspy/blob/master/docs/source/_static/schemaspy_logo.png)](https://schemaspy.org/)
 
 [![Development](https://github.com/schemaspy/schemaspy/actions/workflows/development.yml/badge.svg)](https://github.com/schemaspy/schemaspy/actions/workflows/development.yml)
 [![Documentation Status](https://readthedocs.org/projects/schemaspy/badge/?version=latest)](http://schemaspy.readthedocs.io/en/latest/?badge=latest)
