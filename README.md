@@ -28,11 +28,11 @@ curl -L https://github.com/schemaspy/schemaspy/releases/download/v6.1.0/schemasp
 # Quick start
 
 Let's assume you're using PostgreSQL (11 or later).
-First, download their JBDC driver.
+First, download their JDBC driver.
 
 ```
 curl -L https://jdbc.postgresql.org/download/postgresql-42.5.4.jar \
-    --output ~/Downloads/jbdc-driver.jar
+    --output ~/Downloads/jdbc-driver.jar
 ```
 
 Then run SchemaSpy against your database and you're ready to browse it in
@@ -41,7 +41,7 @@ Then run SchemaSpy against your database and you're ready to browse it in
 ```
 java -jar ~/Downloads/schemaspy.jar \
     --database-type pgsql11 \
-    --driverPath ~/Downloads/jbdc-driver.jar \
+    --driverPath ~/Downloads/jdbc-driver.jar \
     -db DATABASE \
     -host SERVER \
     -port 5432 \
@@ -53,7 +53,7 @@ java -jar ~/Downloads/schemaspy.jar \
 
 If you aren't using PostgreSQL, don't panic! Out of the box, SchemaSpy supports
 over a dozen different databases. List them by using `-dbhelp`. Still not enough?
-As long as your database has a JBDC driver you can
+As long as your database has a JDBC driver you can
 [plug it in](https://schemaspy.readthedocs.io/en/latest/configuration/databaseType.html)
 to SchemaSpy.
 
