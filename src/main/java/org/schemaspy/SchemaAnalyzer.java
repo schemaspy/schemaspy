@@ -150,7 +150,7 @@ public class SchemaAnalyzer {
             List<String> schemas = config.getSchemas();
             Database db = null;
             String schemaSpec = config.getSchemaSpec();
-            Connection connection = new DbDriverLoader().getConnection(config);
+            Connection connection = new DbDriverLoader().getConnection(commandLineArguments, config);
             DatabaseMetaData meta = connection.getMetaData();
             //-all(evaluteAll) given then get list of the database schemas
             if (schemas == null || config.isEvaluateAllEnabled()) {
@@ -237,7 +237,7 @@ public class SchemaAnalyzer {
 
             String catalog = commandLineArguments.getCatalog();
 
-            DatabaseMetaData databaseMetaData = sqlService.connect(config);
+            DatabaseMetaData databaseMetaData = sqlService.connect(commandLineArguments, config);
             DbmsMeta dbmsMeta = sqlService.getDbmsMeta();
 
             LOGGER.debug("supportsSchemasInTableDefinitions: {}", databaseMetaData.supportsSchemasInTableDefinitions());
