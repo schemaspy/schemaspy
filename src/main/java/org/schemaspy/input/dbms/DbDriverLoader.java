@@ -24,6 +24,7 @@
 package org.schemaspy.input.dbms;
 
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithUser;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -60,9 +61,15 @@ public class DbDriverLoader {
 
 
     public Connection getConnection(Config config) throws IOException {
+        return this.getConnection(
+            new ConnectionURLBuilder(config, config.getDbProperties()),
+            config
+        );
+    }
+
+    public Connection getConnection(ConnectionURLBuilder urlBuilder, Config config) throws IOException {
         Properties properties = config.getDbProperties();
 
-        ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(config, properties);
         if (Objects.isNull(config.getDb()))
             config.setDb(urlBuilder.build());
 
