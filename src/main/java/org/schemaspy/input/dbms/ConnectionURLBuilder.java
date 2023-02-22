@@ -23,6 +23,7 @@
 package org.schemaspy.input.dbms;
 
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.DbSpecificOption;
 import org.slf4j.Logger;
@@ -56,6 +57,21 @@ public class ConnectionURLBuilder {
             new DbSpecificConfig(
                 config.getDbType(),
                 config.getDbProperties()
+            ),
+            config,
+            properties
+        );
+    }
+
+    public ConnectionURLBuilder(
+            final CommandLineArguments commandLineArguments,
+            final Config config,
+            final Properties properties
+    ) {
+        this(
+            new DbSpecificConfig(
+                commandLineArguments.getDatabaseType(),
+                config.determineDbProperties(commandLineArguments.getDatabaseType())
             ),
             config,
             properties
