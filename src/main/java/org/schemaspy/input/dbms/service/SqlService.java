@@ -68,7 +68,10 @@ public class SqlService {
     public DatabaseMetaData connect(Config config) throws IOException, SQLException {
         DbDriverLoader driverLoader = new DbDriverLoader();
         connection = driverLoader.getConnection(config);
+        return connect(connection, config);
+    }
 
+    public DatabaseMetaData connect(Connection connection, Config config) throws IOException, SQLException {
         databaseMetaData = connection.getMetaData();
         dbmsMeta = dbmsService.fetchDbmsMeta(databaseMetaData);
         invalidIdentifierPattern = createInvalidIdentifierPattern(databaseMetaData);
