@@ -68,6 +68,13 @@ public class DbDriverLoader {
         );
     }
 
+    public Connection getConnection(CommandLineArguments commandLineArguments, Config config) throws IOException {
+        return this.getConnection(
+            new ConnectionURLBuilder(commandLineArguments, config, config.getDbProperties()),
+            config
+        );
+    }
+
     public Connection getConnection(ConnectionURLBuilder urlBuilder, Config config) throws IOException {
         Properties properties = config.getDbProperties();
 
