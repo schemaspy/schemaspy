@@ -24,6 +24,7 @@
 package org.schemaspy.input.dbms.service;
 
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
@@ -68,6 +69,12 @@ public class SqlService {
     public DatabaseMetaData connect(Config config) throws IOException, SQLException {
         DbDriverLoader driverLoader = new DbDriverLoader();
         connection = driverLoader.getConnection(config);
+        return connect(connection, config);
+    }
+
+    public DatabaseMetaData connect(CommandLineArguments commandLineArguments, Config config) throws IOException, SQLException {
+        DbDriverLoader driverLoader = new DbDriverLoader();
+        connection = driverLoader.getConnection(commandLineArguments, config);
         return connect(connection, config);
     }
 
