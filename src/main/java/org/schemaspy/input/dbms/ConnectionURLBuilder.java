@@ -43,6 +43,7 @@ public class ConnectionURLBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private final DbSpecificConfig dbConfig;
     private final Config config;
     private final Properties dbType;
 
@@ -51,6 +52,18 @@ public class ConnectionURLBuilder {
      * @param properties
      */
     public ConnectionURLBuilder(Config config, Properties properties) {
+        this(
+            new DbSpecificConfig(
+                config.getDbType(),
+                config.getDbProperties()
+            ),
+            config,
+            properties
+        );
+    }
+
+    public ConnectionURLBuilder(DbSpecificConfig dbConfig, Config config, Properties properties) {
+        this.dbConfig = dbConfig;
         this.config = config;
         this.dbType = properties;
     }
@@ -60,8 +73,7 @@ public class ConnectionURLBuilder {
         args.addAll(config.getRemainingParameters());
 
         String connectionURL = dbType.getProperty("connectionSpec");
-        DbSpecificConfig dbConfig = new DbSpecificConfig(config.getDbType(), config.getDbProperties());
-        for (DbSpecificOption option : dbConfig.getOptions()) {
+        for (DbSpecificOption option : this.dbConfig.getOptions()) {
             option.setValue(getParam(args, option));
 
             LOGGER.debug("{}",option);
