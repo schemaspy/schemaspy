@@ -40,8 +40,8 @@ Then run SchemaSpy against your database and you're ready to browse it in
 
 ```
 java -jar ~/Downloads/schemaspy.jar \
-    --database-type pgsql11 \
-    --driverPath ~/Downloads/jdbc-driver.jar \
+    -t pgsql11 \
+    -dp ~/Downloads/jdbc-driver.jar \
     -db DATABASE \
     -host SERVER \
     -port 5432 \
