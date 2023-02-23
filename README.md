@@ -45,7 +45,6 @@ java -jar ~/Downloads/schemaspy.jar \
     -db DATABASE \
     -host SERVER \
     -port 5432 \
-    --schema dbo \
     -u USER \
     -p PASSWORD \
     -o DIRECTORY
