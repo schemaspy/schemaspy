@@ -64,8 +64,10 @@ include
 
 **Then we have required properties**:
 
+dbms=
+    Database Management System should general without version, used for grouping
 description=
-    Description for the databaseType (mostly used in logging)
+    Description for this specific databaseType (mostly used in logging) without dbms
 connectionSpec=
     We will talk more about this one. It's the connectionUrl used, but it supports token replacement
 driver=
