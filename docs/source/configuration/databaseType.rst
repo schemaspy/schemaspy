@@ -64,6 +64,8 @@ include
 
 **Then we have required properties**:
 
+dbms=
+    Database Management System should general without version, used for grouping
 description=
     Description for the databaseType (mostly used in logging)
 connectionSpec=
