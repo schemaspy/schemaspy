@@ -116,15 +116,29 @@ For perpetuating SchemaSpy ever since:
 * [Jesper Olsson](https://github.com/jesperolsson-se)
 
 For creating tutorials and guides for the community:
-* :fr: :arrow_forward: [Une DOC AUTOMATIQUE avec SchemaSpy (et SYMFONY et GITLAB)](https://youtu.be/Ehw1t2S4APQ?t=602) by YoanDev
-* :de: :arrow_forward: [Datenbank-Analyse mit SchemaSpy](https://www.jentsch.io/datenbank-analyse-mit-schemaspy/) by Michael Jentsch
+* :de: [Datenbank-Analyse mit SchemaSpy](https://www.jentsch.io/datenbank-analyse-mit-schemaspy/) by Michael Jentsch
+* :de: [Quick Tipp: Eine Datenbank Struktur verstehen mit Hilfe von schemaspy](https://www.exensio.de/news-medien/newsreader-blog/quick-tipp-eine-datenbank-struktur-verstehen-mit-hilfe-von-schemaspy) by von Irving Tschepke
 * :es: :arrow_forward: [Ejemplo de Uso de schemaspy](https://www.youtube.com/watch?v=13MMSeDaWao) by MGS Educación, Tecnología y Juventud
 * :es: :arrow_forward: [Generar modelo desde una base de datos con schemaSpy](https://youtu.be/RoTITyGJ07Y) by Inforgledys
+* :es: [Cómo documentar tus bases de datos con SchemaSpy](https://profile.es/blog/como-documentar-tus-bases-de-datos-con-schemaspy/) by Jesus Jimenez Herrera
+* :es: [¿Y si documentamos la base de datos? ... SchemaSpy al rescate](https://www.enmilocalfunciona.io/y-si-documentamos-la-base-de-datos-schemaspy-al-rescate/) by Víctor Madrid
+* :fr: :arrow_forward: [Une DOC AUTOMATIQUE avec SchemaSpy (et SYMFONY et GITLAB)](https://youtu.be/Ehw1t2S4APQ?t=602) by YoanDev
+* :fr: [Documentation automatique d’une App Symfony avec SchemaSpy et GitLab !](https://yoandev.co/documentation-automatique-dune-app-symfony-avec-schemaspy-et-gitlab/) by YoanDev
+* :fr: [Documenter une base de données avec SchemaSpy](https://dataforeveryone.medium.com/documenter-une-base-de-donn%C3%A9es-avec-schemaspy-e0f56a6fcfb3) by Data 4 Everyone!
+* :jp: [SchemaSpyでデータベースのドキュメントを生成してみた](https://dev.classmethod.jp/articles/schemaspy-doc/) By 坂井裕介
+* :jp: [SchemaSpyでER図を生成する](https://zenn.dev/onozaty/articles/schema-spy-er) By @onozaty
+* :portugal: [Documentando bancos com Schemaspy](https://www.linkedin.com/pulse/documentando-bancos-com-schemaspy-krisnamourt-silva/) By Krisnamourt Silva
 * :open_book: [Java Power Tools](https://www.goodreads.com/en/book/show/2631468) by John Ferguson Smart
 * [Documenting your database with SchemaSpy](https://robintegg.com/2019/01/29/documenting-your-database-with-schemaspy.html) by Robin Tegg
+* [Documenting your relational database using SchemaSpy](https://tech.asimio.net/2020/11/27/Documenting-your-relational-database-using-SchemaSpy.html) by Orlando L Otero
+* [How to Create ERD(Entity Relationship Diagram)](https://www.cybrosys.com/blog/how-to-create-erd-entity-relationship-diagram) by Cybrosys technologies
 * [How to Document a Database With SchemaSpy](https://levelup.gitconnected.com/database-documentation-with-schemaspy-e9071eecd45a) by Data 4 Everyone!
 * [How to use SchemaSpy to document your database](https://medium.com/@gustavo.ponce.ch/how-to-use-schemaspy-to-document-your-database-4046fdecfe83) by Gustavo Ponce
+* [How to visualize a PostgreSQL schema as SVG with SchemaSpy](https://dev.to/mostalive/how-to-visualize-a-postgresql-schema-as-svg-with-schemaspy-516g) by Willem van den Ende
 * [Installing SchemaSpy to document you database](http://www.goring.org/resources/schemaspy_tutorial.html) by @SimonGoring
+* [Netbox database schema diagram using schemaspy](https://www.oasys.net/posts/netbox-database-schema-diagram-using-schemaspy/) by Jason Lavoie
+* [Production grade PostgreSQL documentation in minutes](https://postgresconf.org/blog/posts/production-grade-postgresql-documentation-in-minutes) by Magnus Brun Falch
+* [Schemaspy – create documentation for your database](https://petrhnilica.cz/en/blog/2018/04/12/schemaspy-create-documentation-for-your-database/) by Petr Hnilica
 * [SchemaSpy-HOWTO](https://gist.github.com/dpapathanasiou/c9c6236a410e9d018ae0) by @dpapathanasiou
 * [Simple database documentation with SchemaSpy](https://rieckpil.de/howto-simple-database-documentation-with-schemaspy/) by @rieckpil
 * [Use cases of data and Schemaspy: Database Management](https://juileetalele.medium.com/use-cases-of-data-and-schemaspy-database-management-6e4c43c383e2) by Juilee Talele
