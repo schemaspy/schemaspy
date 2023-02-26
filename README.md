@@ -147,13 +147,39 @@ For creating tutorials and guides for the community:
 
 We are proud to note that SchemaSpy assists researchers in their work.
 
+* [A data-driven dynamic ontology](https://doi.org/10.1177/0165551515576478) by Dhomas Hatta Fudholi et al.
+* [A large scale empirical comparison of state-of-the-art search-based test case generators](https://doi.org/10.1016/j.infsof.2018.08.009) by Annibale Panichella et al.
+* [A scientist's guide for submitting data to ZFIN](https://doi.org/10.1016/bs.mcb.2016.04.010) by Douglas G Howe
+* [Automated unit test generation for classes with environment dependencies](http://dx.doi.org/10.1145/2642937.2642986) by Andrea Arcuri et al.
+* [BiG-SLiCE: A highly scalable tool maps the diversity of 1.2 million biosynthetic gene clusters](https://doi.org/10.1093/gigascience/giaa154) by Satria A Kautsar et al.
+* [emrKBQA: A Clinical Knowledge-Base Question Answering Dataset](https://hdl.handle.net/1721.1/143907) by Preethi Raghavan et al.
 * [EpiSurf: metadata-driven search server for analyzing amino acid changes within epitopes of SARS-CoV-2 and other viral species](https://doi.org/10.1093/database/baab059) by Anna Bernasconi et al.
 * [Experiences from performing software quality evaluations via combining benchmark-based metrics analysis, software visualization, and expert assessment](https://doi.org/10.1109/ICSM.2015.7332493) by Aiko Yamashita
 * [FOCUSPEARL version 5.5.5 - technical description of database and interface](https://library.wur.nl/WebQuery/wurpubs/608609) by Maarten C Braakhekke et al.
 * [From monolithic systems to microservices: A decomposition framework based on process mining](https://doi.org/10.5220/0007755901530164) by Davide Taibi and Kari Systä
+* [GEM: The GAAIN Entity Mapper](https://doi.org/10.1007%2F978-3-319-21843-4_2) by Naveen Ashish et al.
+* [Healthsheet: Development of a Transparency Artifact for Health Datasets](https://doi.org/10.1145/3531146.3533239) by Negar Rostamzadeh et al.
+* [How Aphia—The Platform behind Several Online and Taxonomically Oriented Databases—Can Serve Both the Taxonomic Community and the Field of Biodiversity Informatics](https://doi.org/10.3390/jmse3041448) by Leen Vandepitte et al.
+* [Incremental Control Dependency Frontier Exploration for Many-Criteria Test Case Generation](https://doi.org/10.1007/978-3-319-99241-9_17) by Annibale Panichella et al.
+* [Integrating Multimodal Radiation Therapy Data into i2b2](https://doi.org/10.1055/s-0038-1651497) by Eric Zapletal et al.
 * [Methodology of integration of a clinical data warehouse with a clinical information system: the HEGP case](https://doi.org/10.3233/978-1-60750-588-4-193) by Eric Zapletal et al.
+* [NakeDB: Database Schema Visualization](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=8374b287c790e70eeee834fd437de9ad9b2fe461) by Luis Miguel Cort ́es-Peña
+* [OCTOPUS database (v.2)](https://doi.org/10.5194/essd-14-3695-2022) by Alexandru T. Codilean et al.
+* [On approximate matching of programs for protecting libre software](https://doi.org/10.1145/1188966.1188994) by Arnoldo José Müller Molina and Takeshi Shinohara
+* [On the Quality of Relational Database Schemas in Open-source Software](https://hal.science/hal-00742605v1) by Fabien Coelho et al.
 * [Predicting Hospital Readmission by Analyzing Patient EHR Records](https://doi.org/10.1007/978-1-4842-7086-8_3) by Anshik
+* [Prediction of actor collaborations using IMDB data](https://users.soe.ucsc.edu/~vassilis/projects/AdvancedMLCS290.pdf) by Vassilis Polychronopoulos and Abhinav Venkateswar Venkataraman
+* [Probabilistic relational model benchmark generation: Principle and application](https://doi.org/10.3233/IDA-160823) by Mouna Ben Ishak et al.
 * [Processes, Motivations, and Issues for Migrating to Microservices Architectures: An Empirical Investigation](https://doi.org/10.1109/MCC.2017.4250931) by Davide Taibi et al.
+* [Realising the Potential for ML from Electronic Health Records](https://cpb-eu-w2.wpmucdn.com/blogs.bristol.ac.uk/dist/8/471/files/2020/01/DSRS-Turing_19.pdf) by Haoyuan Zhang et al.
+* [Seeding strategies in search-based unit test generation](https://doi.org/10.1002/stvr.1601) by José Miguel Rojas et al.
+* [Sound empirical evidence in software testing](https://doi.org/10.1109/ICSE.2012.6227195) by Gordon Fraser and Andrea Arcuri
+* [The Zebrafish Information Network: major gene page and home page updates](https://doi.org/10.1093/nar/gkaa1010) by Douglas G Howe et al
+* [Transformation and Evaluation of the MIMIC Database in the OMOP Common Data Model: Development and Usability Study](https://doi.org/10.2196/30970) by Nicolas Paris et al.
+* [Una base de datos espacial integrada en un Sistema de Información Geográfica para la gestión del terroir: un nuevo sistema consistente e interactivo](https://doi.org/10.1051/e3sconf/20185002008) by Alberto Lázaro-López et al.
+* [Using a combination of measurement tools to extract metrics from open source projects](http://hdl.handle.net/1885/51159) by Normi S Awang Abu Bakar and Clive Boughton
+* [Using Tableau Dashboards as Visualization Tool for MIMIC-III Data](https://dx.doi.org/10.3205/21gmds044) by Karl Gottfried et al.
+* [Zebrafish information network, the knowledgebase for Danio rerio research](https://doi.org/10.1093/genetics/iyac016) by Yvonne M Bradford et al.
 
 # Build Instructions
 ## Application
