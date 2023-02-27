@@ -1145,7 +1145,7 @@ public final class Config implements HtmlConfig {
         }
 
         if (detailedDb) {
-            LOGGER.info("Missing required connection parameters for '{}'", getDbType());
+            LOGGER.info("Missing required connection parameters for '{}'", getDbProperties().getProperty("dbms"));
             new DbSpecificConfig(getDbType(), getDbProperties()).dumpUsage();
         }
 

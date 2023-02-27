@@ -44,7 +44,7 @@ public class DbSpecificConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final Pattern OPTION_PATTER = Pattern.compile("<([a-zA-Z0-9.\\-_]+)>");
-    private static final String DUMP_FORMAT = "   -%s   \t\t%s";
+    private static final String DUMP_FORMAT = "      -%s   \t\t%s";
 
     private String dbType;
     private String description;
@@ -92,7 +92,7 @@ public class DbSpecificConfig {
      * Dump usage details associated with the associated type of database
      */
     public void dumpUsage() {
-        LOGGER.info("{} (-t {})", description, dbType);
+        LOGGER.info("   {} (-t {})", description, dbType);
         getOptions().stream().flatMap(option -> {
             if ("hostOptionalPort".equals(option.getName())) {
                 return Stream.of(
