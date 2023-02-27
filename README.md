@@ -199,7 +199,8 @@ __Linux__ `http://localhost:9000`
 __Windows__ `http://$(boot2docker ip):9000`  
 
 ## Documentation
-You'll need sphinx installed http://www.sphinx-doc.org    
+You'll need sphinx installed http://www.sphinx-doc.org  
+Install linuxdoc, sphinx_rtd_theme, `pip install linuxdoc sphinx_rtd_theme`  
 Navigate into `docs`  
 __Windows__ `make.bat html`  
 __Linux__ `make html`  
