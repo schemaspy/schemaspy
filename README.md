@@ -181,6 +181,25 @@ We are proud to note that SchemaSpy assists researchers in their work.
 * [Using Tableau Dashboards as Visualization Tool for MIMIC-III Data](https://dx.doi.org/10.3205/21gmds044) by Karl Gottfried et al.
 * [Zebrafish information network, the knowledgebase for Danio rerio research](https://doi.org/10.1093/genetics/iyac016) by Yvonne M Bradford et al.
 
+To cite SchemaSpy, please use:
+
+```
+SchemaSpy Team (2023) SchemaSpy: Database documentation built easy. SchemaSpy. URL https://schemaspy.org/
+```
+
+The BibTeX entry for LaTeX users is:
+
+```
+@Manual{schemaspy,
+  title = {SchemaSpy: Database documentation built easy},
+  author = {{SchemaSpy Team}},
+  organization = {SchemaSpy},
+  year = {2023},
+  url = {https://schemaspy.org/}
+}
+```
+
+
 # Build Instructions
 ## Application
 SchemaSpy is built using maven and we utilize the maven wrapper.  
