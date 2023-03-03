@@ -115,7 +115,7 @@ public class OracleSpacesIT {
         given(arguments.getCatalog()).willReturn("%");
         given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
         Config config = new Config(args);
-        sqlService.connect(config);
+        sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),
                 arguments.getDatabaseName(),

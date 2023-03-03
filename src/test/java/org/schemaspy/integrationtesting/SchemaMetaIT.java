@@ -98,7 +98,7 @@ public class SchemaMetaIT {
         given(arguments.getSchema()).willReturn("SCHEMAMETAIT");
         given(arguments.getDatabaseName()).willReturn("SchemaMetaIT");
         config = new Config(args);
-        sqlService.connect(config);
+        sqlService.connect(arguments,config);
         dbmsMeta = sqlService.getDbmsMeta();
         schema = h2MemoryRule.getConnection().getSchema();
         catalog = h2MemoryRule.getConnection().getCatalog();

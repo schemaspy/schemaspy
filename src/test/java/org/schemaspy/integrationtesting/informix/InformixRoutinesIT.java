@@ -103,7 +103,7 @@ public class InformixRoutinesIT {
         };
         CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
-        sqlService.connect(config);
+        sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),
                 arguments.getDatabaseName(),

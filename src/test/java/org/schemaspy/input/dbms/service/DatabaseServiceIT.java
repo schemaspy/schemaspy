@@ -85,7 +85,7 @@ public class DatabaseServiceIT {
         given(arguments.getDatabaseName()).willReturn("DatabaseServiceIT");
 
         Config config = new Config(args);
-        sqlService.connect(config);
+        sqlService.connect(arguments, config);
         String schema = h2MemoryRule.getConnection().getSchema();
         String catalog = h2MemoryRule.getConnection().getCatalog();
         Database database = new Database(
