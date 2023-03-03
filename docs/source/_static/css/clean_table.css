@@ -1,0 +1,18 @@
+table.clean-table {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+}
+
+table.clean-table th {
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom-width: medium !important;
+}
+
+table.clean-table td {
+    background-color: unset !important;
+    vertical-align: top !important;
+    border: none !important;
+}
