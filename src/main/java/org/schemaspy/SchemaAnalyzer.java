@@ -38,7 +38,6 @@ import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.model.*;
-import org.schemaspy.model.Console;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.diagram.Renderer;
@@ -60,7 +59,10 @@ import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -164,7 +166,7 @@ public class SchemaAnalyzer {
                 if (schemas.isEmpty())
                     schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
                 if (schemas.isEmpty())
-                    schemas.add(config.getUser());
+                    schemas.add(commandLineArguments.getUser());
             }
 
             LOGGER.info("Analyzing schemas: {}{}",
@@ -270,7 +272,7 @@ public class SchemaAnalyzer {
             tables.addAll(db.getViews());
 
             if (tables.isEmpty()) {
-                dumpNoTablesMessage(schema, config.getUser(), databaseMetaData, config.getTableInclusions() != null);
+                dumpNoTablesMessage(schema, commandLineArguments.getUser(), databaseMetaData, config.getTableInclusions() != null);
                 if (!config.isOneOfMultipleSchemas()) // don't bail if we're doing the whole enchilada
                     throw new EmptySchemaException();
             }
