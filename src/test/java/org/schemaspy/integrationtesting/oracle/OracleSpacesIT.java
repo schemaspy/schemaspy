@@ -27,6 +27,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -50,7 +51,6 @@ import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 /**
  * @author Nils Petzaell
@@ -68,10 +68,10 @@ public class OracleSpacesIT {
     private ProgressListener progressListener;
 
     @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
     private CommandLineRunner commandLineRunner;
+
+    @Autowired
+    private CommandLineArgumentParser commandLineArgumentParser;
 
     private static Database database;
 
@@ -108,13 +108,8 @@ public class OracleSpacesIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(outputPath.toFile());
-        given(arguments.getDatabaseType()).willReturn("orathin");
-        given(arguments.getUser()).willReturn("orait");
-        given(arguments.getSchema()).willReturn("ORASPACEIT");
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn(jdbcContainerRule.getContainer().getSid());
         Config config = new Config(args);
+        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),

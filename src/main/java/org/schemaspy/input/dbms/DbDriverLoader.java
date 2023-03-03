@@ -60,22 +60,15 @@ public class DbDriverLoader {
 
     private boolean loadJDBCJars = false;
 
-
-    public Connection getConnection(Config config) throws IOException {
-        return this.getConnection(
-            new ConnectionURLBuilder(config, config.getDbProperties()),
-            config
-        );
-    }
-
     public Connection getConnection(CommandLineArguments commandLineArguments, Config config) throws IOException {
         return this.getConnection(
             new ConnectionURLBuilder(commandLineArguments, config, config.getDbProperties()),
+            commandLineArguments,
             config
         );
     }
 
-    public Connection getConnection(ConnectionURLBuilder urlBuilder, Config config) throws IOException {
+    public Connection getConnection(ConnectionURLBuilder urlBuilder, CommandLineArguments commandLineArguments, Config config) throws IOException {
         Properties properties = config.getDbProperties();
 
         if (Objects.isNull(config.getDb()))
@@ -89,10 +82,10 @@ public class DbDriverLoader {
         if (Objects.nonNull(config.getDriverPath()))
             driverPath = config.getDriverPath();
 
-        return getConnection(config, urlBuilder.build(), driverClass, driverPath);
+        return getConnection(commandLineArguments, config, urlBuilder.build(), driverClass, driverPath);
     }
 
-    protected Connection getConnection(Config config, String connectionURL,
+    protected Connection getConnection(CommandLineArguments commandLineArguments, Config config, String connectionURL,
                                        String[] driverClasses, String driverPath) throws IOException {
 
         loadJDBCJars = config.isLoadJDBCJarsEnabled();
@@ -100,7 +93,7 @@ public class DbDriverLoader {
         final Properties connectionProperties = new WithPassword(
             config,
             new WithUser(
-                config,
+                commandLineArguments.getUser(),
                 new PreferencesConnection(config)
             )
         ).properties();
