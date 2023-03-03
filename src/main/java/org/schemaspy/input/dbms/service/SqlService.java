@@ -66,12 +66,6 @@ public class SqlService {
     private Pattern invalidIdentifierPattern;
     private Set<String> allKeywords;
 
-    public DatabaseMetaData connect(Config config) throws IOException, SQLException {
-        DbDriverLoader driverLoader = new DbDriverLoader();
-        connection = driverLoader.getConnection(config);
-        return connect(connection, config);
-    }
-
     public DatabaseMetaData connect(CommandLineArguments commandLineArguments, Config config) throws IOException, SQLException {
         DbDriverLoader driverLoader = new DbDriverLoader();
         connection = driverLoader.getConnection(commandLineArguments, config);
