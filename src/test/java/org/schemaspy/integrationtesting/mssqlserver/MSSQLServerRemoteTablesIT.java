@@ -98,7 +98,7 @@ public class MSSQLServerRemoteTablesIT {
         };
         CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
-        DatabaseMetaData databaseMetaData = sqlService.connect(config);
+        DatabaseMetaData databaseMetaData = sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),
                 arguments.getDatabaseName(),

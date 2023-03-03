@@ -92,7 +92,7 @@ public class H2KeywordIT {
         given(arguments.getSchema()).willReturn(h2MemoryRule.getConnection().getSchema());
         given(arguments.getDatabaseName()).willReturn("h2keyword");
         Config config = new Config(args);
-        sqlService.connect(config);
+        sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),
                 arguments.getDatabaseName(),

@@ -159,7 +159,7 @@ public class MSSQLServerCommentsIT {
         given(arguments.getCatalog()).willReturn("%");
         given(arguments.getDatabaseName()).willReturn(db);
         Config config = new Config(args);
-        sqlService.connect(config);
+        sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),
                 arguments.getDatabaseName(),
