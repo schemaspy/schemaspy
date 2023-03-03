@@ -24,6 +24,9 @@ import org.dummy.DummyDriverUnsatisfiedCtor;
 import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.cli.EnvDefaultProvider;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.testing.H2MemoryRule;
 
@@ -54,13 +57,15 @@ public class DbDriverLoaderTest {
   @Test
   public void testGetConnection() throws IOException {
     DbDriverLoader dbDriverLoader = new DbDriverLoader();
-    Config config = new Config("-t", "h2", "-u", "sa");
-    Connection connection = dbDriverLoader.getConnection(config, h2.getConnectionURL(), toArray("org.h2.Driver"), "");
+    String[] args = {"-t", "h2", "-u", "sa", "-o", "target/dbDriverLoaderTest"};
+    Config config = new Config(args);
+    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
+    Connection connection = dbDriverLoader.getConnection(commandLineArguments, config, h2.getConnectionURL(), toArray("org.h2.Driver"), "");
     assertThat(connection).isNotNull();
   }
 
   @Test
-  public void testLoadAdditionalJarsForDriver() throws NoSuchFieldException, IllegalAccessException, MalformedURLException, NoSuchMethodException, InvocationTargetException {
+  public void testLoadAdditionalJarsForDriver() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
     DbDriverLoader dbDriverLoader = new DbDriverLoader();
     Set<URI> urls = new HashSet<>();
     String driverPath = "src/test/resources/driverFolder/dummy.jar";
@@ -73,7 +78,7 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void driverLoaderCachesDrivers() throws MalformedURLException {
+  public void driverLoaderCachesDrivers() {
     DbDriverLoader driverLoader1 = new DbDriverLoader();
     Driver driver1 = driverLoader1.getDriver(toArray("org.h2.Driver"),"");
     DbDriverLoader driverLoader2 = new DbDriverLoader();
@@ -82,7 +87,7 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void driverPathWorks() throws MalformedURLException, SQLException {
+  public void driverPathWorks() throws SQLException {
     String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
     DbDriverLoader driverLoader = new DbDriverLoader();
     Driver driver = driverLoader.getDriver(toArray("dummy.DummyDriver"), driverPath);
@@ -92,36 +97,48 @@ public class DbDriverLoaderTest {
 
   @Test
   public void connectionIsNullThrowsException() {
+    String[] args = {"-sso", "-o", "someplace"};
+    Config config = new Config(args);
+    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
     DbDriverLoader driverLoader = new DbDriverLoader();
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray(DummyDriver.class.getName()), ""));
+            .isThrownBy(() -> driverLoader.getConnection(commandLineArguments, config, "dummy", toArray(DummyDriver.class.getName()), ""));
   }
 
   @Test
   public void nativeErrorInDriverCreationThrowsException() {
+    String[] args = {"-sso", "-o", "someplace"};
+    Config config = new Config(args);
+    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
     DbDriverLoader driverLoader = new DbDriverLoader();
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray(DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"), ""))
+            .isThrownBy(() -> driverLoader.getConnection(commandLineArguments, config, "dummy", toArray(DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"), ""))
             .withCauseInstanceOf(UnsatisfiedLinkError.class)
             .withMessageContaining("Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedCtor,dummy.dummy'");
   }
 
   @Test
   public void nativeErrorInConnectThrowsException() {
+    String[] args = {"-sso", "-o", "someplace"};
+    Config config = new Config(args);
+    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
     DbDriverLoader driverLoader = new DbDriverLoader();
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray(DummyDriverUnsatisfiedConnect.class.getName()), ""))
+            .isThrownBy(() -> driverLoader.getConnection(commandLineArguments, config, "dummy", toArray(DummyDriverUnsatisfiedConnect.class.getName()), ""))
             .withCauseInstanceOf(UnsatisfiedLinkError.class)
             .withMessageContaining("Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedConnect'");
   }
 
   @Test
   public void DriverMissingWithClasspathThrowsException() {
+    String[] args = {"-sso", "-o", "someplace"};
+    Config config = new Config(args);
+    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
     DbDriverLoader driverLoader = new DbDriverLoader();
     String sep = File.separator;
     final String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString() + File.pathSeparator + "missing";
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(new Config("-sso", "-o", "someplace"), "dummy", toArray("bla.bla.bla", "no.no.no"), driverPath))
+            .isThrownBy(() -> driverLoader.getConnection(commandLineArguments, config, "dummy", toArray("bla.bla.bla", "no.no.no"), driverPath))
             .withCauseInstanceOf(ConnectionFailure.class)
             .withMessageContaining("'bla.bla.bla, no.no.no'")
             .withMessageContaining("src" + sep + "test" + sep + "resources" + sep + "driverFolder" + sep + "dummy.jar"+File.pathSeparator+"missing")
