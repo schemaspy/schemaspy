@@ -187,3 +187,10 @@ So additional columns are ok, but you might need to alias columns so that they a
         *Fetch comments for all columns, expected columns:* |br| **table_name, column_name, comments**
     selectSequencesSql=
         *Fetch all sequences from the database, expected columns:* |br| **sequence_name, start_value, increment** |br| **start_value** and **increment** defaults to 1 if missing
+
+
+Included
+--------
+
+.. dbtypes::
+
