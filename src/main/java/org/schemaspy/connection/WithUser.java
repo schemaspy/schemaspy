@@ -1,7 +1,5 @@
 package org.schemaspy.connection;
 
-import org.schemaspy.Config;
-
 import java.io.IOException;
 import java.util.Properties;
 
@@ -9,10 +7,6 @@ public final class WithUser implements Connection {
 
     private final String user;
     private final Connection origin;
-
-    public WithUser(final Config config, final Connection origin) {
-        this(config.getUser(), origin);
-    }
 
     public WithUser(final String user, final Connection origin) {
         this.user = user;
