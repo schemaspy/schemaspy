@@ -105,7 +105,7 @@ public class MSSQLServerRemoteTablesIT {
                 databaseMetaData.getConnection().getCatalog(),
                 databaseMetaData.getConnection().getSchema()
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
         MSSQLServerRemoteTablesIT.database = database;
     }
 
