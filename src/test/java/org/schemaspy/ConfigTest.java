@@ -39,7 +39,7 @@ public class ConfigTest {
         String[] args = {"-t", "mssql05", "-schemas", "dbo, sys", "-h"};
 
         Config config = new Config(args);
-        assertThat(config.getSchemas().size()).isEqualTo(2);
+        assertThat(config.getSchemas()).hasSize(2);
         assertThat(config.getDbType()).isEqualToIgnoringCase("mssql05");
     }
 
@@ -53,7 +53,6 @@ public class ConfigTest {
     public void testLoadProperties() {
         Config config = new Config("-configFile", "src/test/resources/configTest/loadpropertiesTest.properties");
         assertThat(config.getPassword()).isEqualToIgnoringCase("database_password");
-        assertThat(config.getUser()).isEqualToIgnoringCase("database_user");
         assertThat(config.getPort()).isEqualTo(123);
     }
 
@@ -61,7 +60,6 @@ public class ConfigTest {
     public void propertiesShouldHaveTrailingSpacesTrimmed() {
         Config config = new Config("-configFile", "src/test/resources/configTest/propertiesWithTrailingSpace.properties");
         assertThat(config.getPassword()).isEqualToIgnoringCase("database_password");
-        assertThat(config.getUser()).isEqualToIgnoringCase("database_user");
         assertThat(config.getDb()).isEqualToIgnoringCase("db_name");
     }
 
@@ -69,7 +67,6 @@ public class ConfigTest {
     public void propertiesShouldHaveTrailingSpaces() {
         Config config = new Config("-configFile", "src/test/resources/configTest/propertiesWithTrailingSpaceRetained.properties");
         assertThat(config.getPassword()).isEqualToIgnoringCase("database_password ");
-        assertThat(config.getUser()).isEqualToIgnoringCase("database_user");
         assertThat(config.getDb()).isEqualToIgnoringCase("db_name");
     }
 

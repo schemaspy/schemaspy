@@ -87,8 +87,6 @@ public final class Config implements HtmlConfig {
     private String dbType;
     private List<String> schemas;
     private boolean oneOfMultipleSchemas;
-    private String user;
-    private Boolean singleSignOn;
     private String password;
     private Boolean promptForPassword;
     private String db;
@@ -240,50 +238,6 @@ public final class Config implements HtmlConfig {
 
     private static boolean hasText(String string) {
         return Objects.nonNull(string) && !string.trim().isEmpty();
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    /**
-     * User used to connect to the database.
-     * Required unless single sign-on is enabled
-     * (see {@link #setSingleSignOn(boolean)}).
-     *
-     * @return user as supplied with -u
-     */
-    public String getUser() {
-        if (user == null) {
-            if (!isSingleSignOn())
-                user = pullRequiredParam("-u");
-            else
-                user = pullParam("-u");
-        }
-        return user;
-    }
-
-    /**
-     * By default a "user" (as specified with -u) is required.
-     * This option allows disabling of that requirement for
-     * single sign-on environments.
-     *
-     * @param enabled defaults to <code>false</code>
-     */
-    public void setSingleSignOn(boolean enabled) {
-        singleSignOn = enabled;
-    }
-
-    /**
-     * @see #setSingleSignOn(boolean)
-     *
-     * @return true if single sign-on else false
-     */
-    public boolean isSingleSignOn() {
-        if (singleSignOn == null)
-            singleSignOn = options.remove("-sso");
-
-        return singleSignOn;
     }
 
     /**
@@ -947,10 +901,6 @@ public final class Config implements HtmlConfig {
      */
     private String pullParam(String paramId) {
         return pullParam(paramId, false, false);
-    }
-
-    private String pullRequiredParam(String paramId) {
-        return pullParam(paramId, true, false);
     }
 
     /**
