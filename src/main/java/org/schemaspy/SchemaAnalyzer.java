@@ -126,7 +126,7 @@ public class SchemaAnalyzer {
             config.setOneOfMultipleSchemas(true); // used later for generation rootPathtoHome link.
             return this.analyzeMultipleSchemas(
                     config,
-                    databaseServiceFactory.simple(config),
+                    databaseServiceFactory.forMultipleSchemas(config),
                     progressListener
             );
         } else {
@@ -137,7 +137,7 @@ public class SchemaAnalyzer {
                     schema,
                     config,
                     outputDirectory,
-                    databaseServiceFactory.simple(config),
+                    databaseServiceFactory.forSingleSchema(config),
                     progressListener
             );
         }

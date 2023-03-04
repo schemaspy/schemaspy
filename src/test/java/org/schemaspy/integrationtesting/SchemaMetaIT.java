@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
-import org.schemaspy.DbAnalyzer;
 import org.schemaspy.SimpleDotConfig;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
@@ -112,7 +111,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/nullTableComment.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
@@ -121,7 +120,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTables()).isNotEmpty();
         assertThat(database.getSchema().getComment()).isEqualToIgnoringCase(BY_SCRIPT_COMMENT);
@@ -143,7 +142,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/noTableComment.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
@@ -152,7 +151,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTables()).isNotEmpty();
         assertThat(database.getTablesMap().get("ACCOUNT").getColumn("accountId").getComments()).isNull();
@@ -170,7 +169,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, schemaMeta, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, schemaMeta, progressListener);
 
         assertThat(database.getTables()).isNotEmpty();
         assertThat(database.getSchema().getComment()).isEqualToIgnoringCase(BY_SCHEMA_META_COMMENT);
@@ -186,7 +185,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
@@ -195,7 +194,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getRemoteTables()).hasSizeLessThan(databaseWithSchemaMeta.getRemoteTables().size());
         assertThat(database.getRemoteTablesMap().get("other.other.CONTRACT")).isNull();
@@ -210,7 +209,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/remoteTable.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
@@ -219,7 +218,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTablesMap().get("ACCOUNT").getNumChildren())
                 .isLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getNumChildren());
@@ -233,7 +232,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addColumn.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
@@ -242,7 +241,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTablesMap().get("ACCOUNT").getColumns())
                 .hasSizeLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getColumns().size());
@@ -256,7 +255,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableImpliedOnAgent.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
@@ -265,7 +264,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
         new ImpliedConstraintsFinder().find(database.getTables());
         new ImpliedConstraintsFinder().find(databaseWithSchemaMeta.getTables());
@@ -282,7 +281,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/addFKInsteadOfImplied.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
@@ -291,7 +290,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
         assertThat(database.getTablesMap().get("ACCOUNT").getNumChildren())
                 .isLessThan(databaseWithSchemaMeta.getTablesMap().get("ACCOUNT").getNumChildren());
@@ -305,7 +304,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
 
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/disableDiagramAssociations.xml","SchemaMetaIT", schema, false);
         Database databaseWithSchemaMeta = new Database(
@@ -314,7 +313,7 @@ public class SchemaMetaIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
         DotFormatter dotFormatter = new DotFormatter(
             new SimpleDotConfig(

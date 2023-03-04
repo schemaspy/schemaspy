@@ -94,7 +94,7 @@ public class DatabaseServiceIT {
                 catalog,
                 schema
         );
-        new DatabaseServiceFactory(sqlService).simple(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
 
         assertThat(database.getTables()).hasSize(1);
 
