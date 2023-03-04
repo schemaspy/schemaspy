@@ -884,7 +884,6 @@ public final class Config implements HtmlConfig {
 
     /**
      * Returns the database properties to use.
-     * These should be determined by calling {@link #determineDbProperties(String)}.
      *
      * @return database specific properties
      */
@@ -893,17 +892,6 @@ public final class Config implements HtmlConfig {
             dbProperties = propertiesResolver.getDbProperties(getDbType());
         }
         return dbProperties;
-    }
-
-    /**
-     * Determines the database properties associated with the specified type.
-     *
-     * @param type database type that should be resolved
-     * @return resolved properties for database type
-     * @throws InvalidConfigurationException if db properties are incorrectly formed
-     */
-    public Properties determineDbProperties(String type) {
-        return propertiesResolver.getDbProperties(type);
     }
 
     public List<String> getRemainingParameters() {

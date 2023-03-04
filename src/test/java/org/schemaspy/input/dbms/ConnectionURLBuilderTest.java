@@ -20,6 +20,7 @@ package org.schemaspy.input.dbms;
 
 import org.junit.Test;
 import org.schemaspy.Config;
+import org.schemaspy.input.dbms.config.PropertiesResolver;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -37,7 +38,7 @@ public class ConnectionURLBuilderTest {
                 "-t", "src/test/resources/dbtypes/onlyHost",
                 "-host", "abc.com",
                 "-u", "aUser");
-        Properties properties = config.determineDbProperties(config.getDbType());
+        Properties properties = new PropertiesResolver().getDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
         assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com");
     }
@@ -48,7 +49,7 @@ public class ConnectionURLBuilderTest {
                 "-t", "src/test/resources/dbtypes/hostOptionalPort",
                 "-host", "abc.com",
                 "-u", "aUser");
-        Properties properties = config.determineDbProperties(config.getDbType());
+        Properties properties = new PropertiesResolver().getDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
         assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com");
     }
@@ -60,7 +61,7 @@ public class ConnectionURLBuilderTest {
                 "-host", "abc.com",
                 "-port", "1234",
                 "-u", "aUser");
-        Properties properties = config.determineDbProperties(config.getDbType());
+        Properties properties = new PropertiesResolver().getDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
         assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com:1234");
     }
@@ -72,7 +73,7 @@ public class ConnectionURLBuilderTest {
                 "-host", "abc.com:4321",
                 "-port", "1234",
                 "-u", "aUser");
-        Properties properties = config.determineDbProperties(config.getDbType());
+        Properties properties = new PropertiesResolver().getDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
         assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com:4321");
     }
@@ -84,7 +85,7 @@ public class ConnectionURLBuilderTest {
                 "-host", "abc.com",
                 "-port", "1234",
                 "-u", "aUser");
-        Properties properties = config.determineDbProperties(config.getDbType());
+        Properties properties = new PropertiesResolver().getDbProperties(config.getDbType());
         ConnectionURLBuilder connectionURLBuilder = new ConnectionURLBuilder(config, properties);
         assertThat(connectionURLBuilder.build()).isEqualToIgnoringCase("abc.com|1234");
     }
