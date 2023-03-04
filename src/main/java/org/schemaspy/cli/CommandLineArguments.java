@@ -26,6 +26,8 @@ import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfigCli;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Holds all supported command line arguments.
@@ -406,6 +408,8 @@ public class CommandLineArguments {
     )
     private boolean anomaliesLengthChange = false;
 
+    private List<String> unknownArgs;
+
     public boolean isHelpRequired() {
         return helpRequired;
     }
@@ -576,5 +580,13 @@ public class CommandLineArguments {
 
     public boolean isAnomaliesLengthChange() {
         return anomaliesLengthChange;
+    }
+
+    void setUnknownArgs(List<String> unknownArgs) {
+        this.unknownArgs = unknownArgs;
+    }
+
+    public List<String> unknownArgs() {
+        return Collections.unmodifiableList(unknownArgs);
     }
 }

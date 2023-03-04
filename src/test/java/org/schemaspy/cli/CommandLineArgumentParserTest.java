@@ -167,8 +167,9 @@ public class CommandLineArgumentParserTest {
         CommandLineArgumentParser parser = new CommandLineArgumentParser(new CommandLineArguments(), NO_DEFAULT_PROVIDER);
         parser.printLicense();
         String log = loggingRule.getLog();
-        assertThat(log).contains("GNU GENERAL PUBLIC LICENSE");
-        assertThat(log).contains("GNU LESSER GENERAL PUBLIC LICENSE");
+        assertThat(log)
+            .contains("GNU GENERAL PUBLIC LICENSE")
+            .contains("GNU LESSER GENERAL PUBLIC LICENSE");
     }
 
     @Test
@@ -256,6 +257,20 @@ public class CommandLineArgumentParserTest {
         assertThat(commandLine.isRoutineLengthChange()).isTrue();
         assertThat(commandLine.isFkLengthChange()).isFalse();
         assertThat(commandLine.isDbObjectLengthChange()).isFalse();
+    }
+
+    @Test
+    public void unkownOptionsAreStoredInArgument() {
+        String[] args = {
+            "-o", "aFolder",
+            "-sso",
+            "-server", "xds"
+        };
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            NO_DEFAULT_PROVIDER
+        ).parse(args);
+        assertThat(arguments.unknownArgs()).containsExactly("-server", "xds");
     }
 
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.
