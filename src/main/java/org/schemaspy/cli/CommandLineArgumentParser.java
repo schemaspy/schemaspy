@@ -72,7 +72,7 @@ public class CommandLineArgumentParser {
 
     public CommandLineArguments parse(String... localArgs) {
         jCommander.parse(localArgs);
-
+        arguments.setUnknownArgs(jCommander.getUnknownOptions());
         if (shouldValidate()) {
             validate(arguments);
         }
