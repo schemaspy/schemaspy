@@ -219,7 +219,8 @@ __Windows__ `http://$(boot2docker ip):9000`
 
 ## Documentation
 Built using Python  
-Install dependencies `pip install sphinx linuxdoc sphinx_rtd_theme`  
+Create venv  
+Install dependencies `pip install -r docs/requirements.txt`  
 Navigate into `docs`  
 __Windows__ `make.bat clean && make.bat html`  
 __Linux__ `make clean html`  
