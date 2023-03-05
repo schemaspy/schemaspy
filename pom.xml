@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <!-- list pom: mvn help:effective-pom -->
     <!-- jar:      mvn clean package -->
     <!-- sign:     mvn release:prepare release:perform -->
@@ -56,8 +57,8 @@
         <url>https://github.com/schemaspy/schemaspy</url>
         <connection>scm:git:git://github.com/schemaspy/schemaspy.git</connection>
         <developerConnection>scm:git:git@github.com:schemaspy/schemaspy.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
     <developers>
         <developer>
             <id>rafalkasa</id>
@@ -544,32 +545,13 @@
             </build>
         </profile>
         <profile>
-            <id>sonar</id>
-              <properties>
-                  <sonar.organization>schemaspy</sonar.organization>
-                  <sonar.projectKey>org.schemaspy:schemaspy</sonar.projectKey>
-                  <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/jacoco/unit/jacoco.xml,${project.build.directory}/jacoco/integration/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
-            </properties>     
+            <id>coverage</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.sonarsource.scanner.maven</groupId>
-                        <artifactId>sonar-maven-plugin</artifactId>
-                        <version>3.8.0.2131</version>
-                        <executions>
-                            <execution>
-                                <id>default-sonar</id>
-                                <goals>
-                                    <goal>sonar</goal>
-                                </goals>
-                                <phase>verify</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.6</version>
+                        <version>0.8.8</version>
                         <executions>
                             <execution>
                                 <id>default-prepare-agent</id>
@@ -601,6 +583,36 @@
                                 <phase>post-integration-test</phase>
                                 <configuration>
                                     <outputDirectory>${project.build.directory}/jacoco/integration</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>aggregate-for-report</id>
+                                <goals>
+                                    <goal>merge</goal>
+                                </goals>
+                                <phase>post-integration-test</phase>
+                                <configuration>
+                                    <fileSets>
+                                        <fileSet>
+                                            <directory>${project.build.directory}</directory>
+                                            <includes>
+                                                <include>*.exec</include>
+                                            </includes>
+                                        </fileSet>
+                                    </fileSets>
+                                    <destFile>${project.build.directory}/jacoco-agg.exec</destFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>default-aggregate-report</id>
+                                <goals>
+                                    <goal>report-integration</goal>
+                                </goals>
+                                <phase>post-integration-test</phase>
+                                <configuration>
+                                    <dataFile>${project.build.directory}/jacoco-agg.exec</dataFile>
+                                    <formats>HTML</formats>
+                                    <outputDirectory>${project.build.directory}/jacoco/aggregate</outputDirectory>
                                 </configuration>
                             </execution>
                         </executions>
@@ -639,6 +651,34 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <id>sonar</id>
+            <properties>
+                <sonar.organization>schemaspy</sonar.organization>
+                <sonar.projectKey>org.schemaspy:schemaspy</sonar.projectKey>
+                <sonar.coverage.jacoco.xmlReportPaths>
+                    ${project.build.directory}/jacoco/unit/jacoco.xml,${project.build.directory}/jacoco/integration/jacoco.xml
+                </sonar.coverage.jacoco.xmlReportPaths>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>3.8.0.2131</version>
+                        <executions>
+                            <execution>
+                                <id>default-sonar</id>
+                                <goals>
+                                    <goal>sonar</goal>
+                                </goals>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

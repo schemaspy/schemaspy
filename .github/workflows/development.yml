@@ -44,6 +44,7 @@ jobs:
           --update-snapshots
           --errors
           --show-version
+          -P coverage
           -P sonar
           -Dsonar.host.url=https://sonarcloud.io
           verify
