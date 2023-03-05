@@ -10,10 +10,10 @@ from sphinx.util.docutils import SphinxDirective
 
 class SchemaSpyDatabaseTypes(SphinxDirective):
 
-    types_path = join('src', 'main', 'resources', 'org', 'schemaspy', 'types')
+    types_path = join('..', 'src', 'main', 'resources', 'org', 'schemaspy', 'types')
 
     def run(self):
-        if os.getcwd().endswith('docs'):
+        if not os.getcwd().endswith('docs'):
             self.types_path = join('..', self.types_path)
         db_types_grouped_by_dbms = self.load_database_types()
         table = self.create_table(db_types_grouped_by_dbms)
