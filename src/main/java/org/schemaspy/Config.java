@@ -318,10 +318,6 @@ public final class Config implements HtmlConfig {
         return maxDetailedTables;
     }
 
-    public String connprops() {
-        return pullParam("-connprops");
-    }
-
     public void setDriverPath(String driverPath) {
         this.driverPath = driverPath;
     }

@@ -1,7 +1,5 @@
 package org.schemaspy.connection;
 
-import org.schemaspy.Config;
-
 import java.io.IOException;
 import java.util.Properties;
 
@@ -12,10 +10,6 @@ public class PreferencesConnection implements Connection {
     private final String connprops;
     private Connection origin;
     private static final String ESCAPED_EQUALS = "\\=";
-
-    public PreferencesConnection(Config config) {
-        this(config.connprops());
-    }
 
     public PreferencesConnection(String connprops) {
         this.connprops = connprops;
