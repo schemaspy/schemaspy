@@ -260,7 +260,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void unkownOptionsAreStoredInArgument() {
+    public void unknownOptionsAreStoredInArgument() {
         String[] args = {
             "-o", "aFolder",
             "-sso",
@@ -271,6 +271,20 @@ public class CommandLineArgumentParserTest {
             NO_DEFAULT_PROVIDER
         ).parse(args);
         assertThat(arguments.unknownArgs()).containsExactly("-server", "xds");
+    }
+
+    @Test
+    public void dontTreatWordAsParameterName() {
+        String[] args = {
+            "-u", "user",
+            "-p", "user",
+            "-o", "aFolder",
+        };
+        CommandLineArgumentParser commandLineArgumentParser = new CommandLineArgumentParser(
+            new CommandLineArguments(), NO_DEFAULT_PROVIDER
+        );
+
+        assertThatCode(() -> commandLineArgumentParser.parse(args)).doesNotThrowAnyException();
     }
 
     @Test

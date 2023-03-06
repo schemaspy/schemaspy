@@ -8,7 +8,7 @@ public class GraphvizConfigCli implements GraphvizConfig {
 
     @Parameter(
             names = {
-                    "-gv", "--graphviz-dir", "gv",
+                    "-gv", "--graphviz-dir",
                     "schemaspy.gv"
             },
             descriptionKey = "gv"
@@ -17,7 +17,7 @@ public class GraphvizConfigCli implements GraphvizConfig {
 
     @Parameter(
             names = {
-                    "-renderer", "--renderer", "renderer",
+                    "-renderer", "--renderer",
                     "schemaspy.renderer"
             },
             descriptionKey = "renderer"
@@ -26,7 +26,7 @@ public class GraphvizConfigCli implements GraphvizConfig {
 
     @Parameter(
             names = {
-                    "-lq", "--low-quality", "lq",
+                    "-lq", "--low-quality",
                     "schemaspy.lq"
             },
             descriptionKey = "lq"
@@ -35,7 +35,7 @@ public class GraphvizConfigCli implements GraphvizConfig {
 
     @Parameter(
             names = {
-                    "-imageformat", "--image-format", "imageformat",
+                    "-imageformat", "--image-format",
                     "schemaspy.imageformat"
             },
             descriptionKey = "imageformat"
