@@ -55,66 +55,69 @@ import java.util.List;
 public class CommandLineArguments {
 
     @Parameter(names = {
-            "?", "-?", "/?",
-            "-h",
-            "help", "-help", "--help"},
-            descriptionKey = "help",
-            help = true,
-            order = 1
+        "?", "-?", "/?",
+        "-h", "-help", "--help"
+    },
+        descriptionKey = "help",
+        help = true,
+        order = 1
     )
     private boolean helpRequired;
 
     @Parameter(
-            names = {
-                    "-dbHelp", "-dbhelp",
-                    "--dbHelp", "--dbhelp"
-            },
-            help = true,
-            descriptionKey = "dbhelp",
-            order = 2
+        names = {
+            "-dbHelp", "-dbhelp",
+            "--dbHelp", "--dbhelp"
+        },
+        help = true,
+        descriptionKey = "dbhelp",
+        order = 2
     )
     private boolean dbHelpRequired;
 
     @Parameter(
-            names = {
-                    "-l","--license"
-            },
-            help = true,
-            descriptionKey = "license",
-            order = 3
+        names = {
+            "-l", "--license"
+        },
+        help = true,
+        descriptionKey = "license",
+        order = 3
     )
     private boolean printLicense;
 
     @Parameter(
-            names = {"-debug", "--debug", "debug", "schemaspy.debug"},
-            descriptionKey = "debug"
+        names = {
+            "-debug", "--debug",
+            "schemaspy.debug"
+        },
+        descriptionKey = "debug"
     )
     private boolean debug = false;
 
     @Parameter(
-            names = {
-                    "-nohtml", "--no-html", "nohtml",
-                    "schemaspy.nohtml"
-            },
-            descriptionKey = "nohtml"
+        names = {
+            "-nohtml", "--no-html",
+            "schemaspy.nohtml"
+        },
+        descriptionKey = "nohtml"
     )
     private boolean nohtml = false;
 
     @Parameter(
-            names = {
-                    "-noimplied", "--no-implied", "noimplied",
-                    "schemaspy.noimplied"
-            },
-            descriptionKey = "noimplied"
+        names = {
+            "-noimplied", "--no-implied",
+            "schemaspy.noimplied"
+        },
+        descriptionKey = "noimplied"
     )
     private boolean noImplied = false;
 
     @Parameter(
-            names = {
-                    "-t", "--database-type", "database-type",
-                    "schemaspy.t", "schemaspy.database-type"
-            },
-            descriptionKey = "database-type"
+        names = {
+            "-t", "--database-type",
+            "schemaspy.t", "schemaspy.database-type"
+        },
+        descriptionKey = "database-type"
     )
     private String databaseType = "ora";
 
@@ -128,63 +131,63 @@ public class CommandLineArguments {
     private String connprops = null;
 
     @Parameter(
-            names = {
-                    "-db", "--database-name",
-                    "schemaspy.db", "schemaspy.database-name"
-            },
-            descriptionKey = "databaseName"
+        names = {
+            "-db", "--database-name",
+            "schemaspy.db", "schemaspy.database-name"
+        },
+        descriptionKey = "databaseName"
     )
     private String databaseName;
 
     @Parameter(
-            names = {
-                    "-meta", "--schema-meta",
-                    "meta", "schemaspy.meta"
-            },
-            descriptionKey = "meta"
+        names = {
+            "-meta", "--schema-meta",
+            "schemaspy.meta"
+        },
+        descriptionKey = "meta"
     )
     private String schemaMeta;
 
     @Parameter(
-            names = {
-                    "-sso","--single-sign-on",
-                    "schemaspy.sso", "schemaspy.single-sign-on"
-            },
-            descriptionKey = "sso"
+        names = {
+            "-sso", "--single-sign-on",
+            "schemaspy.sso", "schemaspy.single-sign-on"
+        },
+        descriptionKey = "sso"
     )
     private boolean sso = false;
 
     @Parameter(
-            names = {
-                    "-u", "--user", "user",
-                    "schemaspy.u", "schemaspy.user"},
-            descriptionKey = "user"
+        names = {
+            "-u", "--user",
+            "schemaspy.u", "schemaspy.user"},
+        descriptionKey = "user"
     )
     private String user;
 
     @Parameter(
-            names = {
-                    "-s", "--schema", "schema",
-                    "schemaspy.s", "schemaspy.schema"
+        names = {
+            "-s", "--schema",
+            "schemaspy.s", "schemaspy.schema"
 
-            },
-            descriptionKey = "schema"
+        },
+        descriptionKey = "schema"
     )
     private String schema;
 
     @Parameter(
-            names = {
-                    "-cat", "--catalog", "catalog",
-                    "schemaspy.cat", "schemaspy.catalog"
-            },
-            descriptionKey = "catalog"
+        names = {
+            "-cat", "--catalog",
+            "schemaspy.cat", "schemaspy.catalog"
+        },
+        descriptionKey = "catalog"
     )
     private String catalog;
 
     /* TODO Password handling is more complex, see Config class (prompt for password, fallback to Environment variable, multiple schemas, etc.)
     @Parameter(
             names = {
-                    "-p", "--password", "password",
+                    "-p", "--password",
                     "schemaspy.p", "schemaspy.password"
             },
             descriptionKey = "password",
@@ -193,38 +196,38 @@ public class CommandLineArguments {
     private String password; */
 
     @Parameter(
-            names = {
-                    "-dp", "--driverPath", "driverPath",
-                    "schemaspy.dp", "schemaspy.driverPath"
-            },
-            descriptionKey = "driverPath"
+        names = {
+            "-dp", "--driverPath",
+            "schemaspy.dp", "schemaspy.driverPath"
+        },
+        descriptionKey = "driverPath"
     )
     private String driverPath;
 
     @Parameter(
-            names = {
-                    "-o", "--outputDirectory", "outputDirectory",
-                    "schemaspy.o", "schemaspy.outputDirectory"
-            },
-            descriptionKey = "outputDirectory"
+        names = {
+            "-o", "--outputDirectory",
+            "schemaspy.o", "schemaspy.outputDirectory"
+        },
+        descriptionKey = "outputDirectory"
     )
     private File outputDirectory;
 
     @Parameter(
-            names = {
-                    "-host", "--host", "host",
-                    "schemaspy.host"
-            },
-            descriptionKey = "host"
+        names = {
+            "-host", "--host",
+            "schemaspy.host"
+        },
+        descriptionKey = "host"
     )
     private String host;
 
     @Parameter(
-            names = {
-                    "-port", "--port", "port",
-                    "schemaspy.port"
-            },
-            descriptionKey = "port"
+        names = {
+            "-port", "--port",
+            "schemaspy.port"
+        },
+        descriptionKey = "port"
     )
     private Integer port;
 
@@ -232,83 +235,110 @@ public class CommandLineArguments {
     private GraphvizConfigCli graphvizConfig = new GraphvizConfigCli();
 
     @Parameter(
-            names = {
-                    "-vizjs", "schemaspy.vizjs"
-            },
-            descriptionKey = "vizjs",
-            required = false
+        names = {
+            "-vizjs",
+            "schemaspy.vizjs"
+        },
+        descriptionKey = "vizjs",
+        required = false
     )
     private boolean useVizJS;
 
     @Parameter(
-            names = {
-                    "-degree", "schemaspy.degree"
-            },
-            descriptionKey = "degree",
-            required = false,
-            validateValueWith = DegreeOfSeparationValidator.class
+        names = {
+            "-degree",
+            "schemaspy.degree"
+        },
+        descriptionKey = "degree",
+        required = false,
+        validateValueWith = DegreeOfSeparationValidator.class
     )
     private int degreeOfSeparation = 2;
 
 
     // DataTables options for database_objects (Tables) table in src/main/resources/layout/main.html
     @Parameter(
-            names = {"noDbObjectPaging", "-noDbObjectPaging", "--noDbObjectPaging", "schemaspy.noDbObjectPaging"},
-            descriptionKey = "noDbObjectPaging"
+        names = {
+            "-noDbObjectPaging", "--noDbObjectPaging",
+            "schemaspy.noDbObjectPaging"
+        },
+        descriptionKey = "noDbObjectPaging"
     )
     private boolean noDbObjectPaging = false;
 
     @Parameter(
-            names = {"dbObjectPageLength", "-dbObjectPageLength", "--dbObjectPageLength",
-                    "schemaspy.dbObjectPageLength"},
-            descriptionKey = "dbObjectPageLength"
+        names = {
+            "-dbObjectPageLength", "--dbObjectPageLength",
+            "schemaspy.dbObjectPageLength"
+        },
+        descriptionKey = "dbObjectPageLength"
     )
     private int dbObjectPageLength = 50;
 
     @Parameter(
-            names = {"dbObjectLengthChange", "-dbObjectLengthChange", "--dbObjectLengthChange",
-                    "schemaspy.dbObjectLengthChange"},
-            descriptionKey = "dbObjectLengthChange"
+        names = {
+            "-dbObjectLengthChange", "--dbObjectLengthChange",
+            "schemaspy.dbObjectLengthChange"
+        },
+        descriptionKey = "dbObjectLengthChange"
     )
     private boolean dbObjectLengthChange = false;
 
 
     // DataTables options for standard_table (Columns) table in src/main/resources/layout/tables/table.html
     @Parameter(
-            names = {"noTablePaging", "-noTablePaging", "--noTablePaging", "schemaspy.noTablePaging"},
-            descriptionKey = "noTablePaging"
+        names = {
+            "-noTablePaging", "--noTablePaging",
+            "schemaspy.noTablePaging"
+        },
+        descriptionKey = "noTablePaging"
     )
     private boolean noTablePaging = false;
 
     @Parameter(
-            names = {"tablePageLength", "-tablePageLength", "--tablePageLength", "schemaspy.tablePageLength"},
-            descriptionKey = "tablePageLength"
+        names = {
+            "-tablePageLength", "--tablePageLength",
+            "schemaspy.tablePageLength"
+        },
+        descriptionKey = "tablePageLength"
     )
     private int tablePageLength = 10;
 
     @Parameter(
-            names = {"tableLengthChange", "-tableLengthChange", "--tableLengthChange", "schemaspy.tableLengthChange"},
-            descriptionKey = "tableLengthChange"
+        names = {
+            "-tableLengthChange", "--tableLengthChange",
+            "schemaspy.tableLengthChange"
+        },
+        descriptionKey = "tableLengthChange"
     )
     private boolean tableLengthChange = false;
 
 
     // DataTables options for indexes_table (Indexes) table in src/main/resources/layout/tables/table.html
     @Parameter(
-            names = {"noIndexPaging", "-noIndexPaging", "--noIndexPaging", "schemaspy.noIndexPaging"},
-            descriptionKey = "noIndexPaging"
+        names = {
+            "-noIndexPaging", "--noIndexPaging",
+            "schemaspy.noIndexPaging"
+        },
+        descriptionKey = "noIndexPaging"
     )
     private boolean noIndexPaging = false;
 
     @Parameter(
-            names = {"indexPageLength", "-indexPageLength", "--indexPageLength", "schemaspy.indexPageLength"},
-            descriptionKey = "indexPageLength"
+        names = {
+            "-indexPageLength", "--indexPageLength",
+            "schemaspy.indexPageLength"
+        },
+        descriptionKey = "indexPageLength"
     )
     private int indexPageLength = 10;
 
     @Parameter(
-            names = {"indexLengthChange", "-indexLengthChange", "--indexLengthChange", "schemaspy.indexLengthChange"},
-            descriptionKey = "indexLengthChange"
+        names = {
+            "-indexLengthChange", "--indexLengthChange",
+            "schemaspy.indexLengthChange"
+        },
+        descriptionKey = "indexLengthChange"
     )
     private boolean indexLengthChange = false;
 
@@ -316,104 +346,145 @@ public class CommandLineArguments {
     // DataTables options for check_table (Check Constraints) table in
     // src/main/resources/layout/tables/table.html and src/main/resources/layout/constraint.html
     @Parameter(
-            names = {"noCheckPaging", "-noCheckPaging", "--noCheckPaging", "schemaspy.noCheckPaging"},
-            descriptionKey = "noCheckPaging"
+        names = {
+            "-noCheckPaging", "--noCheckPaging",
+            "schemaspy.noCheckPaging"
+        },
+        descriptionKey = "noCheckPaging"
     )
     private boolean noCheckPaging = false;
 
     @Parameter(
-            names = {"checkPageLength", "-checkPageLength", "--checkPageLength", "schemaspy.checkPageLength"},
-            descriptionKey = "checkPageLength"
+        names = {
+            "-checkPageLength", "--checkPageLength",
+            "schemaspy.checkPageLength"
+        },
+        descriptionKey = "checkPageLength"
     )
     private int checkPageLength = 10;
 
     @Parameter(
-            names = {"checkLengthChange", "-checkLengthChange", "--checkLengthChange", "schemaspy.checkLengthChange"},
-            descriptionKey = "checkLengthChange"
+        names = {
+            "-checkLengthChange", "--checkLengthChange",
+            "schemaspy.checkLengthChange"
+        },
+        descriptionKey = "checkLengthChange"
     )
     private boolean checkLengthChange = false;
 
 
     // DataTables options for routine_table (Routines) table in src/main/resources/layout/routines.html
     @Parameter(
-            names = {"noRoutinePaging", "-noRoutinePaging", "--noRoutinePaging", "schemaspy.noRoutinePaging"},
-            descriptionKey = "noRoutinePaging"
+        names = {
+            "-noRoutinePaging", "--noRoutinePaging",
+            "schemaspy.noRoutinePaging"
+        },
+        descriptionKey = "noRoutinePaging"
     )
     private boolean noRoutinePaging = false;
 
     @Parameter(
-            names = {"routinePageLength", "-routinePageLength", "--routinePageLength", "schemaspy.routinePageLength"},
-            descriptionKey = "routinePageLength"
+        names = {
+            "-routinePageLength", "--routinePageLength",
+            "schemaspy.routinePageLength"
+        },
+        descriptionKey = "routinePageLength"
     )
     private int routinePageLength = 50;
 
     @Parameter(
-            names = {"routineLengthChange", "-routineLengthChange", "--routineLengthChange",
-                    "schemaspy.routineLengthChange"},
-            descriptionKey = "routineLengthChange"
+        names = {
+            "-routineLengthChange", "--routineLengthChange",
+            "schemaspy.routineLengthChange"
+        },
+        descriptionKey = "routineLengthChange"
     )
     private boolean routineLengthChange = false;
 
 
     // DataTables options for fk_table (Foreign Key Constraints) table in src/main/resources/layout/constraint.html
     @Parameter(
-            names = {"noFkPaging", "-noFkPaging", "--noFkPaging", "schemaspy.noFkPaging"},
-            descriptionKey = "noFkPaging"
+        names = {
+            "-noFkPaging", "--noFkPaging",
+            "schemaspy.noFkPaging"
+        },
+        descriptionKey = "noFkPaging"
     )
     private boolean noFkPaging = false;
 
     @Parameter(
-            names = {"fkPageLength", "-fkPageLength", "--fkPageLength", "schemaspy.fkPageLength"},
-            descriptionKey = "fkPageLength"
+        names = {
+            "-fkPageLength", "--fkPageLength",
+            "schemaspy.fkPageLength"
+        },
+        descriptionKey = "fkPageLength"
     )
     private int fkPageLength = 50;
 
     @Parameter(
-            names = {"fkLengthChange", "-fkLengthChange", "--fkLengthChange", "schemaspy.fkLengthChange"},
-            descriptionKey = "fkLengthChange"
+        names = {
+            "-fkLengthChange", "--fkLengthChange",
+            "schemaspy.fkLengthChange"
+        },
+        descriptionKey = "fkLengthChange"
     )
     private boolean fkLengthChange = false;
 
 
     // DataTables options for column_table (Columns) table in src/main/resources/layout/column.html
     @Parameter(
-            names = {"noColumnPaging", "-noColumnPaging", "--noColumnPaging", "schemaspy.noColumnPaging"},
-            descriptionKey = "noColumnPaging"
+        names = {
+            "-noColumnPaging", "--noColumnPaging",
+            "schemaspy.noColumnPaging"
+        },
+        descriptionKey = "noColumnPaging"
     )
     private boolean noColumnPaging = false;
 
     @Parameter(
-            names = {"columnPageLength", "-columnPageLength", "--columnPageLength", "schemaspy.columnPageLength"},
-            descriptionKey = "columnPageLength"
+        names = {
+            "-columnPageLength", "--columnPageLength",
+            "schemaspy.columnPageLength"
+        },
+        descriptionKey = "columnPageLength"
     )
     private int columnPageLength = 50;
 
     @Parameter(
-            names = {"columnLengthChange", "-columnLengthChange", "--columnLengthChange",
-                    "schemaspy.columnLengthChange"},
-            descriptionKey = "columnLengthChange"
+        names = {
+            "-columnLengthChange", "--columnLengthChange",
+            "schemaspy.columnLengthChange"
+        },
+        descriptionKey = "columnLengthChange"
     )
     private boolean columnLengthChange = false;
 
 
     // DataTables options for all tables in src/main/resources/layout/anomalies.html
     @Parameter(
-            names = {"noAnomaliesPaging", "-noAnomaliesPaging", "--noAnomaliesPaging", "schemaspy.noAnomaliesPaging"},
-            descriptionKey = "noAnomaliesPaging"
+        names = {
+            "-noAnomaliesPaging", "--noAnomaliesPaging",
+            "schemaspy.noAnomaliesPaging"
+        },
+        descriptionKey = "noAnomaliesPaging"
     )
     private boolean noAnomaliesPaging = false;
 
     @Parameter(
-            names = {"anomaliesPageLength", "-anomaliesPageLength", "--anomaliesPageLength",
-                    "schemaspy.anomaliesPageLength"},
-            descriptionKey = "anomaliesPageLength"
+        names = {
+            "-anomaliesPageLength", "--anomaliesPageLength",
+            "schemaspy.anomaliesPageLength"
+        },
+        descriptionKey = "anomaliesPageLength"
     )
     private int anomaliesPageLength = 10;
 
     @Parameter(
-            names = {"anomaliesLengthChange", "-anomaliesLengthChange", "--anomaliesLengthChange",
-                    "schemaspy.anomaliesLengthChange"},
-            descriptionKey = "anomaliesLengthChange"
+        names = {
+            "-anomaliesLengthChange", "--anomaliesLengthChange",
+            "schemaspy.anomaliesLengthChange"
+        },
+        descriptionKey = "anomaliesLengthChange"
     )
     private boolean anomaliesLengthChange = false;
 
