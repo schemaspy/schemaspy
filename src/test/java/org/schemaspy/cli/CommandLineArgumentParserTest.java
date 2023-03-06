@@ -273,6 +273,51 @@ public class CommandLineArgumentParserTest {
         assertThat(arguments.unknownArgs()).containsExactly("-server", "xds");
     }
 
+    @Test
+    public void connPropsSinglePair() {
+        String[] args = {
+            "-o", "aFolder",
+            "-sso",
+            "-connprops", "key\\=value"
+        };
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            NO_DEFAULT_PROVIDER
+        ).parse(args);
+
+        assertThat(arguments.getConnprops()).isEqualTo("key\\=value");
+    }
+
+    @Test
+    public void connPropsMultiplePairWindows() {
+        String[] args = {
+            "-o", "aFolder",
+            "-sso",
+            "-connprops", "key\\=value;key2\\=value2"
+        };
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            NO_DEFAULT_PROVIDER
+        ).parse(args);
+
+        assertThat(arguments.getConnprops()).isEqualTo("key\\=value;key2\\=value2");
+    }
+
+    @Test
+    public void connPropsMultiplePairLinux() {
+        String[] args = {
+            "-o", "aFolder",
+            "-sso",
+            "-connprops", "key\\=value:key2\\=value2"
+        };
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            NO_DEFAULT_PROVIDER
+        ).parse(args);
+
+        assertThat(arguments.getConnprops()).isEqualTo("key\\=value:key2\\=value2");
+    }
+
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.
 
     // given only parameter -configFile without value -> error

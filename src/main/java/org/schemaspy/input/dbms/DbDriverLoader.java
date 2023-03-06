@@ -94,7 +94,7 @@ public class DbDriverLoader {
             config,
             new WithUser(
                 commandLineArguments.getUser(),
-                new PreferencesConnection(config)
+                new PreferencesConnection(commandLineArguments.getConnprops())
             )
         ).properties();
 

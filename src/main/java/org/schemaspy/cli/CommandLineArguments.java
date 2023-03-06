@@ -119,6 +119,15 @@ public class CommandLineArguments {
     private String databaseType = "ora";
 
     @Parameter(
+        names = {
+            "-connprops",
+            "schemaspy.connprops"
+        },
+        descriptionKey = "connprops"
+    )
+    private String connprops = null;
+
+    @Parameter(
             names = {
                     "-db", "--database-name",
                     "schemaspy.db", "schemaspy.database-name"
@@ -440,6 +449,10 @@ public class CommandLineArguments {
 
     public String getDatabaseType() {
         return databaseType;
+    }
+
+    public String getConnprops() {
+        return connprops;
     }
 
     public File getOutputDirectory() {
