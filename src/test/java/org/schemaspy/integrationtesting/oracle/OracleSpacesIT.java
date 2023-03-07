@@ -36,9 +36,8 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.OracleContainer;
 
@@ -57,6 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext
 public class OracleSpacesIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","oracle","spaces");
@@ -66,12 +66,6 @@ public class OracleSpacesIT {
 
     @Mock
     private ProgressListener progressListener;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
-
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
 
     private static Database database;
 
@@ -109,7 +103,10 @@ public class OracleSpacesIT {
                 "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
         };
         Config config = new Config(args);
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),

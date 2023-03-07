@@ -53,9 +53,6 @@ public class SqliteIT {
     @Mock
     private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static Database database;
 
     @Before
@@ -74,7 +71,10 @@ public class SqliteIT {
                 "-o", "target/integrationtesting/sqlite",
                 "-sso"
         };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         Config config = new Config(args);
         sqlService.connect(arguments, config);
         Database database = new Database(

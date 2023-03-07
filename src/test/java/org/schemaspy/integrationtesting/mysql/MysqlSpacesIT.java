@@ -71,9 +71,6 @@ public class MysqlSpacesIT {
     @Mock
     private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static Database database;
 
     @SuppressWarnings("unchecked")
@@ -109,8 +106,11 @@ public class MysqlSpacesIT {
                 "-o", outputPath.toString(),
                 "-connprops", "useSSL\\=false"
         };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),

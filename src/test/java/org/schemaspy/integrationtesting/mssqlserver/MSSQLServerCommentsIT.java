@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -34,21 +35,17 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MSSQLContainer;
 
 import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-import static org.mockito.BDDMockito.given;
 import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 
 /**
@@ -65,13 +62,6 @@ public class MSSQLServerCommentsIT {
 
     @Mock
     private ProgressListener progressListener;
-
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
-
     private static Database abc_dbo;
     private static Database abc_a;
     private static Database abc_b;
@@ -152,13 +142,11 @@ public class MSSQLServerCommentsIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(1433).toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/mssql/comments"));
-        given(arguments.getDatabaseType()).willReturn("mssql08");
-        given(arguments.getUser()).willReturn("sa");
-        given(arguments.getSchema()).willReturn(schema);
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn(db);
         Config config = new Config(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),

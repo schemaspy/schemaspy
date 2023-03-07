@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -33,9 +34,8 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 
@@ -48,10 +48,10 @@ import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext
 public class MysqlSchemaLeakageIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","schema_leakage");
@@ -61,12 +61,6 @@ public class MysqlSchemaLeakageIT {
 
     @Mock
     private ProgressListener progressListener;
-
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
 
     private static Database database;
 
@@ -103,13 +97,11 @@ public class MysqlSchemaLeakageIT {
                 "-o", outputPath.toString(),
                 "-connprops", "useSSL\\=false"
         };
-        given(arguments.getOutputDirectory()).willReturn(outputPath.toFile());
-        given(arguments.getDatabaseType()).willReturn("mysql");
-        given(arguments.getUser()).willReturn("testUser");
-        given(arguments.getSchema()).willReturn("schemaleak");
-        given(arguments.getCatalog()).willReturn("%");
-        given(arguments.getDatabaseName()).willReturn("schemaleak");
         Config config = new Config(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),
