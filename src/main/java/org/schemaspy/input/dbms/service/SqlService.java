@@ -77,11 +77,6 @@ public class SqlService {
         dbmsMeta = dbmsService.fetchDbmsMeta(databaseMetaData);
         invalidIdentifierPattern = createInvalidIdentifierPattern(databaseMetaData);
         allKeywords = dbmsMeta.getAllKeywords();
-
-        if (config.isEvaluateAllEnabled()) {
-            return null;    // no database to return
-        }
-
         return databaseMetaData;
     }
 

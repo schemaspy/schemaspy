@@ -683,10 +683,6 @@ public final class Config implements HtmlConfig {
         return tableExclusions;
     }
 
-    public void setSchemas(List<String> schemas) {
-        this.schemas = schemas;
-    }
-
     /**
      * @return list of schemas to process
      */
@@ -709,10 +705,6 @@ public final class Config implements HtmlConfig {
         }
 
         return schemas;
-    }
-
-    public void setEvaluateAllEnabled(boolean enabled) {
-        evaluateAll = enabled;
     }
 
     public boolean isEvaluateAllEnabled() {
