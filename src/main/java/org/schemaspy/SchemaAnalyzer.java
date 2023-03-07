@@ -135,6 +135,7 @@ public class SchemaAnalyzer {
             String schema = commandLineArguments.getSchema();
             return analyze(
                     schema,
+                    false,
                     config,
                     outputDirectory,
                     databaseServiceFactory.forSingleSchema(config),
@@ -183,7 +184,7 @@ public class SchemaAnalyzer {
 
                 LOGGER.info("Analyzing '{}'", schema);
                 File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
-                db = this.analyze(schema, config, outputDirForSchema, databaseService, progressListener);
+                db = this.analyze(schema, true, config, outputDirForSchema, databaseService, progressListener);
                 if (db == null) //if any of analysed schema returns null
                     return null;
                 mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
@@ -221,6 +222,7 @@ public class SchemaAnalyzer {
 
     public Database analyze(
             String schema,
+            boolean isOneOfMultipleSchemas,
             Config config,
             File outputDir,
             DatabaseService databaseService,
@@ -245,7 +247,7 @@ public class SchemaAnalyzer {
             catalog = new CatalogResolver(databaseMetaData).resolveCatalog(catalog);
             schema = new SchemaResolver(databaseMetaData).resolveSchema(schema);
 
-            SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, config.isOneOfMultipleSchemas());
+            SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, isOneOfMultipleSchemas);
             if (commandLineArguments.isHtmlEnabled()) {
                 FileUtils.forceMkdir(new File(outputDir, "tables"));
                 FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
@@ -269,7 +271,7 @@ public class SchemaAnalyzer {
 
             if (tables.isEmpty()) {
                 dumpNoTablesMessage(schema, commandLineArguments.getUser(), databaseMetaData, config.getTableInclusions() != null);
-                if (!config.isOneOfMultipleSchemas()) // don't bail if we're doing the whole enchilada
+                if (!isOneOfMultipleSchemas) // don't bail if we're doing the whole enchilada
                     throw new EmptySchemaException();
             }
 
@@ -277,6 +279,7 @@ public class SchemaAnalyzer {
             if (commandLineArguments.isHtmlEnabled()) {
                 generateHtmlDoc(
                         config,
+                        isOneOfMultipleSchemas,
                         commandLineArguments.useVizJS(),
                         progressListener,
                         outputDir,
@@ -289,7 +292,7 @@ public class SchemaAnalyzer {
             try {
                 outputProducer.generate(db, outputDir);
             } catch (OutputException oe) {
-                if (config.isOneOfMultipleSchemas()) {
+                if (isOneOfMultipleSchemas) {
                     LOGGER.warn("Failed to produce output", oe);
                 } else {
                     throw oe;
@@ -326,6 +329,7 @@ public class SchemaAnalyzer {
 
     private void generateHtmlDoc(
             Config config,
+            boolean isOneOfMultipleSchemas,
             boolean useVizJS,
             ProgressListener progressListener,
             File outputDir,
@@ -378,7 +382,7 @@ public class SchemaAnalyzer {
             config.isRankDirBugEnabled(),
             "svg".equalsIgnoreCase(renderer.format()),
             config.isNumRowsEnabled(),
-            config.isOneOfMultipleSchemas()
+            isOneOfMultipleSchemas
         );
 
         DotFormatter dotProducer = new DotFormatter(dotConfig);
