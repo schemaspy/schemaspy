@@ -332,6 +332,37 @@ public class CommandLineArgumentParserTest {
         assertThat(arguments.getConnprops()).isEqualTo("key\\=value:key2\\=value2");
     }
 
+    @Test
+    public void passwordInArgs() {
+        String[] args = {
+            "-o", "aFolder",
+            "-sso",
+            "-u", "usr",
+            "-p", "pswd"
+        };
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            NO_DEFAULT_PROVIDER
+        ).parse(args);
+
+        assertThat(arguments.getPassword()).isEqualTo("pswd");
+    }
+
+    @Test
+    public void passwordInEnvOrConfigFile() {
+        String[] args = {
+            "-o", "aFolder",
+            "-sso",
+            "-u", "usr"
+        };
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (optionName -> optionName.equals("schemaspy.pw") ? "pswd" : null)
+        ).parse(args);
+
+        assertThat(arguments.getPassword()).isEqualTo("pswd");
+    }
+
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.
 
     // given only parameter -configFile without value -> error

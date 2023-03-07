@@ -28,6 +28,7 @@ import org.schemaspy.output.diagram.graphviz.GraphvizConfigCli;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Holds all supported command line arguments.
@@ -56,7 +57,8 @@ public class CommandLineArguments {
 
     @Parameter(names = {
         "?", "-?", "/?",
-        "-h", "-help", "--help"
+        "-h",
+        "-help", "--help"
     },
         descriptionKey = "help",
         help = true,
@@ -167,6 +169,25 @@ public class CommandLineArguments {
 
     @Parameter(
         names = {
+            "-p", "--password",
+            "schemaspy.pw", "schemaspy.password"
+        },
+        descriptionKey = "password"
+    )
+    private String password;
+
+    @Parameter(
+        names = {
+            "-pfp", "--prompt-for-password",
+            "schemaspy.pfp"
+        },
+        descriptionKey = "pfp",
+        password = true
+    )
+    private String passwordFromPrompt;
+
+    @Parameter(
+        names = {
             "-s", "--schema",
             "schemaspy.s", "schemaspy.schema"
 
@@ -183,17 +204,6 @@ public class CommandLineArguments {
         descriptionKey = "catalog"
     )
     private String catalog;
-
-    /* TODO Password handling is more complex, see Config class (prompt for password, fallback to Environment variable, multiple schemas, etc.)
-    @Parameter(
-            names = {
-                    "-p", "--password",
-                    "schemaspy.p", "schemaspy.password"
-            },
-            descriptionKey = "password",
-            password = true
-    )
-    private String password; */
 
     @Parameter(
         names = {
@@ -540,6 +550,13 @@ public class CommandLineArguments {
 
     public String getUser() {
         return user;
+    }
+
+    public String getPassword() {
+        if (Objects.nonNull(passwordFromPrompt)) {
+            return passwordFromPrompt;
+        }
+        return password;
     }
 
     public String getCatalog() {
