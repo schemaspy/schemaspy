@@ -62,9 +62,6 @@ public class InformixRoutinesIT {
     @Mock
     private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static Database database;
 
     public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
@@ -101,8 +98,11 @@ public class InformixRoutinesIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getJdbcPort().toString()
         };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),

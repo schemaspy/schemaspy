@@ -63,9 +63,6 @@ public class MSSQLServerRemoteTablesIT {
     @Mock
     private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static Database database;
 
     @SuppressWarnings("unchecked")
@@ -96,7 +93,10 @@ public class MSSQLServerRemoteTablesIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(1433).toString()
         };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(arguments, config);
         Database database = new Database(

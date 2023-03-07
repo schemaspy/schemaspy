@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -32,25 +33,23 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.H2MemoryRule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 /**
  * @author Nils Petzaell
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext
 public class H2SpacesIT {
 
     @ClassRule
@@ -61,12 +60,6 @@ public class H2SpacesIT {
 
     @Mock
     private ProgressListener progressListener;
-
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
 
     private static Database database;
 
@@ -79,25 +72,24 @@ public class H2SpacesIT {
 
     private void doCreateDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
-                "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
-                "-db", "h2 spaces",
-                "-s", "h2 spaces",
-                "-o", "target/testout/integrationtesting/h2/ spaces",
-                "-u", "sa"
+            "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
+            "-db", "h2 spaces",
+            "-s", h2MemoryRule.getConnection().getSchema(),
+            "-cat", h2MemoryRule.getConnection().getCatalog(),
+            "-o", "target/testout/integrationtesting/h2/ spaces",
+            "-u", "sa"
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/h2/ spaces"));
-        given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
-        given(arguments.getUser()).willReturn("sa");
-        given(arguments.getCatalog()).willReturn(h2MemoryRule.getConnection().getCatalog());
-        given(arguments.getSchema()).willReturn(h2MemoryRule.getConnection().getSchema());
-        given(arguments.getDatabaseName()).willReturn("h2 spaces");
         Config config = new Config(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
+            sqlService.getDbmsMeta(),
+            arguments.getDatabaseName(),
+            arguments.getCatalog(),
+            arguments.getSchema()
         );
         new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
         H2SpacesIT.database = database;

@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.schemaspy.Config;
 import org.schemaspy.SimpleDotConfig;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -37,12 +38,10 @@ import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.testing.H2MemoryRule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -50,13 +49,13 @@ import java.sql.SQLException;
 import java.util.concurrent.atomic.LongAdder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 /**
  * @author Nils Petzaell
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext
 public class SchemaMetaIT {
 
     private static String BY_SCRIPT_COMMENT = "Set by script";
@@ -70,12 +69,6 @@ public class SchemaMetaIT {
 
     @Mock
     private ProgressListener progressListener;
-
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
 
     private Config config;
     private DbmsMeta dbmsMeta;
@@ -91,12 +84,11 @@ public class SchemaMetaIT {
                 "-o", "target/integrationtesting/schemaMetaIT",
                 "-u", "sa"
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/integrationtesting/schemaMetaIT"));
-        given(arguments.getDatabaseType()).willReturn("src/test/resources/integrationTesting/dbTypes/h2memory");
-        given(arguments.getUser()).willReturn("sa");
-        given(arguments.getSchema()).willReturn("SCHEMAMETAIT");
-        given(arguments.getDatabaseName()).willReturn("SchemaMetaIT");
         config = new Config(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         sqlService.connect(arguments,config);
         dbmsMeta = sqlService.getDbmsMeta();
         schema = h2MemoryRule.getConnection().getSchema();

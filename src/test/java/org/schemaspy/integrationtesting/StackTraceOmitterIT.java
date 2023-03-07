@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext
 public class StackTraceOmitterIT {
 
     @Rule

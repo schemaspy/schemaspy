@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -35,37 +36,29 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MSSQLContainer;
 
 import javax.script.ScriptException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext
 public class MSSQLServerCheckConstraintIT {
     @Autowired
     private SqlService sqlService;
 
     @Mock
     private ProgressListener progressListener;
-
-    @MockBean
-    private CommandLineArguments arguments;
-
-    @MockBean
-    private CommandLineRunner commandLineRunner;
 
     private static Database database;
 
@@ -99,13 +92,11 @@ public class MSSQLServerCheckConstraintIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(1433).toString()
         };
-        given(arguments.getOutputDirectory()).willReturn(new File("target/testout/integrationtesting/mssql/CheckConstraint"));
-        given(arguments.getDatabaseType()).willReturn("mssql08");
-        given(arguments.getUser()).willReturn("sa");
-        given(arguments.getSchema()).willReturn("CheckConstraint");
-        given(arguments.getCatalog()).willReturn("CheckConstraint");
-        given(arguments.getDatabaseName()).willReturn("CheckConstraint");
         Config config = new Config(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),

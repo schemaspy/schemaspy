@@ -61,9 +61,6 @@ public class MariaDbRoutinesIT {
     @Mock
     private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static Database database;
 
     @SuppressWarnings("unchecked")
@@ -97,8 +94,11 @@ public class MariaDbRoutinesIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
         };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
         Config config = new Config(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
                 sqlService.getDbmsMeta(),

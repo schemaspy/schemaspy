@@ -76,9 +76,6 @@ public class PgSqlRelationshipErrorIT {
     @Mock
     private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static Database database;
 
     @Before
@@ -100,7 +97,10 @@ public class PgSqlRelationshipErrorIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
         };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         Config config = new Config(args);
         sqlService.connect(arguments, config);
         Database database = new Database(

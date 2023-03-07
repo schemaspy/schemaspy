@@ -68,9 +68,6 @@ public class OraclePKIT {
     @Mock
     private ProgressListener progressListener;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static Database database;
 
     public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
@@ -106,7 +103,10 @@ public class OraclePKIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
         };
-        CommandLineArguments arguments = commandLineArgumentParser.parse(args);
+        CommandLineArguments arguments = new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        ).parse(args);
         Config config = new Config(args);
         sqlService.connect(arguments, config);
         Database database = new Database(
