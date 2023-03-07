@@ -154,8 +154,7 @@ public class SchemaAnalyzer {
             String schemaSpec = config.getSchemaSpec();
             Connection connection = new DbDriverLoader().getConnection(commandLineArguments, config);
             DatabaseMetaData meta = connection.getMetaData();
-            //-all(evaluteAll) given then get list of the database schemas
-            if (schemas == null || config.isEvaluateAllEnabled()) {
+            if (schemas == null) {
                 if (schemaSpec == null)
                     schemaSpec = ".*";
                 LOGGER.info(
@@ -179,9 +178,6 @@ public class SchemaAnalyzer {
             List<MustacheSchema> mustacheSchemas = new ArrayList<>();
             MustacheCatalog mustacheCatalog = null;
             for (String schema : schemas) {
-                // reset -all(evaluteAll) and -schemas parameter to avoid infinite loop! now we are analyzing single schema
-                config.setSchemas(null);
-                config.setEvaluateAllEnabled(false);
                 if (dbName == null)
                     config.setDb(schema);
 
