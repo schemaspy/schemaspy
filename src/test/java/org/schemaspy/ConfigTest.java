@@ -47,21 +47,18 @@ public class ConfigTest {
     @Test
     public void testLoadProperties() {
         Config config = new Config("-configFile", "src/test/resources/configTest/loadpropertiesTest.properties");
-        assertThat(config.getPassword()).isEqualToIgnoringCase("database_password");
         assertThat(config.getPort()).isEqualTo(123);
     }
 
     @Test
     public void propertiesShouldHaveTrailingSpacesTrimmed() {
         Config config = new Config("-configFile", "src/test/resources/configTest/propertiesWithTrailingSpace.properties");
-        assertThat(config.getPassword()).isEqualToIgnoringCase("database_password");
         assertThat(config.getDb()).isEqualToIgnoringCase("db_name");
     }
 
     @Test
     public void propertiesShouldHaveTrailingSpaces() {
         Config config = new Config("-configFile", "src/test/resources/configTest/propertiesWithTrailingSpaceRetained.properties");
-        assertThat(config.getPassword()).isEqualToIgnoringCase("database_password ");
         assertThat(config.getDb()).isEqualToIgnoringCase("db_name");
     }
 

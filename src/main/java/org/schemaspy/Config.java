@@ -87,8 +87,6 @@ public final class Config implements HtmlConfig {
     private String dbType;
     private List<String> schemas;
     private boolean oneOfMultipleSchemas;
-    private String password;
-    private Boolean promptForPassword;
     private String db;
     private String host;
     private Integer port;
@@ -238,63 +236,6 @@ public final class Config implements HtmlConfig {
 
     private static boolean hasText(String string) {
         return Objects.nonNull(string) && !string.trim().isEmpty();
-    }
-
-    /**
-     * Set the password used to connect to the database.
-     *
-     * @param password db user password
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
-     * @see #setPassword(String)
-     *
-     * @return get password as set by -p or with setPassword
-     */
-    public String getPassword() {
-        if (password == null)
-            password = pullParam("-p");
-
-        if (password == null && isPromptForPasswordEnabled()) {
-            Console console = System.console();
-            if (Objects.isNull(console)) {
-                LOGGER.error("No console found for password input");
-            } else {
-                password = new String(console.readPassword("Password: "));
-            }
-        }
-
-        if (password == null) {
-            password = System.getenv("schemaspy.pw");
-        }
-
-        return password;
-    }
-
-    /**
-     * Set to <code>true</code> to prompt for the password
-     *
-     * @param promptForPassword should we prompt for a password.
-     */
-    public void setPromptForPasswordEnabled(boolean promptForPassword) {
-        this.promptForPassword = promptForPassword;
-    }
-
-    /**
-     * @see #setPromptForPasswordEnabled(boolean)
-     *
-     * @return true if we should prompt for password
-     */
-
-    public boolean isPromptForPasswordEnabled() {
-        if (promptForPassword == null) {
-            promptForPassword = options.remove("-pfp");
-        }
-
-        return promptForPassword;
     }
 
     public void setMaxDetailedTabled(int maxDetailedTables) {
