@@ -91,7 +91,7 @@ public class DbDriverLoader {
         loadJDBCJars = config.isLoadJDBCJarsEnabled();
 
         final Properties connectionProperties = new WithPassword(
-            config,
+            commandLineArguments.getPassword(),
             new WithUser(
                 commandLineArguments.getUser(),
                 new PreferencesConnection(commandLineArguments.getConnprops())
