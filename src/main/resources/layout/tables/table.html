@@ -63,7 +63,8 @@
                                             {{#children}}
                                             <tr>
                                                 <td title="{{constraint}}"><a href='{{path}}{{#toFileName}}{{table.name}}{{/toFileName}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span></td>
-                                                <td class="constraint detail">{{constraint.name}}<span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span></td>
+                                                <td class="constraint detail">{{constraint.name}}</td>
+                                                <td class="constraint detail"><span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span></td>
                                             </tr>
                                             {{/children}}
                                         </table>
@@ -73,7 +74,8 @@
                                             {{#parents}}
                                             <tr>
                                                 <td title="{{constraint}}"><a href='{{path}}{{#toFileName}}{{table.name}}{{/toFileName}}.html'>{{table.name}}</a><span class='relatedKey'>.{{column.name}}</span></td>
-                                                <td class="constraint detail">{{constraint.name}}<span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span></td>
+                                                <td class="constraint detail">{{constraint.name}}</td>
+                                                <td class="constraint detail"><span title='{{constraint.deleteRuleDescription}}'>{{constraint.deleteRuleAlias}}</span></td>
                                             </tr>
                                             {{/parents}}
                                         </table>
