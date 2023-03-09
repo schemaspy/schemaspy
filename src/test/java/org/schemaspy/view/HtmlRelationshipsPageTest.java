@@ -37,11 +37,10 @@ public class HtmlRelationshipsPageTest {
     public void willWriteErrorInformation() {
         HtmlConfig htmlConfig = mock(HtmlConfig.class);
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isOneOfMultipleSchemas()).thenReturn(false);
         when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", htmlConfig, false, dataTableConfig);
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler,  true,false);
         StringWriter writer = new StringWriter();
         MustacheSummaryDiagramResults mustacheSummaryDiagramResults = new MustacheSummaryDiagramResults(Collections.emptyList(), Collections.singletonList(new OutputException("ERROR")));

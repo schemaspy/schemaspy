@@ -46,17 +46,15 @@ public class MustacheCompilerTest {
     public static void setup() {
         HtmlConfig single = mock(HtmlConfig.class);
         when(single.getTemplateDirectory()).thenReturn("mustache");
-        when(single.isOneOfMultipleSchemas()).thenReturn(false);
         when(single.isPaginationEnabled()).thenReturn(true);
         DataTableConfig singleDataTableConfig = new DataTableConfig(single, new CommandLineArguments());
-        mustacheCompilerSingle = new MustacheCompiler("testingSingle", single, singleDataTableConfig);
+        mustacheCompilerSingle = new MustacheCompiler("testingSingle", single, false, singleDataTableConfig);
 
         HtmlConfig multi = mock(HtmlConfig.class);
         when(multi.getTemplateDirectory()).thenReturn("mustache");
-        when(multi.isOneOfMultipleSchemas()).thenReturn(true);
         when(multi.isPaginationEnabled()).thenReturn(true);
         DataTableConfig multiDataTableConfig = new DataTableConfig(multi, new CommandLineArguments());
-        mustacheCompilerMulti = new MustacheCompiler("testingMulti", multi, multiDataTableConfig);
+        mustacheCompilerMulti = new MustacheCompiler("testingMulti", multi, true, multiDataTableConfig);
     }
 
     private PageData pageData = new PageData.Builder()
@@ -117,13 +115,13 @@ public class MustacheCompilerTest {
         when(htmlConfig.getTemplateDirectory()).thenReturn("target");
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("Override", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("Override", htmlConfig, false, dataTableConfig);
         Files.deleteIfExists(overridePath);
         String before = write(mustacheCompiler);
         assertThat(before).isEqualTo("normal");
         Files.write(overridePath, "custom".getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         //Create new MustacheCompiler this is to evict cache, else the already processed override.html will be used
-        mustacheCompiler = new MustacheCompiler("Override", htmlConfig, dataTableConfig);
+        mustacheCompiler = new MustacheCompiler("Override", htmlConfig, false, dataTableConfig);
         String after = write(mustacheCompiler);
         assertThat(after).isEqualTo("custom");
     }
