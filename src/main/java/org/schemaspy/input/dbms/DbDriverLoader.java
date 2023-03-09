@@ -75,7 +75,11 @@ public class DbDriverLoader {
             config.setDb(urlBuilder.build());
 
         String[] driverClass = properties.getProperty("driver").split(",");
-        String driverPath = properties.getProperty("driverPath");
+        String driverPath = commandLineArguments.getDriverPath();
+        
+        if (Objects.isNull(driverPath))
+            driverPath = properties.getProperty("driverPath");
+
         if (Objects.isNull(driverPath))
             driverPath = "";
 
