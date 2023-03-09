@@ -2,7 +2,7 @@
 .diagram {
   margin: 0;
   background: #ffffff;
-  border: 0 0;
+  border: none;
   padding:.4em;
 }
 /* background-color must be specified for th to propagate into diagrams */
