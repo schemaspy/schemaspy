@@ -210,10 +210,6 @@ public final class Config implements HtmlConfig {
         return db;
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
     public String getHost() {
         if (host == null)
             host = pullParam("-host");
@@ -238,10 +234,6 @@ public final class Config implements HtmlConfig {
         return Objects.nonNull(string) && !string.trim().isEmpty();
     }
 
-    public void setMaxDetailedTabled(int maxDetailedTables) {
-        this.maxDetailedTables = maxDetailedTables;
-    }
-
     public int getMaxDetailedTables() {
         if (maxDetailedTables == null) {
             int max = DEFAULT_TABLE_DETAILS_THRESHOLD;
@@ -257,10 +249,6 @@ public final class Config implements HtmlConfig {
         }
 
         return maxDetailedTables;
-    }
-
-    public void setDriverPath(String driverPath) {
-        this.driverPath = driverPath;
     }
 
     public String getDriverPath() {
@@ -282,12 +270,7 @@ public final class Config implements HtmlConfig {
      * <p>
      * Defaults to <code>"schemaSpy.css"</code>.
      *
-     * @param css file path for custom css-file
      */
-    public void setCss(String css) {
-        this.css = css;
-    }
-
     public String getCss() {
         if (css == null) {
             css = pullParam("-css");
@@ -300,14 +283,6 @@ public final class Config implements HtmlConfig {
     /**
      * The font to use within diagrams.  Modify the .css to specify HTML fonts.
      *
-     * @param font font name to use
-     */
-    public void setFont(String font) {
-        this.font = font;
-    }
-
-    /**
-     * @see #setFont(String)
      */
     public String getFont() {
         if (font == null) {
@@ -325,15 +300,6 @@ public final class Config implements HtmlConfig {
      * Modify the .css to specify HTML font sizes.
      *
      * Defaults to 11.
-     *
-     * @param fontSize set the size of the font, default 11.
-     */
-    public void setFontSize(int fontSize) {
-        this.fontSize = fontSize;
-    }
-
-    /**
-     * @see #setFontSize(int)
      * @return the font size to use
      */
     public int getFontSize() {
@@ -356,14 +322,6 @@ public final class Config implements HtmlConfig {
     /**
      * Description of schema that gets display on main pages.
      *
-     * @param description description to put into html report
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * @see #setDescription(String)
      */
     @Override
     public String getDescription() {
@@ -374,16 +332,7 @@ public final class Config implements HtmlConfig {
 
     /**
      * Maximum number of threads to use when querying database metadata information.
-     *
-     * @param maxDbThreads change the number of threads used to fetch data from db
-     */
-    public void setMaxDbThreads(int maxDbThreads) {
-        this.maxDbThreads = maxDbThreads;
-    }
-
-    /**
      * @throws InvalidConfigurationException if unable to load properties
-     * @see #setMaxDbThreads(int)
      */
     public int getMaxDbThreads() {
         if (maxDbThreads == null) {
@@ -415,14 +364,6 @@ public final class Config implements HtmlConfig {
     /**
      * Don't use this unless absolutely necessary as it screws up the layout
      *
-     * @param enabled should we skip setting RIGHT to LEFT
-     */
-    public void setRankDirBugEnabled(boolean enabled) {
-        rankDirBugEnabled = enabled;
-    }
-
-    /**
-     * @see #setRankDirBugEnabled(boolean)
      */
     public boolean isRankDirBugEnabled() {
         if (rankDirBugEnabled == null)
@@ -439,16 +380,6 @@ public final class Config implements HtmlConfig {
      * All tables are named plural names.
      * The columns that logically reference that <code>ID</code> are the singular
      * form of the table name suffixed with <code>_ID</code>.<p>
-     *
-     * @param enabled if we should use rails naming convention
-     */
-    public void setRailsEnabled(boolean enabled) {
-        railsEnabled = enabled;
-    }
-
-    /**
-     * @return if we should use rails naming convention
-     * @see #setRailsEnabled(boolean)
      */
     public boolean isRailsEnabled() {
         if (railsEnabled == null)
@@ -462,16 +393,6 @@ public final class Config implements HtmlConfig {
      * each table contains.<p/>
      * <p>
      * Defaults to <code>true</code> (enabled).
-     *
-     * @param enabled should we show number of rows
-     */
-    public void setNumRowsEnabled(boolean enabled) {
-        numRowsEnabled = enabled;
-    }
-
-    /**
-     * @return if we should show number of rows
-     * @see #setNumRowsEnabled(boolean)
      */
     public boolean isNumRowsEnabled() {
         if (numRowsEnabled == null)
@@ -484,16 +405,6 @@ public final class Config implements HtmlConfig {
      * If enabled we'll include views in the analysis.<p/>
      * <p>
      * Defaults to <code>true</code> (enabled).
-     *
-     * @param enabled should we process views
-     */
-    public void setViewsEnabled(boolean enabled) {
-        viewsEnabled = enabled;
-    }
-
-    /**
-     * @return if we should process views
-     * @see #setViewsEnabled(boolean)
      */
     public boolean isViewsEnabled() {
         if (viewsEnabled == null)
@@ -504,18 +415,6 @@ public final class Config implements HtmlConfig {
 
     /**
      * Set the columns to exclude from all relationship diagrams.
-     *
-     * @param columnExclusions regular expression of the columns to
-     *                         exclude
-     */
-    public void setColumnExclusions(String columnExclusions) {
-        this.columnExclusions = Pattern.compile(columnExclusions);
-    }
-
-    /**
-     * See {@link #setColumnExclusions(String)}
-     *
-     * @return
      */
     public Pattern getColumnExclusions() {
         if (columnExclusions == null) {
@@ -534,17 +433,6 @@ public final class Config implements HtmlConfig {
     /**
      * Set the columns to exclude from relationship diagrams where the specified
      * columns aren't directly referenced by the focal table.
-     *
-     * @param fullColumnExclusions regular expression of the columns to
-     *                         exclude
-     */
-    public void setIndirectColumnExclusions(String fullColumnExclusions) {
-        indirectColumnExclusions = Pattern.compile(fullColumnExclusions);
-    }
-
-    /**
-     * @return
-     * @see #setIndirectColumnExclusions(String)
      */
     public Pattern getIndirectColumnExclusions() {
         if (indirectColumnExclusions == null) {
@@ -558,15 +446,6 @@ public final class Config implements HtmlConfig {
         }
 
         return indirectColumnExclusions;
-    }
-
-    /**
-     * Set the tables to include as a regular expression
-     *
-     * @param tableInclusions
-     */
-    public void setTableInclusions(String tableInclusions) {
-        this.tableInclusions = Pattern.compile(tableInclusions);
     }
 
     /**
@@ -590,15 +469,6 @@ public final class Config implements HtmlConfig {
         }
 
         return tableInclusions;
-    }
-
-    /**
-     * Set the tables to exclude as a regular expression
-     *
-     * @param tableExclusions tables to exclude
-     */
-    public void setTableExclusions(String tableExclusions) {
-        this.tableExclusions = Pattern.compile(tableExclusions);
     }
 
     /**
@@ -673,12 +543,7 @@ public final class Config implements HtmlConfig {
     /**
      * When -all (evaluateAll) is specified then this is the regular
      * expression that determines which schemas to evaluate.
-     *
-     * @param schemaSpec used to filter when -all is used (regex)
-     */
-    public void setSchemaSpec(String schemaSpec) {
-        this.schemaSpec = schemaSpec;
-    }
+    */
 
     public String getSchemaSpec() {
         if (schemaSpec == null)
@@ -717,16 +582,6 @@ public final class Config implements HtmlConfig {
      * If enabled we'll turn on pagination in generated html<p/>
      * <p>
      * Defaults to <code>true</code> (enabled).
-     *
-     * @param enabled if we should use pagination
-     */
-    public void setPaginationEnabled(boolean enabled) {
-        paginationEnabled = enabled;
-    }
-
-    /**
-     * @return if pagination is enabled
-     * @see #setPaginationEnabled(boolean)
      */
     @Override
     public boolean isPaginationEnabled() {
@@ -742,17 +597,6 @@ public final class Config implements HtmlConfig {
      * <p>
      * Defaults to <code>false</code> (enabled).
      *
-     * @param enabled if we should add sibling libraries when -dp is specified
-     * @deprecated replaced by -dp expanding folders
-     */
-    @Deprecated
-    public void setLoadJDBCJarsEnabled(boolean enabled) {
-        loadJDBCJarsEnabled = enabled;
-    }
-
-    /**
-     * @return if should are loading sibling libraries
-     * @see #setLoadJDBCJarsEnabled(boolean)
      * @deprecated replaced by -dp expanding folders
      */
     @Deprecated
@@ -796,13 +640,7 @@ public final class Config implements HtmlConfig {
     /**
      * Options that are specific to a type of database.  E.g. things like <code>host</code>,
      * <code>port</code> or <code>db</code>, but <b>don't</b> have a setter in this class.
-     *
-     * @param dbSpecificOptions options related to database type
      */
-    public void setDbSpecificOptions(Map<String, String> dbSpecificOptions) {
-        this.dbSpecificOptions = dbSpecificOptions;
-    }
-
     public Map<String, String> getDbSpecificOptions() {
         if (dbSpecificOptions == null)
             dbSpecificOptions = new HashMap<>();
