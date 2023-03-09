@@ -571,6 +571,10 @@ public class CommandLineArguments {
         return catalog;
     }
 
+    public String getDriverPath() {
+        return driverPath;
+    }
+
     public String getDatabaseName() {
         return databaseName;
     }
