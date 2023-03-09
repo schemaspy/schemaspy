@@ -39,7 +39,7 @@ public class HtmlRoutinesPageTest {
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig, false, dataTableConfig);
         HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
         Collection<Routine> routines = Collections.singletonList(new Routine("ARoutine", "Function", "Integer", "SQL", "SELECT 1", true, "IMMUTABLE", "INVOKER", "normal *emp* **strong**"));
         StringWriter actual = new StringWriter();

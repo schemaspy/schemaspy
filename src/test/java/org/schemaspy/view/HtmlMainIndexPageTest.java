@@ -40,7 +40,7 @@ public class HtmlMainIndexPageTest {
         when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig, false, dataTableConfig);
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, "normal *emp* **strong**");
         StringWriter writer = new StringWriter();
         Database database = mock(Database.class);
@@ -58,7 +58,7 @@ public class HtmlMainIndexPageTest {
         when(htmlConfig.isNumRowsEnabled()).thenReturn(false);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsTrue", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsTrue", htmlConfig, false, dataTableConfig);
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
         Database database = mock(Database.class);
@@ -76,7 +76,7 @@ public class HtmlMainIndexPageTest {
         when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
         DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsFalse", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsFalse", htmlConfig, false, dataTableConfig);
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
         Database database = mock(Database.class);

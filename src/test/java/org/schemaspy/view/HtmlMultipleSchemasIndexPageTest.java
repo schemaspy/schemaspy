@@ -45,7 +45,7 @@ public class HtmlMultipleSchemasIndexPageTest {
 
     @Test
     public void multiMainIndexShouldHaveDescription() {
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("withComment", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("withComment", htmlConfig, false, dataTableConfig);
         HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
         StringWriter actual = new StringWriter();
         htmlMultipleSchemasIndexPage.write(new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),"A Description", "JAVA_TEST 1.0", actual);
@@ -54,7 +54,7 @@ public class HtmlMultipleSchemasIndexPageTest {
 
     @Test
     public void multiMainIndexShouldNOTHaveDescription() {
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("noComment", htmlConfig, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("noComment", htmlConfig, false, dataTableConfig);
         HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
         StringWriter actual = new StringWriter();
         htmlMultipleSchemasIndexPage.write(new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),null, "JAVA_TEST 1.0", actual);

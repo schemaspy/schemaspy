@@ -316,7 +316,7 @@ public class SchemaMetaIT {
                 config.isRankDirBugEnabled(),
                 false,
                 config.isNumRowsEnabled(),
-                config.isOneOfMultipleSchemas()
+                false
             )
         );
 
