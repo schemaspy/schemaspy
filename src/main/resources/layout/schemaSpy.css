@@ -1,6 +1,6 @@
 /* background must be specified for it to propagate into diagrams */
 .diagram {
-  margin: 0px;
+  margin: 0;
   background: #ffffff;
   border: 0 0;
   padding:.4em;
@@ -9,7 +9,7 @@
 th.diagram  {
   background-color: #f5f5f5;
   text-align: left;
-  padding: 0px 4px;
+  padding: 0 4px;
 }
 
 /* background-color must be specified for td to propagate into diagrams */
@@ -19,7 +19,7 @@ td.diagram  {
 /* background must be specified for .primaryKey to propagate into diagrams */
 .diagram .primaryKey {
   background: #dcdf8d;
-  padding: 0px 4px;
+  padding: 0 4px;
 }
 
 /* background must be specified for .indexedColumn to propagate into diagrams */
@@ -75,7 +75,7 @@ td.diagram  {
 }
 
 .detail {
-  padding: 0px 4px;
+  padding: 0 4px;
 }
 
 .impliedRelationship {
@@ -90,7 +90,7 @@ td.diagram  {
 
 .description {
   display: block;
-  padding: 8px 0px;
+  padding: 8px 0;
 }
 
 .signature {
@@ -100,24 +100,24 @@ td.diagram  {
 }
 
 .relatedTable {
-  padding: 0px 4px;
+  padding: 0 4px;
 }
 
 .relatedKey {
   display: none;
-  padding: 0px -4px 0px 4px;
+  padding: 0 -4px 0 4px;
 }
 
 .constraint {
   display: none;
   text-align: right;
-  padding: 0px 4px;
+  padding: 0 4px;
 }
 
 .comment {
   display: none;
   text-align: left;
-  padding: 0px 4px;
+  padding: 0 4px;
 }
 
 .impliedNotOrphan {
