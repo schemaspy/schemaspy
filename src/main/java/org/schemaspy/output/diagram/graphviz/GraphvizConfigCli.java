@@ -42,31 +42,6 @@ public class GraphvizConfigCli implements GraphvizConfig {
     )
     private String imageFormat = "png";
 
-    public GraphvizConfigCli() {}
-
-    private GraphvizConfigCli(String graphvizDir, String renderer, boolean lowQuality, String imageFormat) {
-        this.graphvizDir = graphvizDir;
-        this.renderer = renderer;
-        this.lowQuality = lowQuality;
-        this.imageFormat = imageFormat;
-    }
-
-    public GraphvizConfigCli withGraphvizDir(String graphvizDir) {
-        return new GraphvizConfigCli(graphvizDir, renderer, lowQuality, imageFormat);
-    }
-
-    public GraphvizConfigCli withRenderer(String renderer) {
-        return new GraphvizConfigCli(graphvizDir, renderer, lowQuality, imageFormat);
-    }
-
-    public GraphvizConfigCli withLowQuality() {
-        return new GraphvizConfigCli(graphvizDir, renderer, true, imageFormat);
-    }
-
-    public GraphvizConfigCli withImageFormat(String imageFormat) {
-        return new GraphvizConfigCli(graphvizDir, renderer, lowQuality, imageFormat);
-    }
-
     @Override
     public String getGraphvizDir() {
         return graphvizDir;
