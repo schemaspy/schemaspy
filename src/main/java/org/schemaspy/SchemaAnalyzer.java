@@ -123,7 +123,6 @@ public class SchemaAnalyzer {
         }
 
         if (config.isEvaluateAllEnabled() || config.getSchemas() != null) {
-            config.setOneOfMultipleSchemas(true); // used later for generation rootPathtoHome link.
             return this.analyzeMultipleSchemas(
                     config,
                     databaseServiceFactory.forMultipleSchemas(config),
