@@ -19,12 +19,15 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.DataTableConfig;
 
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -34,12 +37,9 @@ public class HtmlTablePageTest {
 
     @Test
     public void noRowsFalse_showNoRows() {
-        HtmlConfig htmlConfig = mock(HtmlConfig.class);
-        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig, false, dataTableConfig);
+        CommandLineArguments arguments = parse("");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
 
@@ -54,12 +54,9 @@ public class HtmlTablePageTest {
 
     @Test
     public void noRowsTrue_hideNoRows() {
-        HtmlConfig htmlConfig = mock(HtmlConfig.class);
-        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isNumRowsEnabled()).thenReturn(false);
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", htmlConfig, false, dataTableConfig);
+        CommandLineArguments arguments = parse("-norows");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
 
@@ -70,5 +67,19 @@ public class HtmlTablePageTest {
         htmlTablePage.write(table, Collections.emptyList(), writer);
 
         assertThat(writer.toString()).doesNotContain("<h1>A_TABLE</h1><p><span id=\"recordNumber\">0</span> rows</p><br />");
+    }
+
+    private CommandLineArguments parse(String...args) {
+        String[] defaultArgs = {"-o", "out", "-sso"};
+        return new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        )
+            .parse(
+                Stream
+                    .concat(
+                        Arrays.stream(defaultArgs),
+                        Arrays.stream(args)
+                    ).toArray(String[]::new));
     }
 }

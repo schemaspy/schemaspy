@@ -192,11 +192,22 @@ public class SchemaAnalyzer {
 
             new Jar(layoutFolder.url(), outputDir, notHtml()).copyJarResourceToPath();
 
-            DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
-            MustacheCompiler mustacheCompiler = new MustacheCompiler(dbName, config, true, dataTableConfig);
+            DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
+            MustacheCompiler mustacheCompiler = new MustacheCompiler(
+                dbName,
+                commandLineArguments.getHtmlConfig(),
+                true,
+                dataTableConfig
+            );
             HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
             try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
-                htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas, config.getDescription(), getDatabaseProduct(meta), writer);
+                htmlMultipleSchemasIndexPage.write(
+                    mustacheCatalog,
+                    mustacheSchemas,
+                    commandLineArguments.getHtmlConfig().getDescription(),
+                    getDatabaseProduct(meta),
+                    writer
+                );
             }
             return db;
         } catch (Config.MissingRequiredParameterException missingParam) {
@@ -380,7 +391,7 @@ public class SchemaAnalyzer {
             ),
             config.isRankDirBugEnabled(),
             "svg".equalsIgnoreCase(renderer.format()),
-            config.isNumRowsEnabled(),
+            commandLineArguments.getHtmlConfig().isNumRowsEnabled(),
             isOneOfMultipleSchemas
         );
 
@@ -398,8 +409,13 @@ public class SchemaAnalyzer {
         results.getOutputExceptions().stream().forEachOrdered(exception ->
                 LOGGER.error("RelationShipDiagramError", exception)
         );
-        DataTableConfig dataTableConfig = new DataTableConfig(config, commandLineArguments);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler(db.getName(), config, isOneOfMultipleSchemas, dataTableConfig);
+        DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler(
+            db.getName(),
+            commandLineArguments.getHtmlConfig(),
+            isOneOfMultipleSchemas,
+            dataTableConfig
+        );
 
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler, hasRealConstraints, !impliedConstraints.isEmpty());
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {
@@ -422,7 +438,10 @@ public class SchemaAnalyzer {
 
         progressListener.graphingSummaryProgressed();
 
-        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, config.getDescription());
+        HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(
+            mustacheCompiler,
+            commandLineArguments.getHtmlConfig().getDescription()
+        );
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
             htmlMainIndexPage.write(db, tables, impliedConstraints, writer);
         }

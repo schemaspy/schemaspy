@@ -49,55 +49,103 @@ public class DataTableConfig {
     }
 
 
-    public DataTableConfig(HtmlConfig htmlConfig, CommandLineArguments commandLineArguments) {
+    public DataTableConfig(CommandLineArguments commandLineArguments) {
 
         this.databaseObjects = new Parameters(
                 commandLineArguments.isNoDbObjectPaging(),
                 commandLineArguments.getDbObjectPageLength(),
                 commandLineArguments.isDbObjectLengthChange());
-        this.pageScopeMap.put("databaseObjects", getParameterMap(this.databaseObjects, htmlConfig));
+        this.pageScopeMap.put(
+            "databaseObjects",
+            getParameterMap(
+                this.databaseObjects,
+                commandLineArguments.getHtmlConfig()
+            )
+        );
 
         this.standardTable = new Parameters(
                 commandLineArguments.isNoTablePaging(),
                 commandLineArguments.getTablePageLength(),
                 commandLineArguments.isTableLengthChange());
-        this.pageScopeMap.put("standardTable", getParameterMap(this.standardTable, htmlConfig));
+        this.pageScopeMap.put(
+            "standardTable",
+            getParameterMap(
+                this.standardTable,
+                commandLineArguments.getHtmlConfig()
+            )
+        );
 
         this.indexesTable = new Parameters(
                 commandLineArguments.isNoIndexPaging(),
                 commandLineArguments.getIndexPageLength(),
                 commandLineArguments.isIndexLengthChange());
-        this.pageScopeMap.put("indexesTable", getParameterMap(this.indexesTable, htmlConfig));
+        this.pageScopeMap.put(
+            "indexesTable",
+            getParameterMap(
+                this.indexesTable,
+                commandLineArguments.getHtmlConfig()
+            )
+        );
 
         this.checkTable = new Parameters(
                 commandLineArguments.isNoCheckPaging(),
                 commandLineArguments.getCheckPageLength(),
                 commandLineArguments.isCheckLengthChange());
-        this.pageScopeMap.put("checkTable", getParameterMap(this.checkTable, htmlConfig));
+        this.pageScopeMap.put(
+            "checkTable",
+            getParameterMap(
+                this.checkTable,
+                commandLineArguments.getHtmlConfig()
+            )
+        );
 
         this.routineTable = new Parameters(
                 commandLineArguments.isNoRoutinePaging(),
                 commandLineArguments.getRoutinePageLength(),
                 commandLineArguments.isRoutineLengthChange());
-        this.pageScopeMap.put("routineTable", getParameterMap(this.routineTable, htmlConfig));
+        this.pageScopeMap.put(
+            "routineTable",
+            getParameterMap(
+                this.routineTable,
+                commandLineArguments.getHtmlConfig()
+            )
+        );
 
         this.fkTable = new Parameters(
                 commandLineArguments.isNoFkPaging(),
                 commandLineArguments.getFkPageLength(),
                 commandLineArguments.isFkLengthChange());
-        this.pageScopeMap.put("fkTable", getParameterMap(this.fkTable, htmlConfig));
+        this.pageScopeMap.put(
+            "fkTable",
+            getParameterMap(
+                this.fkTable,
+                commandLineArguments.getHtmlConfig()
+            )
+        );
 
         this.columnTable = new Parameters(
                 commandLineArguments.isNoColumnPaging(),
                 commandLineArguments.getColumnPageLength(),
                 commandLineArguments.isColumnLengthChange());
-        this.pageScopeMap.put("columnTable", getParameterMap(this.columnTable, htmlConfig));
+        this.pageScopeMap.put(
+            "columnTable",
+            getParameterMap(
+                this.columnTable,
+                commandLineArguments.getHtmlConfig()
+            )
+        );
 
         this.anomalies = new Parameters(
                 commandLineArguments.isNoAnomaliesPaging(),
                 commandLineArguments.getAnomaliesPageLength(),
                 commandLineArguments.isAnomaliesLengthChange());
-        this.pageScopeMap.put("anomalies", getParameterMap(this.anomalies, htmlConfig));
+        this.pageScopeMap.put(
+            "anomalies",
+            getParameterMap(
+                this.anomalies,
+                commandLineArguments.getHtmlConfig()
+            )
+        );
     }
 
 

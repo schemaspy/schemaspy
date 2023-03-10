@@ -18,7 +18,8 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Catalog;
 import org.schemaspy.model.Database;
@@ -26,21 +27,21 @@ import org.schemaspy.model.Schema;
 import org.schemaspy.util.DataTableConfig;
 
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class HtmlMainIndexPageTest {
+class HtmlMainIndexPageTest {
 
     @Test
-    public void descriptionSupportsMarkdown() {
-        HtmlConfig htmlConfig = mock(HtmlConfig.class);
-        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig, false, dataTableConfig);
+    void descriptionSupportsMarkdown() {
+        CommandLineArguments arguments = parse("");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, "normal *emp* **strong**");
         StringWriter writer = new StringWriter();
         Database database = mock(Database.class);
@@ -52,13 +53,10 @@ public class HtmlMainIndexPageTest {
     }
 
     @Test
-    public void noRowsTrue_RemovesRowsColumn() {
-        HtmlConfig htmlConfig = mock(HtmlConfig.class);
-        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isNumRowsEnabled()).thenReturn(false);
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsTrue", htmlConfig, false, dataTableConfig);
+    void noRowsTrue_RemovesRowsColumn() {
+        CommandLineArguments arguments = parse("-norows");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsTrue", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
         Database database = mock(Database.class);
@@ -70,13 +68,10 @@ public class HtmlMainIndexPageTest {
     }
 
     @Test
-    public void noRowsFalse_HasRowsColumn() {
-        HtmlConfig htmlConfig = mock(HtmlConfig.class);
-        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsFalse", htmlConfig, false, dataTableConfig);
+    void noRowsFalse_HasRowsColumn() {
+        CommandLineArguments arguments = parse("");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("noRowsFalse", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
         Database database = mock(Database.class);
@@ -85,6 +80,20 @@ public class HtmlMainIndexPageTest {
         htmlMainIndexPage.write(database, Collections.emptyList(), Collections.emptyList(), writer);
 
         assertThat(writer.toString()).contains("<th align=\"right\" valign=\"bottom\">Rows</th>");
+    }
+
+    private CommandLineArguments parse(String...args) {
+        String[] defaultArgs = {"-o", "out", "-sso"};
+        return new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        )
+            .parse(
+                Stream
+                    .concat(
+                        Arrays.stream(defaultArgs),
+                        Arrays.stream(args)
+                    ).toArray(String[]::new));
     }
 
 }

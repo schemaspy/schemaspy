@@ -19,27 +19,26 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Routine;
 import org.schemaspy.util.DataTableConfig;
 
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class HtmlRoutinesPageTest {
 
     @Test
     public void markdownComment() {
-        HtmlConfig htmlConfig = mock(HtmlConfig.class);
-        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", htmlConfig, false, dataTableConfig);
+        CommandLineArguments arguments = parse("");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
         Collection<Routine> routines = Collections.singletonList(new Routine("ARoutine", "Function", "Integer", "SQL", "SELECT 1", true, "IMMUTABLE", "INVOKER", "normal *emp* **strong**"));
         StringWriter actual = new StringWriter();
@@ -49,4 +48,17 @@ public class HtmlRoutinesPageTest {
         assertThat(actual.toString()).contains("<p>normal <em>emp</em> <strong>strong</strong></p>");
     }
 
+    private CommandLineArguments parse(String...args) {
+        String[] defaultArgs = {"-o", "out", "-sso"};
+        return new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        )
+            .parse(
+                Stream
+                    .concat(
+                        Arrays.stream(defaultArgs),
+                        Arrays.stream(args)
+                    ).toArray(String[]::new));
+    }
 }
