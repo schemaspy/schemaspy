@@ -24,6 +24,8 @@ import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfigCli;
+import org.schemaspy.view.HtmlConfig;
+import org.schemaspy.view.HtmlConfigCli;
 
 import java.io.File;
 import java.util.Collections;
@@ -243,6 +245,12 @@ public class CommandLineArguments {
 
     @ParametersDelegate
     private GraphvizConfigCli graphvizConfig = new GraphvizConfigCli();
+
+    @ParametersDelegate
+    private NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
+
+    @ParametersDelegate
+    private HtmlConfigCli htmlConfigCli = new HtmlConfigCli(noRowsConfigCli);
 
     @Parameter(
         names = {
@@ -577,6 +585,10 @@ public class CommandLineArguments {
 
     public GraphvizConfig getGraphVizConfig() {
         return graphvizConfig;
+    }
+
+    public HtmlConfig getHtmlConfig() {
+        return htmlConfigCli;
     }
 
     public boolean useVizJS() {
