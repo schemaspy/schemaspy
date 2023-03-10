@@ -30,7 +30,6 @@ import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.config.PropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
-import org.schemaspy.view.HtmlConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +73,7 @@ import java.util.stream.Stream;
  * @deprecated Move to jCommander
  */
 @Deprecated
-public final class Config implements HtmlConfig {
+public final class Config {
 
     private static final int DEFAULT_FONT_SIZE = 11;
     private static final int DEFAULT_TABLE_DETAILS_THRESHOLD = 300;
@@ -101,7 +100,6 @@ public final class Config implements HtmlConfig {
     private String css;
     private String font;
     private Integer fontSize;
-    private String description;
     private PropertiesResolver propertiesResolver = new PropertiesResolver();
     private Properties dbProperties;
     private Boolean rankDirBugEnabled;
@@ -109,7 +107,6 @@ public final class Config implements HtmlConfig {
     private Boolean viewsEnabled;
     private Boolean railsEnabled;
     private Boolean evaluateAll;
-    private Boolean paginationEnabled;
     /**
      * @deprecated replaced by -dp expanding folders
      */
@@ -316,17 +313,6 @@ public final class Config implements HtmlConfig {
         }
 
         return fontSize;
-    }
-
-    /**
-     * Description of schema that gets display on main pages.
-     *
-     */
-    @Override
-    public String getDescription() {
-        if (description == null)
-            description = pullParam("-desc");
-        return description;
     }
 
     /**
@@ -560,20 +546,6 @@ public final class Config implements HtmlConfig {
         }
         return loadedFrom;
     }
-
-    /**
-     * If enabled we'll turn on pagination in generated html<p/>
-     * <p>
-     * Defaults to <code>true</code> (enabled).
-     */
-    @Override
-    public boolean isPaginationEnabled() {
-        if (paginationEnabled == null)
-            paginationEnabled = !options.remove("-nopages");
-
-        return paginationEnabled;
-    }
-
 
     /**
      * If enabled SchemaSpy will load from classpath additional jars used by JDBC Driver<p/>

@@ -19,6 +19,7 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
@@ -42,8 +43,14 @@ public class HtmlAnomaliesPageTest {
         when(htmlConfig.isPaginationEnabled()).thenReturn(true);
     }
 
-    private static DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-    private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", htmlConfig, false, dataTableConfig);
+    private static CommandLineArguments commandLineArguments = new CommandLineArgumentParser(
+        new CommandLineArguments(),
+        (option) -> null
+    )
+        .parse("-o", "out", "-sso");
+
+    private static DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
+    private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", commandLineArguments.getHtmlConfig(), false, dataTableConfig);
     private static HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
 
     @Test

@@ -21,6 +21,7 @@ package org.schemaspy.view;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.util.DataTableConfig;
 
@@ -31,11 +32,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class MustacheCompilerTest {
 
@@ -44,17 +45,24 @@ public class MustacheCompilerTest {
 
     @BeforeClass
     public static void setup() {
-        HtmlConfig single = mock(HtmlConfig.class);
-        when(single.getTemplateDirectory()).thenReturn("mustache");
-        when(single.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig singleDataTableConfig = new DataTableConfig(single, new CommandLineArguments());
-        mustacheCompilerSingle = new MustacheCompiler("testingSingle", single, false, singleDataTableConfig);
+        CommandLineArguments arguments = parse("-template", "mustache");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        mustacheCompilerSingle = new MustacheCompiler("testingSingle", arguments.getHtmlConfig(), false, dataTableConfig);
+        mustacheCompilerMulti = new MustacheCompiler("testingMulti", arguments.getHtmlConfig(), true, dataTableConfig);
+    }
 
-        HtmlConfig multi = mock(HtmlConfig.class);
-        when(multi.getTemplateDirectory()).thenReturn("mustache");
-        when(multi.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig multiDataTableConfig = new DataTableConfig(multi, new CommandLineArguments());
-        mustacheCompilerMulti = new MustacheCompiler("testingMulti", multi, true, multiDataTableConfig);
+    private static CommandLineArguments parse(String...args) {
+        String[] defaultArgs = {"-o", "out", "-sso"};
+        return new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        )
+            .parse(
+                Stream
+                    .concat(
+                        Arrays.stream(defaultArgs),
+                        Arrays.stream(args)
+                    ).toArray(String[]::new));
     }
 
     private PageData pageData = new PageData.Builder()
@@ -111,17 +119,15 @@ public class MustacheCompilerTest {
     @Test
     public void overrideLayoutTest() throws IOException {
         Path overridePath = Paths.get("target","override.html");
-        HtmlConfig htmlConfig = mock(HtmlConfig.class);
-        when(htmlConfig.getTemplateDirectory()).thenReturn("target");
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("Override", htmlConfig, false, dataTableConfig);
+        CommandLineArguments arguments = parse("-template", "target");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("Override", arguments.getHtmlConfig(), false, dataTableConfig);
         Files.deleteIfExists(overridePath);
         String before = write(mustacheCompiler);
         assertThat(before).isEqualTo("normal");
         Files.write(overridePath, "custom".getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         //Create new MustacheCompiler this is to evict cache, else the already processed override.html will be used
-        mustacheCompiler = new MustacheCompiler("Override", htmlConfig, false, dataTableConfig);
+        mustacheCompiler = new MustacheCompiler("Override", arguments.getHtmlConfig(), false, dataTableConfig);
         String after = write(mustacheCompiler);
         assertThat(after).isEqualTo("custom");
     }
@@ -134,4 +140,5 @@ public class MustacheCompilerTest {
         mustacheCompiler.write(pageData, writer);
         return writer.toString();
     }
+
 }

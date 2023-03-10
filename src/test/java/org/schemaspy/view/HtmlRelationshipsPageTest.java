@@ -19,28 +19,26 @@
 package org.schemaspy.view;
 
 import org.junit.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
 import org.schemaspy.util.DataTableConfig;
 
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class HtmlRelationshipsPageTest {
 
     @Test
     public void willWriteErrorInformation() {
-        HtmlConfig htmlConfig = mock(HtmlConfig.class);
-        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isNumRowsEnabled()).thenReturn(true);
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-        DataTableConfig dataTableConfig = new DataTableConfig(htmlConfig, new CommandLineArguments());
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", htmlConfig, false, dataTableConfig);
+        CommandLineArguments arguments = parse("");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler,  true,false);
         StringWriter writer = new StringWriter();
         MustacheSummaryDiagramResults mustacheSummaryDiagramResults = new MustacheSummaryDiagramResults(Collections.emptyList(), Collections.singletonList(new OutputException("ERROR")));
@@ -48,5 +46,19 @@ public class HtmlRelationshipsPageTest {
         htmlRelationshipsPage.write(mustacheSummaryDiagramResults, writer);
 
         assertThat(writer.toString()).contains("here were 1 error(s)");
+    }
+
+    private CommandLineArguments parse(String...args) {
+        String[] defaultArgs = {"-o", "out", "-sso"};
+        return new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        )
+            .parse(
+                Stream
+                    .concat(
+                        Arrays.stream(defaultArgs),
+                        Arrays.stream(args)
+                    ).toArray(String[]::new));
     }
 }
