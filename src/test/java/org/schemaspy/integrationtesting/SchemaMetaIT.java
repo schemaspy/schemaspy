@@ -71,6 +71,7 @@ public class SchemaMetaIT {
     private ProgressListener progressListener;
 
     private Config config;
+    private CommandLineArguments commandLineArguments;
     private DbmsMeta dbmsMeta;
     private String schema;
     private String catalog;
@@ -85,11 +86,11 @@ public class SchemaMetaIT {
                 "-u", "sa"
         };
         config = new Config(args);
-        CommandLineArguments arguments = new CommandLineArgumentParser(
+        commandLineArguments = new CommandLineArgumentParser(
             new CommandLineArguments(),
             (option) -> null
         ).parse(args);
-        sqlService.connect(arguments,config);
+        sqlService.connect(commandLineArguments,config);
         dbmsMeta = sqlService.getDbmsMeta();
         schema = h2MemoryRule.getConnection().getSchema();
         catalog = h2MemoryRule.getConnection().getCatalog();
@@ -313,9 +314,8 @@ public class SchemaMetaIT {
                     config.getFont(),
                     config.getFontSize()
                 ),
-                config.isRankDirBugEnabled(),
+                commandLineArguments.getDotConfig(),
                 false,
-                config.isNumRowsEnabled(),
                 false
             )
         );

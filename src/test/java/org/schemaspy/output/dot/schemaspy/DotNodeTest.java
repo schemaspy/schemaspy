@@ -22,7 +22,10 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.schemaspy.SimpleRuntimeDotConfig;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.*;
+import org.schemaspy.output.dot.DotConfig;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -99,8 +103,7 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 true
             )
@@ -119,9 +122,8 @@ class DotNodeTest {
             ),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
+                parse("-norows"),
                 true,
-                false,
                 true
             )
         );
@@ -136,8 +138,7 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 true
             )
@@ -156,8 +157,7 @@ class DotNodeTest {
             ),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 true
             )
@@ -173,8 +173,7 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 true
             )
@@ -192,8 +191,7 @@ class DotNodeTest {
                 true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 true
             )
@@ -211,8 +209,7 @@ class DotNodeTest {
                 true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 false
             )
@@ -229,8 +226,7 @@ class DotNodeTest {
                 false),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 false
             )
@@ -247,8 +243,7 @@ class DotNodeTest {
                 false),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 false
             )
@@ -265,8 +260,7 @@ class DotNodeTest {
                 true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 false
             )
@@ -283,8 +277,7 @@ class DotNodeTest {
                 true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 false
             )
@@ -306,9 +299,8 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                true,
+                parse("-rankdirbug"),
                 false,
-                true,
                 false
             )
         );
@@ -320,10 +312,10 @@ class DotNodeTest {
         List<String> expectLines = getLines(fileName);
         assertThat(actualLines).hasSameSizeAs(expectLines);
         SoftAssertions.assertSoftly(soft -> {
-            for(int i = 0; i < expectLines.size(); i++) {
+            for (int i = 0; i < expectLines.size(); i++) {
                 soft
                     .assertThat(actualLines.get(i))
-                    .describedAs("Diff on line %s", i+1)
+                    .describedAs("Diff on line %s", i + 1)
                     .isEqualTo(expectLines.get(i));
             }
         });
@@ -340,9 +332,8 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                true,
+                parse("-rankdirbug"),
                 false,
-                true,
                 false
             )
         );
@@ -361,9 +352,8 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                true,
+                parse("-rankdirbug"),
                 false,
-                true,
                 false
             )
         );
@@ -382,8 +372,7 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                true,
-                false,
+                parse("-norows"),
                 false,
                 false
             )
@@ -401,15 +390,14 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 true
             )
         );
         assertThat(dotNode.value())
-                .contains("tooltip=\"&lt;table&gt;&amp;")
-                .contains("<B>&lt;table&gt;&amp;</B></TD><TD ALIGN=\"RIGHT\">[table]</TD>")
+            .contains("tooltip=\"&lt;table&gt;&amp;")
+            .contains("<B>&lt;table&gt;&amp;</B></TD><TD ALIGN=\"RIGHT\">[table]</TD>")
         ;
     }
 
@@ -422,21 +410,20 @@ class DotNodeTest {
         tableColumn.setDetailedSize(null);
         table.getColumnsMap().put("<A>&", tableColumn);
         DotNode dotNode = new DotNode(
-                table,
+            table,
+            false,
+            new DotNodeConfig(true, true),
+            new SimpleRuntimeDotConfig(
+                fontConfig,
+                parse("-norows"),
                 false,
-                new DotNodeConfig(true, true),
-                new SimpleRuntimeDotConfig(
-                        fontConfig,
-                        false,
-                        false,
-                        false,
-                        true
-                )
+                true
+            )
         );
         assertThat(dotNode.value())
-                .contains("<TD PORT=\"&lt;A&gt;&amp;\" COLSPAN=\"2\" ALIGN=\"LEFT\">")
-                .contains("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"42\" HEIGHT=\"16\">&lt;A&gt;&amp;</TD>")
-                .contains("<TD PORT=\"&lt;A&gt;&amp;.type\" ALIGN=\"LEFT\">")
+            .contains("<TD PORT=\"&lt;A&gt;&amp;\" COLSPAN=\"2\" ALIGN=\"LEFT\">")
+            .contains("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"42\" HEIGHT=\"16\">&lt;A&gt;&amp;</TD>")
+            .contains("<TD PORT=\"&lt;A&gt;&amp;.type\" ALIGN=\"LEFT\">")
         ;
     }
 
@@ -454,8 +441,7 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 true
             )
@@ -477,12 +463,26 @@ class DotNodeTest {
             new DotNodeConfig(true, true),
             new SimpleRuntimeDotConfig(
                 fontConfig,
-                false,
-                false,
+                parse("-norows"),
                 false,
                 true
             )
         );
         assertThat(dotNode.value()).contains("[&lt;D&gt;]");
+    }
+
+    private DotConfig parse(String... args) {
+        String[] defaultArgs = {"-o", "out", "-sso"};
+        return new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        )
+            .parse(
+                Stream
+                    .concat(
+                        Arrays.stream(defaultArgs),
+                        Arrays.stream(args)
+                    ).toArray(String[]::new))
+            .getDotConfig();
     }
 }
