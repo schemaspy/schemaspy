@@ -18,10 +18,10 @@
  */
 package org.schemaspy;
 
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.FontConfig;
 
-public class SimpleDotConfig implements DotConfig {
+public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
 
     private final FontConfig fontConfig;
     private final boolean rankDirBugEnabled;
@@ -29,7 +29,7 @@ public class SimpleDotConfig implements DotConfig {
     private final boolean numRowsEnabled;
     private final boolean multiSchema;
 
-    public SimpleDotConfig(FontConfig fontConfig, boolean rankDirBugEnabled, boolean relativeLinks, boolean numRowsEnabled, boolean multiSchema) {
+    public SimpleRuntimeDotConfig(FontConfig fontConfig, boolean rankDirBugEnabled, boolean relativeLinks, boolean numRowsEnabled, boolean multiSchema) {
         this.fontConfig = fontConfig;
         this.rankDirBugEnabled = rankDirBugEnabled;
         this.relativeLinks = relativeLinks;

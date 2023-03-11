@@ -23,7 +23,7 @@ package org.schemaspy.output.dot.schemaspy;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.Columns;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Default;
 import org.schemaspy.output.dot.schemaspy.columnsfilter.factory.Factory;
@@ -32,7 +32,9 @@ import org.schemaspy.output.dot.schemaspy.edge.PairEdges;
 import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
 import org.schemaspy.output.dot.schemaspy.graph.Digraph;
 import org.schemaspy.output.dot.schemaspy.graph.Element;
-import org.schemaspy.output.dot.schemaspy.name.*;
+import org.schemaspy.output.dot.schemaspy.name.DefaultName;
+import org.schemaspy.output.dot.schemaspy.name.Degree;
+import org.schemaspy.output.dot.schemaspy.name.Implied;
 import org.schemaspy.output.dot.schemaspy.relationship.Relationships;
 import org.schemaspy.util.naming.Concatenation;
 import org.schemaspy.util.naming.Name;
@@ -51,7 +53,7 @@ import java.util.stream.Collectors;
  */
 public class DotTableFormatter implements Relationships {
 
-    private final DotConfig dotConfig;
+    private final RuntimeDotConfig runtimeDotConfig;
     private final Table table;
     private final boolean twoDegreesOfSeparation;
     private final LongAdder stats;
@@ -61,7 +63,7 @@ public class DotTableFormatter implements Relationships {
     private final Name graph;
 
     public DotTableFormatter(
-            final DotConfig dotConfig,
+            final RuntimeDotConfig runtimeDotConfig,
             final Table table,
             final boolean twoDegreesOfSeparation,
             final LongAdder stats,
@@ -69,14 +71,14 @@ public class DotTableFormatter implements Relationships {
             final PrintWriter dot
     ) {
         this(
-                dotConfig,
+            runtimeDotConfig,
                 table,
                 twoDegreesOfSeparation,
                 stats,
                 includeImplied,
                 dot,
                 new DotConfigHeader(
-                        dotConfig,
+                    runtimeDotConfig,
                         true
                 ),
                 new Concatenation(
@@ -90,7 +92,7 @@ public class DotTableFormatter implements Relationships {
     }
 
     public DotTableFormatter(
-        final DotConfig dotConfig,
+        final RuntimeDotConfig runtimeDotConfig,
         final Table table,
         final boolean twoDegreesOfSeparation,
         final LongAdder stats,
@@ -99,7 +101,7 @@ public class DotTableFormatter implements Relationships {
         final Header header,
         final Name graph
     ) {
-        this.dotConfig = dotConfig;
+        this.runtimeDotConfig = runtimeDotConfig;
         this.table = table;
         this.twoDegreesOfSeparation = twoDegreesOfSeparation;
         this.stats = stats;
@@ -175,7 +177,7 @@ public class DotTableFormatter implements Relationships {
         }
 
         // include the table itself
-        nodes.put(table, new DotNode(table, false, new DotNodeConfig(true, true), dotConfig));
+        nodes.put(table, new DotNode(table, false, new DotNodeConfig(true, true), runtimeDotConfig));
 
         edges.addAll(allCousinEdges);
         
@@ -261,7 +263,7 @@ public class DotTableFormatter implements Relationships {
         final Map<Table, DotNode> result = new HashMap<>();
         for (Table relatedTable : tables) {
             DotNodeConfig nodeConfigurations = new DotNodeConfig(false, false);
-            DotNode node = new DotNode(relatedTable, false, nodeConfigurations, dotConfig);
+            DotNode node = new DotNode(relatedTable, false, nodeConfigurations, runtimeDotConfig);
             result.put(relatedTable, node);
         }
         return result;
@@ -301,7 +303,7 @@ public class DotTableFormatter implements Relationships {
             }
 
             for (Table cousin : missing) {
-                final DotNode node = new DotNode(cousin, false, new DotNodeConfig(), dotConfig);
+                final DotNode node = new DotNode(cousin, false, new DotNodeConfig(), runtimeDotConfig);
                 nodes.put(cousin, node);
             }
 

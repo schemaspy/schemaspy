@@ -27,7 +27,7 @@ package org.schemaspy.output.dot.schemaspy;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.util.naming.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,22 +61,22 @@ public class DotNode implements Node {
     private final Table table;
     private final String path;
     private final DotNodeConfig config;
-    private final DotConfig dotConfig;
+    private final RuntimeDotConfig runtimeDotConfig;
     private final String lineSeparator = System.getProperty("line.separator");
     private final String columnSpan;
 
     private boolean showImpliedRelationships;
 
-    public DotNode(Table table, boolean fromRoot, DotNodeConfig config, DotConfig dotConfig) {
+    public DotNode(Table table, boolean fromRoot, DotNodeConfig config, RuntimeDotConfig runtimeDotConfig) {
         this.table = table;
         this.config = config;
-        this.dotConfig = dotConfig;
+        this.runtimeDotConfig = runtimeDotConfig;
         this.path = createPath(fromRoot);
         this.columnSpan = config.showColumnDetails ? "COLSPAN=\"2\" " : "COLSPAN=\"3\" ";
     }
 
     private String createPath(boolean fromRoot) {
-        if (dotConfig.useRelativeLinks()) {
+        if (runtimeDotConfig.useRelativeLinks()) {
             return (table.isRemote() ? "../../../" + new FileNameGenerator(table.getContainer()).value() : "../..") + TABLES_PATH;
         }
         if (fromRoot) {
@@ -129,7 +129,7 @@ public class DotNode implements Node {
         }
 
         buf.append("    </TABLE>>" + lineSeparator);
-        if (!table.isRemote() || dotConfig.isOneOfMultipleSchemas()) {
+        if (!table.isRemote() || runtimeDotConfig.isOneOfMultipleSchemas()) {
             buf.append("    URL=\"" + path + urlEncodeLink(new FileNameGenerator(tableName).value()) + ".html\"" + lineSeparator);
             buf.append("    target=\"_top\"" + lineSeparator);
         }
@@ -186,7 +186,7 @@ public class DotNode implements Node {
     }
 
     private int getTextWidth(String text) {
-        return dotConfig.getTextWidth(text);
+        return runtimeDotConfig.getTextWidth(text);
     }
 
     private String columnToString(TableColumn column, Set<TableColumn> indexColumns, int maxWidth) {
@@ -243,7 +243,7 @@ public class DotNode implements Node {
         buf.append(Html.TD_END);
         buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
         final long numRows = table.getNumRows();
-        if (dotConfig.isNumRowsEnabled() && numRows >= 0) {
+        if (runtimeDotConfig.isNumRowsEnabled() && numRows >= 0) {
             buf.append(NumberFormat.getInstance().format(numRows));
             buf.append(" row");
             if (numRows != 1)
