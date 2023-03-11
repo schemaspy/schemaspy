@@ -75,8 +75,6 @@ import java.util.stream.Stream;
 @Deprecated
 public final class Config {
 
-    private static final int DEFAULT_TABLE_DETAILS_THRESHOLD = 300;
-
     private static final Pattern DBTYPE_PATTERN = Pattern.compile(".*org/schemaspy/types/(.*)\\.properties");
 
     private static Config instance;
@@ -93,7 +91,6 @@ public final class Config {
     private Pattern columnExclusions;
     private Pattern indirectColumnExclusions;
     private Integer maxDbThreads;
-    private Integer maxDetailedTables;
     private String driverPath;
     private PropertiesResolver propertiesResolver = new PropertiesResolver();
     private Properties dbProperties;
@@ -212,23 +209,6 @@ public final class Config {
 
     private static boolean hasText(String string) {
         return Objects.nonNull(string) && !string.trim().isEmpty();
-    }
-
-    public int getMaxDetailedTables() {
-        if (maxDetailedTables == null) {
-            int max = DEFAULT_TABLE_DETAILS_THRESHOLD;
-            String param = pullParam("-maxdet");
-            if (param != null) {
-                try {
-                    max = Integer.parseInt(param);
-                } catch (NumberFormatException e) {
-                    LOGGER.warn(e.getMessage(), e);
-                }
-            }
-            maxDetailedTables = max;
-        }
-
-        return maxDetailedTables;
     }
 
     public String getDriverPath() {
