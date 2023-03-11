@@ -114,6 +114,24 @@ class DotConfigCliTest {
         ).isTrue();
     }
 
+    @Test
+    void maxDetails() {
+        assertThat(
+            parse("-maxdet", "500")
+                .getMaxDetailedTables()
+        )
+            .isEqualTo(500);
+    }
+
+    @Test
+    void maxDetailsDefault() {
+        assertThat(
+            parse("")
+                .getMaxDetailedTables()
+        )
+            .isEqualTo(300);
+    }
+
     private DotConfig parse(String... args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(

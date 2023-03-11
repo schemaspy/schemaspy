@@ -18,7 +18,10 @@
  */
 package org.schemaspy.output.dot;
 
+import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.schemaspy.StyleSheet;
+
+import java.util.Collection;
 
 public interface RuntimeDotConfig {
     boolean isRankDirBugEnabled();
@@ -29,4 +32,5 @@ public interface RuntimeDotConfig {
     boolean isNumRowsEnabled();
     boolean isOneOfMultipleSchemas();
     StyleSheet styleSheet();
+    boolean showDetails(Collection<Table> table);
 }

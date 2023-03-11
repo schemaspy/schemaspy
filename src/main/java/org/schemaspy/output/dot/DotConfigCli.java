@@ -44,6 +44,15 @@ public class DotConfigCli implements DotConfig {
     )
     private String css = "schemaSpy.css";
 
+    @Parameter(
+        names = {
+            "-maxdet", "--max-details",
+            "schemaspy.maxdet", "schemaspy.max-details"
+        },
+        descriptionKey = "maxdet"
+    )
+    private int maxDetails = 300;
+
     private NoRowsConfigCli noRowsConfigCli;
     private TemplateDirectoryConfigCli templateDirectoryConfigCli;
 
@@ -80,5 +89,10 @@ public class DotConfigCli implements DotConfig {
     @Override
     public boolean isNumRowsEnabled() {
         return noRowsConfigCli.isNumRowsEnabled();
+    }
+
+    @Override
+    public int getMaxDetailedTables() {
+        return maxDetails;
     }
 }

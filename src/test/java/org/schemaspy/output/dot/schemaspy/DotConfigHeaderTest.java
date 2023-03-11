@@ -3,7 +3,13 @@ package org.schemaspy.output.dot.schemaspy;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
-import org.schemaspy.output.dot.RuntimeDotConfig;
+import org.schemaspy.SimpleRuntimeDotConfig;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.output.dot.DotConfig;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 class DotConfigHeaderTest {
 
@@ -15,51 +21,16 @@ class DotConfigHeaderTest {
     @Test
     void interpretFonts() {
         MatcherAssert.assertThat(
-                new DotConfigHeader(
-                        new RuntimeDotConfig() {
-                            @Override
-                            public boolean isRankDirBugEnabled() {
-                                return false;
-                            }
-
-                            @Override
-                            public String getFont() {
-                                return "font";
-                            }
-
-                            @Override
-                            public int getFontSize() {
-                                return 0;
-                            }
-
-                            @Override
-                            public int getTextWidth(String text) {
-                                return 0;
-                            }
-
-                            @Override
-                            public boolean useRelativeLinks() {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean isNumRowsEnabled() {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean isOneOfMultipleSchemas() {
-                                return false;
-                            }
-
-                            @Override
-                            public StyleSheet styleSheet() {
-                                return new StyleSheet("layout", "schemaSpy.css").load();
-                            }
-                        },
-                        false
-                ).value(),
-                CoreMatchers.containsString("    fontname=\"font\"")
+            new DotConfigHeader(
+                new SimpleRuntimeDotConfig(
+                    new DefaultFontConfig(parse("-font", "font")),
+                    parse("-font", "font"),
+                    false,
+                    false
+                ),
+                false
+            ).value(),
+            CoreMatchers.containsString("    fontname=\"font\"")
         );
     }
 
@@ -71,51 +42,31 @@ class DotConfigHeaderTest {
     @Test
     void justifyLabel() {
         MatcherAssert.assertThat(
-                new DotConfigHeader(
-                        new RuntimeDotConfig() {
-                            @Override
-                            public boolean isRankDirBugEnabled() {
-                                return false;
-                            }
-
-                            @Override
-                            public String getFont() {
-                                return "";
-                            }
-
-                            @Override
-                            public int getFontSize() {
-                                return 0;
-                            }
-
-                            @Override
-                            public int getTextWidth(String text) {
-                                return 0;
-                            }
-
-                            @Override
-                            public boolean useRelativeLinks() {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean isNumRowsEnabled() {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean isOneOfMultipleSchemas() {
-                                return false;
-                            }
-
-                            @Override
-                            public StyleSheet styleSheet() {
-                                return new StyleSheet("layout", "schemaSpy.css").load();
-                            }
-                        },
-                        true
-                ).value(),
-                CoreMatchers.containsString("    labeljust=\"l\"")
+            new DotConfigHeader(
+                new SimpleRuntimeDotConfig(
+                    new TestFontConfig(),
+                    parse(""),
+                    false,
+                    false
+                ),
+                true
+            ).value(),
+            CoreMatchers.containsString("    labeljust=\"l\"")
         );
+    }
+
+    private DotConfig parse(String... args) {
+        String[] defaultArgs = {"-o", "out", "-sso"};
+        return new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        )
+            .parse(
+                Stream
+                    .concat(
+                        Arrays.stream(defaultArgs),
+                        Arrays.stream(args)
+                    ).toArray(String[]::new))
+            .getDotConfig();
     }
 }
