@@ -1,7 +1,7 @@
 package org.schemaspy.output.dot.schemaspy.relationship;
 
 import org.schemaspy.model.Table;
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.DotTableFormatter;
 
 import java.io.PrintWriter;
@@ -15,7 +15,7 @@ public final class RealRelationships implements Relationships {
     private final Relationships origin;
 
     public RealRelationships(
-        final DotConfig dotConfig,
+        final RuntimeDotConfig runtimeDotConfig,
         final Table table,
         final boolean twoDegreesOfSeparation,
         final LongAdder stats,
@@ -23,7 +23,7 @@ public final class RealRelationships implements Relationships {
     ) {
         this(
             new DotTableFormatter(
-                dotConfig,
+                runtimeDotConfig,
                 table,
                 twoDegreesOfSeparation,
                 stats,

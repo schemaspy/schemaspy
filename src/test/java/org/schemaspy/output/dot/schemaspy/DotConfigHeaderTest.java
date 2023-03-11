@@ -3,9 +3,9 @@ package org.schemaspy.output.dot.schemaspy;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 
-public class DotConfigHeaderTest {
+class DotConfigHeaderTest {
 
     /**
      * Given the name of a font,
@@ -16,7 +16,7 @@ public class DotConfigHeaderTest {
     void interpretFonts() {
         MatcherAssert.assertThat(
                 new DotConfigHeader(
-                        new DotConfig() {
+                        new RuntimeDotConfig() {
                             @Override
                             public boolean isRankDirBugEnabled() {
                                 return false;
@@ -67,7 +67,7 @@ public class DotConfigHeaderTest {
     void justifyLabel() {
         MatcherAssert.assertThat(
                 new DotConfigHeader(
-                        new DotConfig() {
+                        new RuntimeDotConfig() {
                             @Override
                             public boolean isRankDirBugEnabled() {
                                 return false;

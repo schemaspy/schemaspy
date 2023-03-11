@@ -20,7 +20,7 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 
 /**
  * Format table data into .dot format to feed to Graphvis' dot program.
@@ -31,14 +31,14 @@ import org.schemaspy.output.dot.DotConfig;
  */
 public final class DotConfigHeader implements Header {
 
-    private final DotConfig dotConfig;
+    private final RuntimeDotConfig runtimeDotConfig;
     private final boolean showLabel;
 
     public DotConfigHeader(
-            final DotConfig dotConfig,
+            final RuntimeDotConfig runtimeDotConfig,
             final boolean showLabel
     ) {
-        this.dotConfig = dotConfig;
+        this.runtimeDotConfig = runtimeDotConfig;
         this.showLabel = showLabel;
     }
 
@@ -46,7 +46,7 @@ public final class DotConfigHeader implements Header {
     public String value() {
         final StringBuilder header = new StringBuilder();
         header.append("  graph [");
-        final boolean rankdirbug = dotConfig.isRankDirBugEnabled();
+        final boolean rankdirbug = runtimeDotConfig.isRankDirBugEnabled();
         if (!rankdirbug)
             header.append("    rankdir=\"RL\"");
         header.append("    bgcolor=\"" + StyleSheet.getInstance().getBodyBackground() + "\"");
@@ -59,13 +59,13 @@ public final class DotConfigHeader implements Header {
         }
         header.append("    nodesep=\"0.18\"");
         header.append("    ranksep=\"0.46\"");
-        header.append("    fontname=\"" + dotConfig.getFont() + "\"");
-        header.append("    fontsize=\"" + dotConfig.getFontSize() + "\"");
+        header.append("    fontname=\"" + runtimeDotConfig.getFont() + "\"");
+        header.append("    fontsize=\"" + runtimeDotConfig.getFontSize() + "\"");
         header.append("    ration=\"compress\"");
         header.append("  ];");
         header.append("  node [");
-        header.append("    fontname=\"" + dotConfig.getFont() + "\"");
-        header.append("    fontsize=\"" + dotConfig.getFontSize() + "\"");
+        header.append("    fontname=\"" + runtimeDotConfig.getFont() + "\"");
+        header.append("    fontsize=\"" + runtimeDotConfig.getFontSize() + "\"");
         header.append("    shape=\"plaintext\"");
         header.append("  ];");
         header.append("  edge [");

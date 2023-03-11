@@ -21,7 +21,7 @@ package org.schemaspy.output.dot.schemaspy;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.schemaspy.SimpleDotConfig;
+import org.schemaspy.SimpleRuntimeDotConfig;
 import org.schemaspy.model.*;
 
 import java.io.IOException;
@@ -97,7 +97,7 @@ class DotNodeTest {
             localTable,
             false,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -117,7 +117,7 @@ class DotNodeTest {
                 true,
                 true
             ),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 true,
@@ -134,7 +134,7 @@ class DotNodeTest {
             localTable,
             true,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -154,7 +154,7 @@ class DotNodeTest {
                 true,
                 true
             ),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -171,7 +171,7 @@ class DotNodeTest {
             localTable,
             false,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -190,7 +190,7 @@ class DotNodeTest {
             new DotNodeConfig(
                 true,
                 true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -209,7 +209,7 @@ class DotNodeTest {
             new DotNodeConfig(
                 true,
                 true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -227,7 +227,7 @@ class DotNodeTest {
             new DotNodeConfig(
                 true,
                 false),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -245,7 +245,7 @@ class DotNodeTest {
             new DotNodeConfig(
                 false,
                 false),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -263,7 +263,7 @@ class DotNodeTest {
             new DotNodeConfig(
                 false,
                 true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -281,7 +281,7 @@ class DotNodeTest {
             new DotNodeConfig(
                 true,
                 true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -304,7 +304,7 @@ class DotNodeTest {
             table,
             false,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 true,
                 false,
@@ -338,7 +338,7 @@ class DotNodeTest {
             table,
             false,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 true,
                 false,
@@ -359,7 +359,7 @@ class DotNodeTest {
             table,
             false,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 true,
                 false,
@@ -380,7 +380,7 @@ class DotNodeTest {
             table,
             false,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 true,
                 false,
@@ -399,7 +399,7 @@ class DotNodeTest {
             table,
             false,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -425,7 +425,7 @@ class DotNodeTest {
                 table,
                 false,
                 new DotNodeConfig(true, true),
-                new SimpleDotConfig(
+                new SimpleRuntimeDotConfig(
                         fontConfig,
                         false,
                         false,
@@ -452,7 +452,7 @@ class DotNodeTest {
             table,
             false,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,
@@ -475,7 +475,7 @@ class DotNodeTest {
             table,
             false,
             new DotNodeConfig(true, true),
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 fontConfig,
                 false,
                 false,

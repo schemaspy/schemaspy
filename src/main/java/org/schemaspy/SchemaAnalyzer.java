@@ -45,7 +45,7 @@ import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.diagram.TableDiagram;
 import org.schemaspy.output.diagram.graphviz.GraphvizDot;
 import org.schemaspy.output.diagram.vizjs.VizJSDot;
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.output.dot.schemaspy.OrphanGraph;
@@ -384,7 +384,7 @@ public class SchemaAnalyzer {
          ? impliedConstraintsFinder.find(tables)
          : Collections.emptyList();
 
-        DotConfig dotConfig = new SimpleDotConfig(
+        RuntimeDotConfig runtimeDotConfig = new SimpleRuntimeDotConfig(
             new DefaultFontConfig(
                 config.getFont(),
                 config.getFontSize()
@@ -395,7 +395,7 @@ public class SchemaAnalyzer {
             isOneOfMultipleSchemas
         );
 
-        DotFormatter dotProducer = new DotFormatter(dotConfig);
+        DotFormatter dotProducer = new DotFormatter(runtimeDotConfig);
 
         File diagramDir = new File(outputDir, "diagrams");
         diagramDir.mkdirs();
@@ -427,7 +427,7 @@ public class SchemaAnalyzer {
         HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(
                 mustacheCompiler,
                 new OrphanDiagram(
-                        new OrphanGraph(dotConfig, tables),
+                        new OrphanGraph(runtimeDotConfig, tables),
                         renderer,
                         outputDir
                 )

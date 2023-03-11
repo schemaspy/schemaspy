@@ -18,7 +18,7 @@
  */
 package org.schemaspy.output.dot;
 
-public interface DotConfig {
+public interface RuntimeDotConfig {
     boolean isRankDirBugEnabled();
     String getFont();
     int getFontSize();

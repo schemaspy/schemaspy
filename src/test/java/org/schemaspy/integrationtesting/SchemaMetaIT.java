@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Config;
-import org.schemaspy.SimpleDotConfig;
+import org.schemaspy.SimpleRuntimeDotConfig;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
@@ -308,7 +308,7 @@ public class SchemaMetaIT {
         new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(databaseWithSchemaMeta, schemaMeta, progressListener);
 
         DotFormatter dotFormatter = new DotFormatter(
-            new SimpleDotConfig(
+            new SimpleRuntimeDotConfig(
                 new DefaultFontConfig(
                     config.getFont(),
                     config.getFontSize()

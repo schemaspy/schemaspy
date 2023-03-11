@@ -22,11 +22,13 @@ package org.schemaspy.output.dot.schemaspy;
 
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.edge.SimpleEdges;
 import org.schemaspy.output.dot.schemaspy.graph.Digraph;
 import org.schemaspy.output.dot.schemaspy.graph.Element;
-import org.schemaspy.output.dot.schemaspy.name.*;
+import org.schemaspy.output.dot.schemaspy.name.DefaultName;
+import org.schemaspy.output.dot.schemaspy.name.Implied;
+import org.schemaspy.output.dot.schemaspy.name.Sized;
 import org.schemaspy.util.naming.Concatenation;
 import org.schemaspy.util.naming.Name;
 
@@ -42,10 +44,10 @@ import java.util.*;
  */
 public class DotSummaryFormatter {
 
-    private final DotConfig dotConfig;
+    private final RuntimeDotConfig runtimeDotConfig;
 
-    public DotSummaryFormatter(DotConfig dotConfig) {
-        this.dotConfig = dotConfig;
+    public DotSummaryFormatter(RuntimeDotConfig runtimeDotConfig) {
+        this.runtimeDotConfig = runtimeDotConfig;
     }
 
     public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, PrintWriter dot) {
@@ -75,12 +77,12 @@ public class DotSummaryFormatter {
 
         for (Table table : tables) {
             if (!table.isOrphan(includeImplied)) {
-                nodes.add(new DotNode(table, true, nodeConfig, dotConfig));
+                nodes.add(new DotNode(table, true, nodeConfig, runtimeDotConfig));
             }
         }
 
         for (Table table : db.getRemoteTables()) {
-            nodes.add(new DotNode(table, true, nodeConfig, dotConfig));
+            nodes.add(new DotNode(table, true, nodeConfig, runtimeDotConfig));
         }
 
         Set<Edge> edges = new TreeSet<>();
@@ -96,7 +98,7 @@ public class DotSummaryFormatter {
         dot.println(
             new Digraph(
                     name,
-                    new DotConfigHeader(dotConfig, true),
+                    new DotConfigHeader(runtimeDotConfig, true),
                     elements.stream().toArray(Element[]::new)
             ).dot()
         );

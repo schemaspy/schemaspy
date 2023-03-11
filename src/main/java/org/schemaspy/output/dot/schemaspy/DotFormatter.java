@@ -22,7 +22,7 @@ package org.schemaspy.output.dot.schemaspy;
 
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.relationship.ImpliedRelationships;
 import org.schemaspy.output.dot.schemaspy.relationship.RealRelationships;
 
@@ -39,13 +39,13 @@ import java.util.concurrent.atomic.LongAdder;
  */
 public class DotFormatter {
 
-    private final DotConfig dotConfig;
+    private final RuntimeDotConfig runtimeDotConfig;
 
     private final DotSummaryFormatter dotSummaryFormatter;
 
-    public DotFormatter(DotConfig dotConfig) {
-        this.dotConfig = dotConfig;
-        this.dotSummaryFormatter = new DotSummaryFormatter(dotConfig);
+    public DotFormatter(RuntimeDotConfig runtimeDotConfig) {
+        this.runtimeDotConfig = runtimeDotConfig;
+        this.dotSummaryFormatter = new DotSummaryFormatter(runtimeDotConfig);
     }
 
     public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, PrintWriter dot) {
@@ -57,10 +57,10 @@ public class DotFormatter {
     }
 
     public void writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, LongAdder stats, PrintWriter dot) {
-        new RealRelationships(dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
+        new RealRelationships(runtimeDotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
 
     public void writeTableAllRelationships(Table table, boolean twoDegreesOfSeparation, LongAdder stats, PrintWriter dot) {
-        new ImpliedRelationships(dotConfig, table, twoDegreesOfSeparation, stats, dot).write();
+        new ImpliedRelationships(runtimeDotConfig, table, twoDegreesOfSeparation, stats, dot).write();
     }
 }

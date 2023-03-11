@@ -1,7 +1,7 @@
 package org.schemaspy.output.dot.schemaspy;
 
 import org.schemaspy.model.Table;
-import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.graph.Digraph;
 import org.schemaspy.output.dot.schemaspy.graph.Element;
 import org.schemaspy.output.dot.schemaspy.graph.Graph;
@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 
 public class OrphanGraph implements Graph {
 
-    private final DotConfig dotConfig;
+    private final RuntimeDotConfig runtimeDotConfig;
     private final Collection<Table> tables;
 
-    public OrphanGraph(DotConfig dotConfig, Collection<Table> tables) {
-        this.dotConfig = dotConfig;
+    public OrphanGraph(RuntimeDotConfig runtimeDotConfig, Collection<Table> tables) {
+        this.runtimeDotConfig = runtimeDotConfig;
         this.tables = tables;
     }
 
@@ -36,7 +36,7 @@ public class OrphanGraph implements Graph {
     private Graph graph(List<Table> orphans) {
         return new Digraph(
                 () -> "orphans",
-                new DotConfigHeader(dotConfig, false),
+                new DotConfigHeader(runtimeDotConfig, false),
                 orphans.stream()
                         .sorted(Table::compareTo)
                         .map(this::asDotNode)
@@ -49,7 +49,7 @@ public class OrphanGraph implements Graph {
                 table,
                 true,
                 new DotNodeConfig(true, true),
-                dotConfig
+            runtimeDotConfig
         );
     }
 

@@ -1,7 +1,7 @@
 package org.schemaspy.output.dot.schemaspy;
 
 import org.junit.jupiter.api.Test;
-import org.schemaspy.SimpleDotConfig;
+import org.schemaspy.SimpleRuntimeDotConfig;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.LogicalTable;
 import org.schemaspy.model.Table;
@@ -19,7 +19,7 @@ class OrphanGraphTest {
     void orphanGraphContainsOnlyOrphan() {
         assertThat(
                 new OrphanGraph(
-                        new SimpleDotConfig(
+                        new SimpleRuntimeDotConfig(
                                 new TestFontConfig(),
                                 true,
                                 false,
