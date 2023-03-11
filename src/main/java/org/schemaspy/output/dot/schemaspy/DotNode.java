@@ -53,8 +53,6 @@ public class DotNode implements Node {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Html html = new Html();
-    private static final StyleSheet CSS = StyleSheet.getInstance();
-
     private static final String INDENT_6 = "      ";
     private static final String TABLES_PATH = "/tables/"; //NOSONAR
 
@@ -111,9 +109,9 @@ public class DotNode implements Node {
 
         buf.append("  \"" + fqTableName + "\" [" + lineSeparator);
         buf.append("   label=<" + lineSeparator);
-        buf.append("    <TABLE BORDER=\"" + (config.showColumnDetails ? "2" : "0") + "\" CELLBORDER=\"1\" CELLSPACING=\"0\" BGCOLOR=\"" + CSS.getTableBackground() + "\">" + lineSeparator);
+        buf.append("    <TABLE BORDER=\"" + (config.showColumnDetails ? "2" : "0") + "\" CELLBORDER=\"1\" CELLSPACING=\"0\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getTableBackground() + "\">" + lineSeparator);
         buf.append(INDENT_6 + Html.TR_START);
-        buf.append("<TD " + colspanHeader + " BGCOLOR=\"" + CSS.getTableHeadBackground() + "\">");
+        buf.append("<TD " + colspanHeader + " BGCOLOR=\"" + runtimeDotConfig.styleSheet().getTableHeadBackground() + "\">");
         buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\">");
         buf.append(Html.TR_START);
         buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxTitleWidth + "\" HEIGHT=\"16\"><B>" + escapeHtml(fqTableName) +"</B>" + Html.TD_END);
@@ -194,9 +192,9 @@ public class DotNode implements Node {
         buf.append(INDENT_6 + Html.TR_START);
         buf.append("<TD PORT=\"" + escapeHtml(column.getName()) + "\" " + columnSpan);
         if (column.isExcluded())
-            buf.append("BGCOLOR=\"" + CSS.getExcludedColumnBackgroundColor() + "\" ");
+            buf.append("BGCOLOR=\"" + runtimeDotConfig.styleSheet().getExcludedColumnBackgroundColor() + "\" ");
         else if (indexColumns.contains(column))
-            buf.append("BGCOLOR=\"" + CSS.getIndexedColumnBackground() + "\" ");
+            buf.append("BGCOLOR=\"" + runtimeDotConfig.styleSheet().getIndexedColumnBackground() + "\" ");
         buf.append("ALIGN=\"LEFT\">");
         buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\" ALIGN=\"LEFT\">");
         buf.append("<TR ALIGN=\"LEFT\">");
@@ -233,7 +231,7 @@ public class DotNode implements Node {
     private String tableToString() {
         StringBuilder buf = new StringBuilder();
         buf.append(INDENT_6 + Html.TR_START);
-        buf.append("<TD ALIGN=\"LEFT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
+        buf.append("<TD ALIGN=\"LEFT\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\">");
         int numParents = showImpliedRelationships ? table.getNumParents() : table.getNumNonImpliedParents();
         if (numParents > 0 || config.showColumnDetails)
             buf.append("&lt; " + numParents);
@@ -241,7 +239,7 @@ public class DotNode implements Node {
             buf.append("  ");
 
         buf.append(Html.TD_END);
-        buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
+        buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\">");
         final long numRows = table.getNumRows();
         if (runtimeDotConfig.isNumRowsEnabled() && numRows >= 0) {
             buf.append(NumberFormat.getInstance().format(numRows));
@@ -253,7 +251,7 @@ public class DotNode implements Node {
         }
         buf.append(Html.TD_END);
 
-        buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + CSS.getBodyBackground() + "\">");
+        buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\">");
         int numChildren = showImpliedRelationships ? table.getNumChildren() : table.getNumNonImpliedChildren();
         if (numChildren > 0 || config.showColumnDetails)
             buf.append(numChildren + " &gt;");

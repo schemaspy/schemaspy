@@ -49,7 +49,7 @@ public final class DotConfigHeader implements Header {
         final boolean rankdirbug = runtimeDotConfig.isRankDirBugEnabled();
         if (!rankdirbug)
             header.append("    rankdir=\"RL\"");
-        header.append("    bgcolor=\"" + StyleSheet.getInstance().getBodyBackground() + "\"");
+        header.append("    bgcolor=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\"");
         if (showLabel) {
             if (rankdirbug)
                 header.append("    label=\"\\nLayout is significantly better without '-rankdirbug' option\"");

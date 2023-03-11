@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class StyleSheetTest {
 
-    private static final StyleSheet styleSheet = StyleSheet.getInstance();
+    private static final StyleSheet styleSheet = new StyleSheet("layout", "schemaSpy.css").load();
 
     @Test
     public void canGetBodyBackground() {
