@@ -26,34 +26,22 @@ import org.schemaspy.output.dot.schemaspy.StyleSheet;
 public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
 
     private final FontConfig fontConfig;
-    private final boolean rankDirBugEnabled;
+    private final DotConfig dotConfig;
     private final boolean relativeLinks;
-    private final boolean numRowsEnabled;
     private final boolean multiSchema;
-
     private final StyleSheet styleSheet;
 
     public SimpleRuntimeDotConfig(FontConfig fontConfig, DotConfig dotConfig, boolean relativeLinks, boolean multiSchema) {
         this.fontConfig = fontConfig;
-        this.rankDirBugEnabled = dotConfig.isRankDirBugEnabled();
+        this.dotConfig = dotConfig;
         this.relativeLinks = relativeLinks;
-        this.numRowsEnabled = dotConfig.isNumRowsEnabled();
         this.multiSchema = multiSchema;
         this.styleSheet = new StyleSheet(dotConfig.getTemplateDirectory(), dotConfig.getCss()).load();
     }
 
-    public SimpleRuntimeDotConfig(FontConfig fontConfig, boolean rankDirBugEnabled, boolean relativeLinks, boolean numRowsEnabled, boolean multiSchema) {
-        this.fontConfig = fontConfig;
-        this.rankDirBugEnabled = rankDirBugEnabled;
-        this.relativeLinks = relativeLinks;
-        this.numRowsEnabled = numRowsEnabled;
-        this.multiSchema = multiSchema;
-        this.styleSheet = new StyleSheet(Config.getInstance().getTemplateDirectory(), Config.getInstance().getCss()).load();
-    }
-
     @Override
     public boolean isRankDirBugEnabled() {
-        return rankDirBugEnabled;
+        return dotConfig.isRankDirBugEnabled();
     }
 
     @Override
@@ -77,7 +65,7 @@ public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
 
     @Override
     public boolean isNumRowsEnabled() {
-        return numRowsEnabled;
+        return dotConfig.isNumRowsEnabled();
     }
 
     @Override
