@@ -3,13 +3,11 @@ package org.schemaspy.output.html.mustache.diagrams;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
-import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.DiagramResult;
+import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.SummaryDiagram;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 
@@ -19,7 +17,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,7 +45,7 @@ public class MustacheSummaryDiagramFactoryTest {
         ProgressListener progressListener = mock(ProgressListener.class);
 
 
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, noTables, true, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, noTables, progressListener);
         assertThat(results.getDiagrams()).isEmpty();
     }
 
@@ -68,7 +65,7 @@ public class MustacheSummaryDiagramFactoryTest {
         ProgressListener progressListener = mock(ProgressListener.class);
 
 
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, true, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, progressListener);
         assertThat(results.getDiagrams()).hasSize(2);
         assertThat(results.getDiagrams().get(0).getActive()).isNotEmpty();
         assertThat(results.getDiagrams().get(1).getActive()).isNullOrEmpty();
@@ -91,7 +88,7 @@ public class MustacheSummaryDiagramFactoryTest {
         ProgressListener progressListener = mock(ProgressListener.class);
 
 
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, true, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, progressListener);
         assertThat(results.getDiagrams()).hasSize(4);
         assertThat(results.getDiagrams().get(0).getActive()).isNotEmpty();
         assertThat(results.getDiagrams().get(1).getActive()).isNullOrEmpty();
@@ -128,7 +125,7 @@ public class MustacheSummaryDiagramFactoryTest {
         ProgressListener progressListener = mock(ProgressListener.class);
 
 
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, true, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, progressListener);
         assertThat(results.getDiagrams()).isEmpty();
         assertThat(results.getOutputExceptions()).hasSize(4);
     }

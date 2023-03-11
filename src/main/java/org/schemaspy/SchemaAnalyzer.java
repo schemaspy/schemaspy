@@ -365,7 +365,6 @@ public class SchemaAnalyzer {
         writeInfo("renderer", renderer.identifier(), htmlInfoFile);
         progressListener.graphingSummaryProgressed();
 
-        boolean showDetailedTables = tables.size() <= config.getMaxDetailedTables();
         boolean hasRealConstraints = !db.getRemoteTables().isEmpty() || tables.stream().anyMatch(table -> !table.isOrphan(false));
 
         // if evaluating a 'ruby on rails-based' database then connect the columns
@@ -403,7 +402,7 @@ public class SchemaAnalyzer {
 
 
         MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, hasRealConstraints, !impliedConstraints.isEmpty() , outputDir);
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, showDetailedTables, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, progressListener);
         results.getOutputExceptions().stream().forEachOrdered(exception ->
                 LOGGER.error("RelationShipDiagramError", exception)
         );

@@ -48,12 +48,12 @@ public class DotFormatter {
         this.dotSummaryFormatter = new DotSummaryFormatter(runtimeDotConfig);
     }
 
-    public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, PrintWriter dot) {
-        dotSummaryFormatter.writeSummaryRealRelationships(db, tables, compact, showColumns, dot);
+    public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, PrintWriter dot) {
+        dotSummaryFormatter.writeSummaryRealRelationships(db, tables, compact, dot);
     }
 
-    public void writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, PrintWriter dot) {
-        dotSummaryFormatter.writeSummaryAllRelationships(db, tables, compact, showColumns, dot);
+    public void writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, PrintWriter dot) {
+        dotSummaryFormatter.writeSummaryAllRelationships(db, tables, compact, dot);
     }
 
     public void writeTableRealRelationships(Table table, boolean twoDegreesOfSeparation, LongAdder stats, PrintWriter dot) {

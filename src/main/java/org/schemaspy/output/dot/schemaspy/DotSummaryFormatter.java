@@ -50,19 +50,19 @@ public class DotSummaryFormatter {
         this.runtimeDotConfig = runtimeDotConfig;
     }
 
-    public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, PrintWriter dot) {
-        writeRelationships(db, tables, compact, showColumns, false, dot);
+    public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, PrintWriter dot) {
+        writeRelationships(db, tables, compact, false, dot);
     }
 
     /**
      * Returns <code>true</code> if it wrote any implied relationships
      */
-    public void writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, PrintWriter dot) {
-        writeRelationships(db, tables, compact, showColumns, true, dot);
+    public void writeSummaryAllRelationships(Database db, Collection<Table> tables, boolean compact, PrintWriter dot) {
+        writeRelationships(db, tables, compact, true, dot);
     }
 
-    private void writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean showColumns, boolean includeImplied, PrintWriter dot) {
-        DotNodeConfig nodeConfig = showColumns ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
+    private void writeRelationships(Database db, Collection<Table> tables, boolean compact, boolean includeImplied, PrintWriter dot) {
+        DotNodeConfig nodeConfig = runtimeDotConfig.showDetails(tables) ? new DotNodeConfig(!compact, false) : new DotNodeConfig();
 
         final Name name = new Concatenation(
                 new Sized(compact),
