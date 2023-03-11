@@ -21,6 +21,7 @@ package org.schemaspy;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.FontConfig;
+import org.schemaspy.output.dot.schemaspy.StyleSheet;
 
 public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
 
@@ -30,12 +31,15 @@ public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
     private final boolean numRowsEnabled;
     private final boolean multiSchema;
 
+    private final StyleSheet styleSheet;
+
     public SimpleRuntimeDotConfig(FontConfig fontConfig, DotConfig dotConfig, boolean relativeLinks, boolean multiSchema) {
         this.fontConfig = fontConfig;
         this.rankDirBugEnabled = dotConfig.isRankDirBugEnabled();
         this.relativeLinks = relativeLinks;
         this.numRowsEnabled = dotConfig.isNumRowsEnabled();
         this.multiSchema = multiSchema;
+        this.styleSheet = new StyleSheet(dotConfig.getTemplateDirectory(), dotConfig.getCss()).load();
     }
 
     public SimpleRuntimeDotConfig(FontConfig fontConfig, boolean rankDirBugEnabled, boolean relativeLinks, boolean numRowsEnabled, boolean multiSchema) {
@@ -44,6 +48,7 @@ public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
         this.relativeLinks = relativeLinks;
         this.numRowsEnabled = numRowsEnabled;
         this.multiSchema = multiSchema;
+        this.styleSheet = new StyleSheet(Config.getInstance().getTemplateDirectory(), Config.getInstance().getCss()).load();
     }
 
     @Override
@@ -78,5 +83,10 @@ public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
     @Override
     public boolean isOneOfMultipleSchemas() {
         return multiSchema;
+    }
+
+    @Override
+    public StyleSheet styleSheet() {
+        return styleSheet;
     }
 }

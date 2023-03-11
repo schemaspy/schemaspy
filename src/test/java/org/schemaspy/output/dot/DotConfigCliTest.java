@@ -98,21 +98,6 @@ class DotConfigCliTest {
             .isEqualTo("layout");
     }
 
-    private DotConfig parse(String... args) {
-        String[] defaultArgs = {"-o", "out", "-sso"};
-        return new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        )
-            .parse(
-                Stream
-                    .concat(
-                        Arrays.stream(defaultArgs),
-                        Arrays.stream(args)
-                    ).toArray(String[]::new))
-            .getDotConfig();
-    }
-
     @Test
     void noRows() {
         assertThat(
@@ -127,5 +112,20 @@ class DotConfigCliTest {
         parse("")
             .isNumRowsEnabled()
         ).isTrue();
+    }
+
+    private DotConfig parse(String... args) {
+        String[] defaultArgs = {"-o", "out", "-sso"};
+        return new CommandLineArgumentParser(
+            new CommandLineArguments(),
+            (option) -> null
+        )
+            .parse(
+                Stream
+                    .concat(
+                        Arrays.stream(defaultArgs),
+                        Arrays.stream(args)
+                    ).toArray(String[]::new))
+            .getDotConfig();
     }
 }

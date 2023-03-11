@@ -18,6 +18,8 @@
  */
 package org.schemaspy.output.dot;
 
+import org.schemaspy.output.dot.schemaspy.StyleSheet;
+
 public interface RuntimeDotConfig {
     boolean isRankDirBugEnabled();
     String getFont();
@@ -26,5 +28,5 @@ public interface RuntimeDotConfig {
     boolean useRelativeLinks();
     boolean isNumRowsEnabled();
     boolean isOneOfMultipleSchemas();
-
+    StyleSheet styleSheet();
 }

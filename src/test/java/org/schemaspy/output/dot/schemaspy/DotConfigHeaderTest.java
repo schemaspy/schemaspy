@@ -51,6 +51,11 @@ class DotConfigHeaderTest {
                             public boolean isOneOfMultipleSchemas() {
                                 return false;
                             }
+
+                            @Override
+                            public StyleSheet styleSheet() {
+                                return new StyleSheet("layout", "schemaSpy.css").load();
+                            }
                         },
                         false
                 ).value(),
@@ -101,6 +106,11 @@ class DotConfigHeaderTest {
                             @Override
                             public boolean isOneOfMultipleSchemas() {
                                 return false;
+                            }
+
+                            @Override
+                            public StyleSheet styleSheet() {
+                                return new StyleSheet("layout", "schemaSpy.css").load();
                             }
                         },
                         true
