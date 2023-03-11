@@ -24,6 +24,8 @@ import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfigCli;
+import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.DotConfigCli;
 import org.schemaspy.view.HtmlConfig;
 import org.schemaspy.view.HtmlConfigCli;
 
@@ -254,6 +256,9 @@ public class CommandLineArguments {
 
     @ParametersDelegate
     private HtmlConfigCli htmlConfigCli = new HtmlConfigCli(noRowsConfigCli, templateDirectoryConfigCli);
+
+    @ParametersDelegate
+    private DotConfigCli dotConfigCli = new DotConfigCli(templateDirectoryConfigCli);
 
     @Parameter(
         names = {
@@ -596,6 +601,10 @@ public class CommandLineArguments {
 
     public HtmlConfig getHtmlConfig() {
         return htmlConfigCli;
+    }
+
+    public DotConfig getDotConfig() {
+        return dotConfigCli;
     }
 
     public boolean useVizJS() {
