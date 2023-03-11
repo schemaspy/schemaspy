@@ -311,8 +311,8 @@ public class SchemaMetaIT {
         DotFormatter dotFormatter = new DotFormatter(
             new SimpleRuntimeDotConfig(
                 new DefaultFontConfig(
-                    config.getFont(),
-                    config.getFontSize()
+                    "Helvetica",
+                    11
                 ),
                 commandLineArguments.getDotConfig(),
                 false,

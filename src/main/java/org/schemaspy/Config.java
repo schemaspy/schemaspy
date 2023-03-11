@@ -75,7 +75,6 @@ import java.util.stream.Stream;
 @Deprecated
 public final class Config {
 
-    private static final int DEFAULT_FONT_SIZE = 11;
     private static final int DEFAULT_TABLE_DETAILS_THRESHOLD = 300;
 
     private static final Pattern DBTYPE_PATTERN = Pattern.compile(".*org/schemaspy/types/(.*)\\.properties");
@@ -89,7 +88,6 @@ public final class Config {
     private String host;
     private Integer port;
     private Boolean exportedKeysEnabled;
-    private String templateDirectory;
     private Pattern tableInclusions;
     private Pattern tableExclusions;
     private Pattern columnExclusions;
@@ -97,12 +95,8 @@ public final class Config {
     private Integer maxDbThreads;
     private Integer maxDetailedTables;
     private String driverPath;
-    private String css;
-    private String font;
-    private Integer fontSize;
     private PropertiesResolver propertiesResolver = new PropertiesResolver();
     private Properties dbProperties;
-    private Boolean rankDirBugEnabled;
     private Boolean numRowsEnabled;
     private Boolean viewsEnabled;
     private Boolean railsEnabled;
@@ -166,16 +160,6 @@ public final class Config {
             exportedKeysEnabled = !options.remove("-noexportedkeys");
         }
         return exportedKeysEnabled;
-    }
-
-    public String getTemplateDirectory() {
-        if (templateDirectory == null) {
-            templateDirectory = pullParam("-template");
-            if (templateDirectory == null) {
-                templateDirectory = "layout";
-            }
-        }
-        return templateDirectory;
     }
 
     /**
@@ -259,63 +243,6 @@ public final class Config {
     }
 
     /**
-     * The filename of the cascading style sheet to use.
-     * Note that this file is parsed and used to determine characteristics
-     * of the generated diagrams, so it must contain specific settings that
-     * are documented within schemaSpy.css.<p>
-     * <p>
-     * Defaults to <code>"schemaSpy.css"</code>.
-     *
-     */
-    public String getCss() {
-        if (css == null) {
-            css = pullParam("-css");
-            if (css == null)
-                css = "schemaSpy.css";
-        }
-        return css;
-    }
-
-    /**
-     * The font to use within diagrams.  Modify the .css to specify HTML fonts.
-     *
-     */
-    public String getFont() {
-        if (font == null) {
-            font = pullParam("-font");
-            if (font == null)
-                font = "Helvetica";
-        }
-        return font;
-    }
-
-    /**
-     * The font size to use within diagrams.  This is the size of the font used for
-     * 'large' (e.g. not 'compact') diagrams.
-     *
-     * Modify the .css to specify HTML font sizes.
-     *
-     * Defaults to 11.
-     * @return the font size to use
-     */
-    public int getFontSize() {
-        if (fontSize == null) {
-            int size = DEFAULT_FONT_SIZE;
-            String param = pullParam("-fontsize");
-            if (param != null) {
-                try {
-                    size = Integer.parseInt(param);
-                } catch (NumberFormatException e) {
-                    LOGGER.warn(e.getMessage(), e);
-                }
-            }
-            fontSize = size;
-        }
-
-        return fontSize;
-    }
-
-    /**
      * Maximum number of threads to use when querying database metadata information.
      * @throws InvalidConfigurationException if unable to load properties
      */
@@ -346,16 +273,6 @@ public final class Config {
         return maxDbThreads;
     }
 
-    /**
-     * Don't use this unless absolutely necessary as it screws up the layout
-     *
-     */
-    public boolean isRankDirBugEnabled() {
-        if (rankDirBugEnabled == null)
-            rankDirBugEnabled = options.remove("-rankdirbug");
-
-        return rankDirBugEnabled;
-    }
 
     /**
      * Look for Ruby on Rails-based naming conventions in
