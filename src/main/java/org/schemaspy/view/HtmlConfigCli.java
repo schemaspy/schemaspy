@@ -3,6 +3,7 @@ package org.schemaspy.view;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.schemaspy.cli.NoRowsConfigCli;
+import org.schemaspy.cli.TemplateDirectoryConfigCli;
 
 @Parameters(resourceBundle = "htmlconfigcli")
 public class HtmlConfigCli implements HtmlConfig {
@@ -18,15 +19,6 @@ public class HtmlConfigCli implements HtmlConfig {
 
     @Parameter(
         names = {
-            "-template",
-            "schemaspy.template"
-        },
-        descriptionKey = "template"
-    )
-    private String templateDirectory = "layout";
-
-    @Parameter(
-        names = {
             "-nopages", "--no-pages",
             "schemaspy.nopages", "schemaspy.no-pages"
         },
@@ -35,9 +27,14 @@ public class HtmlConfigCli implements HtmlConfig {
     private boolean noPages = false;
 
     private NoRowsConfigCli noRowsConfigCli;
+    private TemplateDirectoryConfigCli templateDirectoryConfigCli;
 
-    public HtmlConfigCli(NoRowsConfigCli noRowsConfigCli) {
+    public HtmlConfigCli(
+        NoRowsConfigCli noRowsConfigCli,
+        TemplateDirectoryConfigCli templateDirectoryConfigCli
+    ) {
         this.noRowsConfigCli = noRowsConfigCli;
+        this.templateDirectoryConfigCli = templateDirectoryConfigCli;
     }
 
     @Override
@@ -47,7 +44,7 @@ public class HtmlConfigCli implements HtmlConfig {
 
     @Override
     public String getTemplateDirectory() {
-        return templateDirectory;
+        return templateDirectoryConfigCli.getTemplateDirectory();
     }
 
     @Override

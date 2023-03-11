@@ -250,7 +250,10 @@ public class CommandLineArguments {
     private NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
 
     @ParametersDelegate
-    private HtmlConfigCli htmlConfigCli = new HtmlConfigCli(noRowsConfigCli);
+    private TemplateDirectoryConfigCli templateDirectoryConfigCli = new TemplateDirectoryConfigCli();
+
+    @ParametersDelegate
+    private HtmlConfigCli htmlConfigCli = new HtmlConfigCli(noRowsConfigCli, templateDirectoryConfigCli);
 
     @Parameter(
         names = {
