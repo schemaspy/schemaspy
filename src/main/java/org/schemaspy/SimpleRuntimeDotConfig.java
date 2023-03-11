@@ -18,10 +18,13 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.model.Table;
 import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.FontConfig;
 import org.schemaspy.output.dot.schemaspy.StyleSheet;
+
+import java.util.Collection;
 
 public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
 
@@ -76,5 +79,9 @@ public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
     @Override
     public StyleSheet styleSheet() {
         return styleSheet;
+    }
+    @Override
+    public boolean showDetails(Collection<Table> table) {
+        return table.size() <= dotConfig.getMaxDetailedTables();
     }
 }

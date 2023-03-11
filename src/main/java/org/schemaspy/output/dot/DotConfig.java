@@ -7,4 +7,5 @@ public interface DotConfig {
     String getCss();
     String getTemplateDirectory();
     boolean isNumRowsEnabled();
+    int getMaxDetailedTables();
 }
