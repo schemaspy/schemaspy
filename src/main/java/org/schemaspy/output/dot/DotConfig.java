@@ -6,4 +6,5 @@ public interface DotConfig {
     boolean isRankDirBugEnabled();
     String getCss();
     String getTemplateDirectory();
+    boolean isNumRowsEnabled();
 }
