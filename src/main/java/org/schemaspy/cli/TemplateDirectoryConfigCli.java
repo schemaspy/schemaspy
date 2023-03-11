@@ -21,19 +21,19 @@ package org.schemaspy.cli;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(resourceBundle = "norowsconfigcli")
-public class NoRowsConfigCli {
+@Parameters(resourceBundle = "templatedirectorycli")
+public class TemplateDirectoryConfigCli {
 
     @Parameter(
         names = {
-            "-norows", "--no-rows",
-            "schemaspy.norows", "schemaspy.no-rows"
+            "-template",
+            "schemaspy.template"
         },
-        descriptionKey = "norows"
+        descriptionKey = "template"
     )
-    private boolean noRows = false;
+    private String templateDirectory = "layout";
 
-    public boolean isNumRowsEnabled() {
-        return !noRows;
+    public String getTemplateDirectory() {
+        return templateDirectory;
     }
 }
