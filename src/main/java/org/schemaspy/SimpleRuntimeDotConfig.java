@@ -18,6 +18,7 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.output.dot.DotConfig;
 import org.schemaspy.output.dot.RuntimeDotConfig;
 import org.schemaspy.output.dot.schemaspy.FontConfig;
 
@@ -28,6 +29,14 @@ public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
     private final boolean relativeLinks;
     private final boolean numRowsEnabled;
     private final boolean multiSchema;
+
+    public SimpleRuntimeDotConfig(FontConfig fontConfig, DotConfig dotConfig, boolean relativeLinks, boolean multiSchema) {
+        this.fontConfig = fontConfig;
+        this.rankDirBugEnabled = dotConfig.isRankDirBugEnabled();
+        this.relativeLinks = relativeLinks;
+        this.numRowsEnabled = dotConfig.isNumRowsEnabled();
+        this.multiSchema = multiSchema;
+    }
 
     public SimpleRuntimeDotConfig(FontConfig fontConfig, boolean rankDirBugEnabled, boolean relativeLinks, boolean numRowsEnabled, boolean multiSchema) {
         this.fontConfig = fontConfig;

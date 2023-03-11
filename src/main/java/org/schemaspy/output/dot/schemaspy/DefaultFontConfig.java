@@ -1,5 +1,7 @@
 package org.schemaspy.output.dot.schemaspy;
 
+import org.schemaspy.output.dot.DotConfig;
+
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
@@ -12,6 +14,10 @@ public class DefaultFontConfig implements FontConfig {
     private final String name;
     private final int size;
     private final Font font;
+
+    public DefaultFontConfig(DotConfig dotConfig) {
+        this(dotConfig.getFont(), dotConfig.getFontSize());
+    }
 
     public DefaultFontConfig(String fontName, int fontSize) {
         this.name = fontName;

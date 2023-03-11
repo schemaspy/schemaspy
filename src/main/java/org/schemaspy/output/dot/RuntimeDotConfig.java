@@ -26,4 +26,5 @@ public interface RuntimeDotConfig {
     boolean useRelativeLinks();
     boolean isNumRowsEnabled();
     boolean isOneOfMultipleSchemas();
+
 }

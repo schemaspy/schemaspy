@@ -258,7 +258,7 @@ public class CommandLineArguments {
     private HtmlConfigCli htmlConfigCli = new HtmlConfigCli(noRowsConfigCli, templateDirectoryConfigCli);
 
     @ParametersDelegate
-    private DotConfigCli dotConfigCli = new DotConfigCli(templateDirectoryConfigCli);
+    private DotConfigCli dotConfigCli = new DotConfigCli(noRowsConfigCli, templateDirectoryConfigCli);
 
     @Parameter(
         names = {

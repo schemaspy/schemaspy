@@ -113,4 +113,19 @@ class DotConfigCliTest {
             .getDotConfig();
     }
 
+    @Test
+    void noRows() {
+        assertThat(
+        parse("-norows")
+            .isNumRowsEnabled()
+        ).isFalse();
+    }
+
+    @Test
+    void noRowsDefault() {
+        assertThat(
+        parse("")
+            .isNumRowsEnabled()
+        ).isTrue();
+    }
 }

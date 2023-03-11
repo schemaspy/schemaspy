@@ -2,6 +2,7 @@ package org.schemaspy.output.dot;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import org.schemaspy.cli.NoRowsConfigCli;
 import org.schemaspy.cli.TemplateDirectoryConfigCli;
 
 @Parameters(resourceBundle = "dotconfigcli")
@@ -43,9 +44,11 @@ public class DotConfigCli implements DotConfig {
     )
     private String css = "schemaSpy.css";
 
+    private NoRowsConfigCli noRowsConfigCli;
     private TemplateDirectoryConfigCli templateDirectoryConfigCli;
 
-    public DotConfigCli(TemplateDirectoryConfigCli templateDirectoryConfigCli) {
+    public DotConfigCli(NoRowsConfigCli noRowsConfigCli, TemplateDirectoryConfigCli templateDirectoryConfigCli) {
+        this.noRowsConfigCli = noRowsConfigCli;
         this.templateDirectoryConfigCli = templateDirectoryConfigCli;
     }
 
@@ -72,5 +75,10 @@ public class DotConfigCli implements DotConfig {
     @Override
     public String getTemplateDirectory() {
         return templateDirectoryConfigCli.getTemplateDirectory();
+    }
+
+    @Override
+    public boolean isNumRowsEnabled() {
+        return noRowsConfigCli.isNumRowsEnabled();
     }
 }

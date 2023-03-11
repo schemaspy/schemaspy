@@ -386,12 +386,10 @@ public class SchemaAnalyzer {
 
         RuntimeDotConfig runtimeDotConfig = new SimpleRuntimeDotConfig(
             new DefaultFontConfig(
-                config.getFont(),
-                config.getFontSize()
+                commandLineArguments.getDotConfig()
             ),
-            config.isRankDirBugEnabled(),
+            commandLineArguments.getDotConfig(),
             "svg".equalsIgnoreCase(renderer.format()),
-            commandLineArguments.getHtmlConfig().isNumRowsEnabled(),
             isOneOfMultipleSchemas
         );
 
