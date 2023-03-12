@@ -3,6 +3,7 @@ package org.schemaspy.input.dbms;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.schemaspy.cli.NoRowsConfigCli;
+import org.schemaspy.cli.PatternConverter;
 
 import java.util.regex.Pattern;
 
@@ -27,6 +28,16 @@ public class DbmsConfigCli implements DbmsConfig {
     )
     private boolean noViews = false;
 
+    @Parameter(
+        names = {
+            "-X", "--column-exclusions",
+            "schemaspy.X", "schemaspy.columnExclusions", "schemaspy.column-exclusions"
+        },
+        descriptionKey = "columnexclusion",
+        converter = PatternConverter.class
+    )
+    private Pattern columnExclusions = Pattern.compile("[^.]");
+
     private NoRowsConfigCli noRowsConfigCli;
 
     public DbmsConfigCli(NoRowsConfigCli noRowsConfigCli) {
@@ -45,5 +56,10 @@ public class DbmsConfigCli implements DbmsConfig {
     @Override
     public boolean isViewsEnabled() {
         return !noViews;
+    }
+
+    @Override
+    public Pattern getColumnExclusions() {
+        return columnExclusions;
     }
 }
