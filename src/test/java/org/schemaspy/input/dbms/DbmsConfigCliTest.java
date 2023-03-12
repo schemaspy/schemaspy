@@ -26,9 +26,31 @@ class DbmsConfigCliTest {
             .isTrue();
     }
 
+    @Test
+    void isNumRowsEnabled() {
+        assertThat(
+            parse("-norows")
+                .isNumRowsEnabled()
+        )
+            .isFalse();
+    }
+
+    @Test
+    void isNumRowsEnabledDefault() {
+        assertThat(
+            parse()
+                .isNumRowsEnabled()
+        )
+            .isTrue();
+    }
+
     private DbmsConfig parse(String...args) {
-        DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(new NoRowsConfigCli());
-        new JCommander(dbmsConfigCli).parse(args);
+        NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
+        DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(noRowsConfigCli);
+        JCommander jCommander = JCommander.newBuilder().build();
+        jCommander.addObject(dbmsConfigCli);
+        jCommander.addObject(noRowsConfigCli);
+        jCommander.parse(args);
         return dbmsConfigCli;
     }
 }
