@@ -4,4 +4,5 @@ public interface DbmsConfig {
 
     boolean isExportedKeysEnabled();
     boolean isNumRowsEnabled();
+    boolean isViewsEnabled();
 }

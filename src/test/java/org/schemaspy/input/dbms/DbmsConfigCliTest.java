@@ -44,6 +44,24 @@ class DbmsConfigCliTest {
             .isTrue();
     }
 
+    @Test
+    void isViewsEnabled() {
+        assertThat(
+            parse("-noviews")
+                .isViewsEnabled()
+        )
+            .isFalse();
+    }
+
+    @Test
+    void isViewsEnabledDefault() {
+        assertThat(
+            parse()
+                .isViewsEnabled()
+        )
+            .isTrue();
+    }
+
     private DbmsConfig parse(String...args) {
         NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
         DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(noRowsConfigCli);
