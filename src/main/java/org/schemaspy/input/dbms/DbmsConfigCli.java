@@ -86,6 +86,15 @@ public class DbmsConfigCli implements DbmsConfig {
     )
     private String schemaSpec;
 
+    @Parameter(
+        names = {
+            "-t", "--database-type",
+            "schemaspy.t", "schemaspy.database-type"
+        },
+        descriptionKey = "database-type"
+    )
+    private String databaseType = "ora";
+
     private NoRowsConfigCli noRowsConfigCli;
 
     public DbmsConfigCli(NoRowsConfigCli noRowsConfigCli) {
@@ -134,5 +143,10 @@ public class DbmsConfigCli implements DbmsConfig {
     @Override
     public String getSchemaSpec() {
         return schemaSpec;
+    }
+
+    @Override
+    public String getDatabaseType() {
+        return databaseType;
     }
 }
