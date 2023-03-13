@@ -178,6 +178,24 @@ class DbmsConfigCliTest {
             .isNull();
     }
 
+    @Test
+    void getDatabaseType() {
+        assertThat(
+            parse("-t", "abc")
+                .getDatabaseType()
+        )
+            .isEqualTo("abc");
+    }
+
+    @Test
+    void getDatabaseTypeDefault() {
+        assertThat(
+            parse()
+                .getDatabaseType()
+        )
+            .isEqualTo("ora");
+    }
+
     private DbmsConfig parse(String...args) {
         NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
         DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(noRowsConfigCli);

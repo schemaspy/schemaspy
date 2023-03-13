@@ -13,4 +13,5 @@ public interface DbmsConfig {
     Pattern getTableExclusions();
     boolean isEvaluateAllEnabled();
     String getSchemaSpec();
+    String getDatabaseType();
 }
