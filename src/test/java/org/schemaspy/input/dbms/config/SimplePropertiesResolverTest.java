@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Nils Petzaell
  */
-public class PropertiesResolverTest {
+public class SimplePropertiesResolverTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -63,7 +63,7 @@ public class PropertiesResolverTest {
 
     @Test
     public void resolveSingleLevel() {
-        PropertiesResolver resolver = new PropertiesResolver(resourceFinder);
+        SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
         Map expected = new HashMap<>();
         expected.put("level", "0");
         expected.put("branch", "A");
@@ -75,7 +75,7 @@ public class PropertiesResolverTest {
 
     @Test
     public void resolverWithExtends() throws IOException {
-        PropertiesResolver resolver = new PropertiesResolver(resourceFinder);
+        SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
         Map expected = new HashMap<>();
         expected.put("level", "2");
         expected.put("branch", "A");
@@ -89,7 +89,7 @@ public class PropertiesResolverTest {
 
     @Test
     public void resolverWillInclude() throws IOException {
-        PropertiesResolver resolver = new PropertiesResolver(resourceFinder);
+        SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
         Map expected = new HashMap<>();
         expected.put("level","0");
         expected.put("branch", "B");
@@ -107,7 +107,7 @@ public class PropertiesResolverTest {
     public void noSuchPropertiesFile() {
         thrown.expect(InvalidConfigurationException.class);
         thrown.expectCause(instanceOf(ResourceNotFoundException.class));
-        PropertiesResolver resolver = new PropertiesResolver(resourceFinder);
+        SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
         resolver.getDbProperties("XX");
     }
 
@@ -115,7 +115,7 @@ public class PropertiesResolverTest {
     public void invalidInclude() {
         thrown.expect(InvalidConfigurationException.class);
         thrown.expectMessage("include.1=mysql:someRefKey");
-        PropertiesResolver resolver = new PropertiesResolver(resourceFinder);
+        SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
         resolver.getDbProperties("badInclude");
     }
 }

@@ -26,6 +26,7 @@ import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.Config;
 import org.schemaspy.input.dbms.config.PropertiesResolver;
+import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class CommandLineArgumentParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final PropertiesResolver propertiesResolver = new PropertiesResolver();
+    private static final PropertiesResolver propertiesResolver = new SimplePropertiesResolver();
 
     private final JCommander jCommander;
 
