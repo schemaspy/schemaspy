@@ -68,6 +68,15 @@ public class DbmsConfigCli implements DbmsConfig {
     )
     private Pattern tableExclusions = Pattern.compile(".*\\$.*");
 
+    @Parameter(
+        names = {
+            "-all",
+            "schemaspy.all"
+        },
+        descriptionKey = "all"
+    )
+    private boolean evaluateAllEnabled = false;
+
     private NoRowsConfigCli noRowsConfigCli;
 
     public DbmsConfigCli(NoRowsConfigCli noRowsConfigCli) {
@@ -106,5 +115,10 @@ public class DbmsConfigCli implements DbmsConfig {
     @Override
     public Pattern getTableExclusions() {
         return tableExclusions;
+    }
+
+    @Override
+    public boolean isEvaluateAllEnabled() {
+        return evaluateAllEnabled;
     }
 }

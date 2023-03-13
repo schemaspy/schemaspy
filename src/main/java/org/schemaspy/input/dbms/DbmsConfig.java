@@ -11,4 +11,5 @@ public interface DbmsConfig {
     Pattern getIndirectColumnExclusions();
     Pattern getTableInclusions();
     Pattern getTableExclusions();
+    boolean isEvaluateAllEnabled();
 }
