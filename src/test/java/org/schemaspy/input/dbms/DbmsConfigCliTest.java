@@ -142,6 +142,24 @@ class DbmsConfigCliTest {
             .isEqualTo(".*\\$.*");
     }
 
+    @Test
+    void isEvaluateAllEnabled() {
+        assertThat(
+            parse("-all")
+                .isEvaluateAllEnabled()
+        )
+            .isTrue();
+    }
+
+    @Test
+    void isEvaluateAllEnabledDefault() {
+        assertThat(
+            parse()
+                .isEvaluateAllEnabled()
+        )
+            .isFalse();
+    }
+
     private DbmsConfig parse(String...args) {
         NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
         DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(noRowsConfigCli);

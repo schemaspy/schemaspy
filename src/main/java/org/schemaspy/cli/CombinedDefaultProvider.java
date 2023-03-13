@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 public class CombinedDefaultProvider implements IDefaultProvider {
 
-    private final List<String> booleans = Arrays.asList("schemaspy.sso", "schemaspy.debug", "schemaspy.nohtml", "schemaspy.vizjs");
+    private final List<String> booleans = Arrays.asList("schemaspy.sso", "schemaspy.debug", "schemaspy.nohtml", "schemaspy.vizjs", "schemaspy.all");
 
     private final IDefaultProvider[] iDefaultProviders;
 
