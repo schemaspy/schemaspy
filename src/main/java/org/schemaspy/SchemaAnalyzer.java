@@ -151,12 +151,11 @@ public class SchemaAnalyzer {
         try {
             List<String> schemas = config.getSchemas();
             Database db = null;
-            String schemaSpec = config.getSchemaSpec();
+
             Connection connection = new DbDriverLoader().getConnection(commandLineArguments, config);
             DatabaseMetaData meta = connection.getMetaData();
             if (schemas == null) {
-                if (schemaSpec == null)
-                    schemaSpec = ".*";
+                String schemaSpec = config.getSchemaSpec();
                 LOGGER.info(
                         "Analyzing schemas that match regular expression '{}'. " +
                         "(use -schemaSpec on command line or in .properties to exclude other schemas)",

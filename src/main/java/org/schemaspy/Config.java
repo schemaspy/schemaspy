@@ -412,9 +412,15 @@ public final class Config {
     */
 
     public String getSchemaSpec() {
-        if (schemaSpec == null)
+        if (schemaSpec == null) {
             schemaSpec = pullParam("-schemaSpec");
-
+            if (Objects.isNull(schemaSpec)) {
+                schemaSpec = getDbProperties().getProperty("schemaSpec");
+            }
+            if (Objects.isNull(schemaSpec)) {
+                schemaSpec = ".*";
+            }
+        }
         return schemaSpec;
     }
 
