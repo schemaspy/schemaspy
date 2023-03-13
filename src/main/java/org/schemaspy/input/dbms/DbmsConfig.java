@@ -1,5 +1,6 @@
 package org.schemaspy.input.dbms;
 
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 public interface DbmsConfig {
@@ -14,4 +15,5 @@ public interface DbmsConfig {
     boolean isEvaluateAllEnabled();
     String getSchemaSpec();
     String getDatabaseType();
+    Properties getDatabaseTypeProperties();
 }

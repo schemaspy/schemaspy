@@ -4,6 +4,8 @@ import com.beust.jcommander.JCommander;
 import org.junit.jupiter.api.Test;
 import org.schemaspy.cli.NoRowsConfigCli;
 
+import java.util.Properties;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DbmsConfigCliTest {
@@ -170,12 +172,23 @@ class DbmsConfigCliTest {
     }
 
     @Test
+    void getSchemaSpecFromDatabaseTypeProperties() {
+        Properties properties = new Properties();
+        properties.put("schemaSpec", "123");
+        assertThat(
+            parse(properties, "-t", "myType")
+                .getSchemaSpec()
+        )
+            .isEqualTo("123");
+    }
+
+    @Test
     void getSchemaSpecDefault() {
         assertThat(
             parse()
                 .getSchemaSpec()
         )
-            .isNull();
+            .isEqualTo(".*");
     }
 
     @Test
@@ -197,8 +210,12 @@ class DbmsConfigCliTest {
     }
 
     private DbmsConfig parse(String...args) {
+        return parse(new Properties(), args);
+    }
+
+    private DbmsConfig parse(Properties properties, String...args) {
         NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
-        DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(noRowsConfigCli);
+        DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(noRowsConfigCli, (databaseType) -> databaseType.equals("myType") ? properties : new Properties());
         JCommander jCommander = JCommander.newBuilder().build();
         jCommander.addObject(dbmsConfigCli);
         jCommander.addObject(noRowsConfigCli);
