@@ -160,6 +160,24 @@ class DbmsConfigCliTest {
             .isFalse();
     }
 
+    @Test
+    void getSchemaSpec() {
+        assertThat(
+            parse("-schemaSpec", "abc")
+                .getSchemaSpec()
+        )
+            .isEqualTo("abc");
+    }
+
+    @Test
+    void getSchemaSpecDefault() {
+        assertThat(
+            parse()
+                .getSchemaSpec()
+        )
+            .isNull();
+    }
+
     private DbmsConfig parse(String...args) {
         NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
         DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(noRowsConfigCli);
