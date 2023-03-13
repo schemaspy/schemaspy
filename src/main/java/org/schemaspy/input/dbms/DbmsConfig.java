@@ -8,4 +8,5 @@ public interface DbmsConfig {
     boolean isNumRowsEnabled();
     boolean isViewsEnabled();
     Pattern getColumnExclusions();
+    Pattern getIndirectColumnExclusions();
 }

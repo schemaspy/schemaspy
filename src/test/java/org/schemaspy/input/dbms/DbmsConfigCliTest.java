@@ -82,6 +82,26 @@ class DbmsConfigCliTest {
             .isEqualTo("[^.]");
     }
 
+    @Test
+    void getIndirectColumnExclusions() {
+        assertThat(
+            parse("-x","^exclude.*")
+                .getIndirectColumnExclusions()
+                .pattern()
+        )
+            .isEqualTo("^exclude.*");
+    }
+
+    @Test
+    void getIndirectColumnExclusionsDefault() {
+        assertThat(
+            parse()
+                .getIndirectColumnExclusions()
+                .pattern()
+        )
+            .isEqualTo("[^.]");
+    }
+
     private DbmsConfig parse(String...args) {
         NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
         DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(noRowsConfigCli);

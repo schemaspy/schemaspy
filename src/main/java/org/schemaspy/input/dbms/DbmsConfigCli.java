@@ -38,6 +38,16 @@ public class DbmsConfigCli implements DbmsConfig {
     )
     private Pattern columnExclusions = Pattern.compile("[^.]");
 
+    @Parameter(
+        names = {
+            "-x", "--indirect-column-exclusions",
+            "schemaspy.x", "schemaspy.indirectColumnExclusions", "schemaspy.indirect-column-exclusions"
+        },
+        descriptionKey = "indirectcolumnexclusions",
+        converter = PatternConverter.class
+    )
+    private Pattern indirectColumnExclusions = Pattern.compile("[^.]");
+
     private NoRowsConfigCli noRowsConfigCli;
 
     public DbmsConfigCli(NoRowsConfigCli noRowsConfigCli) {
@@ -61,5 +71,10 @@ public class DbmsConfigCli implements DbmsConfig {
     @Override
     public Pattern getColumnExclusions() {
         return columnExclusions;
+    }
+
+    @Override
+    public Pattern getIndirectColumnExclusions() {
+        return indirectColumnExclusions;
     }
 }
