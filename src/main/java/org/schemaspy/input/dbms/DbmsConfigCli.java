@@ -4,7 +4,10 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.schemaspy.cli.NoRowsConfigCli;
 import org.schemaspy.cli.PatternConverter;
+import org.schemaspy.input.dbms.config.PropertiesResolver;
 
+import java.util.Objects;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 @Parameters(resourceBundle = "dbmsconfigcli")
@@ -95,10 +98,17 @@ public class DbmsConfigCli implements DbmsConfig {
     )
     private String databaseType = "ora";
 
+    private final PropertiesResolver propertiesResolver;
+    private Properties databaseTypeProperties = null;
+
     private NoRowsConfigCli noRowsConfigCli;
 
-    public DbmsConfigCli(NoRowsConfigCli noRowsConfigCli) {
+    public DbmsConfigCli(
+        NoRowsConfigCli noRowsConfigCli,
+        PropertiesResolver propertiesResolver
+    ) {
         this.noRowsConfigCli = noRowsConfigCli;
+        this.propertiesResolver = propertiesResolver;
     }
 
     public boolean isExportedKeysEnabled() {
@@ -142,11 +152,24 @@ public class DbmsConfigCli implements DbmsConfig {
 
     @Override
     public String getSchemaSpec() {
-        return schemaSpec;
+        if (Objects.nonNull(schemaSpec)) {
+            return schemaSpec;
+        } else if (Objects.nonNull(getDatabaseTypeProperties().getProperty("schemaSpec"))) {
+            return getDatabaseTypeProperties().getProperty("schemaSpec");
+        } else {
+            return ".*";
+        }
     }
 
     @Override
     public String getDatabaseType() {
         return databaseType;
+    }
+
+    public synchronized Properties getDatabaseTypeProperties() {
+        if (Objects.isNull(databaseTypeProperties)) {
+            databaseTypeProperties = propertiesResolver.getDbProperties(getDatabaseType());
+        }
+        return databaseTypeProperties;
     }
 }
