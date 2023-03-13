@@ -58,6 +58,16 @@ public class DbmsConfigCli implements DbmsConfig {
     )
     private Pattern tableInclusions = Pattern.compile(".*");
 
+    @Parameter(
+        names = {
+            "-I", "--table-exclusions",
+            "schemaspy.I", "schemaspy.tableExclusions", "schemaspy.table-exclusions"
+        },
+        descriptionKey = "tableexclusions",
+        converter = PatternConverter.class
+    )
+    private Pattern tableExclusions = Pattern.compile(".*\\$.*");
+
     private NoRowsConfigCli noRowsConfigCli;
 
     public DbmsConfigCli(NoRowsConfigCli noRowsConfigCli) {
@@ -91,5 +101,10 @@ public class DbmsConfigCli implements DbmsConfig {
     @Override
     public Pattern getTableInclusions() {
         return tableInclusions;
+    }
+
+    @Override
+    public Pattern getTableExclusions() {
+        return tableExclusions;
     }
 }
