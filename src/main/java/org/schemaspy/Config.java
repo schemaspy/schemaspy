@@ -28,6 +28,7 @@ package org.schemaspy;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.config.PropertiesResolver;
+import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
@@ -92,7 +93,7 @@ public final class Config {
     private Pattern indirectColumnExclusions;
     private Integer maxDbThreads;
     private String driverPath;
-    private PropertiesResolver propertiesResolver = new PropertiesResolver();
+    private PropertiesResolver propertiesResolver = new SimplePropertiesResolver();
     private Properties dbProperties;
     private Boolean numRowsEnabled;
     private Boolean viewsEnabled;
