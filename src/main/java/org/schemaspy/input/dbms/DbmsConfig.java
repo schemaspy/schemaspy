@@ -10,4 +10,5 @@ public interface DbmsConfig {
     Pattern getColumnExclusions();
     Pattern getIndirectColumnExclusions();
     Pattern getTableInclusions();
+    Pattern getTableExclusions();
 }
