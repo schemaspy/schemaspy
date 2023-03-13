@@ -77,6 +77,15 @@ public class DbmsConfigCli implements DbmsConfig {
     )
     private boolean evaluateAllEnabled = false;
 
+    @Parameter(
+        names = {
+            "-schemaSpec", "--schema-spec",
+            "schemaspy.schemaSpec", "schemaspy.schema-spec"
+        },
+        descriptionKey = "schemaspec"
+    )
+    private String schemaSpec;
+
     private NoRowsConfigCli noRowsConfigCli;
 
     public DbmsConfigCli(NoRowsConfigCli noRowsConfigCli) {
@@ -120,5 +129,10 @@ public class DbmsConfigCli implements DbmsConfig {
     @Override
     public boolean isEvaluateAllEnabled() {
         return evaluateAllEnabled;
+    }
+
+    @Override
+    public String getSchemaSpec() {
+        return schemaSpec;
     }
 }

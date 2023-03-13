@@ -12,4 +12,5 @@ public interface DbmsConfig {
     Pattern getTableInclusions();
     Pattern getTableExclusions();
     boolean isEvaluateAllEnabled();
+    String getSchemaSpec();
 }
