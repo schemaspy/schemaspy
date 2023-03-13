@@ -102,6 +102,26 @@ class DbmsConfigCliTest {
             .isEqualTo("[^.]");
     }
 
+    @Test
+    void getTableInclusions() {
+        assertThat(
+            parse("-i", "abc.*")
+                .getTableInclusions()
+                .pattern()
+        )
+            .isEqualTo("abc.*");
+    }
+
+    @Test
+    void getTableInclusionsDefault() {
+        assertThat(
+            parse()
+                .getTableInclusions()
+                .pattern()
+        )
+            .isEqualTo(".*");
+    }
+
     private DbmsConfig parse(String...args) {
         NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
         DbmsConfigCli dbmsConfigCli = new DbmsConfigCli(noRowsConfigCli);
