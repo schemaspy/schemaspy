@@ -4,8 +4,11 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.schemaspy.cli.NoRowsConfigCli;
 import org.schemaspy.cli.PatternConverter;
+import org.schemaspy.cli.SchemasListConverter;
 import org.schemaspy.input.dbms.config.PropertiesResolver;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Pattern;
@@ -98,6 +101,16 @@ public class DbmsConfigCli implements DbmsConfig {
     )
     private String databaseType = "ora";
 
+    @Parameter(
+        names = {
+            "-schemas", "-schemata",
+            "schemaspy.schemas", "schemaspy.schemata"
+        },
+        descriptionKey = "schemas",
+        listConverter = SchemasListConverter.class
+    )
+    private List<String> schemas = Collections.emptyList();
+
     private final PropertiesResolver propertiesResolver;
     private Properties databaseTypeProperties = null;
 
@@ -171,5 +184,10 @@ public class DbmsConfigCli implements DbmsConfig {
             databaseTypeProperties = propertiesResolver.getDbProperties(getDatabaseType());
         }
         return databaseTypeProperties;
+    }
+
+    @Override
+    public List<String> getSchemas() {
+        return schemas;
     }
 }

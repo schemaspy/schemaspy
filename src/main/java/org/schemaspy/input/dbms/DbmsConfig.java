@@ -1,5 +1,6 @@
 package org.schemaspy.input.dbms;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -16,4 +17,5 @@ public interface DbmsConfig {
     String getSchemaSpec();
     String getDatabaseType();
     Properties getDatabaseTypeProperties();
+    List<String> getSchemas();
 }
