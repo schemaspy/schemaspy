@@ -41,6 +41,7 @@
         <testcontainers-junit.version>1.10.1.0.0</testcontainers-junit.version>
 
         <java.version>1.8</java.version>
+        <skip.surefire>false</skip.surefire>
     </properties>
     <issueManagement>
         <url>https://github.com/schemaspy/schemaspy/issues</url>
@@ -472,6 +473,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
+                <configuration>
+                    <skipTests>${skip.surefire}</skipTests>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
