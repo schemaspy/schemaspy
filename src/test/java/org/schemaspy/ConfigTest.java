@@ -74,4 +74,16 @@ public class ConfigTest {
         assertThat(config.isExportedKeysEnabled()).isFalse();
     }
 
+    @Test
+    public void schemasWithSingleQuotes() {
+        Config config = new Config("-schemas", "'a 1','a 2'");
+        assertThat(config.getSchemas()).containsExactlyInAnyOrder("'a 1'", "'a 2'");
+    }
+
+    @Test
+    public void schemasWithSpaces() {
+        Config config = new Config("-schemas", "a 1,a 2");
+        assertThat(config.getSchemas()).containsExactlyInAnyOrder("a 1", "a 2");
+    }
+
 }

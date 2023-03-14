@@ -62,7 +62,7 @@ Processing
 [-s schema]
     Database schema. This is optional if it's the same as user or isn't supported by your database.
 [-schemas listOfSchemas]
-    List of schemas to analyze, separated by space or ``,`` or ``'`` or ``"``
+    List of schemas to analyze, separated by ``,``
 [-all]
     Try to analyze all schemas in database, schemas can be excluded with ``-schemSpec`` which as defaults set by databaseType
 [-schemaspec schemaRegEx]

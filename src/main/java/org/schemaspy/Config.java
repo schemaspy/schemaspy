@@ -388,7 +388,7 @@ public final class Config {
             if (tmp != null) {
                 schemas = new ArrayList<>();
 
-                for (String name : tmp.split("[\\s,'\"]")) {
+                for (String name : tmp.split(",")) {
                     if (name.length() > 0)
                         schemas.add(name);
                 }
