@@ -211,7 +211,7 @@ public class SchemaAnalyzer {
             }
             return db;
         } catch (MissingRequiredParameterException missingParam) {
-            config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
+            config.dumpUsage(missingParam.getMessage());
             return null;
         }
     }
@@ -332,7 +332,7 @@ public class SchemaAnalyzer {
 
             return db;
         } catch (MissingRequiredParameterException missingParam) {
-            config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
+            config.dumpUsage(missingParam.getMessage());
             return null;
         }
     }
