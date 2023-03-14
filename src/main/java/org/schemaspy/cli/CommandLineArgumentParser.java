@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,7 +65,7 @@ public class CommandLineArgumentParser {
         this.arguments = commandLineArguments;
         jCommander = JCommander.newBuilder()
                 .acceptUnknownOptions(true)
-                .programName("java -jar " + Config.getLoadedFromJar())
+                .programName("java -jar \"" + Paths.get("").toAbsolutePath().relativize(new SchemaSpyJarFile().path()) + "\"")
                 .columnSize(120)
                 .defaultProvider(defaultProvider)
                 .build();

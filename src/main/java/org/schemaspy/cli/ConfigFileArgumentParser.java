@@ -19,9 +19,9 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.JCommander;
-import org.schemaspy.Config;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -36,7 +36,7 @@ public class ConfigFileArgumentParser {
 
         JCommander jCommander = JCommander.newBuilder()
                 .acceptUnknownOptions(true)
-                .programName("java -jar " + Config.getLoadedFromJar())
+                .programName("java -jar \"" + Paths.get("").toAbsolutePath().relativize(new SchemaSpyJarFile().path()) + "\"")
                 .columnSize(120)
                 .build();
 
