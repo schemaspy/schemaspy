@@ -18,4 +18,5 @@ public interface DbmsConfig {
     String getDatabaseType();
     Properties getDatabaseTypeProperties();
     List<String> getSchemas();
+    int getMaxDbThreads();
 }
