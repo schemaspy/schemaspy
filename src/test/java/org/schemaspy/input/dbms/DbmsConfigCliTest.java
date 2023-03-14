@@ -227,6 +227,36 @@ class DbmsConfigCliTest {
             .isEmpty();
     }
 
+    @Test
+    void getMaxDbThreads() {
+        assertThat(
+            parse("-dbThreads", "5")
+                .getMaxDbThreads()
+        )
+            .isEqualTo(5);
+    }
+
+    @Test
+    void getMaxDbThreadsFromDatabaseType() {
+        Properties properties = new Properties();
+        properties.put("dbThreads", "12");
+        assertThat(
+            parse(properties, "-t", "myType")
+                .getMaxDbThreads()
+        )
+            .isEqualTo(12);
+    }
+
+    @Test
+    void getMaxDbThreadsDefault() {
+        int expected = Math.min(Runtime.getRuntime().availableProcessors(), 15);
+        assertThat(
+            parse()
+                .getMaxDbThreads()
+        )
+            .isEqualTo(expected);
+    }
+
     private DbmsConfig parse(String...args) {
         return parse(new Properties(), args);
     }

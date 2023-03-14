@@ -111,6 +111,15 @@ public class DbmsConfigCli implements DbmsConfig {
     )
     private List<String> schemas = Collections.emptyList();
 
+    @Parameter(
+        names = {
+            "-dbThreads", "-dbthreads", "--db-threads",
+            "schemaspy.dbthreads", "schemaspy.dbThreads", "schemaspy.db-threads"
+        },
+        descriptionKey = "maxdbthreads"
+    )
+    private int maxDbThreads = 0;
+
     private final PropertiesResolver propertiesResolver;
     private Properties databaseTypeProperties = null;
 
@@ -189,5 +198,18 @@ public class DbmsConfigCli implements DbmsConfig {
     @Override
     public List<String> getSchemas() {
         return schemas;
+    }
+
+    @Override
+    public int getMaxDbThreads() {
+        if (maxDbThreads != 0) {
+            return maxDbThreads;
+        } else if (getDatabaseTypeProperties().containsKey("dbThreads")) {
+            return Integer.parseInt(getDatabaseTypeProperties().getProperty("dbThreads"));
+        } else if (getDatabaseTypeProperties().containsKey("dbthreads")) {
+            return Integer.parseInt(getDatabaseTypeProperties().getProperty("dbthreads"));
+        } else {
+            return Math.min(Runtime.getRuntime().availableProcessors(), 15);
+        }
     }
 }
