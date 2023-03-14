@@ -126,7 +126,7 @@ public class ConnectionURLBuilder {
                 param = getHostOptionalPort();
             }
             if (param == null)
-                throw new Config.MissingRequiredParameterException(option.getName(), option.getDescription(), true);
+                throw new MissingRequiredParameterException(option.getName(), option.getDescription(), true);
         } else {
             args.remove(paramIndex);
             param = args.get(paramIndex);
@@ -139,7 +139,7 @@ public class ConnectionURLBuilder {
     private String getHostOptionalPort() {
         String hostOptionalPort = config.getHost();
         if (hostOptionalPort == null) {
-            throw new Config.MissingRequiredParameterException("host", "host of database, may contain port", true);
+            throw new MissingRequiredParameterException("host", "host of database, may contain port", true);
         }
         String hostPortSeparator = dbType.getProperty("hostPortSeparator", ":");
         Integer port = config.getPort();
