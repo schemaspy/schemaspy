@@ -209,6 +209,24 @@ class DbmsConfigCliTest {
             .isEqualTo("ora");
     }
 
+    @Test
+    void getSchemas() {
+        assertThat(
+            parse("-schemas", "a 1,b 2")
+                .getSchemas()
+        )
+            .containsExactlyInAnyOrder("a 1","b 2");
+    }
+
+    @Test
+    void getSchemasDefault() {
+        assertThat(
+            parse()
+                .getSchemas()
+        )
+            .isEmpty();
+    }
+
     private DbmsConfig parse(String...args) {
         return parse(new Properties(), args);
     }
