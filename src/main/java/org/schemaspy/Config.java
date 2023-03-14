@@ -514,21 +514,8 @@ public final class Config {
      * @return the value for paramId
      */
     private String pullParam(String paramId) {
-        return pullParam(paramId, false, false);
-    }
-
-    /**
-     * @param paramId argument name to fetch
-     * @param required if argument must be specified
-     * @param dbTypeSpecific if argument is database type specific
-     * @return value for argument
-     * @throws MissingRequiredParameterException if argument is required and not specified
-     */
-    private String pullParam(String paramId, boolean required, boolean dbTypeSpecific) {
         int paramIndex = options.indexOf(paramId);
         if (paramIndex < 0) {
-            if (required)
-                throw new MissingRequiredParameterException(paramId, dbTypeSpecific);
             return null;
         }
         options.remove(paramIndex);
