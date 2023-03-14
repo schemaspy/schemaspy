@@ -36,7 +36,7 @@ public class ConfigIT {
         outputCapture.expect(Matchers.containsString("MySQL"));
         outputCapture.expect(Matchers.not(Matchers.containsString("Microsoft SQL Server")));
         Config config = new Config("-t", "mysql");
-        config.dumpUsage("Test", true);
+        config.dumpUsage("Test");
     }
 
 }

@@ -5,17 +5,11 @@ package org.schemaspy.input.dbms;
  */
 public class MissingRequiredParameterException extends RuntimeException {
     private static final long serialVersionUID = 1L;
-    private final boolean dbTypeSpecific;
 
-    public MissingRequiredParameterException(String paramId, String description, boolean dbTypeSpecific) {
+    public MissingRequiredParameterException(String paramId, String description) {
         super("Required parameter '" + paramId + "' " +
             (description == null ? "" : "(" + description + ") ") +
             "was not specified." +
-            (dbTypeSpecific ? "  It is required for this database type." : ""));
-        this.dbTypeSpecific = dbTypeSpecific;
-    }
-
-    public boolean isDbTypeSpecific() {
-        return dbTypeSpecific;
+            "  It is required for this database type.");
     }
 }

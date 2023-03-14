@@ -647,7 +647,7 @@ public final class Config {
      * @param detailedDb
      */
     @Deprecated
-    void dumpUsage(String errorMessage, boolean detailedDb) {
+    void dumpUsage(String errorMessage) {
 
         if (errorMessage != null) {
             LOGGER.error("*** {} ***", errorMessage );
@@ -655,31 +655,11 @@ public final class Config {
             LOGGER.info("SchemaSpy generates an HTML representation of a database schema's relationships.");
         }
 
+        LOGGER.info("Missing required connection parameters for '{}'", getDbProperties().getProperty("dbms"));
+        new DbSpecificConfig(getDbType(), getDbProperties()).dumpUsage();
 
-        if (!detailedDb) {
-            LOGGER.info("Usage:");
-            LOGGER.info(" java -jar {} [options]", getLoadedFromJar());
-            LOGGER.info("   -t databaseType       type of database - defaults to ora");
-            LOGGER.info("                           use -dbhelp for a list of built-in types");
-            LOGGER.info("   -u user               connect to the database with this user id");
-            LOGGER.info("   -s schema             defaults to the specified user");
-            LOGGER.info("   -p password           defaults to no password");
-            LOGGER.info("   -o outputDirectory    directory to place the generated output in");
-            LOGGER.info("   -dp pathToDrivers     optional - looks for JDBC drivers here before looking");
-            LOGGER.info("                           in driverPath in [databaseType].properties.");
-            LOGGER.info("Go to http://schemaspy.org for a complete list/description");
-            LOGGER.info(" of additional parameters.");
-        }
-
-        if (detailedDb) {
-            LOGGER.info("Missing required connection parameters for '{}'", getDbProperties().getProperty("dbms"));
-            new DbSpecificConfig(getDbType(), getDbProperties()).dumpUsage();
-        }
-
-        if (detailedDb) {
-            LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
-            LOGGER.info("Grab one out of {} and modify it to suit your needs.", getLoadedFromJar());
-        }
+        LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
+        LOGGER.info("Grab one out of {} and modify it to suit your needs.", getLoadedFromJar());
 
         LOGGER.info("Sample usage using the default database type (implied -t ora):");
         LOGGER.info(" java -jar schemaSpy.jar -db mydb -s myschema -u devuser -p password -o output");
