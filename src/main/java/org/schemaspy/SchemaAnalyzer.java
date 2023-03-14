@@ -32,6 +32,7 @@ import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.CatalogResolver;
 import org.schemaspy.input.dbms.DbDriverLoader;
+import org.schemaspy.input.dbms.MissingRequiredParameterException;
 import org.schemaspy.input.dbms.SchemaResolver;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -209,7 +210,7 @@ public class SchemaAnalyzer {
                 );
             }
             return db;
-        } catch (Config.MissingRequiredParameterException missingParam) {
+        } catch (MissingRequiredParameterException missingParam) {
             config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
             return null;
         }
@@ -330,7 +331,7 @@ public class SchemaAnalyzer {
             }
 
             return db;
-        } catch (Config.MissingRequiredParameterException missingParam) {
+        } catch (MissingRequiredParameterException missingParam) {
             config.dumpUsage(missingParam.getMessage(), missingParam.isDbTypeSpecific());
             return null;
         }
