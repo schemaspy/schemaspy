@@ -48,19 +48,28 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
     private static final int EXIT_CODE_CONNECTION_ERROR = 3;
     private static final int EXIT_CODE_CONFIG_ERROR = 4;
 
-    @Autowired
-    private SchemaAnalyzer analyzer;
+    private final SchemaAnalyzer analyzer;
 
-    @Autowired
-    private CommandLineArguments arguments;
+    private final CommandLineArguments arguments;
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
+    private final CommandLineArgumentParser commandLineArgumentParser;
 
-    @Autowired
-    private LoggingSystem loggingSystem;
+    private final LoggingSystem loggingSystem;
 
     private int exitCode = EXIT_CODE_OK;
+
+    @Autowired
+    public SchemaSpyRunner(
+        SchemaAnalyzer analyzer,
+        CommandLineArguments arguments,
+        CommandLineArgumentParser commandLineArgumentParser,
+        LoggingSystem loggingSystem
+    ) {
+        this.analyzer = analyzer;
+        this.arguments = arguments;
+        this.commandLineArgumentParser = commandLineArgumentParser;
+        this.loggingSystem = loggingSystem;
+    }
 
     public void run(String... args) {
         try {
