@@ -47,8 +47,8 @@ public class MustacheCompilerTest {
     public static void setup() {
         CommandLineArguments arguments = parse("-template", "mustache");
         DataTableConfig dataTableConfig = new DataTableConfig(arguments);
-        mustacheCompilerSingle = new MustacheCompiler("testingSingle", arguments.getHtmlConfig(), false, dataTableConfig);
-        mustacheCompilerMulti = new MustacheCompiler("testingMulti", arguments.getHtmlConfig(), true, dataTableConfig);
+        mustacheCompilerSingle = new MustacheCompiler("testingSingle", "testingSingle", arguments.getHtmlConfig(), false, dataTableConfig);
+        mustacheCompilerMulti = new MustacheCompiler("testingMulti", null, arguments.getHtmlConfig(), true, dataTableConfig);
     }
 
     private static CommandLineArguments parse(String...args) {
@@ -121,13 +121,13 @@ public class MustacheCompilerTest {
         Path overridePath = Paths.get("target","override.html");
         CommandLineArguments arguments = parse("-template", "target");
         DataTableConfig dataTableConfig = new DataTableConfig(arguments);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("Override", arguments.getHtmlConfig(), false, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("Override", "Override", arguments.getHtmlConfig(), false, dataTableConfig);
         Files.deleteIfExists(overridePath);
         String before = write(mustacheCompiler);
         assertThat(before).isEqualTo("normal");
         Files.write(overridePath, "custom".getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         //Create new MustacheCompiler this is to evict cache, else the already processed override.html will be used
-        mustacheCompiler = new MustacheCompiler("Override", arguments.getHtmlConfig(), false, dataTableConfig);
+        mustacheCompiler = new MustacheCompiler("Override", "Override", arguments.getHtmlConfig(), false, dataTableConfig);
         String after = write(mustacheCompiler);
         assertThat(after).isEqualTo("custom");
     }

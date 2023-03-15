@@ -39,7 +39,7 @@ public class HtmlTablePageTest {
     public void noRowsFalse_showNoRows() {
         CommandLineArguments arguments = parse("");
         DataTableConfig dataTableConfig = new DataTableConfig(arguments);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", arguments.getHtmlConfig(), false, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", "table_noRowsFalse", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
 
@@ -56,7 +56,7 @@ public class HtmlTablePageTest {
     public void noRowsTrue_hideNoRows() {
         CommandLineArguments arguments = parse("-norows");
         DataTableConfig dataTableConfig = new DataTableConfig(arguments);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", arguments.getHtmlConfig(), false, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("table_noRowsFalse", "table_noRowsFalse", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, null);
         StringWriter writer = new StringWriter();
 

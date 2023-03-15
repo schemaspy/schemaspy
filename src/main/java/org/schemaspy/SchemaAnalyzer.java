@@ -194,6 +194,7 @@ public class SchemaAnalyzer {
             DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
             MustacheCompiler mustacheCompiler = new MustacheCompiler(
                 config.getDb(),
+                null,
                 commandLineArguments.getHtmlConfig(),
                 true,
                 dataTableConfig
@@ -286,6 +287,7 @@ public class SchemaAnalyzer {
             long duration = progressListener.startedGraphingSummaries();
             if (commandLineArguments.isHtmlEnabled()) {
                 generateHtmlDoc(
+                        schema,
                         config,
                         isOneOfMultipleSchemas,
                         commandLineArguments.useVizJS(),
@@ -336,6 +338,7 @@ public class SchemaAnalyzer {
     }
 
     private void generateHtmlDoc(
+            String schema,
             Config config,
             boolean isOneOfMultipleSchemas,
             boolean useVizJS,
@@ -407,6 +410,7 @@ public class SchemaAnalyzer {
         DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
         MustacheCompiler mustacheCompiler = new MustacheCompiler(
             db.getName(),
+            schema,
             commandLineArguments.getHtmlConfig(),
             isOneOfMultipleSchemas,
             dataTableConfig
