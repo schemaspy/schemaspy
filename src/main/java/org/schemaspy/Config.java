@@ -36,7 +36,10 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,9 +50,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
@@ -73,8 +73,6 @@ import java.util.stream.Stream;
  */
 @Deprecated
 public final class Config {
-
-    private static final Pattern DBTYPE_PATTERN = Pattern.compile(".*org/schemaspy/types/(.*)\\.properties");
 
     private static Config instance;
     private final List<String> options;
@@ -615,24 +613,6 @@ public final class Config {
 
             populating = false;
         }
-    }
-
-    public static Set<String> getBuiltInDatabaseTypes(String loadedFromJar) {
-        Set<String> databaseTypes = new TreeSet<>();
-        try (JarInputStream jar = new JarInputStream(new FileInputStream(loadedFromJar))){
-            JarEntry entry;
-
-            while ((entry = jar.getNextJarEntry()) != null) { //NOSONAR
-                Matcher dbTypeMatcher = DBTYPE_PATTERN.matcher(entry.getName());
-                if (dbTypeMatcher.find()) {
-                    databaseTypes.add(dbTypeMatcher.group(1));
-                }
-            }
-        } catch (IOException exc) {
-            LOGGER.error("Failed to read bundled DatabaseTypes", exc);
-        }
-
-        return databaseTypes;
     }
 
     /**
