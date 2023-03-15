@@ -86,7 +86,7 @@ public class ConnectionURLBuilder {
     }
 
     public String build() {
-        List<String> args = getArgs();
+        List<String> args = new ArrayList<>();
         args.addAll(config.getRemainingParameters());
 
         String connectionURL = dbType.getProperty("connectionSpec");
@@ -102,16 +102,6 @@ public class ConnectionURLBuilder {
         LOGGER.trace("connectionURL: {}", connectionURL);
 
         return connectionURL;
-    }
-
-    private List<String> getArgs() {
-        List<String> args = new ArrayList<>();
-
-        for (String key : config.getDbSpecificOptions().keySet()) {
-            args.add((key.startsWith("-") ? "" : "-") + key);
-            args.add(config.getDbSpecificOptions().get(key));
-        }
-        return args;
     }
 
     private String getParam(List<String> args, DbSpecificOption option) {
