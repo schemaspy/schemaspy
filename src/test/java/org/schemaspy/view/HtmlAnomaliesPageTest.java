@@ -50,7 +50,7 @@ public class HtmlAnomaliesPageTest {
         .parse("-o", "out", "-sso");
 
     private static DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
-    private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", commandLineArguments.getHtmlConfig(), false, dataTableConfig);
+    private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", "anomalies", commandLineArguments.getHtmlConfig(), false, dataTableConfig);
     private static HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
 
     @Test

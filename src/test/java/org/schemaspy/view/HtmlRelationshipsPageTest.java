@@ -38,7 +38,7 @@ public class HtmlRelationshipsPageTest {
     public void willWriteErrorInformation() {
         CommandLineArguments arguments = parse("");
         DataTableConfig dataTableConfig = new DataTableConfig(arguments);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", arguments.getHtmlConfig(), false, dataTableConfig);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", "htmlTablePage_error", arguments.getHtmlConfig(), false, dataTableConfig);
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler,  true,false);
         StringWriter writer = new StringWriter();
         MustacheSummaryDiagramResults mustacheSummaryDiagramResults = new MustacheSummaryDiagramResults(Collections.emptyList(), Collections.singletonList(new OutputException("ERROR")));

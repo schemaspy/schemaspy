@@ -48,13 +48,15 @@ import java.util.stream.IntStream;
 public class MustacheCompiler {
 
     private final String databaseName;
+    private final String schemaName;
     private final HtmlConfig htmlConfig;
     private final boolean multiSchema;
     private final DataTableConfig dataTableConfig;
     private final MustacheFactory mustacheFactory;
 
-    public MustacheCompiler(String databaseName, HtmlConfig htmlConfig, boolean multiSchema, DataTableConfig dataTableConfig) {
+    public MustacheCompiler(String databaseName, String schemaName, HtmlConfig htmlConfig, boolean multiSchema, DataTableConfig dataTableConfig) {
         this.databaseName = databaseName;
+        this.schemaName = schemaName;
         this.htmlConfig = htmlConfig;
         this.multiSchema = multiSchema;
         this.dataTableConfig = dataTableConfig;
@@ -67,6 +69,7 @@ public class MustacheCompiler {
         HashMap<String, Object> pageScope = new HashMap<>();
         pageScope.put("toFileName", (Function<String,String>) s -> new FileNameGenerator(s).value());
         pageScope.put("databaseName", databaseName);
+        pageScope.put("schemaName", schemaName);
         pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());
         pageScope.put("displayNumRows", htmlConfig.isNumRowsEnabled());
         pageScope.put("dataTableConfig", dataTableConfig.getPageScopeMap());
