@@ -32,7 +32,6 @@ import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.CatalogResolver;
 import org.schemaspy.input.dbms.DbDriverLoader;
-import org.schemaspy.input.dbms.MissingRequiredParameterException;
 import org.schemaspy.input.dbms.SchemaResolver;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -150,70 +149,65 @@ public class SchemaAnalyzer {
             DatabaseService databaseService,
             ProgressListener progressListener
     ) throws SQLException, IOException {
-        try {
-            List<String> schemas = config.getSchemas();
-            Database db = null;
+        List<String> schemas = config.getSchemas();
+        Database db = null;
 
-            Connection connection = new DbDriverLoader().getConnection(commandLineArguments, config);
-            DatabaseMetaData meta = connection.getMetaData();
-            if (schemas == null) {
-                String schemaSpec = config.getSchemaSpec();
-                LOGGER.info(
-                        "Analyzing schemas that match regular expression '{}'. " +
-                        "(use -schemaSpec on command line or in .properties to exclude other schemas)",
-                        schemaSpec);
-                schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false);
-                if (schemas.isEmpty())
-                    schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
-                if (schemas.isEmpty())
-                    schemas.add(commandLineArguments.getUser());
-            }
-
-            LOGGER.info("Analyzing schemas: {}{}",
-                    System.lineSeparator(),
-                    schemas.stream().map(s -> String.format("'%s'", s)).collect(Collectors.joining(System.lineSeparator())));
-
-            File outputDir = commandLineArguments.getOutputDirectory();
-
-            List<MustacheSchema> mustacheSchemas = new ArrayList<>();
-            MustacheCatalog mustacheCatalog = null;
-            for (String schema : schemas) {
-                String dbName = Objects.nonNull(config.getDb()) ? config.getDb() : schema;
-
-                LOGGER.info("Analyzing '{}'", schema);
-                File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
-                db = this.analyze(dbName, schema, true, config, outputDirForSchema, databaseService, progressListener);
-                if (db == null) //if any of analysed schema returns null
-                    return null;
-                mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
-                mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
-            }
-
-            new Jar(layoutFolder.url(), outputDir, notHtml()).copyJarResourceToPath();
-
-            DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
-            MustacheCompiler mustacheCompiler = new MustacheCompiler(
-                config.getDb(),
-                null,
-                commandLineArguments.getHtmlConfig(),
-                true,
-                dataTableConfig
-            );
-            HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
-            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
-                htmlMultipleSchemasIndexPage.write(
-                    mustacheCatalog,
-                    mustacheSchemas,
-                    commandLineArguments.getHtmlConfig().getDescription(),
-                    getDatabaseProduct(meta),
-                    writer
-                );
-            }
-            return db;
-        } catch (MissingRequiredParameterException missingParam) {
-            config.dumpUsage(missingParam.getMessage());
-            return null;
+        Connection connection = new DbDriverLoader().getConnection(commandLineArguments, config);
+        DatabaseMetaData meta = connection.getMetaData();
+        if (schemas == null) {
+            String schemaSpec = config.getSchemaSpec();
+            LOGGER.info(
+                    "Analyzing schemas that match regular expression '{}'. " +
+                    "(use -schemaSpec on command line or in .properties to exclude other schemas)",
+                    schemaSpec);
+            schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false);
+            if (schemas.isEmpty())
+                schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
+            if (schemas.isEmpty())
+                schemas.add(commandLineArguments.getUser());
         }
+
+        LOGGER.info("Analyzing schemas: {}{}",
+                System.lineSeparator(),
+                schemas.stream().map(s -> String.format("'%s'", s)).collect(Collectors.joining(System.lineSeparator())));
+
+        File outputDir = commandLineArguments.getOutputDirectory();
+
+        List<MustacheSchema> mustacheSchemas = new ArrayList<>();
+        MustacheCatalog mustacheCatalog = null;
+        for (String schema : schemas) {
+            String dbName = Objects.nonNull(config.getDb()) ? config.getDb() : schema;
+
+            LOGGER.info("Analyzing '{}'", schema);
+            File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
+            db = this.analyze(dbName, schema, true, config, outputDirForSchema, databaseService, progressListener);
+            if (db == null) //if any of analysed schema returns null
+                return null;
+            mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
+            mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
+        }
+
+        new Jar(layoutFolder.url(), outputDir, notHtml()).copyJarResourceToPath();
+
+        DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler(
+            config.getDb(),
+            null,
+            commandLineArguments.getHtmlConfig(),
+            true,
+            dataTableConfig
+        );
+        HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
+            htmlMultipleSchemasIndexPage.write(
+                mustacheCatalog,
+                mustacheSchemas,
+                commandLineArguments.getHtmlConfig().getDescription(),
+                getDatabaseProduct(meta),
+                writer
+            );
+        }
+        return db;
     }
 
     /**
@@ -239,102 +233,97 @@ public class SchemaAnalyzer {
             DatabaseService databaseService,
             ProgressListener progressListener
     ) throws SQLException, IOException {
-        try {
-            LOGGER.info("Starting schema analysis");
+        LOGGER.info("Starting schema analysis");
 
-            FileUtils.forceMkdir(outputDir);
+        FileUtils.forceMkdir(outputDir);
 
-            String catalog = commandLineArguments.getCatalog();
+        String catalog = commandLineArguments.getCatalog();
 
-            DatabaseMetaData databaseMetaData = sqlService.connect(commandLineArguments, config);
-            DbmsMeta dbmsMeta = sqlService.getDbmsMeta();
+        DatabaseMetaData databaseMetaData = sqlService.connect(commandLineArguments, config);
+        DbmsMeta dbmsMeta = sqlService.getDbmsMeta();
 
-            LOGGER.debug("supportsSchemasInTableDefinitions: {}", databaseMetaData.supportsSchemasInTableDefinitions());
-            LOGGER.debug("supportsCatalogsInTableDefinitions: {}", databaseMetaData.supportsCatalogsInTableDefinitions());
+        LOGGER.debug("supportsSchemasInTableDefinitions: {}", databaseMetaData.supportsSchemasInTableDefinitions());
+        LOGGER.debug("supportsCatalogsInTableDefinitions: {}", databaseMetaData.supportsCatalogsInTableDefinitions());
 
-            // set default Catalog and Schema of the connection
-            catalog = new CatalogResolver(databaseMetaData).resolveCatalog(catalog);
-            schema = new SchemaResolver(databaseMetaData).resolveSchema(schema);
+        // set default Catalog and Schema of the connection
+        catalog = new CatalogResolver(databaseMetaData).resolveCatalog(catalog);
+        schema = new SchemaResolver(databaseMetaData).resolveSchema(schema);
 
-            SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, isOneOfMultipleSchemas);
-            if (commandLineArguments.isHtmlEnabled()) {
-                FileUtils.forceMkdir(new File(outputDir, "tables"));
-                FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
+        SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, isOneOfMultipleSchemas);
+        if (commandLineArguments.isHtmlEnabled()) {
+            FileUtils.forceMkdir(new File(outputDir, "tables"));
+            FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
-                LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
+            LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
 
-                if (schemaMeta != null && schemaMeta.getFile() != null) {
-                    LOGGER.info("Using additional metadata from {}", schemaMeta.getFile());
-                }
+            if (schemaMeta != null && schemaMeta.getFile() != null) {
+                LOGGER.info("Using additional metadata from {}", schemaMeta.getFile());
             }
-
-            //
-            // create our representation of the database
-            //
-            Database db = new Database(dbmsMeta, dbName, catalog, schema);
-            databaseService.gatherSchemaDetails(db, schemaMeta, progressListener);
-
-
-            Collection<Table> tables = new ArrayList<>(db.getTables());
-            tables.addAll(db.getViews());
-
-            if (tables.isEmpty()) {
-                dumpNoTablesMessage(schema, commandLineArguments.getUser(), databaseMetaData, config.getTableInclusions() != null);
-                if (!isOneOfMultipleSchemas) // don't bail if we're doing the whole enchilada
-                    throw new EmptySchemaException();
-            }
-
-            long duration = progressListener.startedGraphingSummaries();
-            if (commandLineArguments.isHtmlEnabled()) {
-                generateHtmlDoc(
-                        schema,
-                        config,
-                        isOneOfMultipleSchemas,
-                        commandLineArguments.useVizJS(),
-                        progressListener,
-                        outputDir,
-                        db,
-                        duration,
-                        tables
-                );
-            }
-
-            try {
-                outputProducer.generate(db, outputDir);
-            } catch (OutputException oe) {
-                if (isOneOfMultipleSchemas) {
-                    LOGGER.warn("Failed to produce output", oe);
-                } else {
-                    throw oe;
-                }
-            }
-
-            List<ForeignKeyConstraint> recursiveConstraints = new ArrayList<>();
-
-            // create an orderer to be able to determine insertion and deletion ordering of tables
-            TableOrderer orderer = new TableOrderer();
-
-            // side effect is that the RI relationships get trashed
-            // also populates the recursiveConstraints collection
-            List<Table> orderedTables = orderer.getTablesOrderedByRI(db.getTables(), recursiveConstraints);
-
-            new OrderingReport(outputDir, orderedTables).write();
-
-            duration = progressListener.finishedGatheringDetails();
-            long overallDuration = progressListener.finished(tables);
-
-            if (commandLineArguments.isHtmlEnabled()) {
-                LOGGER.info("Wrote table details in {} seconds", duration / SECONDS_IN_MS);
-
-                LOGGER.info("Wrote relationship details of {} tables/views to directory '{}' in {} seconds.", tables.size(), outputDir, overallDuration / SECONDS_IN_MS);
-                LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
-            }
-
-            return db;
-        } catch (MissingRequiredParameterException missingParam) {
-            config.dumpUsage(missingParam.getMessage());
-            return null;
         }
+
+        //
+        // create our representation of the database
+        //
+        Database db = new Database(dbmsMeta, dbName, catalog, schema);
+        databaseService.gatherSchemaDetails(db, schemaMeta, progressListener);
+
+
+        Collection<Table> tables = new ArrayList<>(db.getTables());
+        tables.addAll(db.getViews());
+
+        if (tables.isEmpty()) {
+            dumpNoTablesMessage(schema, commandLineArguments.getUser(), databaseMetaData, config.getTableInclusions() != null);
+            if (!isOneOfMultipleSchemas) // don't bail if we're doing the whole enchilada
+                throw new EmptySchemaException();
+        }
+
+        long duration = progressListener.startedGraphingSummaries();
+        if (commandLineArguments.isHtmlEnabled()) {
+            generateHtmlDoc(
+                    schema,
+                    config,
+                    isOneOfMultipleSchemas,
+                    commandLineArguments.useVizJS(),
+                    progressListener,
+                    outputDir,
+                    db,
+                    duration,
+                    tables
+            );
+        }
+
+        try {
+            outputProducer.generate(db, outputDir);
+        } catch (OutputException oe) {
+            if (isOneOfMultipleSchemas) {
+                LOGGER.warn("Failed to produce output", oe);
+            } else {
+                throw oe;
+            }
+        }
+
+        List<ForeignKeyConstraint> recursiveConstraints = new ArrayList<>();
+
+        // create an orderer to be able to determine insertion and deletion ordering of tables
+        TableOrderer orderer = new TableOrderer();
+
+        // side effect is that the RI relationships get trashed
+        // also populates the recursiveConstraints collection
+        List<Table> orderedTables = orderer.getTablesOrderedByRI(db.getTables(), recursiveConstraints);
+
+        new OrderingReport(outputDir, orderedTables).write();
+
+        duration = progressListener.finishedGatheringDetails();
+        long overallDuration = progressListener.finished(tables);
+
+        if (commandLineArguments.isHtmlEnabled()) {
+            LOGGER.info("Wrote table details in {} seconds", duration / SECONDS_IN_MS);
+
+            LOGGER.info("Wrote relationship details of {} tables/views to directory '{}' in {} seconds.", tables.size(), outputDir, overallDuration / SECONDS_IN_MS);
+            LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
+        }
+
+        return db;
     }
 
     private void generateHtmlDoc(
