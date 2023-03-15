@@ -175,10 +175,6 @@ public final class Config {
         return dbType;
     }
 
-    public void setDb(String db) {
-        this.db = db;
-    }
-
     /**
      * @return Name of database as supplied with -db or set during multi schema analysis
      */

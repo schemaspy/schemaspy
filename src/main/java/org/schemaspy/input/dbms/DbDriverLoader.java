@@ -71,9 +71,6 @@ public class DbDriverLoader {
     public Connection getConnection(ConnectionURLBuilder urlBuilder, CommandLineArguments commandLineArguments, Config config) throws IOException {
         Properties properties = config.getDbProperties();
 
-        if (Objects.isNull(config.getDb()))
-            config.setDb(urlBuilder.build());
-
         String[] driverClass = properties.getProperty("driver").split(",");
         String driverPath = commandLineArguments.getDriverPath();
         

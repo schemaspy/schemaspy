@@ -134,6 +134,7 @@ public class SchemaAnalyzer {
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
             return analyze(
+                    config.getDb(),
                     schema,
                     false,
                     config,
@@ -172,18 +173,16 @@ public class SchemaAnalyzer {
                     System.lineSeparator(),
                     schemas.stream().map(s -> String.format("'%s'", s)).collect(Collectors.joining(System.lineSeparator())));
 
-            String dbName = config.getDb();
             File outputDir = commandLineArguments.getOutputDirectory();
 
             List<MustacheSchema> mustacheSchemas = new ArrayList<>();
             MustacheCatalog mustacheCatalog = null;
             for (String schema : schemas) {
-                if (dbName == null)
-                    config.setDb(schema);
+                String dbName = Objects.nonNull(config.getDb()) ? config.getDb() : schema;
 
                 LOGGER.info("Analyzing '{}'", schema);
                 File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
-                db = this.analyze(schema, true, config, outputDirForSchema, databaseService, progressListener);
+                db = this.analyze(dbName, schema, true, config, outputDirForSchema, databaseService, progressListener);
                 if (db == null) //if any of analysed schema returns null
                     return null;
                 mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
@@ -194,7 +193,7 @@ public class SchemaAnalyzer {
 
             DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
             MustacheCompiler mustacheCompiler = new MustacheCompiler(
-                dbName,
+                config.getDb(),
                 commandLineArguments.getHtmlConfig(),
                 true,
                 dataTableConfig
@@ -231,6 +230,7 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze(
+            String dbName,
             String schema,
             boolean isOneOfMultipleSchemas,
             Config config,
@@ -242,8 +242,6 @@ public class SchemaAnalyzer {
             LOGGER.info("Starting schema analysis");
 
             FileUtils.forceMkdir(outputDir);
-
-            String dbName = config.getDb();
 
             String catalog = commandLineArguments.getCatalog();
 
