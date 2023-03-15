@@ -21,7 +21,7 @@ package org.schemaspy.cli;
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.Config;
 import org.schemaspy.SchemaAnalyzer;
-import org.schemaspy.input.dbms.MissingRequiredParameterException;
+import org.schemaspy.input.dbms.MissingParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
@@ -127,7 +127,7 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
             } else {
                 LOGGER.error("Bad config", badConfig);
             }
-        } catch (MissingRequiredParameterException mrpe) {
+        } catch (MissingParameterException mrpe) {
             exitCode = EXIT_CODE_MISSING_PARAMETER;
             LOGGER.error("*** {} ***", mrpe.getMessage());
             LOGGER.info("Missing required connection parameters for '-t {}'", Config.getInstance().getDbType());
