@@ -2,7 +2,6 @@ package org.schemaspy.input.dbms;
 
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public interface DbmsConfig {
@@ -20,5 +19,4 @@ public interface DbmsConfig {
     Properties getDatabaseTypeProperties();
     List<String> getSchemas();
     int getMaxDbThreads();
-    Set<String> getBuiltInDatabaseTypes();
 }

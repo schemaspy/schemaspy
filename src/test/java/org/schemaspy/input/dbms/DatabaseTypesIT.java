@@ -1,18 +1,15 @@
 package org.schemaspy.input.dbms;
 
 import org.junit.jupiter.api.Test;
-import org.schemaspy.cli.NoRowsConfigCli;
-
-import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DbmsConfigCliIT {
+class DatabaseTypesIT {
 
     @Test
-    void getBuiltInDatabaseTypes() {
+    void getBuildIn() {
         assertThat(
-            new DbmsConfigCli(new NoRowsConfigCli(), (name) -> new Properties())
+            new DatabaseTypes()
                 .getBuiltInDatabaseTypes()
         )
             .contains("mysql");
