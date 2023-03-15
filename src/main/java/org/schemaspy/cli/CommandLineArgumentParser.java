@@ -24,7 +24,7 @@ import com.beust.jcommander.IDefaultProvider;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.ParameterException;
-import org.schemaspy.Config;
+import org.schemaspy.input.dbms.DatabaseTypes;
 import org.schemaspy.input.dbms.config.PropertiesResolver;
 import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.util.DbSpecificConfig;
@@ -162,11 +162,9 @@ public class CommandLineArgumentParser {
      * <p>
      */
     public void printDatabaseTypesHelp() {
-        String schemaspyJarFileName = Config.getLoadedFromJar();
-
         LOGGER.info("Built-in database types and their required connection parameters:");
         TreeMap<String, List<DbSpecificConfig>> builtIns = new TreeMap<>();
-        for (String type : Config.getBuiltInDatabaseTypes(schemaspyJarFileName)) {
+        for (String type : new DatabaseTypes().getBuiltInDatabaseTypes()) {
             Properties props = propertiesResolver.getDbProperties(type);
             String dbms = props.getProperty("dbms");
             builtIns.putIfAbsent(dbms, new ArrayList<>());
@@ -177,7 +175,7 @@ public class CommandLineArgumentParser {
             types.forEach(DbSpecificConfig::dumpUsage);
         });
         LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
-        LOGGER.info("Grab one out of {} and modify it to suit your needs.", schemaspyJarFileName);
+        LOGGER.info("Grab one out of {} and modify it to suit your needs.", new SchemaSpyJarFile().path());
     }
 
     public void printLicense() {
