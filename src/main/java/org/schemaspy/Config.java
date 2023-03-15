@@ -36,16 +36,11 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -415,32 +410,6 @@ public final class Config {
             }
         }
         return schemaSpec;
-    }
-
-    /**
-     * Returns the jar that we were loaded from
-     *
-     * @return jar that we have been started from
-     */
-    public static String getLoadedFromJar() {
-        String path = Config.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-        String loadedFrom = "";
-        try {
-            loadedFrom = URLDecoder.decode(path, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Could not decode path {}", path);
-        }
-
-        if (loadedFrom.contains("!/BOOT-INF")) {
-            try {
-                loadedFrom = new URL(loadedFrom).getFile();
-                loadedFrom = loadedFrom.substring(0, loadedFrom.indexOf('!'));
-            } catch (MalformedURLException e) {
-                String classpath = System.getProperty("java.class.path");
-                return new StringTokenizer(classpath, File.pathSeparator).nextToken();
-            }
-        }
-        return loadedFrom;
     }
 
     /**
