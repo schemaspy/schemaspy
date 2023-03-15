@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.Config;
 import org.schemaspy.SchemaAnalyzer;
-import org.schemaspy.input.dbms.MissingRequiredParameterException;
+import org.schemaspy.input.dbms.MissingParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
@@ -99,7 +99,7 @@ public class SchemaSpyRunnerTest {
     public void exitCode_5_withLogging() throws IOException, SQLException {
         outputCapture.expect(Matchers.containsString("'-t mysql"));
         outputCapture.expect(Matchers.not(Matchers.containsString("'-t mssql")));
-        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new MissingRequiredParameterException("host", "Host is missing"));
+        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new MissingParameterException("host", "Host is missing"));
         schemaSpyRunner.run(args);
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(5);
     }
