@@ -493,16 +493,6 @@ public final class Config {
     }
 
     /**
-     * Options that are specific to a type of database.  E.g. things like <code>host</code>,
-     * <code>port</code> or <code>db</code>, but <b>don't</b> have a setter in this class.
-     */
-    public Map<String, String> getDbSpecificOptions() {
-        if (dbSpecificOptions == null)
-            dbSpecificOptions = new HashMap<>();
-        return dbSpecificOptions;
-    }
-
-    /**
      * 'Pull' the specified parameter from the collection of options. Returns
      * null if the parameter isn't in the list and removes it if it is.
      *
