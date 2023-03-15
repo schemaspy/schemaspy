@@ -257,6 +257,15 @@ class DbmsConfigCliTest {
             .isEqualTo(expected);
     }
 
+    @Test
+    void getBuiltInDatabaseTypes() {
+        assertThat(
+            parse()
+                .getBuiltInDatabaseTypes()
+        )
+            .contains("mysql");
+    }
+
     private DbmsConfig parse(String...args) {
         return parse(new Properties(), args);
     }
