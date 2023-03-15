@@ -6,17 +6,12 @@ import org.schemaspy.cli.NoRowsConfigCli;
 import org.schemaspy.cli.PatternConverter;
 import org.schemaspy.cli.SchemasListConverter;
 import org.schemaspy.input.dbms.config.PropertiesResolver;
-import org.schemaspy.input.dbms.exceptions.RuntimeIOException;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Parameters(resourceBundle = "dbmsconfigcli")
 public class DbmsConfigCli implements DbmsConfig {
@@ -218,59 +213,4 @@ public class DbmsConfigCli implements DbmsConfig {
         }
     }
 
-    @Override
-    public Set<String> getBuiltInDatabaseTypes() {
-        Enumeration<URL> typesFolders = urlsForTypesFolders();
-        Set<String> dbTypes = new HashSet<>();
-        while (typesFolders.hasMoreElements()) {
-            URL typeFolder = typesFolders.nextElement();
-            Path typeFolderPath = asPath(typeFolder);
-            dbTypes.addAll(collectDbTypes(typeFolderPath));
-        }
-        return dbTypes;
-    }
-
-    private Enumeration<URL> urlsForTypesFolders() {
-        try {
-            return getClass().getClassLoader().getResources("org/schemaspy/types");
-        } catch (IOException e) {
-            throw new RuntimeIOException("Unable to retrieve urls for type folders", e);
-        }
-    }
-
-    private Path asPath(URL typeFolder) {
-        try {
-            if (typeFolder.getProtocol().equalsIgnoreCase("file")) {
-                return Paths.get(typeFolder.toURI());
-            }
-            ensureFileSystemExists(typeFolder);
-            URI uri = URI.create(typeFolder.toString().replace("classes!", "classes"));
-            return Paths.get(uri);
-
-        } catch (URISyntaxException | IOException e) {
-            throw new RuntimeIOException("Unable to create Path for '" + typeFolder + "'", e);
-        }
-    }
-
-    private void ensureFileSystemExists(URL url) throws URISyntaxException, IOException {
-        try {
-            FileSystems.getFileSystem(url.toURI());
-        } catch (FileSystemNotFoundException notFound) {
-            FileSystems.newFileSystem(url.toURI(), Collections.singletonMap("create", "false"));
-        }
-    }
-
-    private Set<String> collectDbTypes(Path typeFolderPath) {
-        try (Stream<Path> pathStream = Files.list(typeFolderPath)) {
-            return pathStream
-                .filter(Files::isRegularFile)
-                .map(Path::getFileName)
-                .map(Path::toString)
-                .filter(name -> name.matches(".*\\.properties$"))
-                .map(name -> name.replaceAll("\\.properties$", ""))
-                .collect(Collectors.toSet());
-        } catch (IOException e) {
-            throw new RuntimeIOException("Unable to retrieve dbtypes from '" + typeFolderPath + "'", e);
-        }
-    }
 }
