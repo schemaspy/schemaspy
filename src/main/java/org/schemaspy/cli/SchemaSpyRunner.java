@@ -21,9 +21,11 @@ package org.schemaspy.cli;
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.Config;
 import org.schemaspy.SchemaAnalyzer;
+import org.schemaspy.input.dbms.MissingRequiredParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.model.EmptySchemaException;
 import org.schemaspy.model.InvalidConfigurationException;
+import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,7 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
     private static final int EXIT_CODE_EMPTY_SCHEMA = 2;
     private static final int EXIT_CODE_CONNECTION_ERROR = 3;
     private static final int EXIT_CODE_CONFIG_ERROR = 4;
+    private static final int EXIT_CODE_MISSING_PARAMETER = 5;
 
     private final SchemaAnalyzer analyzer;
 
@@ -115,10 +118,20 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
             exitCode = EXIT_CODE_CONFIG_ERROR;
             LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
             if (badConfig.getParamName() != null) {
-                LOGGER.error("Bad parameter: '{} = {}'", badConfig.getParamName(), badConfig.getParamValue(), badConfig);
+                LOGGER.error(
+                    "Bad parameter: '{} = {}'",
+                    badConfig.getParamName(),
+                    badConfig.getParamValue(),
+                    badConfig
+                );
             } else {
                 LOGGER.error("Bad config", badConfig);
             }
+        } catch (MissingRequiredParameterException mrpe) {
+            exitCode = EXIT_CODE_MISSING_PARAMETER;
+            LOGGER.error("*** {} ***", mrpe.getMessage());
+            LOGGER.info("Missing required connection parameters for '-t {}'", Config.getInstance().getDbType());
+            new DbSpecificConfig(Config.getInstance().getDbType(), Config.getInstance().getDbProperties()).dumpUsage();
         } catch (SQLException e) {
             LOGGER.error("SqlException", e);
         } catch (IOException e) {
