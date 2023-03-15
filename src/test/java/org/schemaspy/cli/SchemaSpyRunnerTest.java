@@ -18,16 +18,20 @@
  */
 package org.schemaspy.cli;
 
+import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.Config;
 import org.schemaspy.SchemaAnalyzer;
+import org.schemaspy.input.dbms.MissingRequiredParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -42,6 +46,9 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SchemaSpyRunnerTest {
+
+    @Rule
+    public OutputCaptureRule outputCapture = new OutputCaptureRule();
 
     private static final String[] args = {
             "-t","mysql",
@@ -85,5 +92,15 @@ public class SchemaSpyRunnerTest {
         when(schemaAnalyzer.analyze(any(Config.class))).thenReturn(database);
         schemaSpyRunner.run(args);
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(0);
+    }
+
+    @Test
+    @DirtiesContext
+    public void exitCode_5_withLogging() throws IOException, SQLException {
+        outputCapture.expect(Matchers.containsString("'-t mysql"));
+        outputCapture.expect(Matchers.not(Matchers.containsString("'-t mssql")));
+        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new MissingRequiredParameterException("host", "Host is missing"));
+        schemaSpyRunner.run(args);
+        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(5);
     }
 }
