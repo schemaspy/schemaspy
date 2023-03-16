@@ -120,6 +120,15 @@ public class CommandLineArguments {
 
     @Parameter(
         names = {
+            "-rails",
+            "schemaspy.rails"
+        },
+        descriptionKey = "rails"
+    )
+    private boolean railsEnabled = false;
+
+    @Parameter(
+        names = {
             "-t", "--database-type",
             "schemaspy.t", "schemaspy.database-type"
         },
@@ -208,6 +217,25 @@ public class CommandLineArguments {
         descriptionKey = "catalog"
     )
     private String catalog;
+
+    @Parameter(
+        names = {
+            "-all",
+            "schemaspy.all"
+        },
+        descriptionKey = "all"
+    )
+    private boolean evaluateAllEnabled = false;
+
+    @Parameter(
+        names = {
+            "-schemas", "-schemata",
+            "schemaspy.schemas", "schemaspy.schemata"
+        },
+        descriptionKey = "schemas",
+        listConverter = SchemasListConverter.class
+    )
+    private List<String> schemas = Collections.emptyList();
 
     @Parameter(
         names = {
@@ -544,6 +572,10 @@ public class CommandLineArguments {
         return !noImplied;
     }
 
+    public boolean isRailsEnabled() {
+        return railsEnabled;
+    }
+
     public String getDatabaseType() {
         return databaseType;
     }
@@ -577,6 +609,14 @@ public class CommandLineArguments {
 
     public String getCatalog() {
         return catalog;
+    }
+
+    public boolean isEvaluateAllEnabled() {
+        return evaluateAllEnabled;
+    }
+
+    public List<String> getSchemas() {
+        return schemas;
     }
 
     public String getDriverPath() {
