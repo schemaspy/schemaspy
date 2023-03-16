@@ -29,6 +29,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -46,36 +47,12 @@ public class DbSpecificConfig {
     private static final Pattern OPTION_PATTER = Pattern.compile("<([a-zA-Z0-9.\\-_]+)>");
     private static final String DUMP_FORMAT = "      -%s   \t\t%s";
 
-    private String dbType;
-    private String description;
-    private final List<DbSpecificOption> options = new ArrayList<>();
+    private final String dbType;
+    private final Properties properties;
 
     public DbSpecificConfig(String dbType, Properties props) {
         this.dbType = dbType;
-        description = props.getProperty("description");
-        loadOptions(props);
-    }
-
-    /**
-     * Resolve the options specified by connectionSpec into {@link DbSpecificOption}s.
-     *
-     * @param properties
-     */
-    private void loadOptions(Properties properties) {
-        Set<String> optionsFound = findOptions(properties.getProperty("connectionSpec"));
-        optionsFound.stream().forEachOrdered(optionName -> {
-            String desc = properties.getProperty(optionName);
-            options.add(new DbSpecificOption(optionName, desc));
-        });
-    }
-
-    private static Set<String> findOptions(String connectionSpec) {
-        Set<String> optionsFound = new LinkedHashSet<>();
-        Matcher matcher = OPTION_PATTER.matcher(connectionSpec);
-        while(matcher.find()) {
-            optionsFound.add(matcher.group(1));
-        }
-        return optionsFound;
+        this.properties = props;
     }
 
     /**
@@ -85,23 +62,41 @@ public class DbSpecificConfig {
      * @return
      */
     public List<DbSpecificOption> getOptions() {
-        return options;
+        Set<String> optionsFound = findOptions(properties.getProperty("connectionSpec"));
+        return optionsFound
+            .stream()
+            .map(optionName ->
+                     new DbSpecificOption(
+                         optionName,
+                         properties.getProperty(optionName)
+                     )
+            )
+            .collect(Collectors.toList());
+    }
+
+    private static Set<String> findOptions(String connectionSpec) {
+        Set<String> optionsFound = new LinkedHashSet<>();
+        Matcher matcher = OPTION_PATTER.matcher(connectionSpec);
+        while (matcher.find()) {
+            optionsFound.add(matcher.group(1));
+        }
+        return optionsFound;
     }
 
     /**
      * Dump usage details associated with the associated type of database
      */
     public void dumpUsage() {
-        LOGGER.info("   {} (-t {})", description, dbType);
+        LOGGER.info("   {} (-t {})", this, dbType);
         getOptions().stream().flatMap(option -> {
             if ("hostOptionalPort".equals(option.getName())) {
                 return Stream.of(
-                        String.format(DUMP_FORMAT, "host", "host of database, may contain port"),
-                        String.format(DUMP_FORMAT, "port", "optional port if not default")
+                    String.format(DUMP_FORMAT, "host", "host of database, may contain port"),
+                    String.format(DUMP_FORMAT, "port", "optional port if not default")
                 );
             } else {
                 return Stream.of(
-                        String.format(DUMP_FORMAT, option.getName(), getDescription(option))
+                    String.format(DUMP_FORMAT, option.getName(), getDescription(option))
                 );
             }
         }).forEach(LOGGER::info);
@@ -116,6 +111,23 @@ public class DbSpecificConfig {
      */
     @Override
     public String toString() {
-        return description;
+        return properties.getProperty("description");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof DbSpecificConfig) {
+            DbSpecificConfig that = (DbSpecificConfig) o;
+            return dbType.equals(that.dbType) && properties.equals(that.properties);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dbType, properties);
     }
 }
