@@ -52,13 +52,13 @@ import static java.util.Optional.ofNullable;
  * @author Ismail Simsek
  * @author Thomas Traude
  * @author Nils Petzaell
- * @auther Daniel Watt
+ * @author Daniel Watt
  */
 public class SqlService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private DbmsService dbmsService = new DbmsService();
+    private final DbmsService dbmsService = new DbmsService();
 
     private Connection connection;
     private DatabaseMetaData databaseMetaData;
@@ -69,10 +69,10 @@ public class SqlService {
     public DatabaseMetaData connect(CommandLineArguments commandLineArguments, Config config) throws IOException, SQLException {
         DbDriverLoader driverLoader = new DbDriverLoader();
         connection = driverLoader.getConnection(commandLineArguments, config);
-        return connect(connection, config);
+        return connect(connection);
     }
 
-    public DatabaseMetaData connect(Connection connection, Config config) throws IOException, SQLException {
+    public DatabaseMetaData connect(Connection connection) throws SQLException {
         databaseMetaData = connection.getMetaData();
         dbmsMeta = dbmsService.fetchDbmsMeta(databaseMetaData);
         invalidIdentifierPattern = createInvalidIdentifierPattern(databaseMetaData);
@@ -213,7 +213,6 @@ public class SqlService {
      *
      * @param id
      * @return
-     * @throws SQLException
      */
     public String getQuotedIdentifier(String id) {
         // look for any character that isn't valid (then matcher.find() returns true)
