@@ -56,8 +56,8 @@
     </licenses>
     <scm>
         <url>https://github.com/schemaspy/schemaspy</url>
-        <connection>scm:git:git://github.com/schemaspy/schemaspy.git</connection>
-        <developerConnection>scm:git:git@github.com:schemaspy/schemaspy.git</developerConnection>
+        <connection>scm:git:https://github.com/schemaspy/schemaspy.git</connection>
+        <developerConnection>scm:git:https://github.com/schemaspy/schemaspy.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <developers>
