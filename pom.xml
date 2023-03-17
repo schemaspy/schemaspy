@@ -511,7 +511,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.0-M1</version>
+                <version>3.0.0-M7</version>
                 <configuration>
                     <arguments>-Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true</arguments>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
