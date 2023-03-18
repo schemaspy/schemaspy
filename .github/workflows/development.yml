@@ -61,10 +61,11 @@ jobs:
       - name: Create latest.json
         if: success()
         run: |
+          SCHEMASPY_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
           mkdir gh-pages
           cp .github/pages/* gh-pages/
-          cp target/schemaspy-*.jar gh-pages/
-          echo "{\"version\": \"$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)\", \"filename\": \"$(./mvnw help:evaluate -Dexpression=project.build.finalName -q -DforceStdout).jar\"}" >> gh-pages/latest.json
+          cp target/schemaspy-*-app.jar gh-pages/schemaspy-${SCHEMASPY_VERSION}.jar
+          echo "{\"version\": \"${SCHEMASPY_VERSION}\", \"filename\": \"schemaspy-${SCHEMASPY_VERSION}.jar\"}" >> gh-pages/latest.json
       - name: Deploy to gh-pages
         if: success()
         uses: crazy-max/ghaction-github-pages@c0d7ff0487ee0415efb7f32dab10ea880330b1dd
