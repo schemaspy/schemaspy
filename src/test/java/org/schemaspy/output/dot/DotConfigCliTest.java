@@ -1,11 +1,9 @@
 package org.schemaspy.output.dot;
 
+import com.beust.jcommander.JCommander;
 import org.junit.jupiter.api.Test;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
+import org.schemaspy.cli.NoRowsConfigCli;
+import org.schemaspy.cli.TemplateDirectoryConfigCli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +20,7 @@ class DotConfigCliTest {
 
     void fontDefault() {
         assertThat(
-            parse("")
+            parse()
                 .getFont()
         )
             .isEqualTo("Helvetica");
@@ -39,7 +37,7 @@ class DotConfigCliTest {
     @Test
     void fontSizeDefault() {
         assertThat(
-            parse("")
+            parse()
                 .getFontSize()
         ).isEqualTo(11);
     }
@@ -56,7 +54,7 @@ class DotConfigCliTest {
     @Test
     void isRankDirBugEnabledDefault() {
         assertThat(
-            parse("")
+            parse()
                 .isRankDirBugEnabled()
         )
             .isFalse();
@@ -74,7 +72,7 @@ class DotConfigCliTest {
     @Test
     void cssDefault() {
         assertThat(
-            parse("")
+            parse()
                 .getCss()
         )
             .isEqualTo("schemaSpy.css");
@@ -92,7 +90,7 @@ class DotConfigCliTest {
     @Test
     void getTemplateDirectoryDefault() {
         assertThat(
-            parse("")
+            parse()
                 .getTemplateDirectory()
         )
             .isEqualTo("layout");
@@ -109,7 +107,7 @@ class DotConfigCliTest {
     @Test
     void noRowsDefault() {
         assertThat(
-        parse("")
+        parse()
             .isNumRowsEnabled()
         ).isTrue();
     }
@@ -126,24 +124,21 @@ class DotConfigCliTest {
     @Test
     void maxDetailsDefault() {
         assertThat(
-            parse("")
+            parse()
                 .getMaxDetailedTables()
         )
             .isEqualTo(300);
     }
 
     private DotConfig parse(String... args) {
-        String[] defaultArgs = {"-o", "out", "-sso"};
-        return new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        )
-            .parse(
-                Stream
-                    .concat(
-                        Arrays.stream(defaultArgs),
-                        Arrays.stream(args)
-                    ).toArray(String[]::new))
-            .getDotConfig();
+        NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
+        TemplateDirectoryConfigCli templateDirectoryConfigCli = new TemplateDirectoryConfigCli();
+        DotConfigCli dotConfigCli = new DotConfigCli(noRowsConfigCli, templateDirectoryConfigCli);
+        JCommander jCommander = JCommander.newBuilder().build();
+        jCommander.addObject(noRowsConfigCli);
+        jCommander.addObject(templateDirectoryConfigCli);
+        jCommander.addObject(dotConfigCli);
+        jCommander.parse(args);
+        return dotConfigCli;
     }
 }
