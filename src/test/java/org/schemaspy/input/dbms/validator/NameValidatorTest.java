@@ -18,8 +18,8 @@
  */
 package org.schemaspy.input.dbms.validator;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.validator.NameValidator;
 
 import java.util.regex.Pattern;
@@ -29,35 +29,65 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Daniel Watt
  */
-public class NameValidatorTest {
+class NameValidatorTest {
 
-    private static final Pattern includeWithTable = Pattern.compile(".*table.*");
-    private static final Pattern exclude          = Pattern.compile("excl.+");
+    private NameValidator nameValidator;
 
-    NameValidator nameValidator;
-
-    @Before
+    @BeforeEach
     public void setup() {
-        nameValidator = new NameValidator("table", includeWithTable, exclude, new String[]{"TABLE"});
+        nameValidator = new NameValidator(
+            "table",
+            Pattern.compile(".*table.*"),
+            Pattern.compile("excl.+"),
+            new String[]{"TABLE"}
+        );
     }
 
     @Test
-    public void valid() {
-        assertThat(nameValidator.isValid("tablename","table")).isTrue();
+    void valid() {
+        assertThat(nameValidator.isValid("tablename", "table")).isTrue();
     }
 
     @Test
-    public void doesntMatchInclusion() {
-        assertThat(nameValidator.isValid("doesntContainWord","table")).isFalse();
+    void doesntMatchInclusion() {
+        assertThat(nameValidator.isValid("doesntContainWord", "table")).isFalse();
     }
 
     @Test
-    public void excluded() {
-        assertThat(nameValidator.isValid("exclude_table","table")).isFalse();
+    void excluded() {
+        assertThat(nameValidator.isValid("exclude_table", "table")).isFalse();
     }
 
     @Test
-    public void typeDoesntMatch() {
-        assertThat(nameValidator.isValid("tablename","view")).isFalse();
+    void typeDoesntMatch() {
+        assertThat(nameValidator.isValid("tablename", "view")).isFalse();
+    }
+
+    @Test
+    void defaultExcludesDollarSign() {
+        assertThat(
+            new NameValidator(
+                "table",
+                Pattern.compile(".*"),
+                Pattern.compile(".*\\$.*"),
+                new String[]{"TABLE"}
+            )
+                .isValid("abc$123", "TABLE")
+        )
+            .isFalse();
+    }
+
+    @Test
+    void overrideDefaultIncludesDollarSign() {
+        assertThat(
+            new NameValidator(
+                "table",
+                Pattern.compile(".*"),
+                Pattern.compile(""),
+                new String[]{"TABLE"}
+            )
+                .isValid("abc$123", "TABLE")
+        )
+            .isTrue();
     }
 }
