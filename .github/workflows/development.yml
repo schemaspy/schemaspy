@@ -32,7 +32,7 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: Build, Test, Sonar
+      - name: Build, Test, Sonar, Deploy
         run: >
           ./mvnw
           --batch-mode
@@ -43,6 +43,7 @@ jobs:
           -P sonar
           -Dsonar.host.url=https://sonarcloud.io
           verify
+          deploy:deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -57,11 +58,6 @@ jobs:
             !target/testout/**/fonts/
             !target/testout/**/*.js
           retention-days: 7
-      - name: Deploy to GitHub Packages
-        if: success()
-        run: ./mvnw deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create latest.json
         if: success()
         run: |
