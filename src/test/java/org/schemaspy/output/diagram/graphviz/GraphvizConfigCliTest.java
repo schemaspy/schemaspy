@@ -1,11 +1,7 @@
 package org.schemaspy.output.diagram.graphviz;
 
+import com.beust.jcommander.JCommander;
 import org.junit.jupiter.api.Test;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +36,7 @@ class GraphvizConfigCliTest {
     @Test
     void lowQualityDefault() {
         assertThat(
-            parse("")
+            parse()
                 .isLowQuality()
         ).isFalse();
     }
@@ -57,7 +53,7 @@ class GraphvizConfigCliTest {
     @Test
     void imageFormatDefault() {
         assertThat(
-            parse("")
+            parse()
                 .getImageFormat()
         )
             .isEqualTo("png");
@@ -65,18 +61,11 @@ class GraphvizConfigCliTest {
 
 
     private GraphvizConfig parse(String... args) {
-        String[] defaultArgs = {"-o", "out", "-sso"};
-        return new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        )
-            .parse(
-                Stream
-                    .concat(
-                        Arrays.stream(defaultArgs),
-                        Arrays.stream(args)
-                    ).toArray(String[]::new))
-            .getGraphVizConfig();
+        GraphvizConfigCli graphvizConfigCli = new GraphvizConfigCli();
+        JCommander jCommander = JCommander.newBuilder().build();
+        jCommander.addObject(graphvizConfigCli);
+        jCommander.parse(args);
+        return graphvizConfigCli;
     }
 
 }
