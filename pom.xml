@@ -66,6 +66,11 @@
             <name>schemaspy/schemaspy Packages</name>
             <url>https://maven.pkg.github.com/schemaspy/schemaspy</url>
         </repository>
+        <snapshotRepository>
+            <id>github</id>
+            <name>schemaspy/schemaspy Packages</name>
+            <url>https://maven.pkg.github.com/schemaspy/schemaspy</url>
+        </snapshotRepository>
     </distributionManagement>
     <developers>
         <developer>
