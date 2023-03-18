@@ -60,6 +60,13 @@
         <developerConnection>scm:git:https://github.com/schemaspy/schemaspy.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>schemaspy/schemaspy Packages</name>
+            <url>https://maven.pkg.github.com/schemaspy/schemaspy</url>
+        </repository>
+    </distributionManagement>
     <developers>
         <developer>
             <id>rafalkasa</id>

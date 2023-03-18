@@ -57,6 +57,11 @@ jobs:
             !target/testout/**/fonts/
             !target/testout/**/*.js
           retention-days: 7
+      - name: Deploy to GitHub Packages
+        if: success()
+        run: ./mvnw deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create latest.json
         if: success()
         run: |
