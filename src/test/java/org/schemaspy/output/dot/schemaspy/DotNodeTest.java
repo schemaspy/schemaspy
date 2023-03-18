@@ -18,14 +18,16 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
+import com.beust.jcommander.JCommander;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.schemaspy.SimpleRuntimeDotConfig;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.cli.NoRowsConfigCli;
+import org.schemaspy.cli.TemplateDirectoryConfigCli;
 import org.schemaspy.model.*;
 import org.schemaspy.output.dot.DotConfig;
+import org.schemaspy.output.dot.DotConfigCli;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +36,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -472,17 +473,14 @@ class DotNodeTest {
     }
 
     private DotConfig parse(String... args) {
-        String[] defaultArgs = {"-o", "out", "-sso"};
-        return new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        )
-            .parse(
-                Stream
-                    .concat(
-                        Arrays.stream(defaultArgs),
-                        Arrays.stream(args)
-                    ).toArray(String[]::new))
-            .getDotConfig();
+        NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
+        TemplateDirectoryConfigCli templateDirectoryConfigCli = new TemplateDirectoryConfigCli();
+        DotConfigCli dotConfigCli = new DotConfigCli(noRowsConfigCli, templateDirectoryConfigCli);
+        JCommander jCommander = JCommander.newBuilder().build();
+        jCommander.addObject(noRowsConfigCli);
+        jCommander.addObject(templateDirectoryConfigCli);
+        jCommander.addObject(dotConfigCli);
+        jCommander.parse(args);
+        return dotConfigCli;
     }
 }

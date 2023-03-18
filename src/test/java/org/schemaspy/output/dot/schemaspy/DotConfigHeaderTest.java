@@ -1,15 +1,14 @@
 package org.schemaspy.output.dot.schemaspy;
 
+import com.beust.jcommander.JCommander;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import org.schemaspy.SimpleRuntimeDotConfig;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.cli.NoRowsConfigCli;
+import org.schemaspy.cli.TemplateDirectoryConfigCli;
 import org.schemaspy.output.dot.DotConfig;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
+import org.schemaspy.output.dot.DotConfigCli;
 
 class DotConfigHeaderTest {
 
@@ -45,7 +44,7 @@ class DotConfigHeaderTest {
             new DotConfigHeader(
                 new SimpleRuntimeDotConfig(
                     new TestFontConfig(),
-                    parse(""),
+                    parse(),
                     false,
                     false
                 ),
@@ -56,17 +55,14 @@ class DotConfigHeaderTest {
     }
 
     private DotConfig parse(String... args) {
-        String[] defaultArgs = {"-o", "out", "-sso"};
-        return new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        )
-            .parse(
-                Stream
-                    .concat(
-                        Arrays.stream(defaultArgs),
-                        Arrays.stream(args)
-                    ).toArray(String[]::new))
-            .getDotConfig();
+        NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
+        TemplateDirectoryConfigCli templateDirectoryConfigCli = new TemplateDirectoryConfigCli();
+        DotConfigCli dotConfigCli = new DotConfigCli(noRowsConfigCli, templateDirectoryConfigCli);
+        JCommander jCommander = JCommander.newBuilder().build();
+        jCommander.addObject(noRowsConfigCli);
+        jCommander.addObject(templateDirectoryConfigCli);
+        jCommander.addObject(dotConfigCli);
+        jCommander.parse(args);
+        return dotConfigCli;
     }
 }
