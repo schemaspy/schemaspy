@@ -71,9 +71,7 @@ public final class Config {
 
     private static Config instance;
     private final List<String> options;
-    private Map<String, String> dbSpecificOptions;
     private String dbType;
-    private List<String> schemas;
     private String db;
     private String host;
     private Integer port;
@@ -88,14 +86,11 @@ public final class Config {
     private Properties dbProperties;
     private Boolean numRowsEnabled;
     private Boolean viewsEnabled;
-    private Boolean railsEnabled;
-    private Boolean evaluateAll;
     /**
      * @deprecated replaced by -dp expanding folders
      */
     @Deprecated
     private Boolean loadJDBCJarsEnabled = false;
-    private String schemaSpec;  // used in conjunction with evaluateAll
     private boolean populating;
     private static final String ESCAPED_EQUALS = "\\=";
     private static final String DEFAULT_TABLE_INCLUSION = ".*"; // match everything
@@ -241,23 +236,6 @@ public final class Config {
         return maxDbThreads;
     }
 
-
-    /**
-     * Look for Ruby on Rails-based naming conventions in
-     * relationships between logical foreign keys and primary keys.<p>
-     * <p>
-     * Basically all tables have a primary key named <code>ID</code>.
-     * All tables are named plural names.
-     * The columns that logically reference that <code>ID</code> are the singular
-     * form of the table name suffixed with <code>_ID</code>.<p>
-     */
-    public boolean isRailsEnabled() {
-        if (railsEnabled == null)
-            railsEnabled = options.remove("-rails");
-
-        return railsEnabled;
-    }
-
     /**
      * If enabled we'll attempt to query/render the number of rows that
      * each table contains.<p/>
@@ -362,54 +340,6 @@ public final class Config {
         }
 
         return tableExclusions;
-    }
-
-    /**
-     * @return list of schemas to process
-     */
-    public List<String> getSchemas() {
-        if (schemas == null) {
-            String tmp = pullParam("-schemas");
-            if (tmp == null)
-                tmp = pullParam("-schemata");
-            if (tmp != null) {
-                schemas = new ArrayList<>();
-
-                for (String name : tmp.split(",")) {
-                    if (name.length() > 0)
-                        schemas.add(name);
-                }
-
-                if (schemas.isEmpty())
-                    schemas = null;
-            }
-        }
-
-        return schemas;
-    }
-
-    public boolean isEvaluateAllEnabled() {
-        if (evaluateAll == null)
-            evaluateAll = options.remove("-all");
-        return evaluateAll;
-    }
-
-    /**
-     * When -all (evaluateAll) is specified then this is the regular
-     * expression that determines which schemas to evaluate.
-    */
-
-    public String getSchemaSpec() {
-        if (schemaSpec == null) {
-            schemaSpec = pullParam("-schemaSpec");
-            if (Objects.isNull(schemaSpec)) {
-                schemaSpec = getDbProperties().getProperty("schemaSpec");
-            }
-            if (Objects.isNull(schemaSpec)) {
-                schemaSpec = ".*";
-            }
-        }
-        return schemaSpec;
     }
 
     /**
