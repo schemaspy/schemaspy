@@ -23,7 +23,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
@@ -76,7 +75,6 @@ public class DatabaseServiceIT {
             "-u", "sa"
         };
 
-        Config config = new Config(args);
         CommandLineArguments arguments = new CommandLineArgumentParser(
             new CommandLineArguments(),
             (option) -> null
@@ -88,7 +86,7 @@ public class DatabaseServiceIT {
             arguments.getCatalog(),
             arguments.getSchema()
         );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(config)
+        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig())
                                               .gatherSchemaDetails(database, null, progressListener);
 
         assertThat(database.getTables()).hasSize(1);

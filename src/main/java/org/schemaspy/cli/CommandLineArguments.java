@@ -22,9 +22,7 @@ package org.schemaspy.cli;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
-import org.schemaspy.input.dbms.ConnectionConfig;
-import org.schemaspy.input.dbms.ConnectionConfigCli;
-import org.schemaspy.input.dbms.DatabaseTypeConfigCli;
+import org.schemaspy.input.dbms.*;
 import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfigCli;
@@ -216,6 +214,9 @@ public class CommandLineArguments {
 
     @ParametersDelegate
     private ConnectionConfigCli connectionConfigCli = new ConnectionConfigCli(databaseTypeConfigCli);
+
+    @ParametersDelegate
+    private ProcessingConfigCli processingConfigCli = new ProcessingConfigCli(noRowsConfigCli, databaseTypeConfigCli);
 
     @ParametersDelegate
     private TemplateDirectoryConfigCli templateDirectoryConfigCli = new TemplateDirectoryConfigCli();
@@ -556,6 +557,10 @@ public class CommandLineArguments {
 
     public ConnectionConfig getConnectionConfig() {
         return connectionConfigCli;
+    }
+
+    public ProcessingConfig getProcessingConfig() {
+        return processingConfigCli;
     }
 
     public HtmlConfig getHtmlConfig() {

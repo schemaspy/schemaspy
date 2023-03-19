@@ -24,7 +24,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -97,7 +96,6 @@ public class MSSQLServerRemoteTablesIT {
             new CommandLineArguments(),
             (option) -> null
         ).parse(args);
-        Config config = new Config(args);
         DatabaseMetaData databaseMetaData = sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
                 sqlService.getDbmsMeta(),
@@ -105,7 +103,7 @@ public class MSSQLServerRemoteTablesIT {
                 databaseMetaData.getConnection().getCatalog(),
                 databaseMetaData.getConnection().getSchema()
         );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
         MSSQLServerRemoteTablesIT.database = database;
     }
 
