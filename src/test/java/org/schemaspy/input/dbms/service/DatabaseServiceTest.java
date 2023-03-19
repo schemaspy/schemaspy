@@ -21,7 +21,6 @@ package org.schemaspy.input.dbms.service;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.schemaspy.Config;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
@@ -65,7 +64,6 @@ public class DatabaseServiceTest {
     @Test
     @Logger(DatabaseService.class)
     public void databaseServicePrintsInformationWhenConnectionTablesWillTakeMoreThan30MinutesAndExportedKeysIsEnabled() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Config config = new Config("-something","thisThing");
         SqlService sqlService = mock(SqlService.class);
         TableService tableService = mock(TableService.class);
         doAnswer(invocation -> {
@@ -109,7 +107,6 @@ public class DatabaseServiceTest {
     @Test
     @Logger(DatabaseService.class)
     public void databaseServiceDoesNotPrintInformationWhenConnectionTablesWillTakeMoreThan30MinutesAndExportedKeysIsDisabled() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Config config = new Config("-noexportedkeys");
         SqlService sqlService = mock(SqlService.class);
         TableService tableService = mock(TableService.class);
         doAnswer(invocation -> {
@@ -153,7 +150,6 @@ public class DatabaseServiceTest {
     @Test
     @Logger(DatabaseService.class)
     public void databaseServiceDoesNotPrintInformationWhenConnectionTablesWillTakeLessThan30Minutes() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Config config = new Config("-something","thisThing");
         SqlService sqlService = mock(SqlService.class);
         TableService tableService = mock(TableService.class);
         doAnswer(invocation -> {

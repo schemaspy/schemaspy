@@ -19,7 +19,6 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.ParameterException;
-import org.schemaspy.Config;
 import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.input.dbms.MissingParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -107,7 +106,7 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
     private void runAnalyzer(String... args) {
         exitCode = EXIT_CODE_GENERIC_ERROR;
         try {
-            exitCode = analyzer.analyze(new Config(args)) == null ? EXIT_CODE_GENERIC_ERROR : EXIT_CODE_OK;
+            exitCode = analyzer.analyze() == null ? EXIT_CODE_GENERIC_ERROR : EXIT_CODE_OK;
         } catch (ConnectionFailure couldntConnect) {
             LOGGER.warn("Connection Failure", couldntConnect);
             exitCode = EXIT_CODE_CONNECTION_ERROR;
