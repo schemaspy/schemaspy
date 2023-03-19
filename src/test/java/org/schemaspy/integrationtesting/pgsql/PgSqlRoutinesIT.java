@@ -24,7 +24,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.schemaspy.Config;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -97,7 +96,6 @@ public class PgSqlRoutinesIT {
             new CommandLineArguments(),
             (option) -> null
         ).parse(args);
-        Config config = new Config(args);
         sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
             sqlService.getDbmsMeta(),
@@ -105,7 +103,7 @@ public class PgSqlRoutinesIT {
             arguments.getCatalog(),
             arguments.getSchema()
         );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
         PgSqlRoutinesIT.database = database;
     }
 
@@ -121,7 +119,7 @@ public class PgSqlRoutinesIT {
     }
 
     @Test
-    public void routinFilmInStockHasComment() {
+    public void routineFilmInStockHasComment() {
         assertThat(database.getRoutinesMap().get("film_in_stock(integer, integer)").getComment()).isEqualToIgnoringCase("Current stock");
     }
 

@@ -125,7 +125,7 @@ public class SchemaAnalyzer {
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
                     config,
-                    databaseServiceFactory.forMultipleSchemas(config),
+                    databaseServiceFactory.forMultipleSchemas(commandLineArguments.getProcessingConfig()),
                     progressListener
             );
         } else {
@@ -138,7 +138,7 @@ public class SchemaAnalyzer {
                     false,
                     config,
                     outputDirectory,
-                    databaseServiceFactory.forSingleSchema(config),
+                    databaseServiceFactory.forSingleSchema(commandLineArguments.getProcessingConfig()),
                     progressListener
             );
         }

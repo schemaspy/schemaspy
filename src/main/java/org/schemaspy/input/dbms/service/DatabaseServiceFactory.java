@@ -1,6 +1,6 @@
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.Config;
+import org.schemaspy.input.dbms.ProcessingConfig;
 
 import java.time.Clock;
 
@@ -13,50 +13,50 @@ public class DatabaseServiceFactory {
         this.sqlService = sqlService;
     }
 
-    public DatabaseService forSingleSchema(Config config) {
-        return create(config, false);
+    public DatabaseService forSingleSchema(ProcessingConfig processingConfig) {
+        return create(processingConfig, false);
     }
 
-    public DatabaseService forMultipleSchemas(Config config) {
-        return create(config, true);
+    public DatabaseService forMultipleSchemas(ProcessingConfig processingConfig) {
+        return create(processingConfig, true);
     }
 
-    private DatabaseService create(Config config, boolean multipleSchemas) {
+    private DatabaseService create(ProcessingConfig processingConfig, boolean multipleSchemas) {
         return new DatabaseService(
                 clock,
                 sqlService,
-                config.isViewsEnabled(),
-                config.getTableInclusions(),
-                config.getTableExclusions(),
-                config.getMaxDbThreads(),
-                config.isExportedKeysEnabled(),
-                config.isNumRowsEnabled(),
-                config.getDbProperties(),
+                processingConfig.isViewsEnabled(),
+                processingConfig.getTableInclusions(),
+                processingConfig.getTableExclusions(),
+                processingConfig.getMaxDbThreads(),
+                processingConfig.isExportedKeysEnabled(),
+                processingConfig.isNumRowsEnabled(),
+                processingConfig.getDatabaseTypeProperties(),
                 new TableService(
                         sqlService,
-                        config.isExportedKeysEnabled(),
+                        processingConfig.isExportedKeysEnabled(),
                         multipleSchemas,
-                        config.getTableInclusions(),
-                        config.getTableExclusions(),
-                        config.getDbProperties(),
+                        processingConfig.getTableInclusions(),
+                        processingConfig.getTableExclusions(),
+                        processingConfig.getDatabaseTypeProperties(),
                         new ColumnService(
                                 sqlService,
-                                config.getIndirectColumnExclusions(),
-                                config.getColumnExclusions()
+                                processingConfig.getIndirectColumnExclusions(),
+                                processingConfig.getColumnExclusions()
                         ),
-                        new IndexService(sqlService, config.getDbProperties())
+                        new IndexService(sqlService, processingConfig.getDatabaseTypeProperties())
                 ),
                 new ViewService(
                         sqlService,
-                        config.getDbProperties(),
+                        processingConfig.getDatabaseTypeProperties(),
                         new ColumnService(
                                 sqlService,
-                                config.getIndirectColumnExclusions(),
-                                config.getColumnExclusions()
+                                processingConfig.getIndirectColumnExclusions(),
+                                processingConfig.getColumnExclusions()
                         )
                 ),
-                new RoutineService(sqlService, config.getDbProperties()),
-                new SequenceService(sqlService, config.getDbProperties())
+                new RoutineService(sqlService, processingConfig.getDatabaseTypeProperties()),
+                new SequenceService(sqlService, processingConfig.getDatabaseTypeProperties())
         );
     }
 }
