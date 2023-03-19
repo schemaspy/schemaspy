@@ -122,7 +122,7 @@ public class SchemaAnalyzer {
             progressListener = new Console(commandLineArguments, progressListener);
         }
 
-        if (config.isEvaluateAllEnabled() || config.getSchemas() != null) {
+        if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
                     config,
                     databaseServiceFactory.forMultipleSchemas(config),
@@ -149,13 +149,13 @@ public class SchemaAnalyzer {
             DatabaseService databaseService,
             ProgressListener progressListener
     ) throws SQLException, IOException {
-        List<String> schemas = config.getSchemas();
+        List<String> schemas = commandLineArguments.getSchemas();
         Database db = null;
 
         Connection connection = new DbDriverLoader().getConnection(commandLineArguments, config);
         DatabaseMetaData meta = connection.getMetaData();
-        if (schemas == null) {
-            String schemaSpec = config.getSchemaSpec();
+        if (schemas.isEmpty()) {
+            String schemaSpec = commandLineArguments.getSchemaSpec();
             LOGGER.info(
                     "Analyzing schemas that match regular expression '{}'. " +
                     "(use -schemaSpec on command line or in .properties to exclude other schemas)",
@@ -281,7 +281,6 @@ public class SchemaAnalyzer {
         if (commandLineArguments.isHtmlEnabled()) {
             generateHtmlDoc(
                     schema,
-                    config,
                     isOneOfMultipleSchemas,
                     commandLineArguments.useVizJS(),
                     progressListener,
@@ -328,7 +327,6 @@ public class SchemaAnalyzer {
 
     private void generateHtmlDoc(
             String schema,
-            Config config,
             boolean isOneOfMultipleSchemas,
             boolean useVizJS,
             ProgressListener progressListener,
@@ -361,7 +359,7 @@ public class SchemaAnalyzer {
         // based on RoR conventions
         // note that this is done before 'hasRealRelationships' gets evaluated so
         // we get a relationships ER diagram
-        if (config.isRailsEnabled()) {
+        if (commandLineArguments.isRailsEnabled()) {
             DbAnalyzer.getRailsConstraints(db.getTablesMap());
         }
 

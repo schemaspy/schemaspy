@@ -9,7 +9,30 @@ import java.util.stream.Stream;
 
 public class CombinedDefaultProvider implements IDefaultProvider {
 
-    private final List<String> booleans = Arrays.asList("schemaspy.sso", "schemaspy.debug", "schemaspy.nohtml", "schemaspy.vizjs", "schemaspy.all");
+    private final List<String> booleans = Arrays.asList(
+        "schemaspy.sso", "schemaspy.single-sign-on",
+        "schemaspy.debug",
+        "schemaspy.nohtml",
+        "schemaspy.noimplied",
+        "schemaspy.vizjs",
+        "schemaspy.all",
+        "schemaspy.rails",
+        "schemaspy.noDbObjectPaging",
+        "schemaspy.dbObjectLengthChange",
+        "schemaspy.noTablePaging",
+        "schemaspy.tableLengthChange",
+        "schemaspy.noIndexPaging",
+        "schemaspy.indexLengthChange",
+        "schemaspy.noCheckPaging",
+        "schemaspy.checkLengthChange",
+        "schemaspy.noRoutinePaging",
+        "schemaspy.routineLengthChange",
+        "schemaspy.noFkPaging",
+        "schemaspy.noColumnPaging",
+        "schemaspy.columnLengthChange",
+        "schemaspy.noAnomaliesPaging",
+        "schemaspy.anomaliesLengthChange"
+    );
 
     private final IDefaultProvider[] iDefaultProviders;
 

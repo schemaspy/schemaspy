@@ -22,6 +22,8 @@ package org.schemaspy.cli;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
+import org.schemaspy.input.dbms.DatabaseTypeConfigCli;
+import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfigCli;
 import org.schemaspy.output.dot.DotConfig;
@@ -33,6 +35,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  * Holds all supported command line arguments.
@@ -129,15 +132,6 @@ public class CommandLineArguments {
 
     @Parameter(
         names = {
-            "-t", "--database-type",
-            "schemaspy.t", "schemaspy.database-type"
-        },
-        descriptionKey = "database-type"
-    )
-    private String databaseType = "ora";
-
-    @Parameter(
-        names = {
             "-connprops",
             "schemaspy.connprops"
         },
@@ -229,6 +223,15 @@ public class CommandLineArguments {
 
     @Parameter(
         names = {
+            "-schemaSpec", "--schema-spec",
+            "schemaspy.schemaSpec", "schemaspy.schema-spec"
+        },
+        descriptionKey = "schemaspec"
+    )
+    private String schemaSpec;
+
+    @Parameter(
+        names = {
             "-schemas", "-schemata",
             "schemaspy.schemas", "schemaspy.schemata"
         },
@@ -280,6 +283,9 @@ public class CommandLineArguments {
     private NoRowsConfigCli noRowsConfigCli = new NoRowsConfigCli();
 
     @ParametersDelegate
+    private DatabaseTypeConfigCli databaseTypeConfigCli = new DatabaseTypeConfigCli(new SimplePropertiesResolver());
+
+    @ParametersDelegate
     private TemplateDirectoryConfigCli templateDirectoryConfigCli = new TemplateDirectoryConfigCli();
 
     @ParametersDelegate
@@ -296,7 +302,7 @@ public class CommandLineArguments {
         descriptionKey = "vizjs",
         required = false
     )
-    private boolean useVizJS;
+    private boolean useVizJS = false;
 
     @Parameter(
         names = {
@@ -577,7 +583,11 @@ public class CommandLineArguments {
     }
 
     public String getDatabaseType() {
-        return databaseType;
+        return databaseTypeConfigCli.getType();
+    }
+
+    public Properties getDatabaseTypeProperties() {
+        return databaseTypeConfigCli.getProperties();
     }
 
     public String getConnprops() {
@@ -613,6 +623,16 @@ public class CommandLineArguments {
 
     public boolean isEvaluateAllEnabled() {
         return evaluateAllEnabled;
+    }
+
+    public String getSchemaSpec() {
+        if (Objects.nonNull(schemaSpec)) {
+            return schemaSpec;
+        } else if (Objects.nonNull(databaseTypeConfigCli.getProperties().getProperty("schemaSpec"))) {
+            return databaseTypeConfigCli.getProperties().getProperty("schemaSpec");
+        } else {
+            return ".*";
+        }
     }
 
     public List<String> getSchemas() {

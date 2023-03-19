@@ -34,7 +34,6 @@ public class ConfigTest {
         String[] args = {"-t", "mssql05", "-schemas", "dbo, sys", "-h"};
 
         Config config = new Config(args);
-        assertThat(config.getSchemas()).hasSize(2);
         assertThat(config.getDbType()).isEqualToIgnoringCase("mssql05");
     }
 
@@ -72,18 +71,6 @@ public class ConfigTest {
     public void exportedKeysCanBeDisabled() {
         Config config = new Config("-noexportedkeys");
         assertThat(config.isExportedKeysEnabled()).isFalse();
-    }
-
-    @Test
-    public void schemasWithSingleQuotes() {
-        Config config = new Config("-schemas", "'a 1','a 2'");
-        assertThat(config.getSchemas()).containsExactlyInAnyOrder("'a 1'", "'a 2'");
-    }
-
-    @Test
-    public void schemasWithSpaces() {
-        Config config = new Config("-schemas", "a 1,a 2");
-        assertThat(config.getSchemas()).containsExactlyInAnyOrder("a 1", "a 2");
     }
 
 }

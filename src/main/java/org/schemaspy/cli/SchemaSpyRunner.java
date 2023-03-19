@@ -130,8 +130,8 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
         } catch (MissingParameterException mrpe) {
             exitCode = EXIT_CODE_MISSING_PARAMETER;
             LOGGER.error("*** {} ***", mrpe.getMessage());
-            LOGGER.info("Missing required connection parameters for '-t {}'", Config.getInstance().getDbType());
-            new DbSpecificConfig(Config.getInstance().getDbType(), Config.getInstance().getDbProperties()).dumpUsage();
+            LOGGER.info("Missing required connection parameters for '-t {}'", arguments.getDatabaseType());
+            new DbSpecificConfig(arguments.getDatabaseType(), arguments.getDatabaseTypeProperties()).dumpUsage();
         } catch (SQLException e) {
             LOGGER.error("SqlException", e);
         } catch (IOException e) {
