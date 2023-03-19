@@ -23,8 +23,7 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
@@ -66,13 +65,12 @@ public class SqlService {
     private Pattern invalidIdentifierPattern;
     private Set<String> allKeywords;
 
-    public DatabaseMetaData connect(CommandLineArguments commandLineArguments, Config config) throws IOException, SQLException {
-        DbDriverLoader driverLoader = new DbDriverLoader();
-        connection = driverLoader.getConnection(commandLineArguments, config);
-        return connect(connection);
+    public DatabaseMetaData connect(ConnectionConfig connectionConfig) throws IOException, SQLException {
+        return connect(new DbDriverLoader(connectionConfig).getConnection());
     }
 
     public DatabaseMetaData connect(Connection connection) throws SQLException {
+        this.connection = connection;
         databaseMetaData = connection.getMetaData();
         dbmsMeta = dbmsService.fetchDbmsMeta(databaseMetaData);
         invalidIdentifierPattern = createInvalidIdentifierPattern(databaseMetaData);

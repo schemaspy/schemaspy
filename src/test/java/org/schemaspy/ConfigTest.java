@@ -38,30 +38,6 @@ public class ConfigTest {
     }
 
     @Test
-    public void testLoadJars() {
-        Config config = new Config("-loadjars", "true");
-        assertThat(config.isLoadJDBCJarsEnabled()).isTrue();
-    }
-
-    @Test
-    public void testLoadProperties() {
-        Config config = new Config("-configFile", "src/test/resources/configTest/loadpropertiesTest.properties");
-        assertThat(config.getPort()).isEqualTo(123);
-    }
-
-    @Test
-    public void propertiesShouldHaveTrailingSpacesTrimmed() {
-        Config config = new Config("-configFile", "src/test/resources/configTest/propertiesWithTrailingSpace.properties");
-        assertThat(config.getDb()).isEqualToIgnoringCase("db_name");
-    }
-
-    @Test
-    public void propertiesShouldHaveTrailingSpaces() {
-        Config config = new Config("-configFile", "src/test/resources/configTest/propertiesWithTrailingSpaceRetained.properties");
-        assertThat(config.getDb()).isEqualToIgnoringCase("db_name");
-    }
-
-    @Test
     public void exportedKeysIsEnabledByDefault() {
         Config config = new Config();
         assertThat(config.isExportedKeysEnabled()).isTrue();

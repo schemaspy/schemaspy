@@ -22,9 +22,6 @@
  */
 package org.schemaspy.input.dbms;
 
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.util.DbSpecificConfig;
 import org.schemaspy.util.DbSpecificOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+import java.util.Objects;
 
 /**
  * @author John Currier
@@ -43,59 +40,25 @@ import java.util.Properties;
 public class ConnectionURLBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private ConnectionConfig connectionConfig;
 
-    private final DbSpecificConfig dbConfig;
-    private final Config config;
-    private final Properties dbType;
-
-    /**
-     * @param config
-     * @param properties
-     */
-    public ConnectionURLBuilder(Config config, Properties properties) {
-        this(
-            new DbSpecificConfig(
-                config.getDbType(),
-                config.getDbProperties()
-            ),
-            config,
-            properties
-        );
-    }
-
-    public ConnectionURLBuilder(
-            final CommandLineArguments commandLineArguments,
-            final Config config,
-            final Properties properties
-    ) {
-        this(
-            new DbSpecificConfig(
-                commandLineArguments.getDatabaseType(),
-                commandLineArguments.getDatabaseTypeProperties()
-            ),
-            config,
-            properties
-        );
-    }
-
-    public ConnectionURLBuilder(DbSpecificConfig dbConfig, Config config, Properties properties) {
-        this.dbConfig = dbConfig;
-        this.config = config;
-        this.dbType = properties;
+    public ConnectionURLBuilder(ConnectionConfig connectionConfig) {
+        this.connectionConfig = connectionConfig;
     }
 
     public String build() {
         List<String> args = new ArrayList<>();
-        args.addAll(config.getRemainingParameters());
+        args.addAll(connectionConfig.getRemainingArguments());
 
-        String connectionURL = dbType.getProperty("connectionSpec");
-        for (DbSpecificOption option : this.dbConfig.getOptions()) {
+        String connectionURL = connectionConfig.getDatabaseTypeProperties().getProperty("connectionSpec");
+        List<DbSpecificOption> options = connectionConfig.getDbSpecificConfig().getOptions();
+        for (DbSpecificOption option : options) {
             option.setValue(getParam(args, option));
 
             LOGGER.debug("{}",option);
 
             // replace e.g. <host> with myDbHost
-            connectionURL = connectionURL.replaceAll("\\<" + option.getName() + "\\>", option.getValue());
+            connectionURL = connectionURL.replaceAll("<" + option.getName() + ">", option.getValue());
         }
 
         LOGGER.trace("connectionURL: {}", connectionURL);
@@ -108,9 +71,15 @@ public class ConnectionURLBuilder {
         int paramIndex = args.indexOf("-" + option.getName());
 
         if (paramIndex < 0) {
-            if (config != null)
-                param = config.getParam(option.getName());  // not in args...might be one of
-            // the common db params
+            if ("db".equals(option.getName())) {
+                param = connectionConfig.getDatabaseName();
+            }
+            if ("host".equals(option.getName())) {
+                param = connectionConfig.getHost();
+            }
+            if ("port".equals(option.getName())) {
+                param = Objects.nonNull(connectionConfig.getPort()) ? connectionConfig.getPort().toString() : null;
+            }
             if ("hostOptionalPort".equals(option.getName())) {
                 param = getHostOptionalPort();
             }
@@ -126,12 +95,12 @@ public class ConnectionURLBuilder {
     }
 
     private String getHostOptionalPort() {
-        String hostOptionalPort = config.getHost();
+        String hostOptionalPort = connectionConfig.getHost();
         if (hostOptionalPort == null) {
             throw new MissingParameterException("host", "host of database, may contain port");
         }
-        String hostPortSeparator = dbType.getProperty("hostPortSeparator", ":");
-        Integer port = config.getPort();
+        String hostPortSeparator = connectionConfig.getDatabaseTypeProperties().getProperty("hostPortSeparator", ":");
+        Integer port = connectionConfig.getPort();
         if (hostOptionalPort.contains(hostPortSeparator)) {
             return hostOptionalPort;
         }

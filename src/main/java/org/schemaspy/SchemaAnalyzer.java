@@ -133,7 +133,7 @@ public class SchemaAnalyzer {
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
             return analyze(
-                    config.getDb(),
+                    commandLineArguments.getConnectionConfig().getDatabaseName(),
                     schema,
                     false,
                     config,
@@ -152,7 +152,7 @@ public class SchemaAnalyzer {
         List<String> schemas = commandLineArguments.getSchemas();
         Database db = null;
 
-        Connection connection = new DbDriverLoader().getConnection(commandLineArguments, config);
+        Connection connection = new DbDriverLoader(commandLineArguments.getConnectionConfig()).getConnection();
         DatabaseMetaData meta = connection.getMetaData();
         if (schemas.isEmpty()) {
             String schemaSpec = commandLineArguments.getSchemaSpec();
@@ -164,7 +164,7 @@ public class SchemaAnalyzer {
             if (schemas.isEmpty())
                 schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
             if (schemas.isEmpty())
-                schemas.add(commandLineArguments.getUser());
+                schemas.add(commandLineArguments.getConnectionConfig().getUser());
         }
 
         LOGGER.info("Analyzing schemas: {}{}",
@@ -176,7 +176,12 @@ public class SchemaAnalyzer {
         List<MustacheSchema> mustacheSchemas = new ArrayList<>();
         MustacheCatalog mustacheCatalog = null;
         for (String schema : schemas) {
-            String dbName = Objects.nonNull(config.getDb()) ? config.getDb() : schema;
+            String dbName = Objects
+                .nonNull(
+                    commandLineArguments.getConnectionConfig().getDatabaseName()
+                )
+                ? commandLineArguments.getConnectionConfig().getDatabaseName()
+                : schema;
 
             LOGGER.info("Analyzing '{}'", schema);
             File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
@@ -191,7 +196,7 @@ public class SchemaAnalyzer {
 
         DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
         MustacheCompiler mustacheCompiler = new MustacheCompiler(
-            config.getDb(),
+            commandLineArguments.getConnectionConfig().getDatabaseName(),
             null,
             commandLineArguments.getHtmlConfig(),
             true,
@@ -239,7 +244,7 @@ public class SchemaAnalyzer {
 
         String catalog = commandLineArguments.getCatalog();
 
-        DatabaseMetaData databaseMetaData = sqlService.connect(commandLineArguments, config);
+        DatabaseMetaData databaseMetaData = sqlService.connect(commandLineArguments.getConnectionConfig());
         DbmsMeta dbmsMeta = sqlService.getDbmsMeta();
 
         LOGGER.debug("supportsSchemasInTableDefinitions: {}", databaseMetaData.supportsSchemasInTableDefinitions());
@@ -272,7 +277,7 @@ public class SchemaAnalyzer {
         tables.addAll(db.getViews());
 
         if (tables.isEmpty()) {
-            dumpNoTablesMessage(schema, commandLineArguments.getUser(), databaseMetaData, config.getTableInclusions() != null);
+            dumpNoTablesMessage(schema, commandLineArguments.getConnectionConfig().getUser(), databaseMetaData, config.getTableInclusions() != null);
             if (!isOneOfMultipleSchemas) // don't bail if we're doing the whole enchilada
                 throw new EmptySchemaException();
         }

@@ -98,10 +98,10 @@ public class MSSQLServerRemoteTablesIT {
             (option) -> null
         ).parse(args);
         Config config = new Config(args);
-        DatabaseMetaData databaseMetaData = sqlService.connect(arguments, config);
+        DatabaseMetaData databaseMetaData = sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
                 sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
+                arguments.getConnectionConfig().getDatabaseName(),
                 databaseMetaData.getConnection().getCatalog(),
                 databaseMetaData.getConnection().getSchema()
         );

@@ -22,6 +22,8 @@ package org.schemaspy.cli;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
+import org.schemaspy.input.dbms.ConnectionConfig;
+import org.schemaspy.input.dbms.ConnectionConfigCli;
 import org.schemaspy.input.dbms.DatabaseTypeConfigCli;
 import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.output.diagram.graphviz.GraphvizConfig;
@@ -35,7 +37,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Properties;
 
 /**
  * Holds all supported command line arguments.
@@ -132,24 +133,6 @@ public class CommandLineArguments {
 
     @Parameter(
         names = {
-            "-connprops",
-            "schemaspy.connprops"
-        },
-        descriptionKey = "connprops"
-    )
-    private String connprops = null;
-
-    @Parameter(
-        names = {
-            "-db", "--database-name",
-            "schemaspy.db", "schemaspy.database-name"
-        },
-        descriptionKey = "databaseName"
-    )
-    private String databaseName;
-
-    @Parameter(
-        names = {
             "-meta", "--schema-meta",
             "schemaspy.meta"
         },
@@ -165,33 +148,6 @@ public class CommandLineArguments {
         descriptionKey = "sso"
     )
     private boolean sso = false;
-
-    @Parameter(
-        names = {
-            "-u", "--user",
-            "schemaspy.u", "schemaspy.user"},
-        descriptionKey = "user"
-    )
-    private String user;
-
-    @Parameter(
-        names = {
-            "-p", "--password",
-            "schemaspy.pw", "schemaspy.password"
-        },
-        descriptionKey = "password"
-    )
-    private String password;
-
-    @Parameter(
-        names = {
-            "-pfp", "--prompt-for-password",
-            "schemaspy.pfp"
-        },
-        descriptionKey = "pfp",
-        password = true
-    )
-    private String passwordFromPrompt;
 
     @Parameter(
         names = {
@@ -242,39 +198,12 @@ public class CommandLineArguments {
 
     @Parameter(
         names = {
-            "-dp", "--driverPath",
-            "schemaspy.dp", "schemaspy.driverPath"
-        },
-        descriptionKey = "driverPath"
-    )
-    private String driverPath;
-
-    @Parameter(
-        names = {
             "-o", "--outputDirectory",
             "schemaspy.o", "schemaspy.outputDirectory"
         },
         descriptionKey = "outputDirectory"
     )
     private File outputDirectory;
-
-    @Parameter(
-        names = {
-            "-host", "--host",
-            "schemaspy.host"
-        },
-        descriptionKey = "host"
-    )
-    private String host;
-
-    @Parameter(
-        names = {
-            "-port", "--port",
-            "schemaspy.port"
-        },
-        descriptionKey = "port"
-    )
-    private Integer port;
 
     @ParametersDelegate
     private GraphvizConfigCli graphvizConfig = new GraphvizConfigCli();
@@ -284,6 +213,9 @@ public class CommandLineArguments {
 
     @ParametersDelegate
     private DatabaseTypeConfigCli databaseTypeConfigCli = new DatabaseTypeConfigCli(new SimplePropertiesResolver());
+
+    @ParametersDelegate
+    private ConnectionConfigCli connectionConfigCli = new ConnectionConfigCli(databaseTypeConfigCli);
 
     @ParametersDelegate
     private TemplateDirectoryConfigCli templateDirectoryConfigCli = new TemplateDirectoryConfigCli();
@@ -548,8 +480,6 @@ public class CommandLineArguments {
     )
     private boolean anomaliesLengthChange = false;
 
-    private List<String> unknownArgs;
-
     public boolean isHelpRequired() {
         return helpRequired;
     }
@@ -582,18 +512,6 @@ public class CommandLineArguments {
         return railsEnabled;
     }
 
-    public String getDatabaseType() {
-        return databaseTypeConfigCli.getType();
-    }
-
-    public Properties getDatabaseTypeProperties() {
-        return databaseTypeConfigCli.getProperties();
-    }
-
-    public String getConnprops() {
-        return connprops;
-    }
-
     public File getOutputDirectory() {
         return outputDirectory;
     }
@@ -604,17 +522,6 @@ public class CommandLineArguments {
 
     public boolean isSingleSignOn() {
         return sso;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public String getPassword() {
-        if (Objects.nonNull(passwordFromPrompt)) {
-            return passwordFromPrompt;
-        }
-        return password;
     }
 
     public String getCatalog() {
@@ -639,24 +546,16 @@ public class CommandLineArguments {
         return schemas;
     }
 
-    public String getDriverPath() {
-        return driverPath;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
     public String getSchemaMeta() {
         return schemaMeta;
     }
 
-    public Integer getPort() {
-        return port;
-    }
-
     public GraphvizConfig getGraphVizConfig() {
         return graphvizConfig;
+    }
+
+    public ConnectionConfig getConnectionConfig() {
+        return connectionConfigCli;
     }
 
     public HtmlConfig getHtmlConfig() {
@@ -772,10 +671,7 @@ public class CommandLineArguments {
     }
 
     void setUnknownArgs(List<String> unknownArgs) {
-        this.unknownArgs = unknownArgs;
+        connectionConfigCli.setRemainingArguments(unknownArgs);
     }
 
-    public List<String> unknownArgs() {
-        return Collections.unmodifiableList(unknownArgs);
-    }
 }

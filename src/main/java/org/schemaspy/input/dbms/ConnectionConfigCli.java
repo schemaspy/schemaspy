@@ -4,10 +4,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.schemaspy.util.DbSpecificConfig;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 @Parameters(resourceBundle = "connectionconfigcli")
 public class ConnectionConfigCli implements ConnectionConfig {
@@ -94,7 +91,7 @@ public class ConnectionConfigCli implements ConnectionConfig {
     private boolean loadSiblings = false;
 
     private final DatabaseTypeConfig databaseTypeConfig;
-    private List<String> remainingArguments;
+    private List<String> remainingArguments = Collections.emptyList();
 
     public ConnectionConfigCli(DatabaseTypeConfig databaseTypeConfig) {
         this.databaseTypeConfig = databaseTypeConfig;

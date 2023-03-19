@@ -99,10 +99,10 @@ public class PgSqlPloyFuncIT {
             (option) -> null
         ).parse(args);
         Config config = new Config(args);
-        sqlService.connect(arguments, config);
+        sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
                 sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
+                arguments.getConnectionConfig().getDatabaseName(),
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
@@ -118,7 +118,7 @@ public class PgSqlPloyFuncIT {
 
     @Test
     public void hasThreeFunctions() {
-        assertThat(database.getRoutines().size()).isEqualTo(3);
+        assertThat(database.getRoutines()).hasSize(3);
     }
 
     @Test

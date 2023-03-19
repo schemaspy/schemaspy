@@ -102,10 +102,10 @@ public class MysqlSchemaLeakageIT {
             new CommandLineArguments(),
             (option) -> null
         ).parse(args);
-        sqlService.connect(arguments, config);
+        sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
                 sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
+                arguments.getConnectionConfig().getDatabaseName(),
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
@@ -115,6 +115,6 @@ public class MysqlSchemaLeakageIT {
 
     @Test
     public void shouldHaveNoViews() {
-        assertThat(database.getViews().size()).isEqualTo(0);
+        assertThat(database.getViews()).isEmpty();
     }
 }

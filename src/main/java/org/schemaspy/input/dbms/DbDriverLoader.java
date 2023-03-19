@@ -23,8 +23,6 @@
  */
 package org.schemaspy.input.dbms;
 
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
@@ -57,22 +55,22 @@ public class DbDriverLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static Map<String, Driver> driverCache = new HashMap<>();
+    private final ConnectionConfig connectionConfig;
 
-    private boolean loadJDBCJars = false;
-
-    public Connection getConnection(CommandLineArguments commandLineArguments, Config config) throws IOException {
+    public DbDriverLoader(ConnectionConfig connectionConfig) {
+        this.connectionConfig = connectionConfig;
+    }
+    public Connection getConnection() throws IOException {
         return this.getConnection(
-            new ConnectionURLBuilder(commandLineArguments, config, config.getDbProperties()),
-            commandLineArguments,
-            config
+            new ConnectionURLBuilder(connectionConfig)
         );
     }
 
-    public Connection getConnection(ConnectionURLBuilder urlBuilder, CommandLineArguments commandLineArguments, Config config) throws IOException {
-        Properties properties = config.getDbProperties();
+    public Connection getConnection(ConnectionURLBuilder urlBuilder) throws IOException {
+        Properties properties = connectionConfig.getDatabaseTypeProperties();
 
         String[] driverClass = properties.getProperty("driver").split(",");
-        String driverPath = commandLineArguments.getDriverPath();
+        String driverPath = connectionConfig.getDriverPath();
         
         if (Objects.isNull(driverPath))
             driverPath = properties.getProperty("driverPath");
@@ -80,22 +78,22 @@ public class DbDriverLoader {
         if (Objects.isNull(driverPath))
             driverPath = "";
 
-        if (Objects.nonNull(config.getDriverPath()))
-            driverPath = config.getDriverPath();
+        if (Objects.nonNull(connectionConfig.getDriverPath()))
+            driverPath = connectionConfig.getDriverPath();
 
-        return getConnection(commandLineArguments, config, urlBuilder.build(), driverClass, driverPath);
+        return getConnection(urlBuilder.build(), driverClass, driverPath);
     }
 
-    protected Connection getConnection(CommandLineArguments commandLineArguments, Config config, String connectionURL,
-                                       String[] driverClasses, String driverPath) throws IOException {
-
-        loadJDBCJars = config.isLoadJDBCJarsEnabled();
-
+    protected Connection getConnection(
+        String connectionURL,
+        String[] driverClasses,
+        String driverPath
+    ) throws IOException {
         final Properties connectionProperties = new WithPassword(
-            commandLineArguments.getPassword(),
+            connectionConfig.getPassword(),
             new WithUser(
-                commandLineArguments.getUser(),
-                new PreferencesConnection(commandLineArguments.getConnprops())
+                connectionConfig.getUser(),
+                new PreferencesConnection(connectionConfig.getConnectionProperties())
             )
         ).properties();
 
@@ -146,7 +144,7 @@ public class DbDriverLoader {
         }
 
         //If this option is true additional jars used by JDBC Driver will be loaded to the classpath
-        if (loadJDBCJars) {
+        if (connectionConfig.withLoadSiblings()) {
             loadAdditionalJarsForDriver(driverPath, classpath);
         }
 
@@ -196,7 +194,7 @@ public class DbDriverLoader {
                 .append("' driver from driverPath '")
                 .append(driverPath)
                 .append("' with sibling jars ")
-                .append((loadJDBCJars ? "yes": "no"))
+                .append((connectionConfig.withLoadSiblings() ? "yes": "no"))
                 .append(".")
                 .append(System.lineSeparator())
                 .append("Resulting in classpath:");

@@ -101,12 +101,12 @@ public class PgSqlMaterializedViewsIT {
             (option) -> null
         ).parse(args);
         Config config = new Config(args);
-        sqlService.connect(arguments, config);
+        sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
+            sqlService.getDbmsMeta(),
+            arguments.getConnectionConfig().getDatabaseName(),
+            arguments.getCatalog(),
+            arguments.getSchema()
         );
         new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
         PgSqlMaterializedViewsIT.database = database;
@@ -120,13 +120,13 @@ public class PgSqlMaterializedViewsIT {
 
     @Test
     public void databaseShouldHaveTables() {
-        assertThat(database.getTables().size()).isEqualTo(1);
+        assertThat(database.getTables()).hasSize(1);
         assertThat(database.getTablesMap().get("invoice")).isNotNull();
     }
 
     @Test
     public void databaseShouldHaveView() {
-        assertThat(database.getViews().size()).isEqualTo(1);
+        assertThat(database.getViews()).hasSize(1);
         assertThat(database.getViewsMap().get("sales_summary")).isNotNull();
     }
 

@@ -90,7 +90,7 @@ public class SchemaMetaIT {
             new CommandLineArguments(),
             (option) -> null
         ).parse(args);
-        sqlService.connect(commandLineArguments,config);
+        sqlService.connect(commandLineArguments.getConnectionConfig());
         dbmsMeta = sqlService.getDbmsMeta();
         schema = h2MemoryRule.getConnection().getSchema();
         catalog = h2MemoryRule.getConnection().getCatalog();
