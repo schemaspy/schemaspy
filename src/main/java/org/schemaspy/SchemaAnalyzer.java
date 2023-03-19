@@ -114,7 +114,7 @@ public class SchemaAnalyzer {
         this.layoutFolder = layoutFolder;
     }
 
-    public Database analyze(Config config) throws SQLException, IOException {
+    public Database analyze() throws SQLException, IOException {
         ProgressListener progressListener = new Tracked();
         // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
         // and not already logging fine details (to keep from obfuscating those)
@@ -124,7 +124,6 @@ public class SchemaAnalyzer {
 
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
-                    config,
                     databaseServiceFactory.forMultipleSchemas(commandLineArguments.getProcessingConfig()),
                     progressListener
             );
@@ -136,7 +135,6 @@ public class SchemaAnalyzer {
                     commandLineArguments.getConnectionConfig().getDatabaseName(),
                     schema,
                     false,
-                    config,
                     outputDirectory,
                     databaseServiceFactory.forSingleSchema(commandLineArguments.getProcessingConfig()),
                     progressListener
@@ -145,7 +143,6 @@ public class SchemaAnalyzer {
     }
 
     public Database analyzeMultipleSchemas(
-            Config config,
             DatabaseService databaseService,
             ProgressListener progressListener
     ) throws SQLException, IOException {
@@ -185,7 +182,7 @@ public class SchemaAnalyzer {
 
             LOGGER.info("Analyzing '{}'", schema);
             File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
-            db = this.analyze(dbName, schema, true, config, outputDirForSchema, databaseService, progressListener);
+            db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService, progressListener);
             if (db == null) //if any of analysed schema returns null
                 return null;
             mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
@@ -233,7 +230,6 @@ public class SchemaAnalyzer {
             String dbName,
             String schema,
             boolean isOneOfMultipleSchemas,
-            Config config,
             File outputDir,
             DatabaseService databaseService,
             ProgressListener progressListener
@@ -277,7 +273,12 @@ public class SchemaAnalyzer {
         tables.addAll(db.getViews());
 
         if (tables.isEmpty()) {
-            dumpNoTablesMessage(schema, commandLineArguments.getConnectionConfig().getUser(), databaseMetaData, config.getTableInclusions() != null);
+            dumpNoTablesMessage(
+                schema,
+                commandLineArguments.getConnectionConfig().getUser(),
+                databaseMetaData,
+                !".*".equals(commandLineArguments.getProcessingConfig().getTableInclusions().toString())
+            );
             if (!isOneOfMultipleSchemas) // don't bail if we're doing the whole enchilada
                 throw new EmptySchemaException();
         }

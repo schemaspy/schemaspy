@@ -22,7 +22,6 @@ import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.schemaspy.Config;
 import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.input.dbms.MissingParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -39,7 +38,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +62,7 @@ public class SchemaSpyRunnerTest {
     @Test
     @DirtiesContext
     public void ioExceptionExitCode_1() throws IOException, SQLException {
-        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new IOException("file permission error"));
+        when(schemaAnalyzer.analyze()).thenThrow(new IOException("file permission error"));
         schemaSpyRunner.run(args);
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(1);
     }
@@ -72,7 +70,7 @@ public class SchemaSpyRunnerTest {
     @Test
     @DirtiesContext
     public void emptySchemaExitCode_2() throws IOException, SQLException {
-        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new EmptySchemaException());
+        when(schemaAnalyzer.analyze()).thenThrow(new EmptySchemaException());
         schemaSpyRunner.run(args);
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(2);
     }
@@ -80,7 +78,7 @@ public class SchemaSpyRunnerTest {
     @Test
     @DirtiesContext
     public void connectionFailureExitCode_3() throws IOException, SQLException {
-        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new ConnectionFailure("failed to connect"));
+        when(schemaAnalyzer.analyze()).thenThrow(new ConnectionFailure("failed to connect"));
         schemaSpyRunner.run(args);
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(3);
     }
@@ -89,9 +87,9 @@ public class SchemaSpyRunnerTest {
     @DirtiesContext
     public void returnsNoneNullExitCode_0() throws IOException, SQLException {
         Database database = mock(Database.class);
-        when(schemaAnalyzer.analyze(any(Config.class))).thenReturn(database);
+        when(schemaAnalyzer.analyze()).thenReturn(database);
         schemaSpyRunner.run(args);
-        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(0);
+        assertThat(schemaSpyRunner.getExitCode()).isZero();
     }
 
     @Test
@@ -99,7 +97,7 @@ public class SchemaSpyRunnerTest {
     public void exitCode_5_withLogging() throws IOException, SQLException {
         outputCapture.expect(Matchers.containsString("'-t mysql"));
         outputCapture.expect(Matchers.not(Matchers.containsString("'-t mssql")));
-        when(schemaAnalyzer.analyze(any(Config.class))).thenThrow(new MissingParameterException("host", "Host is missing"));
+        when(schemaAnalyzer.analyze()).thenThrow(new MissingParameterException("host", "Host is missing"));
         schemaSpyRunner.run(args);
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(5);
     }

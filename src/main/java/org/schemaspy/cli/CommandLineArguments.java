@@ -53,7 +53,6 @@ import java.util.Objects;
  *     }
  * </pre>
  * <p>
- * TODO migrate other command line parameter from {@link org.schemaspy.Config}
  *
  * @author Thomas Traude
  * @author Nils Petzaell

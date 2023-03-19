@@ -23,7 +23,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.input.dbms.service.helper.ImportForeignKey;
 import org.schemaspy.model.*;
-import org.schemaspy.testing.ConfigRule;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
 
@@ -43,9 +42,6 @@ public class TableServiceAddForeignKeyTest {
 
     @Rule
     public LoggingRule loggingRule = new LoggingRule();
-
-    @Rule
-    public ConfigRule configRule = new ConfigRule();
 
     private SqlService sqlService = mock(SqlService.class);
 
@@ -171,8 +167,9 @@ public class TableServiceAddForeignKeyTest {
                 .build();
         tableService.addForeignKey(database, table, foreignKey, database.getTablesMap());
         String log = loggingRule.getLog();
-        assertThat(log).contains("Adding remote table other.other.parent");
-        assertThat(log).contains("Couldn't add FK 'withChild' to table 'mainTable' - Column 'parent' doesn't exist in table 'parent'");
+        assertThat(log)
+            .contains("Adding remote table other.other.parent")
+            .contains("Couldn't add FK 'withChild' to table 'mainTable' - Column 'parent' doesn't exist in table 'parent'");
         assertThat(database.getRemoteTablesMap().get("other.other.parent")).isNotNull();
         assertThat(table.getForeignKeysMap().get("withChild")).isNotNull();
     }
@@ -191,15 +188,15 @@ public class TableServiceAddForeignKeyTest {
         parentColumn.setName("parent");
         remoteTable.getColumnsMap().put(parentColumn.getName(), parentColumn);
 
-        assertThat(childColumn.getChildren().size()).isEqualTo(0);
-        assertThat(childColumn.getParents().size()).isEqualTo(0);
-        assertThat(parentColumn.getChildren().size()).isEqualTo(0);
-        assertThat(parentColumn.getParents().size()).isEqualTo(0);
+        assertThat(childColumn.getChildren()).isEmpty();
+        assertThat(childColumn.getParents()).isEmpty();
+        assertThat(parentColumn.getChildren()).isEmpty();
+        assertThat(parentColumn.getParents()).isEmpty();
 
-        assertThat(table.getMaxChildren()).isEqualTo(0);
-        assertThat(table.getMaxParents()).isEqualTo(0);
-        assertThat(remoteTable.getMaxChildren()).isEqualTo(0);
-        assertThat(remoteTable.getMaxParents()).isEqualTo(0);
+        assertThat(table.getMaxChildren()).isZero();
+        assertThat(table.getMaxParents()).isZero();
+        assertThat(remoteTable.getMaxChildren()).isZero();
+        assertThat(remoteTable.getMaxParents()).isZero();
 
         ImportForeignKey foreignKey = new ImportForeignKey.Builder()
                 .withFkName("withChild")
@@ -213,15 +210,15 @@ public class TableServiceAddForeignKeyTest {
                 .build();
         tableService.addForeignKey(database, table, foreignKey, database.getTablesMap());
 
-        assertThat(childColumn.getChildren().size()).isEqualTo(0);
-        assertThat(childColumn.getParents().size()).isEqualTo(1);
-        assertThat(parentColumn.getChildren().size()).isEqualTo(1);
-        assertThat(parentColumn.getParents().size()).isEqualTo(0);
+        assertThat(childColumn.getChildren()).isEmpty();
+        assertThat(childColumn.getParents()).hasSize(1);
+        assertThat(parentColumn.getChildren()).hasSize(1);
+        assertThat(parentColumn.getParents()).isEmpty();
 
-        assertThat(table.getMaxChildren()).isEqualTo(0);
+        assertThat(table.getMaxChildren()).isZero();
         assertThat(table.getMaxParents()).isEqualTo(1);
         assertThat(remoteTable.getMaxChildren()).isEqualTo(1);
-        assertThat(remoteTable.getMaxParents()).isEqualTo(0);
+        assertThat(remoteTable.getMaxParents()).isZero();
 
     }
 

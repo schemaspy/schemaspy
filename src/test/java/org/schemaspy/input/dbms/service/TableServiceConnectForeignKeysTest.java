@@ -23,7 +23,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 import org.schemaspy.model.*;
-import org.schemaspy.testing.ConfigRule;
 import org.schemaspy.testing.LoggingRule;
 
 import java.sql.DatabaseMetaData;
@@ -40,9 +39,6 @@ public class TableServiceConnectForeignKeysTest {
 
     @Rule
     public LoggingRule loggingRule = new LoggingRule();
-
-    @Rule
-    public ConfigRule configRule = new ConfigRule();
 
     private SqlService sqlService;
 
@@ -116,41 +112,41 @@ public class TableServiceConnectForeignKeysTest {
         remoteParent.getColumnsMap().put(parent.getName(), parent);
         database.getRemoteTablesMap().put(database.getRemoteTableKey(remoteParent.getCatalog(), remoteParent.getSchema(),remoteParent.getName()), remoteParent);
 
-        assertThat(table.getMaxChildren()).isEqualTo(0);
-        assertThat(table.getMaxParents()).isEqualTo(0);
-        assertThat(remoteParent.getMaxChildren()).isEqualTo(0);
-        assertThat(remoteParent.getMaxParents()).isEqualTo(0);
+        assertThat(table.getMaxChildren()).isZero();
+        assertThat(table.getMaxParents()).isZero();
+        assertThat(remoteParent.getMaxChildren()).isZero();
+        assertThat(remoteParent.getMaxParents()).isZero();
 
-        assertThat(table.getForeignKeys().size()).isEqualTo(0);
-        assertThat(remoteParent.getForeignKeys().size()).isEqualTo(0);
+        assertThat(table.getForeignKeys()).isEmpty();
+        assertThat(remoteParent.getForeignKeys()).isEmpty();
 
-        assertThat(mainPrimary.getChildren().size()).isEqualTo(0);
-        assertThat(mainPrimary.getParents().size()).isEqualTo(0);
+        assertThat(mainPrimary.getChildren()).isEmpty();
+        assertThat(mainPrimary.getParents()).isEmpty();
 
-        assertThat(mainForeign.getChildren().size()).isEqualTo(0);
-        assertThat(mainForeign.getParents().size()).isEqualTo(0);
+        assertThat(mainForeign.getChildren()).isEmpty();
+        assertThat(mainForeign.getParents()).isEmpty();
 
-        assertThat(parent.getChildren().size()).isEqualTo(0);
-        assertThat(parent.getParents().size()).isEqualTo(0);
+        assertThat(parent.getChildren()).isEmpty();
+        assertThat(parent.getParents()).isEmpty();
 
         tableService.connectForeignKeys(database, table, database.getLocals());
 
-        assertThat(table.getMaxChildren()).isEqualTo(0);
+        assertThat(table.getMaxChildren()).isZero();
         assertThat(table.getMaxParents()).isEqualTo(1);
         assertThat(remoteParent.getMaxChildren()).isEqualTo(1);
-        assertThat(remoteParent.getMaxParents()).isEqualTo(0);
+        assertThat(remoteParent.getMaxParents()).isZero();
 
-        assertThat(table.getForeignKeys().size()).isEqualTo(1);
-        assertThat(remoteParent.getForeignKeys().size()).isEqualTo(0);
+        assertThat(table.getForeignKeys()).hasSize(1);
+        assertThat(remoteParent.getForeignKeys()).isEmpty();
 
-        assertThat(mainPrimary.getChildren().size()).isEqualTo(0);
-        assertThat(mainPrimary.getParents().size()).isEqualTo(0);
+        assertThat(mainPrimary.getChildren()).isEmpty();
+        assertThat(mainPrimary.getParents()).isEmpty();
 
-        assertThat(mainForeign.getChildren().size()).isEqualTo(0);
-        assertThat(mainForeign.getParents().size()).isEqualTo(1);
+        assertThat(mainForeign.getChildren()).isEmpty();
+        assertThat(mainForeign.getParents()).hasSize(1);
 
-        assertThat(parent.getChildren().size()).isEqualTo(1);
-        assertThat(parent.getParents().size()).isEqualTo(0);
+        assertThat(parent.getChildren()).hasSize(1);
+        assertThat(parent.getParents()).isEmpty();
     }
 
     @Test
@@ -206,23 +202,23 @@ public class TableServiceConnectForeignKeysTest {
 
         when(sqlService.getDatabaseMetaData()).thenReturn(databaseMetaData);
 
-        assertThat(table.getMaxChildren()).isEqualTo(0);
-        assertThat(table.getMaxParents()).isEqualTo(0);
-        assertThat(database.getRemoteTables().size()).isEqualTo(0);
+        assertThat(table.getMaxChildren()).isZero();
+        assertThat(table.getMaxParents()).isZero();
+        assertThat(database.getRemoteTables()).isEmpty();
 
-        assertThat(table.getForeignKeys().size()).isEqualTo(0);
+        assertThat(table.getForeignKeys()).isEmpty();
 
-        assertThat(mainPrimary.getChildren().size()).isEqualTo(0);
-        assertThat(mainPrimary.getParents().size()).isEqualTo(0);
+        assertThat(mainPrimary.getChildren()).isEmpty();
+        assertThat(mainPrimary.getParents()).isEmpty();
 
-        assertThat(mainForeign.getChildren().size()).isEqualTo(0);
-        assertThat(mainForeign.getParents().size()).isEqualTo(0);
+        assertThat(mainForeign.getChildren()).isEmpty();
+        assertThat(mainForeign.getParents()).isEmpty();
 
         tableService.connectForeignKeys(database, table, database.getLocals());
 
         assertThat(table.getMaxChildren()).isEqualTo(1);
-        assertThat(table.getMaxParents()).isEqualTo(0);
-        assertThat(database.getRemoteTables().size()).isEqualTo(1);
+        assertThat(table.getMaxParents()).isZero();
+        assertThat(database.getRemoteTables()).hasSize(1);
 
         Table remote = database.getRemoteTablesMap().get("child.child.child");
         assertThat(remote).isNotNull();
@@ -230,17 +226,17 @@ public class TableServiceConnectForeignKeysTest {
         TableColumn child = remote.getColumn("child");
         assertThat(child).isNotNull();
 
-        assertThat(table.getForeignKeys().size()).isEqualTo(0);
-        assertThat(remote.getForeignKeys().size()).isEqualTo(1);
+        assertThat(table.getForeignKeys()).isEmpty();
+        assertThat(remote.getForeignKeys()).hasSize(1);
 
-        assertThat(mainPrimary.getChildren().size()).isEqualTo(1);
-        assertThat(mainPrimary.getParents().size()).isEqualTo(0);
+        assertThat(mainPrimary.getChildren()).hasSize(1);
+        assertThat(mainPrimary.getParents()).isEmpty();
 
-        assertThat(mainForeign.getChildren().size()).isEqualTo(0);
-        assertThat(mainForeign.getParents().size()).isEqualTo(0);
+        assertThat(mainForeign.getChildren()).isEmpty();
+        assertThat(mainForeign.getParents()).isEmpty();
 
-        assertThat(child.getChildren().size()).isEqualTo(0);
-        assertThat(child.getParents().size()).isEqualTo(1);
+        assertThat(child.getChildren()).isEmpty();
+        assertThat(child.getParents()).hasSize(1);
 
     }
 
