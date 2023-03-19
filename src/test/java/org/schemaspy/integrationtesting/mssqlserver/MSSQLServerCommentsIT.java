@@ -147,12 +147,12 @@ public class MSSQLServerCommentsIT {
             new CommandLineArguments(),
             (option) -> null
         ).parse(args);
-        sqlService.connect(arguments, config);
+        sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
+            sqlService.getDbmsMeta(),
+            arguments.getConnectionConfig().getDatabaseName(),
+            arguments.getCatalog(),
+            arguments.getSchema()
         );
         new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
         return database;

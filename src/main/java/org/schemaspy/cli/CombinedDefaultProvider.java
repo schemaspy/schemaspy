@@ -31,7 +31,8 @@ public class CombinedDefaultProvider implements IDefaultProvider {
         "schemaspy.noColumnPaging",
         "schemaspy.columnLengthChange",
         "schemaspy.noAnomaliesPaging",
-        "schemaspy.anomaliesLengthChange"
+        "schemaspy.anomaliesLengthChange",
+        "schemaspy.loadjars", "schemaspy.load-sibling-jars"
     );
 
     private final IDefaultProvider[] iDefaultProviders;

@@ -76,10 +76,10 @@ public class SqliteIT {
             (option) -> null
         ).parse(args);
         Config config = new Config(args);
-        sqlService.connect(arguments, config);
+        sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
                 sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
+                arguments.getConnectionConfig().getDatabaseName(),
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
@@ -89,11 +89,11 @@ public class SqliteIT {
 
     @Test
     public void databaseContainsTable() {
-        assertThat(database.getTables().size()).isEqualTo(11);
+        assertThat(database.getTables()).hasSize(11);
     }
 
     @Test
     public void databaseTablePlaylistsContainsPrimaryKey() {
-        assertThat(database.getTablesMap().get("playlists").getPrimaryColumns().size()).isGreaterThanOrEqualTo(1);
+        assertThat(database.getTablesMap().get("playlists").getPrimaryColumns()).isNotEmpty();
     }
 }

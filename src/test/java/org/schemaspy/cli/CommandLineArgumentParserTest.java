@@ -72,7 +72,6 @@ public class CommandLineArgumentParserTest {
         CommandLineArguments arguments = parser.parse(args);
 
         assertThat(arguments.getOutputDirectory().getPath()).isEqualTo("aFolder");
-        assertThat(arguments.getUser()).isEqualTo("MyUser");
     }
 
     @Test
@@ -86,7 +85,6 @@ public class CommandLineArgumentParserTest {
         CommandLineArguments commandLineArguments = parser.parse();
 
         assertThat(commandLineArguments.getOutputDirectory()).isNotNull();
-        assertThat(commandLineArguments.getUser()).isNotNull();
     }
 
     @Test
@@ -100,7 +98,6 @@ public class CommandLineArgumentParserTest {
         CommandLineArguments arguments = parser.parse(args);
 
         assertThat(arguments.getOutputDirectory().getPath()).isEqualTo("aFolder");
-        assertThat(arguments.getUser()).isNull();
     }
 
     @Test
@@ -114,7 +111,6 @@ public class CommandLineArgumentParserTest {
         CommandLineArguments commandLineArguments = parser.parse();
 
         assertThat(commandLineArguments.getOutputDirectory()).isNotNull();
-        assertThat(commandLineArguments.getUser()).isNull();
     }
 
     @Test
@@ -260,20 +256,6 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void unknownOptionsAreStoredInArgument() {
-        String[] args = {
-            "-o", "aFolder",
-            "-sso",
-            "-server", "xds"
-        };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            NO_DEFAULT_PROVIDER
-        ).parse(args);
-        assertThat(arguments.unknownArgs()).containsExactly("-server", "xds");
-    }
-
-    @Test
     public void dontTreatWordAsParameterName() {
         String[] args = {
             "-u", "user",
@@ -288,79 +270,17 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void connPropsSinglePair() {
+    public void unkownOptionsAreStoredInArgument() {
         String[] args = {
             "-o", "aFolder",
             "-sso",
-            "-connprops", "key\\=value"
+            "-server", "xds"
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(
             new CommandLineArguments(),
             NO_DEFAULT_PROVIDER
         ).parse(args);
-
-        assertThat(arguments.getConnprops()).isEqualTo("key\\=value");
-    }
-
-    @Test
-    public void connPropsMultiplePairWindows() {
-        String[] args = {
-            "-o", "aFolder",
-            "-sso",
-            "-connprops", "key\\=value;key2\\=value2"
-        };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            NO_DEFAULT_PROVIDER
-        ).parse(args);
-
-        assertThat(arguments.getConnprops()).isEqualTo("key\\=value;key2\\=value2");
-    }
-
-    @Test
-    public void connPropsMultiplePairLinux() {
-        String[] args = {
-            "-o", "aFolder",
-            "-sso",
-            "-connprops", "key\\=value:key2\\=value2"
-        };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            NO_DEFAULT_PROVIDER
-        ).parse(args);
-
-        assertThat(arguments.getConnprops()).isEqualTo("key\\=value:key2\\=value2");
-    }
-
-    @Test
-    public void passwordInArgs() {
-        String[] args = {
-            "-o", "aFolder",
-            "-sso",
-            "-u", "usr",
-            "-p", "pswd"
-        };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            NO_DEFAULT_PROVIDER
-        ).parse(args);
-
-        assertThat(arguments.getPassword()).isEqualTo("pswd");
-    }
-
-    @Test
-    public void passwordInEnvOrConfigFile() {
-        String[] args = {
-            "-o", "aFolder",
-            "-sso",
-            "-u", "usr"
-        };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (optionName -> optionName.equals("schemaspy.pw") ? "pswd" : null)
-        ).parse(args);
-
-        assertThat(arguments.getPassword()).isEqualTo("pswd");
+        assertThat(arguments.getConnectionConfig().getRemainingArguments()).containsExactly("-server", "xds");
     }
 
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.

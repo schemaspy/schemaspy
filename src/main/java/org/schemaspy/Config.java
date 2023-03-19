@@ -25,22 +25,15 @@
  */
 package org.schemaspy;
 
-import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.config.PropertiesResolver;
 import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -73,25 +66,16 @@ public final class Config {
     private final List<String> options;
     private String dbType;
     private String db;
-    private String host;
-    private Integer port;
     private Boolean exportedKeysEnabled;
     private Pattern tableInclusions;
     private Pattern tableExclusions;
     private Pattern columnExclusions;
     private Pattern indirectColumnExclusions;
     private Integer maxDbThreads;
-    private String driverPath;
     private PropertiesResolver propertiesResolver = new SimplePropertiesResolver();
     private Properties dbProperties;
     private Boolean numRowsEnabled;
     private Boolean viewsEnabled;
-    /**
-     * @deprecated replaced by -dp expanding folders
-     */
-    @Deprecated
-    private Boolean loadJDBCJarsEnabled = false;
-    private boolean populating;
     private static final String ESCAPED_EQUALS = "\\=";
     private static final String DEFAULT_TABLE_INCLUSION = ".*"; // match everything
     private static final String DEFAULT_TABLE_EXCLUSION = ".*\\$.*";
@@ -147,7 +131,6 @@ public final class Config {
     }
 
     /**
-     * @deprecated use {@link CommandLineArguments#getDatabaseType()}
      * @return databaseType as supplied with -t if null returns "ora"
      */
     @Deprecated
@@ -169,42 +152,6 @@ public final class Config {
             db = pullParam("-db");
         return db;
     }
-
-    public String getHost() {
-        if (host == null)
-            host = pullParam("-host");
-        return host;
-    }
-
-    public Integer getPort() {
-        if (port == null) {
-            String portAsString = pullParam("-port");
-            if (hasText(portAsString)) {
-                try {
-                    port = Integer.valueOf(portAsString);
-                } catch (NumberFormatException notSpecified) {
-                    LOGGER.warn(notSpecified.getMessage(), notSpecified);
-                }
-            }
-        }
-        return port;
-    }
-
-    private static boolean hasText(String string) {
-        return Objects.nonNull(string) && !string.trim().isEmpty();
-    }
-
-    public String getDriverPath() {
-        if (driverPath == null)
-            driverPath = pullParam("-dp");
-
-        // was previously -cp:
-        if (driverPath == null)
-            driverPath = pullParam("-cp");
-
-        return driverPath;
-    }
-
     /**
      * Maximum number of threads to use when querying database metadata information.
      * @throws InvalidConfigurationException if unable to load properties
@@ -343,23 +290,6 @@ public final class Config {
     }
 
     /**
-     * If enabled SchemaSpy will load from classpath additional jars used by JDBC Driver<p/>
-     * <p>
-     * Defaults to <code>false</code> (enabled).
-     *
-     * @deprecated replaced by -dp expanding folders
-     */
-    @Deprecated
-    public boolean isLoadJDBCJarsEnabled() {
-        String loadJars = pullParam("-loadjars");
-        if (loadJars != null && "true".equals(loadJars)) {
-            loadJDBCJarsEnabled = true;
-        }
-
-        return loadJDBCJarsEnabled;
-    }
-
-    /**
      * Returns the database properties to use.
      *
      * @return database specific properties
@@ -369,22 +299,6 @@ public final class Config {
             dbProperties = propertiesResolver.getDbProperties(getDbType());
         }
         return dbProperties;
-    }
-
-    public List<String> getRemainingParameters() {
-        try {
-            populate();
-        } catch (IllegalArgumentException |
-                 IllegalAccessException |
-                 IntrospectionException exc) {
-            throw new InvalidConfigurationException(exc);
-        } catch (InvocationTargetException exc) {
-            if (exc.getCause() instanceof InvalidConfigurationException)
-                throw (InvalidConfigurationException) exc.getCause();
-            throw new InvalidConfigurationException(exc.getCause());
-        }
-
-        return options;
     }
 
     /**
@@ -480,51 +394,4 @@ public final class Config {
         return s.substring(0,i+1);
     }
 
-    /**
-     * Call all the getters to populate all the lazy initialized stuff.
-     *
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws IntrospectionException
-     */
-    private void populate() throws IllegalAccessException, InvocationTargetException, IntrospectionException {
-        if (!populating) { // prevent recursion
-            populating = true;
-
-            BeanInfo beanInfo = Introspector.getBeanInfo(Config.class);
-            PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-            for (PropertyDescriptor prop : props) {
-                Method readMethod = prop.getReadMethod();
-                if (readMethod != null)
-                    readMethod.invoke(this, (Object[]) null);
-            }
-
-            populating = false;
-        }
-    }
-
-    /**
-     * Get the value of the specified parameter.
-     * Used for properties that are common to most db's, but aren't required.
-     *
-     * @param paramName
-     * @return
-     */
-    public String getParam(String paramName) {
-        try {
-            BeanInfo beanInfo = Introspector.getBeanInfo(Config.class);
-            PropertyDescriptor[] props = beanInfo.getPropertyDescriptors();
-            for (PropertyDescriptor prop : props) {
-                if (prop.getName().equalsIgnoreCase(paramName)) {
-                    Object result = prop.getReadMethod().invoke(this, (Object[]) null);
-                    return result == null ? null : result.toString();
-                }
-            }
-        } catch (Exception failed) {
-            LOGGER.error("Unable to get parameter {}",paramName,failed);
-        }
-
-        return null;
-    }
 }

@@ -97,10 +97,10 @@ public class MSSQLServerCheckConstraintIT {
             new CommandLineArguments(),
             (option) -> null
         ).parse(args);
-        sqlService.connect(arguments, config);
+        sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
                 sqlService.getDbmsMeta(),
-                arguments.getDatabaseName(),
+                arguments.getConnectionConfig().getDatabaseName(),
                 arguments.getCatalog(),
                 arguments.getSchema()
         );
@@ -111,6 +111,6 @@ public class MSSQLServerCheckConstraintIT {
     @Test
     public void databaseShouldBePopulatedWithTableTest() {
         Table range = database.getTablesMap().get("range");
-        assertThat(range.getCheckConstraints().size()).isEqualTo(1);
+        assertThat(range.getCheckConstraints()).hasSize(1);
     }
 }

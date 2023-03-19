@@ -52,7 +52,12 @@ public class DatabaseServiceIT {
     private static String CREATE_SEQUENCE = "CREATE SEQUENCE SEQ_CLIENT start with 5 increment by 2";
 
     @Rule
-    public H2MemoryRule h2MemoryRule = new H2MemoryRule("DatabaseServiceIT").addSqls(CREATE_SCHEMA, SET_SCHEMA, CREATE_TABLE, CREATE_SEQUENCE);
+    public H2MemoryRule h2MemoryRule = new H2MemoryRule("DatabaseServiceIT").addSqls(
+        CREATE_SCHEMA,
+        SET_SCHEMA,
+        CREATE_TABLE,
+        CREATE_SEQUENCE
+    );
 
     @Autowired
     private SqlService sqlService;
@@ -65,25 +70,26 @@ public class DatabaseServiceIT {
         String[] args = {
             "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
             "-db", "DatabaseServiceIT",
-            "-s", "DATABASESERVICEIT",
+            "-s", h2MemoryRule.getConnection().getSchema(),
+            "-cat", h2MemoryRule.getConnection().getCatalog(),
             "-o", "target/integrationtesting/databaseServiceIT",
             "-u", "sa"
         };
+
         Config config = new Config(args);
         CommandLineArguments arguments = new CommandLineArgumentParser(
             new CommandLineArguments(),
             (option) -> null
         ).parse(args);
-        sqlService.connect(arguments, config);
-        String schema = h2MemoryRule.getConnection().getSchema();
-        String catalog = h2MemoryRule.getConnection().getCatalog();
+        sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
-                sqlService.getDbmsMeta(),
-                "DatabaseServiceIT",
-                catalog,
-                schema
+            sqlService.getDbmsMeta(),
+            arguments.getConnectionConfig().getDatabaseName(),
+            arguments.getCatalog(),
+            arguments.getSchema()
         );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(config).gatherSchemaDetails(database, null, progressListener);
+        new DatabaseServiceFactory(sqlService).forSingleSchema(config)
+                                              .gatherSchemaDetails(database, null, progressListener);
 
         assertThat(database.getTables()).hasSize(1);
 

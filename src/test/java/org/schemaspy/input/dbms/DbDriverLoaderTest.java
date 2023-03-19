@@ -18,15 +18,13 @@
  */
 package org.schemaspy.input.dbms;
 
+import com.beust.jcommander.JCommander;
 import org.dummy.DummyDriver;
 import org.dummy.DummyDriverUnsatisfiedConnect;
 import org.dummy.DummyDriverUnsatisfiedCtor;
 import org.junit.Rule;
 import org.junit.Test;
-import org.schemaspy.Config;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.cli.EnvDefaultProvider;
+import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.testing.H2MemoryRule;
 
@@ -34,10 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Paths;
-import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -56,161 +52,186 @@ public class DbDriverLoaderTest {
 
   @Test
   public void testGetConnection() throws IOException {
-    DbDriverLoader dbDriverLoader = new DbDriverLoader();
-    String[] args = {"-t", "h2", "-u", "sa", "-o", "target/dbDriverLoaderTest"};
-    Config config = new Config(args);
-    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
-    Connection connection = dbDriverLoader.getConnection(commandLineArguments, config, h2.getConnectionURL(), toArray("org.h2.Driver"), "");
-    assertThat(connection).isNotNull();
+    assertThat(
+        new DbDriverLoader(
+            parse("-t", Paths.get("src", "test", "resources", "integrationTesting", "dbTypes", "h2memory.properties").toString(), "-u", "sa", "-db", "DbDriverLoaderTest")
+        ).getConnection()
+    ).isNotNull();
   }
 
   @Test
   public void testLoadAdditionalJarsForDriver() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-    DbDriverLoader dbDriverLoader = new DbDriverLoader();
+    DbDriverLoader dbDriverLoader = new DbDriverLoader(null);
     Set<URI> urls = new HashSet<>();
     String driverPath = "src/test/resources/driverFolder/dummy.jar";
-    Method loadAdditionalJarsFromDriver = DbDriverLoader.class.getDeclaredMethod("loadAdditionalJarsForDriver", String.class, Set.class);
+    Method loadAdditionalJarsFromDriver = DbDriverLoader.class.getDeclaredMethod(
+        "loadAdditionalJarsForDriver",
+        String.class,
+        Set.class
+    );
     loadAdditionalJarsFromDriver.setAccessible(true);
     loadAdditionalJarsFromDriver.invoke(dbDriverLoader, driverPath, urls);
-    assertThat(urls).contains(Paths.get(driverPath).toUri());
-    assertThat(urls).contains(Paths.get(driverPath).resolveSibling("dummy.nar").toUri());
-    assertThat(urls).doesNotContain(Paths.get(driverPath).resolveSibling("nar.jar.war.not.included").toUri());
+    assertThat(urls)
+        .contains(Paths.get(driverPath).toUri())
+     .contains(Paths.get(driverPath).resolveSibling("dummy.nar").toUri())
+     .doesNotContain(Paths.get(driverPath).resolveSibling("nar.jar.war.not.included").toUri());
   }
 
   @Test
   public void driverLoaderCachesDrivers() {
-    DbDriverLoader driverLoader1 = new DbDriverLoader();
-    Driver driver1 = driverLoader1.getDriver(toArray("org.h2.Driver"),"");
-    DbDriverLoader driverLoader2 = new DbDriverLoader();
-    Driver driver2 = driverLoader2.getDriver(toArray("org.h2.Driver"),"");
+    DbDriverLoader driverLoader1 = new DbDriverLoader(parse());
+    Driver driver1 = driverLoader1.getDriver(new String[]{"org.h2.Driver"}, "");
+    DbDriverLoader driverLoader2 = new DbDriverLoader(parse());
+    Driver driver2 = driverLoader2.getDriver(new String[]{"org.h2.Driver"}, "");
     assertThat(driver1).isSameAs(driver2);
   }
 
   @Test
   public void driverPathWorks() throws SQLException {
     String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
-    DbDriverLoader driverLoader = new DbDriverLoader();
-    Driver driver = driverLoader.getDriver(toArray("dummy.DummyDriver"), driverPath);
+    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    Driver driver = driverLoader.getDriver(new String[]{"dummy.DummyDriver"}, driverPath);
     assertThat(driver).isNotNull();
     assertThat(driver.acceptsURL("dummy")).isTrue();
   }
 
   @Test
   public void connectionIsNullThrowsException() {
-    String[] args = {"-sso", "-o", "someplace"};
-    Config config = new Config(args);
-    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
-    DbDriverLoader driverLoader = new DbDriverLoader();
+    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    String[] drivers = new String[]{DummyDriver.class.getName()};
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(commandLineArguments, config, "dummy", toArray(DummyDriver.class.getName()), ""));
+        .isThrownBy(() -> driverLoader.getConnection(
+            "dummy",
+            drivers,
+            ""
+        ));
   }
 
   @Test
   public void nativeErrorInDriverCreationThrowsException() {
-    String[] args = {"-sso", "-o", "someplace"};
-    Config config = new Config(args);
-    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
-    DbDriverLoader driverLoader = new DbDriverLoader();
+    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    String[] drivers = new String[]{DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"};
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(commandLineArguments, config, "dummy", toArray(DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"), ""))
-            .withCauseInstanceOf(UnsatisfiedLinkError.class)
-            .withMessageContaining("Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedCtor,dummy.dummy'");
+        .isThrownBy(() -> driverLoader.getConnection(
+            "dummy",
+            drivers,
+            ""
+        ))
+        .withCauseInstanceOf(UnsatisfiedLinkError.class)
+        .withMessageContaining(
+            "Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedCtor,dummy.dummy'");
   }
 
   @Test
   public void nativeErrorInConnectThrowsException() {
-    String[] args = {"-sso", "-o", "someplace"};
-    Config config = new Config(args);
-    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
-    DbDriverLoader driverLoader = new DbDriverLoader();
+    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    String[] drivers = new String[]{DummyDriverUnsatisfiedConnect.class.getName()};
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(commandLineArguments, config, "dummy", toArray(DummyDriverUnsatisfiedConnect.class.getName()), ""))
-            .withCauseInstanceOf(UnsatisfiedLinkError.class)
-            .withMessageContaining("Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedConnect'");
+        .isThrownBy(() -> driverLoader.getConnection(
+            "dummy",
+            drivers,
+            ""
+        ))
+        .withCauseInstanceOf(UnsatisfiedLinkError.class)
+        .withMessageContaining(
+            "Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedConnect'");
   }
 
   @Test
   public void DriverMissingWithClasspathThrowsException() {
-    String[] args = {"-sso", "-o", "someplace"};
-    Config config = new Config(args);
-    CommandLineArguments commandLineArguments = new CommandLineArgumentParser(new CommandLineArguments(), new EnvDefaultProvider()).parse(args);
-    DbDriverLoader driverLoader = new DbDriverLoader();
+    DbDriverLoader driverLoader = new DbDriverLoader(parse());
     String sep = File.separator;
-    final String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString() + File.pathSeparator + "missing";
+    final String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar")
+                                   .toString() + File.pathSeparator + "missing";
     assertThatExceptionOfType(ConnectionFailure.class)
-            .isThrownBy(() -> driverLoader.getConnection(commandLineArguments, config, "dummy", toArray("bla.bla.bla", "no.no.no"), driverPath))
-            .withCauseInstanceOf(ConnectionFailure.class)
-            .withMessageContaining("'bla.bla.bla, no.no.no'")
-            .withMessageContaining("src" + sep + "test" + sep + "resources" + sep + "driverFolder" + sep + "dummy.jar"+File.pathSeparator+"missing")
-            .withMessageContaining("There were missing paths in driverPath:"+System.lineSeparator()+"\tmissing");
-  }
-
-  private String[] toArray(String...strings) {
-    return strings;
+        .isThrownBy(() -> driverLoader.getConnection(
+            "dummy",
+            new String[]{"bla.bla.bla", "no.no.no"},
+            driverPath
+        ))
+        .withCauseInstanceOf(ConnectionFailure.class)
+        .withMessageContaining("'bla.bla.bla, no.no.no'")
+        .withMessageContaining("src" + sep + "test" + sep + "resources" + sep + "driverFolder" + sep + "dummy.jar" + File.pathSeparator + "missing")
+        .withMessageContaining("There were missing paths in driverPath:" + System.lineSeparator() + "\tmissing");
   }
 
   @Test
   public void firstDriverClassMissingSecondExists() {
-    DbDriverLoader driverLoader = new DbDriverLoader();
-    Driver driver = driverLoader.getDriver(toArray("com.no","org.h2.Driver"),"");
+    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    Driver driver = driverLoader.getDriver(new String[]{"com.no", "org.h2.Driver"}, "");
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("org.h2.Driver");
   }
 
   @Test
   public void twoDriversBothExists() {
-    DbDriverLoader driverLoader = new DbDriverLoader();
-    Driver driver = driverLoader.getDriver(toArray("com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"),"");
+    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    Driver driver = driverLoader.getDriver(new String[]{"com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"}, "");
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("com.mysql.cj.jdbc.Driver");
   }
 
   @Test
   public void willAddDirAndContentIfDpIsADirAndNotAFile() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-    URI driverFolder = Paths.get("src","test", "resources", "driverFolder").toUri();
-    URI dummyJarURI = Paths.get("src","test", "resources", "driverFolder","dummy.jar").toUri();
-    URI dummyNarURI = Paths.get("src","test", "resources", "driverFolder","dummy.nar").toUri();
-    URI narJarWarNotIncludedURI = Paths.get("src","test", "resources", "driverFolder","nar.jar.war.not.included").toUri();
-    DbDriverLoader dbDriverLoader = new DbDriverLoader();
-    String dp = Paths.get("src","test", "resources", "driverFolder").toString();
+    URI driverFolder = Paths.get("src", "test", "resources", "driverFolder").toUri();
+    URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
+    URI dummyNarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.nar").toUri();
+    URI narJarWarNotIncludedURI = Paths.get("src", "test", "resources", "driverFolder", "nar.jar.war.not.included")
+                                       .toUri();
+    DbDriverLoader dbDriverLoader = new DbDriverLoader(null);
+    String dp = Paths.get("src", "test", "resources", "driverFolder").toString();
 
     Method method = DbDriverLoader.class.getDeclaredMethod("getExistingUrls", String.class);
     method.setAccessible(true);
 
     Set<URI> uris = (Set<URI>) method.invoke(dbDriverLoader, dp);
-    assertThat(uris.size()).isEqualTo(4);
-    assertThat(uris).contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
+    assertThat(uris)
+        .hasSize(4)
+        .contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
   }
 
   @Test
   public void willOnlyAddFileIfFileIsSpecified() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    URI dummyJarURI = Paths.get("src","test", "resources", "driverFolder","dummy.jar").toUri();
-    DbDriverLoader dbDriverLoader = new DbDriverLoader();
-    String dp = Paths.get("src","test", "resources", "driverFolder", "dummy.jar").toString();
+    URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
+    DbDriverLoader dbDriverLoader = new DbDriverLoader(null);
+    String dp = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
 
     Method method = DbDriverLoader.class.getDeclaredMethod("getExistingUrls", String.class);
     method.setAccessible(true);
 
     Set<URI> uris = (Set<URI>) method.invoke(dbDriverLoader, dp);
-    assertThat(uris.size()).isEqualTo(1);
-    assertThat(uris).contains(dummyJarURI);
+    assertThat(uris)
+        .hasSize(1)
+        .contains(dummyJarURI);
   }
 
   @Test
   public void willAddDirAndContentIfDpSecondArgIsADirAndNotAFile() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-    URI driverFolder = Paths.get("src","test", "resources", "driverFolder").toUri();
-    URI dummyJarURI = Paths.get("src","test", "resources", "driverFolder","dummy.jar").toUri();
-    URI dummyNarURI = Paths.get("src","test", "resources", "driverFolder","dummy.nar").toUri();
-    URI narJarWarNotIncludedURI = Paths.get("src","test", "resources", "driverFolder","nar.jar.war.not.included").toUri();
-    DbDriverLoader dbDriverLoader = new DbDriverLoader();
-    String dpFile = Paths.get("src","test", "resources", "driverFolder", "dummy.jar").toString();
-    String dpDir = Paths.get("src","test", "resources", "driverFolder").toString();
+    URI driverFolder = Paths.get("src", "test", "resources", "driverFolder").toUri();
+    URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
+    URI dummyNarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.nar").toUri();
+    URI narJarWarNotIncludedURI = Paths.get("src", "test", "resources", "driverFolder", "nar.jar.war.not.included")
+                                       .toUri();
+    DbDriverLoader dbDriverLoader = new DbDriverLoader(null);
+    String dpFile = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
+    String dpDir = Paths.get("src", "test", "resources", "driverFolder").toString();
 
     Method method = DbDriverLoader.class.getDeclaredMethod("getExistingUrls", String.class);
     method.setAccessible(true);
 
     Set<URI> uris = (Set<URI>) method.invoke(dbDriverLoader, dpFile + File.pathSeparator + dpDir);
-    assertThat(uris.size()).isEqualTo(4);
-    assertThat(uris).contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
+    assertThat(uris)
+        .hasSize(4)
+        .contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
+  }
+
+  ConnectionConfig parse(String... args) {
+    DatabaseTypeConfigCli databaseTypeConfigCli = new DatabaseTypeConfigCli(new SimplePropertiesResolver());
+    ConnectionConfigCli connectionConfigCli = new ConnectionConfigCli(databaseTypeConfigCli);
+    JCommander jCommander = JCommander.newBuilder().build();
+    jCommander.addObject(databaseTypeConfigCli);
+    jCommander.addObject(connectionConfigCli);
+    jCommander.parse(args);
+    return connectionConfigCli;
   }
 }
