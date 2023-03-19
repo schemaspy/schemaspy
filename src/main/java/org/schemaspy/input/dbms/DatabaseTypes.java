@@ -61,7 +61,7 @@ public class DatabaseTypes {
     private Set<String> collectDbTypes(Path typeFolderPath) {
         try (Stream<Path> pathStream = Files.list(typeFolderPath)) {
             return pathStream
-                .filter(Files::isRegularFile)
+                .filter(Files::isRegularFile) //NOSONAR toFile().isFile() isn't supported by ZipFilesystem
                 .map(Path::getFileName)
                 .map(Path::toString)
                 .filter(name -> name.matches(".*\\.properties$"))
