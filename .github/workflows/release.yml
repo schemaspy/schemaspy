@@ -49,7 +49,7 @@ jobs:
         id: drafting
         with:
           draft-tag: "v${{ github.event.inputs.release_version }}"
-          template: "./.github/release-ready/release_note.dot"
+          template: ".github/release-ready/release_notes.dot"
       - name: Setup git
         run: |
           git config user.name "$GITHUB_ACTOR"
