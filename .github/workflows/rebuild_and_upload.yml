@@ -1,0 +1,66 @@
+name: Rebuild and upload
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to rebuild, a corresponding tag v{version} must exist'
+        required: true
+      upload-url:
+        description: 'Upload url for asset'
+        required: true
+
+jobs:
+  release:
+    if: ${{ github.repository_owner == 'schemaspy' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: v${{ github.event.inputs.version }}
+      - name: Setup JDK 11
+        if: success()
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 11
+          cache: 'maven'
+      - name: Maven build
+        if: success()
+        run: >
+          ./mvnw
+          --batch-mode
+          --errors
+          --show-version
+          -DskipTests
+          -Dskip.surefire=true
+          clean
+          package
+      - name: Upload Release Asset
+        if: success()
+        id: upload-release-asset
+        uses: npetzall/upload-release-asset@016b64f5b681ab69bd2099581068e78edf2db25f
+        with:
+          upload_url: ${{ github.event.inputs.upload-url }}
+          asset_path: ./target/schemaspy-${{ github.event.inputs.version }}-app.jar
+          asset_name: schemaspy-${{ github.event.inputs.version }}.jar
+          asset_content_type: application/java-archive
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build docker image
+        if: success()
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            "${{ github.repository }}:${{ github.event.inputs.version }}"
+            "${{ github.repository }}:latest"
+          build-args: |
+            GIT_BRANCH=${{ github.ref_name }}
+            GIT_REVISION=${{ github.sha }}
