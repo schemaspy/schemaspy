@@ -526,7 +526,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>3.0.0-M7</version>
                 <configuration>
-                    <arguments>-Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true</arguments>
+                    <arguments>-Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -Dsonar.host.url=https://sonarcloud.io</arguments>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
