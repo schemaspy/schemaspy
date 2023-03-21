@@ -56,17 +56,18 @@ public class DbDriverLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static Map<String, Driver> driverCache = new HashMap<>();
     private final ConnectionConfig connectionConfig;
+    private final ConnectionURLBuilder urlBuilder;
 
-    public DbDriverLoader(ConnectionConfig connectionConfig) {
+    public DbDriverLoader(final ConnectionConfig connectionConfig) {
+        this(connectionConfig, new ConnectionURLBuilder(connectionConfig));
+    }
+
+    public DbDriverLoader(final ConnectionConfig connectionConfig, final ConnectionURLBuilder urlBuilder) {
         this.connectionConfig = connectionConfig;
-    }
-    public Connection getConnection() throws IOException {
-        return this.getConnection(
-            new ConnectionURLBuilder(connectionConfig)
-        );
+        this.urlBuilder = urlBuilder;
     }
 
-    public Connection getConnection(ConnectionURLBuilder urlBuilder) throws IOException {
+    public Connection getConnection() throws IOException {
         Properties properties = connectionConfig.getDatabaseTypeProperties();
 
         String[] driverClass = properties.getProperty("driver").split(",");
