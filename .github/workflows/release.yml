@@ -73,9 +73,9 @@ jobs:
       - name: Upload Release Asset
         if: success()
         id: upload-release-asset
-        uses: npetzall/upload-release-asset@016b64f5b681ab69bd2099581068e78edf2db25f
+        uses: npetzall/upload-release-asset@384b047305ab6dc8050e8b2c83772af692cd80cd
         with:
-          upload_url: ${{ steps.drafting.outputs.upload-url }}
+          release_id: ${{ steps.drafting.outputs.draft-id }}
           asset_path: ./target/schemaspy-${{ github.event.inputs.release_version }}-app.jar
           asset_name: schemaspy-${{ github.event.inputs.release_version }}.jar
           asset_content_type: application/java-archive
