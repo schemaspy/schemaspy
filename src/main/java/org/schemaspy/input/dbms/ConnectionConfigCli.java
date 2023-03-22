@@ -47,7 +47,7 @@ public class ConnectionConfigCli implements ConnectionConfig {
     @Parameter(
         names = {
             "-p", "--password",
-            "schemaspy.pw", "schemaspy.password"
+            "schemaspy.p", "schemaspy.pw", "schemaspy.password"
         },
         descriptionKey = "password"
     )
