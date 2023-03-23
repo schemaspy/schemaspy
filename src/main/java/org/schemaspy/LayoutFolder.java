@@ -19,6 +19,7 @@ public class LayoutFolder {
     /**
      * The layout folder.
      *
+     * @return url for layout folder
      * @throws IOException when not possible to retrieve layout folder
      */
     public URL url() throws IOException {

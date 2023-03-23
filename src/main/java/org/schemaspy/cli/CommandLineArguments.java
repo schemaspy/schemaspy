@@ -41,7 +41,7 @@ import java.util.Objects;
  * <p>
  * An instance of this class registered as singleton bean in {@link org.schemaspy.SchemaSpyConfiguration} via {@link CommandLineArgumentParser}.
  * Therefore it can be injected in other beans, for example:
- * <p>
+ * </p>
  * <pre>
  *     public class MyService {
  *         private CommandLineArguments arguments;
@@ -52,7 +52,7 @@ import java.util.Objects;
  *         }
  *     }
  * </pre>
- * <p>
+ *
  *
  * @author Thomas Traude
  * @author Nils Petzaell

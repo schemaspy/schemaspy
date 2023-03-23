@@ -1,11 +1,11 @@
 package org.schemaspy.output.dot.schemaspy.edge;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.schemaspy.Edge;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class RelatedEdges implements Edges {
     private final TableColumn column;
@@ -16,8 +16,6 @@ public class RelatedEdges implements Edges {
     /**
      * @param column TableColumn
      * @param targetTable Table
-     * @throws IOException
-     * @return Set of <code>dot</code> relationships (as {@link Edge}s)
      */
     public RelatedEdges(TableColumn column, Table targetTable, boolean includeExcluded, boolean includeImplied) {
         this.column = column;
@@ -26,6 +24,10 @@ public class RelatedEdges implements Edges {
         this.includeImplied = includeImplied;
     }
 
+    /**
+     *
+     * @return Set of <code>dot</code> relationships (as {@link Edge}s)
+     */
     @Override
     public Set<Edge> unique() {
         Set<Edge> relatedConnectors = new HashSet<>();

@@ -1,11 +1,11 @@
 package org.schemaspy.output.dot.schemaspy.edge;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.output.dot.schemaspy.Edge;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class PairEdges implements Edges {
 
@@ -19,8 +19,6 @@ public class PairEdges implements Edges {
      *
      * @param table1 Table
      * @param table2 Table
-     * @throws IOException
-     * @return Set of <code>dot</code> relationships (as {@link Edge}s)
      */
     public PairEdges(Table table1, Table table2, boolean includeExcluded, boolean includeImplied) {
         this.table1 = table1;
@@ -29,6 +27,10 @@ public class PairEdges implements Edges {
         this.includeImplied = includeImplied;
     }
 
+    /**
+     *
+     * @return Set of <code>dot</code> relationships (as {@link Edge}s)
+     */
     @Override
     public Set<Edge> unique() {
         Set<Edge> relationships = new HashSet<>();

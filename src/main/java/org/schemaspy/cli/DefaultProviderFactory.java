@@ -54,7 +54,7 @@ public class DefaultProviderFactory {
      * If for the given propertiesFilename there exists no file the method will exit the application.
      * <p>
      * If the given propertiesFilename is null it falls back to the {@link #DEFAULT_PROPERTIES_FILE_NAME}.
-     * If a properties file exists it will return CombinedDefaultProvider search order Properties -> Env
+     * If a properties file exists it will return CombinedDefaultProvider search order Properties then Env
      * If this file does not exist the method returns CombinedDefaultProvider with only EnvDefaultProvider
      *
      * @param propertiesFilename
