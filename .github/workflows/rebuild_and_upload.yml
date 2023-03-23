@@ -35,6 +35,7 @@ jobs:
           --show-version
           -DskipTests
           -Dskip.surefire=true
+          -P release
           clean
           package
       - name: Upload Release Asset
