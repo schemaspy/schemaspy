@@ -507,9 +507,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.0-M7</version>
+                <version>3.0.0</version>
                 <configuration>
-                    <arguments>-Dmaven.javadoc.skip=true -Dmaven.deploy.skip=true -Dsonar.host.url=https://sonarcloud.io</arguments>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <preparationProfiles>sonar,coverage,release</preparationProfiles>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>sonar,coverage,release</releaseProfiles>
+                    <goals>deploy</goals>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
