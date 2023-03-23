@@ -57,22 +57,47 @@ public class DbDriverLoader {
     private static Map<String, Driver> driverCache = new HashMap<>();
     private final ConnectionConfig connectionConfig;
     private final ConnectionURLBuilder urlBuilder;
+    private final Properties properties;
+    private final String[] driverClass;
+    private String driverPath;
 
     public DbDriverLoader(final ConnectionConfig connectionConfig) {
         this(connectionConfig, new ConnectionURLBuilder(connectionConfig));
     }
 
     public DbDriverLoader(final ConnectionConfig connectionConfig, final ConnectionURLBuilder urlBuilder) {
+        this(connectionConfig, urlBuilder, connectionConfig.getDatabaseTypeProperties());
+    }
+
+    public DbDriverLoader(
+        final ConnectionConfig connectionConfig,
+        final ConnectionURLBuilder urlBuilder,
+        final Properties properties
+    ) {
+        this(
+            connectionConfig,
+            urlBuilder,
+            properties,
+            properties.getProperty("driver").split(","),
+            connectionConfig.getDriverPath()
+        );
+    }
+
+    public DbDriverLoader(
+        final ConnectionConfig connectionConfig,
+        final ConnectionURLBuilder urlBuilder,
+        final Properties properties,
+        final String[] driverClass,
+        final String driverPath
+    ) {
         this.connectionConfig = connectionConfig;
         this.urlBuilder = urlBuilder;
+        this.properties = properties;
+        this.driverClass = driverClass;
+        this.driverPath = driverPath;
     }
 
     public Connection getConnection() throws IOException {
-        Properties properties = connectionConfig.getDatabaseTypeProperties();
-
-        String[] driverClass = properties.getProperty("driver").split(",");
-        String driverPath = connectionConfig.getDriverPath();
-        
         if (Objects.isNull(driverPath))
             driverPath = properties.getProperty("driverPath");
 
