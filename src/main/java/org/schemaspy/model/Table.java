@@ -319,7 +319,7 @@ public class Table implements Comparable<Table> {
     }
 
     /**
-     * Returns <code>true</code> if this table references no other tables..<p/>
+     * Returns <code>true</code> if this table references no other tables..
      * Used in dependency analysis.
      *
      * @return
@@ -335,7 +335,7 @@ public class Table implements Comparable<Table> {
     }
 
     /**
-     * Returns <code>true</code> if this table is referenced by no other tables.<p/>
+     * Returns <code>true</code> if this table is referenced by no other tables.
      * Used in dependency analysis.
      *
      * @return
@@ -543,7 +543,8 @@ public class Table implements Comparable<Table> {
     /**
      * Remove one foreign key constraint.
      * <p>
-     * <p/>Used during dependency analysis phase.
+     * Used during dependency analysis phase.
+     * </p>
      *
      * @return
      */
@@ -691,12 +692,13 @@ public class Table implements Comparable<Table> {
 
     /**
      * Compare this table to another table.
-     * Results are based on 1: identity, 2: table name, 3: schema name<p/>
-     * <p>
+     * Results are based on 1: identity, 2: table name, 3: schema name
+     *
      * This implementation was put in place to deal with analyzing multiple
      * schemas that contain identically named tables.
      *
-     * @see {@link Comparable#compareTo(Object)}
+     * @see Comparable#compareTo(Object)
+     *
      */
     public int compareTo(Table other) {
         if (other == this)  // fast way out

@@ -28,9 +28,7 @@ import java.util.Collection;
  * @author John Currier
  */
 public interface ProgressListener {
-	/**
-	 * @return startup / connection duration in milliseconds
-	 */
+
 	void startedGatheringDetails();
 	void gatheringDetailsProgressed(Table table);
 

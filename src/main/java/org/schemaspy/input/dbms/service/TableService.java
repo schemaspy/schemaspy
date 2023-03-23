@@ -99,11 +99,8 @@ public class TableService {
     /**
      * "Connect" all of this table's foreign keys to their referenced primary keys
      * (and, in some cases, do the reverse as well).
-     *
-     * @param tables
-     * @throws SQLException
      */
-    public void connectForeignKeys(Database db, Table table, Map<String, Table> tables) throws SQLException {
+    public void connectForeignKeys(Database db, Table table, Map<String, Table> tables) {
         LOGGER.trace("Connecting foreign keys to {}", table.getFullName());
 
 
@@ -263,7 +260,6 @@ public class TableService {
      *
      * @param db Database
      * @return int
-     * @throws SQLException
      */
     protected long fetchNumRows(Database db, Table table) {
         if (table.isView() || table.isRemote())
@@ -473,8 +469,6 @@ public class TableService {
      * Initializes table comments.
      * If the SQL also returns view comments then they're plugged into the
      * appropriate views.
-     *
-     * @throws SQLException
      */
     public void gatherTableComments(Database db) {
         String sql = dbProperties.getProperty("selectTableCommentsSql");
@@ -500,8 +494,6 @@ public class TableService {
      * Initializes table column comments.
      * If the SQL also returns view column comments then they're plugged into the
      * appropriate views.
-     *
-     * @throws SQLException
      */
     public void gatherTableColumnComments(Database db) {
         String sql = dbProperties.getProperty("selectColumnCommentsSql");
