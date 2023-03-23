@@ -30,6 +30,7 @@ jobs:
           --update-snapshots
           --errors
           --show-version
+          -P release
           verify
       - name: Upload test output
         uses: actions/upload-artifact@v3

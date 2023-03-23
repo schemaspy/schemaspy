@@ -41,7 +41,7 @@ jobs:
           --show-version
           -P coverage
           -P sonar
-          -Dsonar.host.url=https://sonarcloud.io
+          -P release
           verify
           deploy:deploy
         env:

@@ -61,9 +61,6 @@ jobs:
           --batch-mode
           --errors
           --show-version
-          -P coverage
-          -P sonar
-          -Dsonar.host.url=https://sonarcloud.io
           release:prepare
           -DreleaseVersion=${{ github.event.inputs.release_version }}
           -DdevelopmentVersion=${{ github.event.inputs.next_development_version }}-SNAPSHOT
