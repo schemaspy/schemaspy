@@ -1,19 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <!-- list pom: mvn help:effective-pom -->
-    <!-- jar:      mvn clean package -->
-    <!-- sign:     mvn release:prepare release:perform -->
-    <!-- javadocs: mvn javadocs:jar -->
-    <!-- sources:  mvn source:jar -->
-    <!--
- mvn gpg:sign-and-deploy-file
-              -DpomFile=pom.xml
-              -Dfile=target/myapp-1.0.jar
-              -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/
-              -DrepositoryId=sonatype-nexus-staging 
-              -Dgpg.passphrase="passphrase"
-       optional: -Dclassifier=sources or -Dclassifier=javadoc              
-    -->
-    <!-- mvn clean deploy -Dgpg.passphrase=passphrase -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.schemaspy</groupId>
     <artifactId>schemaspy</artifactId>
@@ -24,11 +9,6 @@
     <description>SchemaSpy generates HTML and PNG-based entity relationship diagrams from JDBC-enabled databases.
     </description>
     <inceptionYear>2016</inceptionYear>
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -76,11 +56,15 @@
             <id>rafalkasa</id>
             <name>Rafal Kasa</name>
             <email>rafalkasa@gmail.com</email>
+            <organization>SchemaSpy</organization>
+            <organizationUrl>https://schemaspy.org/</organizationUrl>
         </developer>
         <developer>
             <id>npetzall</id>
             <name>Nils Petzaell</name>
             <email>nils.petzall@gmail.com</email>
+            <organization>SchemaSpy</organization>
+            <organizationUrl>https://schemaspy.org/</organizationUrl>
         </developer>
     </developers>
     <dependencyManagement>
