@@ -40,16 +40,14 @@
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>schemaspy/schemaspy Packages</name>
-            <url>https://maven.pkg.github.com/schemaspy/schemaspy</url>
-        </repository>
         <snapshotRepository>
-            <id>github</id>
-            <name>schemaspy/schemaspy Packages</name>
-            <url>https://maven.pkg.github.com/schemaspy/schemaspy</url>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
     <developers>
         <developer>
@@ -505,6 +503,17 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.13</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>3.0.0</version>
@@ -512,7 +521,7 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <preparationProfiles>sonar,coverage,release</preparationProfiles>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>sonar,coverage,release</releaseProfiles>
+                    <releaseProfiles>sonar,coverage,release,sign</releaseProfiles>
                     <goals>deploy</goals>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
@@ -574,6 +583,12 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
