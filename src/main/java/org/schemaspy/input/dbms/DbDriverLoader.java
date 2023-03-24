@@ -135,11 +135,11 @@ public class DbDriverLoader {
                 return driver;
             }
         }
-        Set<URI> classpath = getExistingUrls(driverPath);
+        Set<URI> classpath = new GetExistingUrls().getExistingUrls(driverPath);
         if (classpath.isEmpty()) {
             URL url = getClass().getResource(driverPath);
             if (url != null) {
-                classpath = getExistingUrls(url.getPath());
+                classpath = new GetExistingUrls().getExistingUrls(url.getPath());
             }
         }
 
@@ -286,41 +286,5 @@ public class DbDriverLoader {
         }
 
         return missingFiles;
-    }
-
-    /**
-     * Returns a list of {@link URL}s in <code>path</code> that point to files that
-     * exist.
-     *
-     * @param path
-     * @return
-     */
-    private Set<URI> getExistingUrls(String path) {
-        Set<URI> existingUrls = new HashSet<>();
-
-        String[] pieces = path.split(File.pathSeparator);
-        for (String piece : pieces) {
-            File file = new File(piece);
-            if (file.exists()) {
-                existingUrls.add(file.toURI());
-                if (file.isDirectory()) {
-                    addDirectoryContent(file, existingUrls);
-                }
-            }
-        }
-
-        return existingUrls;
-    }
-
-    private void addDirectoryContent(File dir, Set<URI> existingUrls) {
-        File[] files = dir.listFiles();
-        for(File file : files) {
-            if (file.exists()) {
-                existingUrls.add(file.toURI());
-                if (file.isDirectory()) {
-                    addDirectoryContent(file, existingUrls);
-                }
-            }
-        }
     }
 }
