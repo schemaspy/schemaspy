@@ -33,6 +33,11 @@ jobs:
           distribution: 'temurin'
           java-version: 11
           cache: 'maven'
+          server-id: ossrh
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
       - name: Install Graphviz
         if: success()
         run: sudo apt-get install graphviz
@@ -54,7 +59,7 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "action@github.com"
-      - name: Maven release
+      - name: Maven Prepare release
         if: success()
         run: >
           ./mvnw
@@ -67,6 +72,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Maven Perform release
+        run: >
+          ./mvnw
+          --batch-mode
+          --errors
+          --show-version
+          release:perform
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       - name: Upload Release Asset
         if: success()
         id: upload-release-asset
