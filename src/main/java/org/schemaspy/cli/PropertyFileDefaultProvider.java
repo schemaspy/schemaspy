@@ -21,12 +21,9 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.IDefaultProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -44,8 +41,6 @@ import java.util.Properties;
  * @author Nils Petzaell
  */
 public class PropertyFileDefaultProvider implements IDefaultProvider {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final Properties properties;
 

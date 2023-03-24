@@ -2,14 +2,14 @@ package org.schemaspy.cli;
 
 import com.beust.jcommander.IStringConverter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class SchemasListConverter implements IStringConverter<List<String>> {
+public class SchemasListConverter implements IStringConverter<Set<String>> {
 
     @Override
-    public List<String> convert(String value) {
-        List<String> schemas = new ArrayList<>();
+    public Set<String> convert(String value) {
+        Set<String> schemas = new HashSet<>();
         for (String name : value.split(",")) {
             if (name.length() > 0)
                 schemas.add(name);

@@ -32,9 +32,7 @@ import org.schemaspy.view.HtmlConfig;
 import org.schemaspy.view.HtmlConfigCli;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Holds all supported command line arguments.
@@ -189,9 +187,10 @@ public class CommandLineArguments {
             "schemaspy.schemas", "schemaspy.schemata"
         },
         descriptionKey = "schemas",
-        listConverter = SchemasListConverter.class
+        converter = SchemasListConverter.class
     )
-    private List<String> schemas = Collections.emptyList();
+    //Use Set instead of List to workaround https://github.com/cbeust/jcommander/issues/457
+    private Set<String> schemas = new HashSet<>();
 
     @Parameter(
         names = {
@@ -543,7 +542,7 @@ public class CommandLineArguments {
     }
 
     public List<String> getSchemas() {
-        return schemas;
+        return new ArrayList<>(schemas);
     }
 
     public String getSchemaMeta() {
