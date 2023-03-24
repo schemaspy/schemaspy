@@ -24,6 +24,9 @@ jobs:
           distribution: 'temurin'
           java-version: 11
           cache: 'maven'
+          server-id: ossrh
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_PASSWORD
       - name: Install Graphviz
         run: sudo apt-get install graphviz
       - name: Cache SonarCloud packages
@@ -42,11 +45,13 @@ jobs:
           -P coverage
           -P sonar
           -P release
-          verify
-          deploy:deploy
+          clean
+          deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
       - name: Upload test output
         uses: actions/upload-artifact@v3
         if: failure()
