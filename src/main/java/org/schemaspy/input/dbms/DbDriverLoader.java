@@ -145,7 +145,7 @@ public class DbDriverLoader {
 
         //If this option is true additional jars used by JDBC Driver will be loaded to the classpath
         if (connectionConfig.withLoadSiblings()) {
-            loadAdditionalJarsForDriver(driverPath, classpath);
+            new LoadAdditionalJarsForDriver().loadAdditionalJarsForDriver(driverPath, classpath);
         }
 
 
@@ -218,26 +218,6 @@ public class DbDriverLoader {
                     .append("If you need to load sibling jars used '-loadjars'");
         }
         return sb.toString();
-    }
-
-    private void loadAdditionalJarsForDriver(String driverPath, Set<URI> classpath) {
-        File driverFolder = new File(Paths.get(driverPath).getParent().toString());
-        if (driverFolder.exists()) {
-            File[] files = driverFolder.listFiles(
-                    (dir, name) -> name.toLowerCase().matches(".*\\.?ar$")
-            );
-
-            LOGGER.info("Additional files will be loaded for JDBC Driver");
-
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile()) {
-                        classpath.add(file.toURI());
-                        LOGGER.info("Added: {}", file.toURI());
-                    }
-                }
-            }
-        }
     }
 
     /**

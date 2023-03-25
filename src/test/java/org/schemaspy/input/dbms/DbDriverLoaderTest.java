@@ -60,24 +60,6 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void testLoadAdditionalJarsForDriver() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-    DbDriverLoader dbDriverLoader = new DbDriverLoader(null);
-    Set<URI> urls = new HashSet<>();
-    String driverPath = "src/test/resources/driverFolder/dummy.jar";
-    Method loadAdditionalJarsFromDriver = DbDriverLoader.class.getDeclaredMethod(
-        "loadAdditionalJarsForDriver",
-        String.class,
-        Set.class
-    );
-    loadAdditionalJarsFromDriver.setAccessible(true);
-    loadAdditionalJarsFromDriver.invoke(dbDriverLoader, driverPath, urls);
-    assertThat(urls)
-        .contains(Paths.get(driverPath).toUri())
-     .contains(Paths.get(driverPath).resolveSibling("dummy.nar").toUri())
-     .doesNotContain(Paths.get(driverPath).resolveSibling("nar.jar.war.not.included").toUri());
-  }
-
-  @Test
   public void driverLoaderCachesDrivers() {
     DbDriverLoader driverLoader1 = new DbDriverLoader(parse());
     Driver driver1 = driverLoader1.getDriver(new String[]{"org.h2.Driver"}, "");
