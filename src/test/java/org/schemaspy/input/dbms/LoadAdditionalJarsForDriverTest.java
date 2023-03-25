@@ -20,8 +20,6 @@ package org.schemaspy.input.dbms;
 
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -32,17 +30,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LoadAdditionalJarsForDriverTest {
 
   @Test
-  public void testLoadAdditionalJarsForDriver() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-    LoadAdditionalJarsForDriver loadAdditionalJarsForDriver = new LoadAdditionalJarsForDriver();
+  public void testLoadAdditionalJarsForDriver() {
     Set<URI> urls = new HashSet<>();
     String driverPath = "src/test/resources/driverFolder/dummy.jar";
-    Method loadAdditionalJarsFromDriver = LoadAdditionalJarsForDriver.class.getDeclaredMethod(
-            "loadAdditionalJarsForDriver",
-            String.class,
-            Set.class
-    );
-    loadAdditionalJarsFromDriver.setAccessible(true);
-    loadAdditionalJarsFromDriver.invoke(loadAdditionalJarsForDriver, driverPath, urls);
+    new LoadAdditionalJarsForDriver().loadAdditionalJarsForDriver(driverPath, urls);
     assertThat(urls)
             .contains(Paths.get(driverPath).toUri())
             .contains(Paths.get(driverPath).resolveSibling("dummy.nar").toUri())
