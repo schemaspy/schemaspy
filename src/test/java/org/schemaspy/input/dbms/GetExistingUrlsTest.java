@@ -21,8 +21,6 @@ package org.schemaspy.input.dbms;
 import org.junit.Test;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -32,54 +30,45 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GetExistingUrlsTest {
 
   @Test
-  public void willAddDirAndContentIfDpIsADirAndNotAFile() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+  public void willAddDirAndContentIfDpIsADirAndNotAFile() {
     URI driverFolder = Paths.get("src", "test", "resources", "driverFolder").toUri();
     URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
     URI dummyNarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.nar").toUri();
     URI narJarWarNotIncludedURI = Paths.get("src", "test", "resources", "driverFolder", "nar.jar.war.not.included")
                                        .toUri();
-    GetExistingUrls getExistingUrls = new GetExistingUrls();
+
     String dp = Paths.get("src", "test", "resources", "driverFolder").toString();
+    Set<URI> uris = new GetExistingUrls().getExistingUrls(dp);
 
-    Method method = GetExistingUrls.class.getDeclaredMethod("getExistingUrls", String.class);
-    method.setAccessible(true);
-
-    Set<URI> uris = (Set<URI>) method.invoke(getExistingUrls, dp);
     assertThat(uris)
         .hasSize(4)
         .contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
   }
 
   @Test
-  public void willOnlyAddFileIfFileIsSpecified() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+  public void willOnlyAddFileIfFileIsSpecified() {
     URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
-    GetExistingUrls getExistingUrls = new GetExistingUrls();
+
     String dp = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
+    Set<URI> uris = new GetExistingUrls().getExistingUrls(dp);
 
-    Method method = GetExistingUrls.class.getDeclaredMethod("getExistingUrls", String.class);
-    method.setAccessible(true);
-
-    Set<URI> uris = (Set<URI>) method.invoke(getExistingUrls, dp);
     assertThat(uris)
         .hasSize(1)
         .contains(dummyJarURI);
   }
 
   @Test
-  public void willAddDirAndContentIfDpSecondArgIsADirAndNotAFile() throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+  public void willAddDirAndContentIfDpSecondArgIsADirAndNotAFile() {
     URI driverFolder = Paths.get("src", "test", "resources", "driverFolder").toUri();
     URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
     URI dummyNarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.nar").toUri();
     URI narJarWarNotIncludedURI = Paths.get("src", "test", "resources", "driverFolder", "nar.jar.war.not.included")
                                        .toUri();
-    GetExistingUrls getExistingUrls = new GetExistingUrls();
+
     String dpFile = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
     String dpDir = Paths.get("src", "test", "resources", "driverFolder").toString();
+    Set<URI> uris = new GetExistingUrls().getExistingUrls(dpFile + File.pathSeparator + dpDir);
 
-    Method method = GetExistingUrls.class.getDeclaredMethod("getExistingUrls", String.class);
-    method.setAccessible(true);
-
-    Set<URI> uris = (Set<URI>) method.invoke(getExistingUrls, dpFile + File.pathSeparator + dpDir);
     assertThat(uris)
         .hasSize(4)
         .contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
