@@ -27,6 +27,8 @@ public final class CopyFromUrl implements Copy {
         URLConnection url = resourceUrl.openConnection();
         if (url instanceof JarURLConnection) {
             new CopyFromJar((JarURLConnection) url, targetPath, filter).copy();
+        } else {
+            new NullCopy().copy();
         }
     }
 }
