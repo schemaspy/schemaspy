@@ -54,6 +54,7 @@ import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults
 import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
 import org.schemaspy.output.html.mustache.diagrams.OrphanDiagram;
 import org.schemaspy.util.*;
+import org.schemaspy.util.copy.Jar;
 import org.schemaspy.util.naming.FileNameGenerator;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
