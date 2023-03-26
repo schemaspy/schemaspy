@@ -19,6 +19,7 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 
 import java.util.Optional;
 
@@ -45,9 +46,13 @@ import java.util.Optional;
  * Schemaspy checks for the presence <code>configFile</code> argument before any other arguments defined in {@link CommandLineArguments}.
  * @author Thomas Traude
  */
+@Parameters(resourceBundle = "configfileargument")
 public final class ConfigFileArgument {
 
-    @Parameter(names = "-configFile")
+    @Parameter(
+        names = "-configFile",
+        descriptionKey = "configfile"
+    )
     private String configFile;
 
     public Optional<String> getConfigFile() {
