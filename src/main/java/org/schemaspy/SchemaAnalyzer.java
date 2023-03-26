@@ -54,7 +54,7 @@ import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults
 import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
 import org.schemaspy.output.html.mustache.diagrams.OrphanDiagram;
 import org.schemaspy.util.*;
-import org.schemaspy.util.copy.CopyFromJar;
+import org.schemaspy.util.copy.CopyFromUrl;
 import org.schemaspy.util.naming.FileNameGenerator;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
@@ -190,7 +190,7 @@ public class SchemaAnalyzer {
             mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
         }
 
-        new CopyFromJar(layoutFolder.url(), outputDir, notHtml()).copy();
+        new CopyFromUrl(layoutFolder.url(), outputDir, notHtml()).copy();
 
         DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
         MustacheCompiler mustacheCompiler = new MustacheCompiler(
@@ -347,7 +347,7 @@ public class SchemaAnalyzer {
 
         Markdown.registryPage(tables);
 
-        new CopyFromJar(layoutFolder.url(), outputDir, notHtml()).copy();
+        new CopyFromUrl(layoutFolder.url(), outputDir, notHtml()).copy();
 
         Renderer renderer = useVizJS ? new VizJSDot() : new GraphvizDot(commandLineArguments.getGraphVizConfig());
 
