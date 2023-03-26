@@ -19,22 +19,22 @@ import java.util.jar.JarFile;
 /**
  * Represents JAR file resources.
  */
-public class Jar {
+public class CopyFromJar implements Copy {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final JarURLConnection jarConnection;
     private final File destPath;
     private final FileFilter filter;
 
-    public Jar(URL resourceUrl, File targetPath, FileFilter filter) throws IOException {
+    public CopyFromJar(URL resourceUrl, File targetPath, FileFilter filter) throws IOException {
         this(resourceUrl.openConnection(), targetPath, filter);
     }
 
-    public Jar(URLConnection urlConnection, File targetPath, FileFilter filter) {
+    public CopyFromJar(URLConnection urlConnection, File targetPath, FileFilter filter) {
         this((JarURLConnection) urlConnection, targetPath, filter);
     }
 
-    public Jar(JarURLConnection jarConnection, File destPath, FileFilter filter) {
+    public CopyFromJar(JarURLConnection jarConnection, File destPath, FileFilter filter) {
         this.jarConnection = jarConnection;
         this.destPath = destPath;
         this.filter = filter;
@@ -44,7 +44,8 @@ public class Jar {
      * Copies resources from the jar file of the current thread and extract it
      * to the destination path.
      */
-    public void copyJarResourceToPath() {
+    @Override
+    public void copy() {
         try {
             JarFile jarFile = jarConnection.getJarFile();
             String jarConnectionEntryName = jarConnection.getEntryName();
