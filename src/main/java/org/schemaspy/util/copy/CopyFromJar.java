@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.net.JarURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Enumeration;
@@ -25,14 +23,6 @@ public class CopyFromJar implements Copy {
     private final JarURLConnection jarConnection;
     private final File destPath;
     private final FileFilter filter;
-
-    public CopyFromJar(URL resourceUrl, File targetPath, FileFilter filter) throws IOException {
-        this(resourceUrl.openConnection(), targetPath, filter);
-    }
-
-    public CopyFromJar(URLConnection urlConnection, File targetPath, FileFilter filter) {
-        this((JarURLConnection) urlConnection, targetPath, filter);
-    }
 
     public CopyFromJar(JarURLConnection jarConnection, File destPath, FileFilter filter) {
         this.jarConnection = jarConnection;
