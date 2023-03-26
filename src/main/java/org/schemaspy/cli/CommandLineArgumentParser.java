@@ -69,6 +69,7 @@ public class CommandLineArgumentParser {
                 .columnSize(120)
                 .defaultProvider(defaultProvider)
                 .build();
+        jCommander.addObject(new ConfigFileArgument());
         jCommander.addObject(arguments);
     }
 
