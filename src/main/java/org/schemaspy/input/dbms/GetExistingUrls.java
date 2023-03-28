@@ -24,7 +24,7 @@ public class GetExistingUrls {
             if (file.exists()) {
                 existingUrls.add(file.toURI());
                 if (file.isDirectory()) {
-                    addDirectoryContent(file, existingUrls);
+                    existingUrls.addAll(addDirectoryContent(file));
                 }
             }
         }
@@ -32,15 +32,17 @@ public class GetExistingUrls {
         return existingUrls;
     }
 
-    private void addDirectoryContent(File dir, Set<URI> existingUrls) {
+    private Set<URI> addDirectoryContent(File dir) {
+        Set<URI> result = new HashSet<>();
         File[] files = dir.listFiles();
         for(File file : files) {
             if (file.exists()) {
-                existingUrls.add(file.toURI());
+                result.add(file.toURI());
                 if (file.isDirectory()) {
-                    addDirectoryContent(file, existingUrls);
+                    result.addAll(addDirectoryContent(file));
                 }
             }
         }
+        return result;
     }
 }
