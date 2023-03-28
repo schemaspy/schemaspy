@@ -3,8 +3,10 @@ package org.schemaspy.input.dbms;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GetExistingUrls {
 
@@ -19,8 +21,9 @@ public class GetExistingUrls {
         Set<URI> existingUrls = new HashSet<>();
 
         String[] pieces = path.split(File.pathSeparator);
-        for (String piece : pieces) {
-            File file = new File(piece);
+        Iterable<File> files = Arrays.stream(pieces).map(File::new).collect(Collectors.toList());
+
+        for (File file : files) {
             if (file.exists()) {
                 existingUrls.add(file.toURI());
                 if (file.isDirectory()) {
