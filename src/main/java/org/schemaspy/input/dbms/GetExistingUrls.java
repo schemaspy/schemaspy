@@ -18,26 +18,17 @@ public class GetExistingUrls {
      * @return
      */
     public Set<URI> getExistingUrls(String path) {
-        Set<URI> existingUrls = new HashSet<>();
-
         String[] pieces = path.split(File.pathSeparator);
         Iterable<File> files = Arrays.stream(pieces).map(File::new).collect(Collectors.toList());
-
-        for (File file : files) {
-            if (file.exists()) {
-                existingUrls.add(file.toURI());
-                if (file.isDirectory()) {
-                    existingUrls.addAll(addDirectoryContent(file));
-                }
-            }
-        }
-
-        return existingUrls;
+        return consider(files);
     }
 
     private Set<URI> addDirectoryContent(File dir) {
+        return consider(() -> Arrays.stream(dir.listFiles()).iterator());
+    }
+
+    private Set<URI> consider(Iterable<File> files) {
         Set<URI> result = new HashSet<>();
-        File[] files = dir.listFiles();
         for(File file : files) {
             if (file.exists()) {
                 result.add(file.toURI());
