@@ -104,9 +104,6 @@ public class DbDriverLoader {
         if (Objects.isNull(driverPath))
             driverPath = "";
 
-        if (Objects.nonNull(connectionConfig.getDriverPath()))
-            driverPath = connectionConfig.getDriverPath();
-
         return getConnection(urlBuilder.build(), driverClass, driverPath);
     }
 
