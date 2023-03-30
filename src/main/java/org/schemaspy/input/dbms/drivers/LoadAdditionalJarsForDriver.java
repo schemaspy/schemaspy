@@ -1,4 +1,4 @@
-package org.schemaspy.input.dbms;
+package org.schemaspy.input.dbms.drivers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LoadAdditionalJarsForDriver {
+public class LoadAdditionalJarsForDriver implements Jars {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final String driverPath;
 
@@ -18,7 +18,8 @@ public class LoadAdditionalJarsForDriver {
         this.driverPath = driverPath;
     }
 
-    public Set<URI> loadAdditionalJarsForDriver() {
+    @Override
+    public Set<URI> value() {
         Set<URI> result = new HashSet<>();
         File driverFolder = new File(Paths.get(this.driverPath).getParent().toString());
         if (driverFolder.exists()) {

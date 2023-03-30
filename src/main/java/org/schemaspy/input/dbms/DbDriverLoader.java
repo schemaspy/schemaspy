@@ -26,6 +26,7 @@ package org.schemaspy.input.dbms;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
+import org.schemaspy.input.dbms.drivers.LoadAdditionalJarsForDriver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.util.*;
@@ -168,7 +168,7 @@ public class DbDriverLoader {
 
         //If this option is true additional jars used by JDBC Driver will be loaded to the classpath
         if (connectionConfig.withLoadSiblings()) {
-            classpath.addAll(new LoadAdditionalJarsForDriver(driverPath).loadAdditionalJarsForDriver());
+            classpath.addAll(new LoadAdditionalJarsForDriver(driverPath).value());
         }
 
 
