@@ -168,7 +168,7 @@ public class DbDriverLoader {
 
         //If this option is true additional jars used by JDBC Driver will be loaded to the classpath
         if (connectionConfig.withLoadSiblings()) {
-            classpath.addAll(new LoadAdditionalJarsForDriver().loadAdditionalJarsForDriver(driverPath));
+            classpath.addAll(new LoadAdditionalJarsForDriver(driverPath).loadAdditionalJarsForDriver());
         }
 
 
