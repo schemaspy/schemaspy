@@ -20,10 +20,7 @@ package org.schemaspy.input.dbms;
 
 import org.junit.Test;
 
-import java.net.URI;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,10 +28,8 @@ public class LoadAdditionalJarsForDriverTest {
 
   @Test
   public void testLoadAdditionalJarsForDriver() {
-    Set<URI> urls = new HashSet<>();
     String driverPath = "src/test/resources/driverFolder/dummy.jar";
-    new LoadAdditionalJarsForDriver().loadAdditionalJarsForDriver(driverPath, urls);
-    assertThat(urls)
+    assertThat(new LoadAdditionalJarsForDriver().loadAdditionalJarsForDriver(driverPath))
             .contains(Paths.get(driverPath).toUri())
             .contains(Paths.get(driverPath).resolveSibling("dummy.nar").toUri())
             .doesNotContain(Paths.get(driverPath).resolveSibling("nar.jar.war.not.included").toUri());
