@@ -29,7 +29,7 @@ public class LoadAdditionalJarsForDriverTest {
   @Test
   public void testLoadAdditionalJarsForDriver() {
     String driverPath = "src/test/resources/driverFolder/dummy.jar";
-    assertThat(new LoadAdditionalJarsForDriver().loadAdditionalJarsForDriver(driverPath))
+    assertThat(new LoadAdditionalJarsForDriver(driverPath).loadAdditionalJarsForDriver())
             .contains(Paths.get(driverPath).toUri())
             .contains(Paths.get(driverPath).resolveSibling("dummy.nar").toUri())
             .doesNotContain(Paths.get(driverPath).resolveSibling("nar.jar.war.not.included").toUri());

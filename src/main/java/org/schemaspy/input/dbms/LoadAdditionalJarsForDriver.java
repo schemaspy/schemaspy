@@ -12,10 +12,15 @@ import java.util.Set;
 
 public class LoadAdditionalJarsForDriver {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final String driverPath;
 
-    public Set<URI> loadAdditionalJarsForDriver(String driverPath) {
+    public LoadAdditionalJarsForDriver(final String driverPath) {
+        this.driverPath = driverPath;
+    }
+
+    public Set<URI> loadAdditionalJarsForDriver() {
         Set<URI> result = new HashSet<>();
-        File driverFolder = new File(Paths.get(driverPath).getParent().toString());
+        File driverFolder = new File(Paths.get(this.driverPath).getParent().toString());
         if (driverFolder.exists()) {
             File[] files = driverFolder.listFiles(
                     (dir, name) -> name.toLowerCase().matches(".*\\.?ar$")
