@@ -69,15 +69,25 @@ public class NameValidator {
      * @return
      */
     public boolean isValid(String name, String type) {
+        return isValidType(type) && isNotExcluded(name) && isIncluded(name);
+    }
+
+    public boolean isValidType(String type) {
         // some databases (MySQL) return more than we wanted
         if (!validTypes.contains(type.toUpperCase()))
             return false;
+        return true;
+    }
 
+    public boolean isNotExcluded(String name) {
         if (exclude.matcher(name).matches()) {
             LOGGER.debug("Excluding {} {}: matches exclusion pattern '{}'", clazz, name, exclude);
             return false;
         }
+        return true;
+    }
 
+    public boolean isIncluded(String name) {
         boolean valid = include.matcher(name).matches();
         if (valid) {
             LOGGER.debug("Including {} {}: matches inclusion pattern '{}'", clazz, name, include);
