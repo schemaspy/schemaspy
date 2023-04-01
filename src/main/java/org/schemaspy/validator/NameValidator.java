@@ -69,14 +69,8 @@ public class NameValidator {
      * @return
      */
     public boolean isValid(String name, String type) {
-        return isValidType(type) && isNotExcluded(name) && isIncluded(name);
-    }
-
-    public boolean isValidType(String type) {
-        // some databases (MySQL) return more than we wanted
-        if (!validTypes.contains(type.toUpperCase()))
-            return false;
-        return true;
+        return new DatabasetypeValidator(this.validTypes).isValid(type)
+                && isNotExcluded(name) && isIncluded(name);
     }
 
     public boolean isNotExcluded(String name) {
