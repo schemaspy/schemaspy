@@ -70,15 +70,8 @@ public class NameValidator {
      */
     public boolean isValid(String name, String type) {
         return new DatabasetypeValidator(this.validTypes).isValid(type)
-                && isNotExcluded(name) && isIncluded(name);
-    }
-
-    public boolean isNotExcluded(String name) {
-        if (exclude.matcher(name).matches()) {
-            LOGGER.debug("Excluding {} {}: matches exclusion pattern '{}'", clazz, name, exclude);
-            return false;
-        }
-        return true;
+                && new ExclusionValidator(this.clazz, this.exclude).isValid(name)
+                && isIncluded(name);
     }
 
     public boolean isIncluded(String name) {
