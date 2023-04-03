@@ -20,10 +20,6 @@
  */
 package org.schemaspy.validator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -42,8 +38,6 @@ public class NameValidator {
     private final Pattern include;
     private final Pattern exclude;
     private final Set<String> validTypes;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * @param clazz table or view
@@ -71,16 +65,6 @@ public class NameValidator {
     public boolean isValid(String name, String type) {
         return new DatabasetypeValidator(this.validTypes).isValid(type)
                 && new ExclusionValidator(this.clazz, this.exclude).isValid(name)
-                && isIncluded(name);
-    }
-
-    public boolean isIncluded(String name) {
-        boolean valid = include.matcher(name).matches();
-        if (valid) {
-            LOGGER.debug("Including {} {}: matches inclusion pattern '{}'", clazz, name, include);
-        } else {
-            LOGGER.debug("Excluding {} {}: doesn't match inclusion pattern '{}'", clazz, name, include);
-        }
-        return valid;
+                && new InclusionValidator(this.clazz, this.include).isIncluded(name);
     }
 }
