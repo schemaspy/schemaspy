@@ -67,10 +67,8 @@ public class TableOrdererTest {
         tables.add(parent);
 
         TableOrderer tableOrderer = new TableOrderer();
-        List<ForeignKeyConstraint> recursiveConstraints = new ArrayList<>();
-        List<Table> orderedByInsert = tableOrderer.getTablesOrderedByRI(tables, recursiveConstraints);
+        List<Table> orderedByInsert = tableOrderer.getTablesOrderedByRI(tables);
         assertThat(orderedByInsert).containsExactly(child, complexRecursion1, complexRecursion2, recursion, parent, unattached);
-        assertThat(recursiveConstraints.size()).isEqualTo(3);
     }
 
     private Table createParent(Database database) {
