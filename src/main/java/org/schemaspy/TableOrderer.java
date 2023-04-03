@@ -40,13 +40,11 @@ public class TableOrderer {
      * Returns a list of <code>Table</code>s ordered such that parents are listed first
      * and child tables are listed last.
      *
-     * <code>recursiveConstraints</code> gets populated with <code>TableConstraint</code>s
-     * that had to be removed to resolve the returned list.
      * @param tables Tables to order
-     * @param recursiveConstraints gets populated with TableConstraints that had to be removed to resolve the returned list
      * @return Returns a list of <code>Table</code>s ordered such that parents are listed first and child tables are listed last.
      */
-    public List<Table> getTablesOrderedByRI(Collection<Table> tables, Collection<ForeignKeyConstraint> recursiveConstraints) {
+    public List<Table> getTablesOrderedByRI(Collection<Table> tables) {
+        Collection<ForeignKeyConstraint> recursiveConstraints = new ArrayList<>();
         List<Table> heads = new ArrayList<>();
         List<Table> tails = new ArrayList<>();
         List<Table> remainingTables = new ArrayList<>(tables);

@@ -308,14 +308,11 @@ public class SchemaAnalyzer {
             }
         }
 
-        List<ForeignKeyConstraint> recursiveConstraints = new ArrayList<>();
-
         // create an orderer to be able to determine insertion and deletion ordering of tables
         TableOrderer orderer = new TableOrderer();
 
         // side effect is that the RI relationships get trashed
-        // also populates the recursiveConstraints collection
-        List<Table> orderedTables = orderer.getTablesOrderedByRI(db.getTables(), recursiveConstraints);
+        List<Table> orderedTables = orderer.getTablesOrderedByRI(db.getTables());
 
         new OrderingReport(outputDir, orderedTables).write();
 
