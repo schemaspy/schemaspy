@@ -114,22 +114,20 @@ public class TableOrderer {
     private List<Table> trimLeaves(List<Table> tables) {
         List<Table> leaves = new ArrayList<>();
 
-        Iterator<Table> iter = tables.iterator();
-        while (iter.hasNext()) {
-            Table leaf = iter.next();
+        for (Table leaf : new ArrayList<>(tables)) {
             if (leaf.isLeaf()) {
                 leaves.add(leaf);
-                iter.remove();
+                tables.remove(leaf);
             }
         }
 
         // now sort them so the ones with large numbers of children show up first (not required, but cool)
         List<Table> trimmedLeaves = sortTrimmedLevel(leaves);
-        Iterator<Table> trimmedIter = trimmedLeaves.iterator();
-        while (trimmedIter.hasNext()) {
+
+        for (Table trimmedLeaf : trimmedLeaves) {
             // do this after the previous loop to prevent getting leaves before they're ready
             // and so we can sort them correctly
-            trimmedIter.next().unlinkParents();
+            trimmedLeaf.unlinkParents();
         }
 
         return trimmedLeaves;
@@ -144,22 +142,19 @@ public class TableOrderer {
     private List<Table> trimRoots(List<Table> tables) {
         List<Table> roots = new ArrayList<>();
 
-        Iterator<Table> iter = tables.iterator();
-        while (iter.hasNext()) {
-            Table root = iter.next();
+        for (Table root : new ArrayList<>(tables)) {
             if (root.isRoot()) {
                 roots.add(root);
-                iter.remove();
+                tables.remove(root);
             }
         }
 
         // now sort them so the ones with large numbers of children show up first (not required, but cool)
         List<Table> trimmedRoots = sortTrimmedLevel(roots);
-        Iterator<Table> trimmedIter = trimmedRoots.iterator();
-        while (trimmedIter.hasNext()) {
+        for (Table trimmedRoot : trimmedRoots) {
             // do this after the previous loop to prevent getting roots before they're ready
             // and so we can sort them correctly
-            trimmedIter.next().unlinkChildren();
+            trimmedRoot.unlinkChildren();
         }
 
         return trimmedRoots;
