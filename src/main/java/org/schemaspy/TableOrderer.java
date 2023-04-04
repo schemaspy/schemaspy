@@ -124,15 +124,15 @@ public class TableOrderer {
         }
 
         // now sort them so the ones with large numbers of children show up first (not required, but cool)
-        leaves = sortTrimmedLevel(leaves);
-        iter = leaves.iterator();
-        while (iter.hasNext()) {
+        List<Table> trimmedLeaves = sortTrimmedLevel(leaves);
+        Iterator<Table> trimmedIter = trimmedLeaves.iterator();
+        while (trimmedIter.hasNext()) {
             // do this after the previous loop to prevent getting leaves before they're ready
             // and so we can sort them correctly
-            iter.next().unlinkParents();
+            trimmedIter.next().unlinkParents();
         }
 
-        return leaves;
+        return trimmedLeaves;
     }
 
     /**
@@ -154,15 +154,15 @@ public class TableOrderer {
         }
 
         // now sort them so the ones with large numbers of children show up first (not required, but cool)
-        roots = sortTrimmedLevel(roots);
-        iter = roots.iterator();
-        while (iter.hasNext()) {
+        List<Table> trimmedRoots = sortTrimmedLevel(roots);
+        Iterator<Table> trimmedIter = trimmedRoots.iterator();
+        while (trimmedIter.hasNext()) {
             // do this after the previous loop to prevent getting roots before they're ready
             // and so we can sort them correctly
-            iter.next().unlinkChildren();
+            trimmedIter.next().unlinkChildren();
         }
 
-        return roots;
+        return trimmedRoots;
     }
 
     /**
