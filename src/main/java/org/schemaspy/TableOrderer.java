@@ -89,7 +89,7 @@ public class TableOrderer {
         return ordered;
     }
 
-    private static void removeRemotesAndUnattached(List<Table> remainingTables, List<Table> unattached) {
+    private void removeRemotesAndUnattached(List<Table> remainingTables, List<Table> unattached) {
         for (Iterator<Table> iter = remainingTables.iterator(); iter.hasNext(); ) {
             Table table = iter.next();
             if (table.isRemote()) {
@@ -111,7 +111,7 @@ public class TableOrderer {
      * @param tables tables to remove leafs from
      * @return tables removed
      */
-    private static List<Table> trimLeaves(List<Table> tables) {
+    private List<Table> trimLeaves(List<Table> tables) {
         List<Table> leaves = new ArrayList<>();
 
         Iterator<Table> iter = tables.iterator();
@@ -141,7 +141,7 @@ public class TableOrderer {
      * @param tables to trim roots from
      * @return tables removed
      */
-    private static List<Table> trimRoots(List<Table> tables) {
+    private List<Table> trimRoots(List<Table> tables) {
         List<Table> roots = new ArrayList<>();
 
         Iterator<Table> iter = tables.iterator();
@@ -168,7 +168,7 @@ public class TableOrderer {
     /**
      * this doesn't change the logical output of the program because all of these (leaves or roots) are at the same logical level
      */
-    private static List<Table> sortTrimmedLevel(List<Table> tables) {
+    private List<Table> sortTrimmedLevel(List<Table> tables) {
         /*
           order by
           <ul>
@@ -195,7 +195,7 @@ public class TableOrderer {
         return new ArrayList<>(sorter);
     }
 
-    private static boolean removeSelfReferencingConstraints(List<Table> remainingTables, Collection<ForeignKeyConstraint> recursiveConstraints) {
+    private boolean removeSelfReferencingConstraints(List<Table> remainingTables, Collection<ForeignKeyConstraint> recursiveConstraints) {
         boolean foundSimpleRecursion = false;
         for (Table potentialRecursiveTable : remainingTables) {
             ForeignKeyConstraint recursiveConstraint = potentialRecursiveTable.removeSelfReferencingConstraint();
@@ -207,7 +207,7 @@ public class TableOrderer {
         return foundSimpleRecursion;
     }
 
-    private static void removeAForeignKeyConstraint(Collection<ForeignKeyConstraint> recursiveConstraints, List<Table> remainingTables, boolean foundSimpleRecursion) {
+    private void removeAForeignKeyConstraint(Collection<ForeignKeyConstraint> recursiveConstraints, List<Table> remainingTables, boolean foundSimpleRecursion) {
         if (!foundSimpleRecursion) {
             // expensive comparison, but we're down to the end of the tables so it shouldn't really matter
             Set<Table> byParentChildDelta = new TreeSet<>((t1, t2) -> {
