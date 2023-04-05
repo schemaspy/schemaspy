@@ -114,12 +114,13 @@ public class TableOrderer {
     private List<Table> trimLeaves(List<Table> tables) {
         List<Table> leaves = new ArrayList<>();
 
-        for (Table leaf : new ArrayList<>(tables)) {
+        for (Table leaf : tables) {
             if (leaf.isLeaf()) {
                 leaves.add(leaf);
-                tables.remove(leaf);
             }
         }
+
+        tables.removeAll(leaves);
 
         // now sort them so the ones with large numbers of children show up first (not required, but cool)
         List<Table> trimmedLeaves = sortTrimmedLevel(leaves);
@@ -142,12 +143,13 @@ public class TableOrderer {
     private List<Table> trimRoots(List<Table> tables) {
         List<Table> roots = new ArrayList<>();
 
-        for (Table root : new ArrayList<>(tables)) {
+        for (Table root : tables) {
             if (root.isRoot()) {
                 roots.add(root);
-                tables.remove(root);
             }
         }
+
+        tables.removeAll(roots);
 
         // now sort them so the ones with large numbers of children show up first (not required, but cool)
         List<Table> trimmedRoots = sortTrimmedLevel(roots);
