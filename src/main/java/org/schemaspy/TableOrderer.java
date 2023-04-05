@@ -96,7 +96,10 @@ public class TableOrderer {
                 table.unlinkParents();
                 table.unlinkChildren();
                 remainingTables.remove(table);
-            } else if (table.isLeaf() && table.isRoot()) {
+            }
+        }
+        for (Table table : new ArrayList<>(remainingTables)) {
+            if (table.isLeaf() && table.isRoot()) {
                 // floater, so add it to 'unattached'
                 unattached.add(table);
                 remainingTables.remove(table);
