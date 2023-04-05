@@ -90,17 +90,16 @@ public class TableOrderer {
     }
 
     private void removeRemotesAndUnattached(List<Table> remainingTables, List<Table> unattached) {
-        for (Iterator<Table> iter = remainingTables.iterator(); iter.hasNext(); ) {
-            Table table = iter.next();
+        for (Table table : new ArrayList<>(remainingTables)) {
             if (table.isRemote()) {
                 // ignore remote tables since there's no way to deal with them
                 table.unlinkParents();
                 table.unlinkChildren();
-                iter.remove();
+                remainingTables.remove(table);
             } else if (table.isLeaf() && table.isRoot()) {
                 // floater, so add it to 'unattached'
                 unattached.add(table);
-                iter.remove();
+                remainingTables.remove(table);
             }
         }
     }
