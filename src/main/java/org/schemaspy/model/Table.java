@@ -319,6 +319,16 @@ public class Table implements Comparable<Table> {
     }
 
     /**
+     * Returns <code>true</code> if this table is unattached to other tables.
+     * Used in dependency analysis.
+     *
+     * @return
+     */
+    public boolean isFloater() {
+        return this.isLeaf() && this.isRoot();
+    }
+
+    /**
      * Returns <code>true</code> if this table references no other tables..
      * Used in dependency analysis.
      *

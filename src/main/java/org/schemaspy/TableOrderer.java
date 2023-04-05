@@ -103,7 +103,7 @@ public class TableOrderer {
 
     private void removeUnattached(List<Table> remainingTables, List<Table> unattached) {
         for (Table table : new ArrayList<>(remainingTables)) {
-            if (table.isLeaf() && table.isRoot()) {
+            if (table.isFloater()) {
                 // floater, so add it to 'unattached'
                 unattached.add(table);
                 remainingTables.remove(table);
