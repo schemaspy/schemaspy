@@ -91,14 +91,14 @@ public class TableOrderer {
     }
 
     private void removeRemotes(List<Table> remainingTables) {
-        for (Table table : new ArrayList<>(remainingTables)) {
-            if (table.isRemote()) {
+        remainingTables.stream()
+            .filter(Table::isRemote)
+            .forEach(table -> {
                 // ignore remote tables since there's no way to deal with them
                 table.unlinkParents();
                 table.unlinkChildren();
-                remainingTables.remove(table);
-            }
-        }
+            });
+        remainingTables.removeIf(Table::isRemote);
     }
 
     private void removeUnattached(List<Table> remainingTables, List<Table> unattached) {
