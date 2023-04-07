@@ -48,11 +48,11 @@ public class TableOrderer {
         List<Table> heads = new ArrayList<>();
         List<Table> tails = new ArrayList<>();
         List<Table> remainingTables = new ArrayList<>(tables);
-        List<Table> unattached = new ArrayList<>();
 
         // first pass to gather the 'low hanging fruit'
         removeRemotes(remainingTables);
-        removeUnattached(remainingTables, unattached);
+        List<Table> unattached = floaters(remainingTables);
+        remainingTables.removeAll(unattached);
 
         unattached = sortTrimmedLevel(unattached);
         boolean prunedNonReals = false;
@@ -101,14 +101,15 @@ public class TableOrderer {
         remainingTables.removeIf(Table::isRemote);
     }
 
-    private void removeUnattached(List<Table> remainingTables, List<Table> unattached) {
+    private List<Table> floaters(List<Table> remainingTables) {
+        List<Table> unattached = new ArrayList<>();
         for (Table table : new ArrayList<>(remainingTables)) {
             if (table.isFloater()) {
                 // floater, so add it to 'unattached'
                 unattached.add(table);
-                remainingTables.remove(table);
             }
         }
+        return unattached;
     }
 
     /**
