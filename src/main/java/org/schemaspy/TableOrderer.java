@@ -25,6 +25,7 @@ import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Sorts {@link Table}s by their referential integrity constraints.
@@ -102,14 +103,9 @@ public class TableOrderer {
     }
 
     private List<Table> floaters(List<Table> remainingTables) {
-        List<Table> unattached = new ArrayList<>();
-        for (Table table : new ArrayList<>(remainingTables)) {
-            if (table.isFloater()) {
-                // floater, so add it to 'unattached'
-                unattached.add(table);
-            }
-        }
-        return unattached;
+        return remainingTables.stream()
+                .filter(Table::isFloater)
+                .collect(Collectors.toList());
     }
 
     /**
