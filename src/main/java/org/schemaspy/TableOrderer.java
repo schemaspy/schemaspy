@@ -52,10 +52,10 @@ public class TableOrderer {
 
         // first pass to gather the 'low hanging fruit'
         removeRemotes(remainingTables);
-        List<Table> unattached = floaters(remainingTables);
-        remainingTables.removeAll(unattached);
+        List<Table> floaters = floaters(remainingTables);
+        remainingTables.removeAll(floaters);
 
-        unattached = sortTrimmedLevel(unattached);
+        List<Table> unattached = sortTrimmedLevel(floaters);
         boolean prunedNonReals = false;
 
         while (!remainingTables.isEmpty()) {
