@@ -73,11 +73,10 @@ public class TableOrderer {
                     }
 
                     prunedNonReals = true;
-                    continue;
+                } else {
+                    boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables, recursiveConstraints);
+                    removeAForeignKeyConstraint(recursiveConstraints, remainingTables, foundSimpleRecursion);
                 }
-
-                boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables, recursiveConstraints);
-                removeAForeignKeyConstraint(recursiveConstraints, remainingTables, foundSimpleRecursion);
             }
         }
 
