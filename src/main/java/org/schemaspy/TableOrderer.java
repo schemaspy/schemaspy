@@ -59,13 +59,13 @@ public class TableOrderer {
         boolean prunedNonReals = false;
 
         while (!remainingTables.isEmpty()) {
-            int tablesLeft = remainingTables.size();
+            boolean hasRecursion = hasRecursion(remainingTables);
             tails.addAll(0, trimLeaves(remainingTables));
             heads.addAll(trimRoots(remainingTables));
 
             // if we could't trim anything then there's recursion....
             // resolve it by removing a constraint, one by one, 'till the tables are all trimmed
-            if (tablesLeft == remainingTables.size()) {
+            if (hasRecursion) {
                 if (!prunedNonReals) {
                     // get ride of everything that isn't explicitly specified by the database
                     for (Table table : remainingTables) {
@@ -88,6 +88,13 @@ public class TableOrderer {
         ordered.addAll(unattached);
 
         return ordered;
+    }
+
+    private boolean hasRecursion(List<Table> remainingTables) {
+        final List<Table> copy = new LinkedList<>(remainingTables);
+        copy.removeIf(Table::isLeaf);
+        copy.removeIf(Table::isRoot);
+        return copy.size() == remainingTables.size();
     }
 
     private void removeRemotes(List<Table> remainingTables) {
