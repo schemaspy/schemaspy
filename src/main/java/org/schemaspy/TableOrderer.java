@@ -58,25 +58,32 @@ public class TableOrderer {
         List<Table> unattached = sortTrimmedLevel(floaters);
         boolean prunedNonReals = false;
 
+        while (!remainingTables.isEmpty() && !hasRecursion(remainingTables)) {
+            boolean hasRecursion = hasRecursion(remainingTables);
+            tails.addAll(0, trimLeaves(remainingTables));
+            heads.addAll(trimRoots(remainingTables));
+        }
+
+        // if we could't trim anything then there's recursion....
+        // resolve it by removing a constraint, one by one, 'till the tables are all trimmed
+        if (hasRecursion(remainingTables)) {
+            if (!prunedNonReals) {
+                // get ride of everything that isn't explicitly specified by the database
+                for (Table table : remainingTables) {
+                    table.removeNonRealForeignKeys();
+                }
+
+                prunedNonReals = true;
+            }
+        }
+
         while (!remainingTables.isEmpty()) {
             boolean hasRecursion = hasRecursion(remainingTables);
             tails.addAll(0, trimLeaves(remainingTables));
             heads.addAll(trimRoots(remainingTables));
-
-            // if we could't trim anything then there's recursion....
-            // resolve it by removing a constraint, one by one, 'till the tables are all trimmed
             if (hasRecursion) {
-                if (!prunedNonReals) {
-                    // get ride of everything that isn't explicitly specified by the database
-                    for (Table table : remainingTables) {
-                        table.removeNonRealForeignKeys();
-                    }
-
-                    prunedNonReals = true;
-                } else {
-                    boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables, recursiveConstraints);
-                    removeAForeignKeyConstraint(recursiveConstraints, remainingTables, foundSimpleRecursion);
-                }
+                boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables, recursiveConstraints);
+                removeAForeignKeyConstraint(recursiveConstraints, remainingTables, foundSimpleRecursion);
             }
         }
 
