@@ -56,10 +56,8 @@ public class TableOrderer {
         remainingTables.removeAll(floaters);
 
         List<Table> unattached = sortTrimmedLevel(floaters);
-        boolean prunedNonReals = false;
 
         while (!remainingTables.isEmpty() && !hasRecursion(remainingTables)) {
-            boolean hasRecursion = hasRecursion(remainingTables);
             tails.addAll(0, trimLeaves(remainingTables));
             heads.addAll(trimRoots(remainingTables));
         }
@@ -67,13 +65,9 @@ public class TableOrderer {
         // if we could't trim anything then there's recursion....
         // resolve it by removing a constraint, one by one, 'till the tables are all trimmed
         if (hasRecursion(remainingTables)) {
-            if (!prunedNonReals) {
-                // get ride of everything that isn't explicitly specified by the database
-                for (Table table : remainingTables) {
-                    table.removeNonRealForeignKeys();
-                }
-
-                prunedNonReals = true;
+            // get ride of everything that isn't explicitly specified by the database
+            for (Table table : remainingTables) {
+                table.removeNonRealForeignKeys();
             }
         }
 
