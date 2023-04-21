@@ -26,10 +26,14 @@ RUN adduser java -h / -D && \
     fc-cache -fv && \
     mkdir /drivers_inc && \
     cd /drivers_inc && \
-    curl -JLO https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/$MYSQL_VERSION/mysql-connector-java-$MYSQL_VERSION.jar && \
-    curl -JLO https://search.maven.org/remotecontent?filepath=org/mariadb/jdbc/mariadb-java-client/$MARIADB_VERSION/mariadb-java-client-$MARIADB_VERSION.jar && \
-    curl -JLO https://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.jar && \
-    curl -JLO https://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/$JTDS_VERSION/jtds-$JTDS_VERSION.jar && \
+    curl -L https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/$MYSQL_VERSION/mysql-connector-java-$MYSQL_VERSION.jar \
+      -o mysql-connector-java-$MYSQL_VERSION.jar && \
+    curl -L https://search.maven.org/remotecontent?filepath=org/mariadb/jdbc/mariadb-java-client/$MARIADB_VERSION/mariadb-java-client-$MARIADB_VERSION.jar \
+      -o mariadb-java-client-$MARIADB_VERSION.jar && \
+    curl -L https://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.jar \
+      -o postgresql-$POSTGRESQL_VERSION.jar && \
+    curl -L https://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/$JTDS_VERSION/jtds-$JTDS_VERSION.jar \
+      -o jtds-$JTDS_VERSION.jar && \
     mkdir /output && \
     chown -R java /drivers_inc && \
     chown -R java /output && \
