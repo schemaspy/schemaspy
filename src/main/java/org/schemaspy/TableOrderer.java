@@ -77,7 +77,9 @@ public class TableOrderer {
             heads.addAll(trimRoots(remainingTables));
             if (hasRecursion) {
                 boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables, recursiveConstraints);
-                removeAForeignKeyConstraint(recursiveConstraints, remainingTables, foundSimpleRecursion);
+                if (!foundSimpleRecursion) {
+                    removeAForeignKeyConstraint(recursiveConstraints, remainingTables);
+                }
             }
         }
 
@@ -214,22 +216,20 @@ public class TableOrderer {
         return foundSimpleRecursion;
     }
 
-    private void removeAForeignKeyConstraint(Collection<ForeignKeyConstraint> recursiveConstraints, List<Table> remainingTables, boolean foundSimpleRecursion) {
-        if (!foundSimpleRecursion) {
-            // expensive comparison, but we're down to the end of the tables so it shouldn't really matter
-            Set<Table> byParentChildDelta = new TreeSet<>((t1, t2) -> {
-                // sort on the delta between number of parents and kids so we can
-                // target the tables with the biggest delta and therefore the most impact
-                // on reducing the smaller of the two
-                int rc = Math.abs(t2.getNumChildren() - t2.getNumParents()) - Math.abs(t1.getNumChildren() - t1.getNumParents());
-                if (rc == 0)
-                    rc = t1.compareTo(t2);
-                return rc;
-            });
-            byParentChildDelta.addAll(remainingTables);
-            Table recursiveTable = byParentChildDelta.iterator().next(); // this one has the largest delta
-            ForeignKeyConstraint removedConstraint = recursiveTable.removeAForeignKeyConstraint();
-            recursiveConstraints.add(removedConstraint);
-        }
+    private void removeAForeignKeyConstraint(Collection<ForeignKeyConstraint> recursiveConstraints, List<Table> remainingTables) {
+        // expensive comparison, but we're down to the end of the tables so it shouldn't really matter
+        Set<Table> byParentChildDelta = new TreeSet<>((t1, t2) -> {
+            // sort on the delta between number of parents and kids so we can
+            // target the tables with the biggest delta and therefore the most impact
+            // on reducing the smaller of the two
+            int rc = Math.abs(t2.getNumChildren() - t2.getNumParents()) - Math.abs(t1.getNumChildren() - t1.getNumParents());
+            if (rc == 0)
+                rc = t1.compareTo(t2);
+            return rc;
+        });
+        byParentChildDelta.addAll(remainingTables);
+        Table recursiveTable = byParentChildDelta.iterator().next(); // this one has the largest delta
+        ForeignKeyConstraint removedConstraint = recursiveTable.removeAForeignKeyConstraint();
+        recursiveConstraints.add(removedConstraint);
     }
 }
