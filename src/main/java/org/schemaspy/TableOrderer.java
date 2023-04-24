@@ -45,7 +45,6 @@ public class TableOrderer {
      * @return Returns a list of <code>Table</code>s ordered such that parents are listed first and child tables are listed last.
      */
     public List<Table> getTablesOrderedByRI(Collection<Table> tables) {
-        Collection<ForeignKeyConstraint> recursiveConstraints = new ArrayList<>();
         List<Table> heads = new ArrayList<>();
         List<Table> tails = new ArrayList<>();
         List<Table> remainingTables = new ArrayList<>(tables);
@@ -76,9 +75,9 @@ public class TableOrderer {
             tails.addAll(0, trimLeaves(remainingTables));
             heads.addAll(trimRoots(remainingTables));
             if (hasRecursion) {
-                boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables, recursiveConstraints);
+                boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables);
                 if (!foundSimpleRecursion) {
-                    removeAForeignKeyConstraint(recursiveConstraints, remainingTables);
+                    removeAForeignKeyConstraint(remainingTables);
                 }
             }
         }
@@ -204,19 +203,18 @@ public class TableOrderer {
         return new ArrayList<>(sorter);
     }
 
-    private boolean removeSelfReferencingConstraints(List<Table> remainingTables, Collection<ForeignKeyConstraint> recursiveConstraints) {
+    private boolean removeSelfReferencingConstraints(List<Table> remainingTables) {
         boolean foundSimpleRecursion = false;
         for (Table potentialRecursiveTable : remainingTables) {
             ForeignKeyConstraint recursiveConstraint = potentialRecursiveTable.removeSelfReferencingConstraint();
             if (recursiveConstraint != null) {
-                recursiveConstraints.add(recursiveConstraint);
                 foundSimpleRecursion = true;
             }
         }
         return foundSimpleRecursion;
     }
 
-    private void removeAForeignKeyConstraint(Collection<ForeignKeyConstraint> recursiveConstraints, List<Table> remainingTables) {
+    private void removeAForeignKeyConstraint(List<Table> remainingTables) {
         // expensive comparison, but we're down to the end of the tables so it shouldn't really matter
         Set<Table> byParentChildDelta = new TreeSet<>((t1, t2) -> {
             // sort on the delta between number of parents and kids so we can
@@ -230,6 +228,5 @@ public class TableOrderer {
         byParentChildDelta.addAll(remainingTables);
         Table recursiveTable = byParentChildDelta.iterator().next(); // this one has the largest delta
         ForeignKeyConstraint removedConstraint = recursiveTable.removeAForeignKeyConstraint();
-        recursiveConstraints.add(removedConstraint);
     }
 }
