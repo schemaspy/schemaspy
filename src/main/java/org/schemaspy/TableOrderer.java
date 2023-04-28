@@ -214,18 +214,16 @@ public class TableOrderer {
     }
 
     private void removeAForeignKeyConstraint(List<Table> remainingTables) {
-        // expensive comparison, but we're down to the end of the tables so it shouldn't really matter
-        Set<Table> byParentChildDelta = new TreeSet<>((t1, t2) -> {
-            // sort on the delta between number of parents and kids so we can
-            // target the tables with the biggest delta and therefore the most impact
-            // on reducing the smaller of the two
-            int rc = Math.abs(t2.getNumChildren() - t2.getNumParents()) - Math.abs(t1.getNumChildren() - t1.getNumParents());
-            if (rc == 0)
-                rc = t1.compareTo(t2);
-            return rc;
-        });
-        byParentChildDelta.addAll(remainingTables);
-        Table recursiveTable = byParentChildDelta.iterator().next(); // this one has the largest delta
+        Table recursiveTable = remainingTables.stream()
+            .min((t1, t2) -> {
+                // sort on the delta between number of parents and kids so we can
+                // target the tables with the biggest delta and therefore the most impact
+                // on reducing the smaller of the two
+                int rc = Math.abs(t2.getNumChildren() - t2.getNumParents()) - Math.abs(t1.getNumChildren() - t1.getNumParents());
+                if (rc == 0)
+                    rc = t1.compareTo(t2);
+                return rc;
+            }).get(); // this one has the largest delta
         recursiveTable.removeAForeignKeyConstraint();
     }
 }
