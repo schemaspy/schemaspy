@@ -488,6 +488,9 @@
                 <version>3.1.2</version>
                 <configuration>
                     <skipTests>${skip.surefire}</skipTests>
+                    <argLine>
+                        -Djava.security.manager=allow
+                    </argLine>
                 </configuration>
             </plugin>
             <plugin>
