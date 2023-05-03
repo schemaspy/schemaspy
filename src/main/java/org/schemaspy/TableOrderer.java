@@ -61,8 +61,6 @@ public class TableOrderer {
             heads.addAll(trimRoots(remainingTables));
         }
 
-        // if we could't trim anything then there's recursion....
-        // resolve it by removing a constraint, one by one, 'till the tables are all trimmed
         if (hasRecursion(remainingTables)) {
             // get ride of everything that isn't explicitly specified by the database
             for (Table table : remainingTables) {
@@ -74,6 +72,8 @@ public class TableOrderer {
             boolean hasRecursion = hasRecursion(remainingTables);
             tails.addAll(0, trimLeaves(remainingTables));
             heads.addAll(trimRoots(remainingTables));
+
+            // resolve the recursion by removing a constraint, one by one, 'till the tables are all trimmed
             if (hasRecursion) {
                 boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables);
                 if (!foundSimpleRecursion) {
