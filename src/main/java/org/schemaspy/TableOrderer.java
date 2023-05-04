@@ -45,7 +45,6 @@ public class TableOrderer {
      * @return Returns a list of <code>Table</code>s ordered such that parents are listed first and child tables are listed last.
      */
     public List<Table> getTablesOrderedByRI(Collection<Table> tables) {
-        Collection<ForeignKeyConstraint> recursiveConstraints = new ArrayList<>();
         List<Table> heads = new ArrayList<>();
         List<Table> tails = new ArrayList<>();
         List<Table> remainingTables = new ArrayList<>(tables);
@@ -56,26 +55,29 @@ public class TableOrderer {
         remainingTables.removeAll(floaters);
 
         List<Table> unattached = sortTrimmedLevel(floaters);
-        boolean prunedNonReals = false;
+
+        while (!remainingTables.isEmpty() && !hasRecursion(remainingTables)) {
+            tails.addAll(0, trimLeaves(remainingTables));
+            heads.addAll(trimRoots(remainingTables));
+        }
+
+        // if we could't trim anything then there's recursion....
+        // resolve it by removing a constraint, one by one, 'till the tables are all trimmed
+        if (hasRecursion(remainingTables)) {
+            // get ride of everything that isn't explicitly specified by the database
+            for (Table table : remainingTables) {
+                table.removeNonRealForeignKeys();
+            }
+        }
 
         while (!remainingTables.isEmpty()) {
             boolean hasRecursion = hasRecursion(remainingTables);
             tails.addAll(0, trimLeaves(remainingTables));
             heads.addAll(trimRoots(remainingTables));
-
-            // if we could't trim anything then there's recursion....
-            // resolve it by removing a constraint, one by one, 'till the tables are all trimmed
             if (hasRecursion) {
-                if (!prunedNonReals) {
-                    // get ride of everything that isn't explicitly specified by the database
-                    for (Table table : remainingTables) {
-                        table.removeNonRealForeignKeys();
-                    }
-
-                    prunedNonReals = true;
-                } else {
-                    boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables, recursiveConstraints);
-                    removeAForeignKeyConstraint(recursiveConstraints, remainingTables, foundSimpleRecursion);
+                boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables);
+                if (!foundSimpleRecursion) {
+                    removeAForeignKeyConstraint(remainingTables);
                 }
             }
         }
@@ -201,22 +203,19 @@ public class TableOrderer {
         return new ArrayList<>(sorter);
     }
 
-    private boolean removeSelfReferencingConstraints(List<Table> remainingTables, Collection<ForeignKeyConstraint> recursiveConstraints) {
-        boolean foundSimpleRecursion = false;
+    private boolean removeSelfReferencingConstraints(List<Table> remainingTables) {
         for (Table potentialRecursiveTable : remainingTables) {
             ForeignKeyConstraint recursiveConstraint = potentialRecursiveTable.removeSelfReferencingConstraint();
             if (recursiveConstraint != null) {
-                recursiveConstraints.add(recursiveConstraint);
-                foundSimpleRecursion = true;
+                return true;
             }
         }
-        return foundSimpleRecursion;
+        return false;
     }
 
-    private void removeAForeignKeyConstraint(Collection<ForeignKeyConstraint> recursiveConstraints, List<Table> remainingTables, boolean foundSimpleRecursion) {
-        if (!foundSimpleRecursion) {
-            // expensive comparison, but we're down to the end of the tables so it shouldn't really matter
-            Set<Table> byParentChildDelta = new TreeSet<>((t1, t2) -> {
+    private void removeAForeignKeyConstraint(List<Table> remainingTables) {
+        Table recursiveTable = remainingTables.stream()
+            .min((t1, t2) -> {
                 // sort on the delta between number of parents and kids so we can
                 // target the tables with the biggest delta and therefore the most impact
                 // on reducing the smaller of the two
@@ -224,11 +223,7 @@ public class TableOrderer {
                 if (rc == 0)
                     rc = t1.compareTo(t2);
                 return rc;
-            });
-            byParentChildDelta.addAll(remainingTables);
-            Table recursiveTable = byParentChildDelta.iterator().next(); // this one has the largest delta
-            ForeignKeyConstraint removedConstraint = recursiveTable.removeAForeignKeyConstraint();
-            recursiveConstraints.add(removedConstraint);
-        }
+            }).get(); // this one has the largest delta
+        recursiveTable.removeAForeignKeyConstraint();
     }
 }
