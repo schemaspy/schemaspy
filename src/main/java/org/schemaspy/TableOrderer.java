@@ -21,6 +21,7 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 
@@ -37,14 +38,27 @@ import java.util.stream.Collectors;
  * @author Nils Petzaell
  */
 public class TableOrderer {
+
+    private final Collection<Table> tables;
+
+    public TableOrderer(Database db) {
+        this(db.getTables());
+    }
+
+    /**
+     * @param tables Tables to order
+     */
+    public TableOrderer(final Collection<Table> tables) {
+        this.tables = tables;
+    }
+
     /**
      * Returns a list of <code>Table</code>s ordered such that parents are listed first
      * and child tables are listed last.
      *
-     * @param tables Tables to order
      * @return Returns a list of <code>Table</code>s ordered such that parents are listed first and child tables are listed last.
      */
-    public List<Table> getTablesOrderedByRI(Collection<Table> tables) {
+    public List<Table> getTablesOrderedByRI() {
         List<Table> heads = new ArrayList<>();
         List<Table> tails = new ArrayList<>();
         List<Table> remainingTables = new ArrayList<>(tables);
