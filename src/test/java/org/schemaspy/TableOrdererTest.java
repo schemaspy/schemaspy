@@ -66,8 +66,7 @@ public class TableOrdererTest {
         tables.add(child);
         tables.add(parent);
 
-        TableOrderer tableOrderer = new TableOrderer();
-        List<Table> orderedByInsert = tableOrderer.getTablesOrderedByRI(tables);
+        List<Table> orderedByInsert = new TableOrderer(tables).getTablesOrderedByRI();
         assertThat(orderedByInsert).containsExactly(child, complexRecursion1, complexRecursion2, recursion, parent, unattached);
     }
 
