@@ -310,7 +310,7 @@ public class SchemaAnalyzer {
 
         // create an orderer to be able to determine insertion and deletion ordering of tables
         // side effect is that the RI relationships get trashed
-        List<Table> orderedTables = new TableOrderer(db).getTablesOrderedByRI();
+        List<Table> orderedTables = new InsertionOrdered(db).getTablesOrderedByRI();
 
         new OrderingReport(outputDir, orderedTables).write();
 

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Nils Petzaell
  */
-public class TableOrdererTest {
+public class InsertionOrderedTest {
 
     private static final String CATALOG = "catalog";
     private static final String SCHEMA = "schema";
@@ -66,7 +66,7 @@ public class TableOrdererTest {
         tables.add(child);
         tables.add(parent);
 
-        List<Table> orderedByInsert = new TableOrderer(tables).getTablesOrderedByRI();
+        List<Table> orderedByInsert = new InsertionOrdered(tables).getTablesOrderedByRI();
         assertThat(orderedByInsert).containsExactly(child, complexRecursion1, complexRecursion2, recursion, parent, unattached);
     }
 
