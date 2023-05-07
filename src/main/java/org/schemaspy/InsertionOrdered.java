@@ -37,18 +37,18 @@ import java.util.stream.Collectors;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-public class TableOrderer {
+public class InsertionOrdered {
 
     private final Collection<Table> tables;
 
-    public TableOrderer(Database db) {
+    public InsertionOrdered(Database db) {
         this(db.getTables());
     }
 
     /**
      * @param tables Tables to order
      */
-    public TableOrderer(final Collection<Table> tables) {
+    public InsertionOrdered(final Collection<Table> tables) {
         this.tables = tables;
     }
 
