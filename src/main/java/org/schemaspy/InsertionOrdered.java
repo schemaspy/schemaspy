@@ -228,7 +228,7 @@ public class InsertionOrdered {
     }
 
     private void removeAForeignKeyConstraint(List<Table> remainingTables) {
-        Table recursiveTable = remainingTables.stream()
+        remainingTables.stream()
             .min((t1, t2) -> {
                 // sort on the delta between number of parents and kids so we can
                 // target the tables with the biggest delta and therefore the most impact
@@ -237,7 +237,6 @@ public class InsertionOrdered {
                 if (rc == 0)
                     rc = t1.compareTo(t2);
                 return rc;
-            }).get(); // this one has the largest delta
-        recursiveTable.removeAForeignKeyConstraint();
+            }).ifPresent(Table::removeAForeignKeyConstraint); // this one has the largest delta
     }
 }
