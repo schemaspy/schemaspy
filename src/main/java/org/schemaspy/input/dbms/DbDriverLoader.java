@@ -26,6 +26,7 @@ package org.schemaspy.input.dbms;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
+import org.schemaspy.input.dbms.driverpath.DpConnectionConfig;
 import org.schemaspy.input.dbms.driverpath.DpProperties;
 import org.schemaspy.input.dbms.drivers.LoadAdditionalJarsForDriver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -80,7 +81,7 @@ public class DbDriverLoader {
             urlBuilder,
             properties,
             properties.getProperty("driver").split(","),
-            connectionConfig.getDriverPath()
+            new DpConnectionConfig(connectionConfig).value()
         );
     }
 
