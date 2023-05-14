@@ -5,7 +5,7 @@
 DROP SCHEMA IF EXISTS cendraom CASCADE;
 
 
-CREATE SCHEMA cendraom AUTHORIZATION postgres;
+CREATE SCHEMA cendraom AUTHORIZATION test;
 
 
 CREATE EXTENSION "uuid-ossp" SCHEMA cendraom;
@@ -231,10 +231,10 @@ DROP SCHEMA IF EXISTS org_cendra_person CASCADE;
 DROP SCHEMA IF EXISTS org_cendra_person_human CASCADE;
 
 
-CREATE SCHEMA org_cendra_person AUTHORIZATION postgres;
+CREATE SCHEMA org_cendra_person AUTHORIZATION test;
 
 
-CREATE SCHEMA org_cendra_person_human AUTHORIZATION postgres;
+CREATE SCHEMA org_cendra_person_human AUTHORIZATION test;
 
 
 -- Table: org_cendra_person.person
@@ -257,7 +257,7 @@ TABLESPACE pg_default;
 
 
 ALTER TABLE org_cendra_person.person
-    OWNER to postgres;
+    OWNER to test;
 
 
 -- Table: org_cendra_person.personaddress
@@ -294,7 +294,7 @@ TABLESPACE pg_default;
 
 
 ALTER TABLE org_cendra_person.personaddress
-    OWNER to postgres;
+    OWNER to test;
 
 
 -- Table: org_cendra_person.personemail
@@ -321,7 +321,7 @@ TABLESPACE pg_default;
 
 
 ALTER TABLE org_cendra_person.personemail
-    OWNER to postgres;
+    OWNER to test;
 
 
 -- Table: org_cendra_person.personphone
@@ -349,7 +349,7 @@ TABLESPACE pg_default;
 
 
 ALTER TABLE org_cendra_person.personphone
-    OWNER to postgres;
+    OWNER to test;
 
 
 -- Table: org_cendra_person_human.humanidtype
@@ -373,7 +373,7 @@ TABLESPACE pg_default;
 
 
 ALTER TABLE org_cendra_person_human.humanidtype
-    OWNER to postgres;
+    OWNER to test;
 
 
 -- Table: org_cendra_person_human.human
@@ -404,7 +404,7 @@ TABLESPACE pg_default;
 
 
 ALTER TABLE org_cendra_person_human.human
-    OWNER to postgres;
+    OWNER to test;
 
 
 -- Table: org_cendra_person_human.humanbirth
@@ -436,7 +436,7 @@ TABLESPACE pg_default;
 
 
 ALTER TABLE org_cendra_person_human.humanbirth
-    OWNER to postgres;
+    OWNER to test;
 
 
 -- Table: org_cendra_person_human.humanid
@@ -471,7 +471,7 @@ TABLESPACE pg_default;
 
 
 ALTER TABLE org_cendra_person_human.humanid
-    OWNER to postgres;
+    OWNER to test;
 
 
 -- Table: org_cendra_person_human.humannationality
@@ -498,5 +498,5 @@ TABLESPACE pg_default;
 
 
 ALTER TABLE org_cendra_person_human.humannationality
-    OWNER to postgres;
+    OWNER to test;
 
