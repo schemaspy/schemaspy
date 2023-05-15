@@ -1,4 +1,4 @@
-FROM openjdk:17-alpine3.14
+FROM registry.access.redhat.com/ubi8/openjdk-17:1.14-3
 
 ENV LC_ALL=C
 
@@ -18,11 +18,12 @@ LABEL JTDS_VERSION=$JTDS_VERSION
 LABEL GIT_BRANCH=$GIT_BRANCH
 LABEL GIT_REVISION=$GIT_REVISION
 
+USER root
+
 ADD docker/open-sans.tar.gz /usr/share/fonts/
 
-RUN adduser java -h / -D && \
-    set -x && \
-    apk add --no-cache curl unzip graphviz fontconfig && \
+RUN set -x && \
+    microdnf install -y unzip graphviz fontconfig && \
     fc-cache -fv && \
     mkdir /drivers_inc && \
     cd /drivers_inc && \
@@ -35,18 +36,17 @@ RUN adduser java -h / -D && \
     curl -L https://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/$JTDS_VERSION/jtds-$JTDS_VERSION.jar \
       -o jtds-$JTDS_VERSION.jar && \
     mkdir /output && \
-    chown -R java /drivers_inc && \
-    chown -R java /output && \
-    apk del curl
+    chown -R jboss /drivers_inc && \
+    chown -R jboss /output
 
 
-ADD target/schema*-app.jar /usr/local/lib/schemaspy/
-ADD docker/schemaspy.sh /usr/local/bin/schemaspy
+ADD target/schema*.jar /usr/local/lib/schemaspy/
+ADD docker/schemaspy.sh /usr/local/bin/schemaspy.sh
 
-USER java
+USER jboss
 WORKDIR /
 
 ENV SCHEMASPY_DRIVERS=/drivers
 ENV SCHEMASPY_OUTPUT=/output
 
-ENTRYPOINT ["/usr/local/bin/schemaspy"]
+ENTRYPOINT ["/usr/local/bin/schemaspy.sh"]

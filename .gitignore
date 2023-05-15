@@ -13,3 +13,5 @@ ext-lib/**/*.jar
 !/src/test/resources/target
 .java-version
 .sdkmanrc
+output/
+.vscode/
