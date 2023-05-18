@@ -119,11 +119,11 @@ public class PgSql11RoutinesIT {
 
     @Test
     public void routineFilmInStockHasComment() {
-        assertThat(database.getRoutinesMap().get("film_in_stock(integer, integer)").getComment()).isEqualToIgnoringCase("Current stock");
+        assertThat(database.getRoutinesMap().get("film_in_stock(p_film_id integer, p_store_id integer, out p_film_count integer)").getComment()).isEqualToIgnoringCase("Current stock");
     }
 
     @Test
     public void routineFilmInStockHas3Parameters() {
-        assertThat(database.getRoutinesMap().get("film_in_stock(integer, integer)").getParameters()).hasSize(3);
+        assertThat(database.getRoutinesMap().get("film_in_stock(p_film_id integer, p_store_id integer, out p_film_count integer)").getParameters()).hasSize(3);
     }
 }
