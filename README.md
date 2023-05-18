@@ -10,7 +10,7 @@
 
 **SchemaSpy** is a database metadata analyzer. It helps your database administors and developers visualize, navigate and understand your data model. With an easy-to-use HTML-based report, traversing the entity-relationship diagram has never been simpler. Our product showcase is available at http://schemaspy.org/sample/index.html.
 
-[![SchemaSpy sample](http://schemaspy.org/img/example_page_table_relationships.png)](http://schemaspy.org/sample/index.html)
+[![SchemaSpy sample](http://schemaspy.org/img/example_page_epivirusurf.png)](http://schemaspy.org/samples/epivirusurf)
 
 # Installation
 
