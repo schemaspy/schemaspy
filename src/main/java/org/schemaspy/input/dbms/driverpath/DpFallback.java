@@ -17,6 +17,7 @@ public final class DpFallback implements Driverpath {
 
     @Override
     public String value() {
-        return !Objects.isNull(this.primary) ? this.primary.value() : this.secondary.value();
+        final String value = this.primary.value();
+        return Objects.nonNull(value) ? value : this.secondary.value();
     }
 }
