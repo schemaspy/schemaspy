@@ -26,9 +26,7 @@ package org.schemaspy.input.dbms;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
-import org.schemaspy.input.dbms.driverpath.DpConnectionConfig;
-import org.schemaspy.input.dbms.driverpath.DpNull;
-import org.schemaspy.input.dbms.driverpath.DpProperties;
+import org.schemaspy.input.dbms.driverpath.*;
 import org.schemaspy.input.dbms.drivers.LoadAdditionalJarsForDriver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
@@ -62,7 +60,7 @@ public class DbDriverLoader {
     private final ConnectionURLBuilder urlBuilder;
     private final Properties properties;
     private final String[] driverClass;
-    private String driverPath;
+    private Driverpath driverPath;
 
     public DbDriverLoader(final ConnectionConfig connectionConfig) {
         this(connectionConfig, new ConnectionURLBuilder(connectionConfig));
@@ -82,7 +80,7 @@ public class DbDriverLoader {
             urlBuilder,
             properties,
             properties.getProperty("driver").split(","),
-            new DpConnectionConfig(connectionConfig).value()
+            new DpConnectionConfig(connectionConfig)
         );
     }
 
@@ -91,7 +89,7 @@ public class DbDriverLoader {
         final ConnectionURLBuilder urlBuilder,
         final Properties properties,
         final String[] driverClass,
-        final String driverPath
+        final Driverpath driverPath
     ) {
         this.connectionConfig = connectionConfig;
         this.urlBuilder = urlBuilder;
@@ -101,13 +99,14 @@ public class DbDriverLoader {
     }
 
     public Connection getConnection() throws IOException {
-        if (Objects.isNull(driverPath))
-            driverPath = new DpProperties(properties).value();
-
-        if (Objects.isNull(driverPath))
-            driverPath = new DpNull().value();
-
-        return getConnection(urlBuilder.build(), driverClass, driverPath);
+        final Driverpath dp = new DpFallback(
+            driverPath,
+            new DpFallback(
+                new DpProperties(properties),
+                new DpNull()
+            )
+        );
+        return getConnection(urlBuilder.build(), driverClass, dp.value());
     }
 
     protected Connection getConnection(
