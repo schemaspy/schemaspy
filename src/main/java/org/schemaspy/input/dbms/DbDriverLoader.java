@@ -58,7 +58,6 @@ public class DbDriverLoader {
     private static Map<String, Driver> driverCache = new HashMap<>();
     private final ConnectionConfig connectionConfig;
     private final ConnectionURLBuilder urlBuilder;
-    private final Properties properties;
     private final String[] driverClass;
     private Driverpath driverPath;
 
@@ -78,42 +77,34 @@ public class DbDriverLoader {
         this(
             connectionConfig,
             urlBuilder,
-            properties,
             properties.getProperty("driver").split(","),
-            new DpConnectionConfig(connectionConfig)
+            new DpFallback(
+                new DpConnectionConfig(connectionConfig),
+                new DpFallback(
+                    new DpProperties(properties),
+                    new DpNull()
+                )
+            )
         );
     }
 
     public DbDriverLoader(
         final ConnectionConfig connectionConfig,
         final ConnectionURLBuilder urlBuilder,
-        final Properties properties,
         final String[] driverClass,
         final Driverpath driverPath
     ) {
         this.connectionConfig = connectionConfig;
         this.urlBuilder = urlBuilder;
-        this.properties = properties;
         this.driverClass = driverClass;
         this.driverPath = driverPath;
     }
 
     public Connection getConnection() throws IOException {
-        final Driverpath dp = new DpFallback(
-            driverPath,
-            new DpFallback(
-                new DpProperties(properties),
-                new DpNull()
-            )
-        );
-        return getConnection(urlBuilder.build(), driverClass, dp.value());
-    }
+        String connectionURL = urlBuilder.build();
+        String[] driverClasses = driverClass;
+        String driverPath = this.driverPath.value();
 
-    protected Connection getConnection(
-        String connectionURL,
-        String[] driverClasses,
-        String driverPath
-    ) throws IOException {
         final Properties connectionProperties = new WithPassword(
             connectionConfig.getPassword(),
             new WithUser(
