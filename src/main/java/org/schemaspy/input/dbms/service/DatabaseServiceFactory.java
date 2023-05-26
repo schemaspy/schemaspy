@@ -56,6 +56,7 @@ public class DatabaseServiceFactory {
                         )
                 ),
                 new RoutineService(sqlService, processingConfig.getDatabaseTypeProperties()),
+                new TypeService(sqlService, processingConfig.getDatabaseTypeProperties()),
                 new SequenceService(sqlService, processingConfig.getDatabaseTypeProperties())
         );
     }

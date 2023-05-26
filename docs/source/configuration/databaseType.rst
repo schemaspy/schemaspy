@@ -177,6 +177,8 @@ So additional columns are ok, but you might need to alias columns so that they a
         *Fetch column comments for all views, expected columns:* |br| **view_name|table_name, column_name, comments**
     selectCheckConstraintsSql=
         *Fetch check constraints for all tables, expected columns:* |br| **table_name, constraint_name, text**
+    selectTypesSql=
+        *Fetch all types and domains in the schema or catalog, expected columns:* |br| **type_of_type, schema, catalog, name, description, definition**
     selectTableIdsSql=
         *Fetch ids for all tables, expected columns:* |br| **table_name, table_id**
     selectIndexIdsSql=

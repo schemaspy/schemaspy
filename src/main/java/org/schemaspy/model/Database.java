@@ -49,6 +49,7 @@ public class Database {
     private final Map<String, Table> remoteTables = new CaseInsensitiveMap<>(); // key: schema.tableName
     private final Map<String, Table> locals = new CombinedMap(tables, views);
     private final Map<String, Routine> routines = new CaseInsensitiveMap<>();
+    private final Map<String, Type> types = new CaseInsensitiveMap<>();
     private final ZonedDateTime connectTime = ZonedDateTime.now();
     private final Map<String, Sequence> sequences = new CaseInsensitiveMap<>();
 
@@ -117,9 +118,15 @@ public class Database {
     public Collection<Routine> getRoutines() {
         return routines.values();
     }
+    public Collection<Type> getTypes() {
+        return types.values();
+    }
 
     public Map<String, Routine> getRoutinesMap() {
         return routines;
+    }
+    public Map<String, Type> getTypesMap() {
+        return types;
     }
 
     public Collection<Sequence> getSequences(){ return sequences.values();}
