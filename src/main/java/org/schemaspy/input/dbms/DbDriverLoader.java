@@ -103,7 +103,6 @@ public class DbDriverLoader {
     public Connection getConnection() throws IOException {
         String connectionURL = urlBuilder.build();
         String[] driverClasses = driverClass;
-        String driverPath = this.driverPath.value();
 
         final Properties connectionProperties = new WithPassword(
             connectionConfig.getPassword(),
@@ -115,7 +114,7 @@ public class DbDriverLoader {
 
         Connection connection;
         try {
-            Driver driver = getDriver(driverClasses, driverPath);
+            Driver driver = getDriver();
             connection = driver.connect(connectionURL, connectionProperties);
             if (connection == null) {
                 throw new ConnectionFailure("Cannot connect to '" + connectionURL +"' with driver '" + toList(driverClasses) + "'");
@@ -139,11 +138,11 @@ public class DbDriverLoader {
      * Returns an instance of {@link Driver} specified by <code>driverClass</code>
      * loaded from <code>driverPath</code>.
      *
-     * @param driverClasses
-     * @param driverPath
      * @return
      */
-    protected synchronized Driver getDriver(final String []driverClasses, final String driverPath) {
+    protected synchronized Driver getDriver() {
+        String[] driverClasses = this.driverClass;
+        String driverPath = this.driverPath.value();
         Driver driver;
         for (String driverClass: driverClasses) {
             driver = driverCache.get(driverClass + "|" + driverPath);
