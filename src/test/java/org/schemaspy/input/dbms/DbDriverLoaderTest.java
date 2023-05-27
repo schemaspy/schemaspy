@@ -62,18 +62,24 @@ public class DbDriverLoaderTest {
 
   @Test
   public void driverLoaderCachesDrivers() {
-    DbDriverLoader driverLoader1 = new DbDriverLoader(parse());
-    Driver driver1 = driverLoader1.getDriver(new String[]{"org.h2.Driver"}, "");
-    DbDriverLoader driverLoader2 = new DbDriverLoader(parse());
-    Driver driver2 = driverLoader2.getDriver(new String[]{"org.h2.Driver"}, "");
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("");
+    String[] drivers = new String[]{"org.h2.Driver"};
+
+    DbDriverLoader driverLoader1 = new DbDriverLoader(parse(), builder, drivers, () -> "");
+    Driver driver1 = driverLoader1.getDriver();
+    DbDriverLoader driverLoader2 = new DbDriverLoader(parse(), builder, drivers, () -> "");
+    Driver driver2 = driverLoader2.getDriver();
     assertThat(driver1).isSameAs(driver2);
   }
 
   @Test
   public void driverPathWorks() throws SQLException {
     String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
-    Driver driver = driverLoader.getDriver(new String[]{"dummy.DummyDriver"}, driverPath);
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("");
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"dummy.DummyDriver"}, () -> driverPath);
+    Driver driver = driverLoader.getDriver();
     assertThat(driver).isNotNull();
     assertThat(driver.acceptsURL("dummy")).isTrue();
   }
@@ -132,16 +138,20 @@ public class DbDriverLoaderTest {
 
   @Test
   public void firstDriverClassMissingSecondExists() {
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
-    Driver driver = driverLoader.getDriver(new String[]{"com.no", "org.h2.Driver"}, "");
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("");
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"com.no", "org.h2.Driver"}, () -> "");
+    Driver driver = driverLoader.getDriver();
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("org.h2.Driver");
   }
 
   @Test
   public void twoDriversBothExists() {
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
-    Driver driver = driverLoader.getDriver(new String[]{"com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"}, "");
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("");
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"}, () -> "");
+    Driver driver = driverLoader.getDriver();
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("com.mysql.cj.jdbc.Driver");
   }
