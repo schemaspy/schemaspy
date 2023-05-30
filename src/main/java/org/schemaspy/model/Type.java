@@ -35,8 +35,8 @@ public class Type implements Comparable<Type> {
     private final String description;
     private final String definition;
 
-    private static Comparator<String> stringComparatorIgnoreCase = Comparator.nullsFirst(String::compareToIgnoreCase);
-    private static Comparator<Type> typeComparator = Comparator
+    private static final Comparator<String> stringComparatorIgnoreCase = Comparator.nullsFirst(String::compareToIgnoreCase);
+    private static final Comparator<Type> typeComparator = Comparator
             .comparing(Type::getTypeOfType, stringComparatorIgnoreCase)
             .thenComparing(Type::getCatalog, stringComparatorIgnoreCase)
             .thenComparing(Type::getSchema, stringComparatorIgnoreCase)
