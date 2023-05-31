@@ -71,7 +71,7 @@ public class PgSqlTypesIT {
                     new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/types.sql", ";"))
+                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/types.sql", "\n\n\n"))
             );
 
     @Before

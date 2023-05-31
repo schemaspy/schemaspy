@@ -22,10 +22,7 @@ import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.schemaspy.integrationtesting.pgsql.PgSqlCheckConstraintsIT;
-import org.schemaspy.integrationtesting.pgsql.PgSqlMaterializedViewsIT;
-import org.schemaspy.integrationtesting.pgsql.PgSqlRelationshipErrorIT;
-import org.schemaspy.integrationtesting.pgsql.PgSqlRoutinesIT;
+import org.schemaspy.integrationtesting.pgsql.*;
 import org.schemaspy.testing.SQLScriptsRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -36,7 +33,8 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
         PgSqlCheckConstraintsIT.class,
         PgSqlMaterializedViewsIT.class,
         PgSqlRelationshipErrorIT.class,
-        PgSqlRoutinesIT.class
+        PgSqlRoutinesIT.class,
+        PgSqlTypesIT.class
 })
 public class PgSqlSuite {
 
