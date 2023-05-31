@@ -471,6 +471,11 @@ public class SchemaAnalyzer {
             }
         }
 
+        HtmlTypesPage htmlTypesPage = new HtmlTypesPage(mustacheCompiler);
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("types.html").toFile())) {
+            htmlTypesPage.write(db.getTypes(), writer);
+        }
+
         // create detailed diagrams
 
         duration = progressListener.startedGraphingDetails();
