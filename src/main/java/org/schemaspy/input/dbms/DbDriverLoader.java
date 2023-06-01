@@ -26,6 +26,7 @@ package org.schemaspy.input.dbms;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
+import org.schemaspy.input.dbms.driverpath.*;
 import org.schemaspy.input.dbms.drivers.LoadAdditionalJarsForDriver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
@@ -57,9 +58,8 @@ public class DbDriverLoader {
     private static Map<String, Driver> driverCache = new HashMap<>();
     private final ConnectionConfig connectionConfig;
     private final ConnectionURLBuilder urlBuilder;
-    private final Properties properties;
     private final String[] driverClass;
-    private String driverPath;
+    private Driverpath driverPath;
 
     public DbDriverLoader(final ConnectionConfig connectionConfig) {
         this(connectionConfig, new ConnectionURLBuilder(connectionConfig));
@@ -77,41 +77,33 @@ public class DbDriverLoader {
         this(
             connectionConfig,
             urlBuilder,
-            properties,
             properties.getProperty("driver").split(","),
-            connectionConfig.getDriverPath()
+            new DpFallback(
+                new DpConnectionConfig(connectionConfig),
+                new DpFallback(
+                    new DpProperties(properties),
+                    new DpNull()
+                )
+            )
         );
     }
 
     public DbDriverLoader(
         final ConnectionConfig connectionConfig,
         final ConnectionURLBuilder urlBuilder,
-        final Properties properties,
         final String[] driverClass,
-        final String driverPath
+        final Driverpath driverPath
     ) {
         this.connectionConfig = connectionConfig;
         this.urlBuilder = urlBuilder;
-        this.properties = properties;
         this.driverClass = driverClass;
         this.driverPath = driverPath;
     }
 
     public Connection getConnection() throws IOException {
-        if (Objects.isNull(driverPath))
-            driverPath = properties.getProperty("driverPath");
+        String connectionURL = urlBuilder.build();
+        String[] driverClasses = driverClass;
 
-        if (Objects.isNull(driverPath))
-            driverPath = "";
-
-        return getConnection(urlBuilder.build(), driverClass, driverPath);
-    }
-
-    protected Connection getConnection(
-        String connectionURL,
-        String[] driverClasses,
-        String driverPath
-    ) throws IOException {
         final Properties connectionProperties = new WithPassword(
             connectionConfig.getPassword(),
             new WithUser(
@@ -122,35 +114,28 @@ public class DbDriverLoader {
 
         Connection connection;
         try {
-            Driver driver = getDriver(driverClasses, driverPath);
+            Driver driver = getDriver();
             connection = driver.connect(connectionURL, connectionProperties);
             if (connection == null) {
-                throw new ConnectionFailure("Cannot connect to '" + connectionURL +"' with driver '" + toList(driverClasses) + "'");
+                throw new ConnectionFailure("Cannot connect to '" + connectionURL + "' with driver '" + String.join(",", driverClasses) + "'");
             }
         } catch (UnsatisfiedLinkError badPath) {
-            throw new ConnectionFailure("Error with native library occurred while trying to use driver '"+ toList(driverClasses)+"'",badPath);
+            throw new ConnectionFailure("Error with native library occurred while trying to use driver '" + String.join(",", driverClasses) + "'", badPath);
         } catch (Exception exc) {
             throw new ConnectionFailure("Failed to connect to database URL [" + connectionURL + "]", exc);
         }
         return connection;
     }
 
-    private String toList(String[] array) {
-        if (array.length == 1) {
-            return array[0];
-        }
-        return Stream.of(array).collect(Collectors.joining(","));
-    }
-
     /**
      * Returns an instance of {@link Driver} specified by <code>driverClass</code>
      * loaded from <code>driverPath</code>.
      *
-     * @param driverClasses
-     * @param driverPath
      * @return
      */
-    protected synchronized Driver getDriver(final String []driverClasses, final String driverPath) {
+    protected synchronized Driver getDriver() {
+        String[] driverClasses = this.driverClass;
+        String driverPath = this.driverPath.value();
         Driver driver;
         for (String driverClass: driverClasses) {
             driver = driverCache.get(driverClass + "|" + driverPath);

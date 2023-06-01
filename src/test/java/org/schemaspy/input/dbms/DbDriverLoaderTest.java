@@ -24,6 +24,7 @@ import org.dummy.DummyDriverUnsatisfiedConnect;
 import org.dummy.DummyDriverUnsatisfiedCtor;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.testing.H2MemoryRule;
@@ -61,44 +62,46 @@ public class DbDriverLoaderTest {
 
   @Test
   public void driverLoaderCachesDrivers() {
-    DbDriverLoader driverLoader1 = new DbDriverLoader(parse());
-    Driver driver1 = driverLoader1.getDriver(new String[]{"org.h2.Driver"}, "");
-    DbDriverLoader driverLoader2 = new DbDriverLoader(parse());
-    Driver driver2 = driverLoader2.getDriver(new String[]{"org.h2.Driver"}, "");
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("");
+    String[] drivers = new String[]{"org.h2.Driver"};
+
+    DbDriverLoader driverLoader1 = new DbDriverLoader(parse(), builder, drivers, () -> "");
+    Driver driver1 = driverLoader1.getDriver();
+    DbDriverLoader driverLoader2 = new DbDriverLoader(parse(), builder, drivers, () -> "");
+    Driver driver2 = driverLoader2.getDriver();
     assertThat(driver1).isSameAs(driver2);
   }
 
   @Test
   public void driverPathWorks() throws SQLException {
     String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
-    Driver driver = driverLoader.getDriver(new String[]{"dummy.DummyDriver"}, driverPath);
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("");
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"dummy.DummyDriver"}, () -> driverPath);
+    Driver driver = driverLoader.getDriver();
     assertThat(driver).isNotNull();
     assertThat(driver.acceptsURL("dummy")).isTrue();
   }
 
   @Test
   public void connectionIsNullThrowsException() {
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("dummy");
     String[] drivers = new String[]{DummyDriver.class.getName()};
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, drivers, () -> "");
     assertThatExceptionOfType(ConnectionFailure.class)
-        .isThrownBy(() -> driverLoader.getConnection(
-            "dummy",
-            drivers,
-            ""
-        ));
+        .isThrownBy(driverLoader::getConnection);
   }
 
   @Test
   public void nativeErrorInDriverCreationThrowsException() {
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("dummy");
     String[] drivers = new String[]{DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"};
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, drivers, () -> "");
     assertThatExceptionOfType(ConnectionFailure.class)
-        .isThrownBy(() -> driverLoader.getConnection(
-            "dummy",
-            drivers,
-            ""
-        ))
+        .isThrownBy(driverLoader::getConnection)
         .withCauseInstanceOf(UnsatisfiedLinkError.class)
         .withMessageContaining(
             "Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedCtor,dummy.dummy'");
@@ -106,14 +109,12 @@ public class DbDriverLoaderTest {
 
   @Test
   public void nativeErrorInConnectThrowsException() {
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("dummy");
     String[] drivers = new String[]{DummyDriverUnsatisfiedConnect.class.getName()};
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, drivers, () -> "");
     assertThatExceptionOfType(ConnectionFailure.class)
-        .isThrownBy(() -> driverLoader.getConnection(
-            "dummy",
-            drivers,
-            ""
-        ))
+        .isThrownBy(driverLoader::getConnection)
         .withCauseInstanceOf(UnsatisfiedLinkError.class)
         .withMessageContaining(
             "Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedConnect'");
@@ -121,16 +122,14 @@ public class DbDriverLoaderTest {
 
   @Test
   public void DriverMissingWithClasspathThrowsException() {
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("dummy");
     String sep = File.separator;
     final String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar")
                                    .toString() + File.pathSeparator + "missing";
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"bla.bla.bla", "no.no.no"}, () -> driverPath);
     assertThatExceptionOfType(ConnectionFailure.class)
-        .isThrownBy(() -> driverLoader.getConnection(
-            "dummy",
-            new String[]{"bla.bla.bla", "no.no.no"},
-            driverPath
-        ))
+        .isThrownBy(driverLoader::getConnection)
         .withCauseInstanceOf(ConnectionFailure.class)
         .withMessageContaining("'bla.bla.bla, no.no.no'")
         .withMessageContaining("src" + sep + "test" + sep + "resources" + sep + "driverFolder" + sep + "dummy.jar" + File.pathSeparator + "missing")
@@ -139,16 +138,20 @@ public class DbDriverLoaderTest {
 
   @Test
   public void firstDriverClassMissingSecondExists() {
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
-    Driver driver = driverLoader.getDriver(new String[]{"com.no", "org.h2.Driver"}, "");
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("");
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"com.no", "org.h2.Driver"}, () -> "");
+    Driver driver = driverLoader.getDriver();
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("org.h2.Driver");
   }
 
   @Test
   public void twoDriversBothExists() {
-    DbDriverLoader driverLoader = new DbDriverLoader(parse());
-    Driver driver = driverLoader.getDriver(new String[]{"com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"}, "");
+    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
+    Mockito.when(builder.build()).thenReturn("");
+    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"}, () -> "");
+    Driver driver = driverLoader.getDriver();
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("com.mysql.cj.jdbc.Driver");
   }
