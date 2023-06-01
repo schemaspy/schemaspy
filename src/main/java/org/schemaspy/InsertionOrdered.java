@@ -21,6 +21,7 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 
@@ -36,15 +37,28 @@ import java.util.stream.Collectors;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-public class TableOrderer {
+public class InsertionOrdered {
+
+    private final Collection<Table> tables;
+
+    public InsertionOrdered(Database db) {
+        this(db.getTables());
+    }
+
+    /**
+     * @param tables Tables to order
+     */
+    public InsertionOrdered(final Collection<Table> tables) {
+        this.tables = tables;
+    }
+
     /**
      * Returns a list of <code>Table</code>s ordered such that parents are listed first
      * and child tables are listed last.
      *
-     * @param tables Tables to order
      * @return Returns a list of <code>Table</code>s ordered such that parents are listed first and child tables are listed last.
      */
-    public List<Table> getTablesOrderedByRI(Collection<Table> tables) {
+    public List<Table> getTablesOrderedByRI() {
         List<Table> heads = new ArrayList<>();
         List<Table> tails = new ArrayList<>();
         List<Table> remainingTables = new ArrayList<>(tables);
@@ -61,8 +75,6 @@ public class TableOrderer {
             heads.addAll(trimRoots(remainingTables));
         }
 
-        // if we could't trim anything then there's recursion....
-        // resolve it by removing a constraint, one by one, 'till the tables are all trimmed
         if (hasRecursion(remainingTables)) {
             // get ride of everything that isn't explicitly specified by the database
             for (Table table : remainingTables) {
@@ -74,6 +86,8 @@ public class TableOrderer {
             boolean hasRecursion = hasRecursion(remainingTables);
             tails.addAll(0, trimLeaves(remainingTables));
             heads.addAll(trimRoots(remainingTables));
+
+            // resolve the recursion by removing a constraint, one by one, 'till the tables are all trimmed
             if (hasRecursion) {
                 boolean foundSimpleRecursion = removeSelfReferencingConstraints(remainingTables);
                 if (!foundSimpleRecursion) {
@@ -214,7 +228,7 @@ public class TableOrderer {
     }
 
     private void removeAForeignKeyConstraint(List<Table> remainingTables) {
-        Table recursiveTable = remainingTables.stream()
+        remainingTables.stream()
             .min((t1, t2) -> {
                 // sort on the delta between number of parents and kids so we can
                 // target the tables with the biggest delta and therefore the most impact
@@ -223,7 +237,6 @@ public class TableOrderer {
                 if (rc == 0)
                     rc = t1.compareTo(t2);
                 return rc;
-            }).get(); // this one has the largest delta
-        recursiveTable.removeAForeignKeyConstraint();
+            }).ifPresent(Table::removeAForeignKeyConstraint); // this one has the largest delta
     }
 }
