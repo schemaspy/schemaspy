@@ -3,7 +3,7 @@ drop schema if exists type_tests cascade;
 
 
 
-create schema type_tests authorization postgres;
+create schema type_tests authorization test;
 
 
 
