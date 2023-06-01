@@ -27,8 +27,7 @@ create function type_tests.base_type_out(type_tests.base_type) returns cstring
 create type type_tests.base_type
 (
     input = type_tests.base_type_in,
-    output = type_tests.base_type_out,
-    element = int4
+    output = type_tests.base_type_out
 );
 
 
