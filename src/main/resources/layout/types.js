@@ -2,15 +2,17 @@ const filterBy = function (functionType) {
     $.fn.dataTableExt.afnFiltering.length = 0;
     $.fn.dataTable.ext.search.push(
         function (settings, data, dataIndex) {
-            return data[0].toUpperCase() === functionType || functionType === 'All';
+            return data[0].toUpperCase() === functionType || functionType === 'ALL';
         }
     );
 };
 
 const getButtons = function () {
     let activeObject;
-    let typeOfTypeButtons = $.map($('#types_table > tbody > tr'), row => {
-        let typeOfType = row.cells[0].innerText;
+    let typesOfType = $.unique($.map($('#types_table > tbody > tr'), row => row.cells[0].innerText));
+    typesOfType.unshift('All');
+
+    let typeOfTypeButtons = $.map(typesOfType, typeOfType => {
         return {
             text: typeOfType,
             action: function (e, dt, node, config) {
@@ -22,16 +24,6 @@ const getButtons = function () {
                 activeObject = this;
                 dt.draw();
             }
-        }
-    });
-    typeOfTypeButtons.unshift({
-        text: 'All',
-        action: function (e, dt, node, config) {
-            filterBy('All');
-            if (activeObject != null) {
-                activeObject.active(false);
-            }
-            dt.draw();
         }
     });
     typeOfTypeButtons.push({
