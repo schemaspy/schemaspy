@@ -273,7 +273,7 @@ public class SchemaAnalyzer {
         Collection<Table> tables = new ArrayList<>(db.getTables());
         tables.addAll(db.getViews());
 
-        if (tables.isEmpty() && db.getTypes().isEmpty()) {
+        if (db.getTables().isEmpty() && db.getViews().isEmpty() && db.getSequences().isEmpty() && db.getRoutines().isEmpty() && db.getTypes().isEmpty()) {
             dumpNoTablesMessage(
                 schema,
                 commandLineArguments.getConnectionConfig().getUser(),
