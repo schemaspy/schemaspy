@@ -170,9 +170,7 @@ public class DbDriverLoader {
         // setLogStream should only be called once maybe in SpringConfig or Main?
         driver = new DsDriverClass(driverClass, createMessage(driverClasses, driverPath, classpath)).driver();
 
-        if (Objects.nonNull(driver)) {
-            driverCache.put(driverClass.getName() + "|" + driverPath, driver);
-        }
+        driverCache.put(driverClass.getName() + "|" + driverPath, driver);
 
         return driver;
     }
