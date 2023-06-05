@@ -21,7 +21,7 @@ package org.schemaspy.view;
 
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.TableColumn;
-import org.schemaspy.util.Markdown;
+import org.schemaspy.util.markup.MarkupProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,7 +150,7 @@ public class MustacheTableColumn {
 
     public String getComments() {
         String comments = column.getComments();
-        comments = new Markdown(comments, rootPath).toHtml();
+        comments = MarkupProcessor.getInstance().toHtml(comments, rootPath);
         return comments;
     }
 
