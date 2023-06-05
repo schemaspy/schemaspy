@@ -17,20 +17,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.util;
+package org.schemaspy.util.markup;
 
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.profiles.pegdown.Extensions;
 import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.options.DataHolder;
-import org.schemaspy.model.Table;
-import org.schemaspy.util.naming.NameFromString;
-import org.schemaspy.util.naming.SanitizedFileName;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,78 +36,56 @@ import java.util.regex.Pattern;
  * @author Rafal Kasa
  * @author Daniel Watt
  */
-public class Markdown {
+public class Markdown extends MarkupProcessor {
 
-    private static final HashMap<String, String> pages = new HashMap<>();
-
-    private final String markdownText;
-    private final String rootPath;
     private final Parser parser;
     private final HtmlRenderer renderer;
 
-    public Markdown(final String markdownText, final String rootPath) {
+    public Markdown() {
         this(
-                markdownText,
-                rootPath,
                 PegdownOptionsAdapter.flexmarkOptions(true,
                         Extensions.ALL ^ Extensions.HARDWRAPS
                 )
         );
     }
 
-    public Markdown(final String markdownText, final String rootPath, final DataHolder options) {
+    public Markdown(final DataHolder options) {
         this(
-                markdownText,
-                rootPath,
                 Parser.builder(options).build(),
                 HtmlRenderer.builder(options).build()
         );
     }
 
     public Markdown(
-            final String markdownText,
-            final String rootPath,
             final Parser parser,
             final HtmlRenderer renderer
     ) {
-        this.markdownText = markdownText;
-        this.rootPath = rootPath;
         this.parser = parser;
         this.renderer = renderer;
     }
 
-    public String toHtml() {
-        if (markdownText == null) {
+    @Override
+    protected String parseToHtml(final String markupText, final String rootPath) {
+        if (markupText == null) {
             return null;
         }
 
         return renderer.render(
-                parser.parse(
-                        addReferenceLink()
-                )
+            parser.parse(
+                markupText
+            )
         ).trim();
     }
 
-    public static void registryPage(final Collection<Table> tables) {
-        final String DOT_HTML = ".html";
-        tables.stream()
-                .filter(table -> !table.isLogical())
-                .forEach( table -> {
-                    String tablePath = "tables/" + new SanitizedFileName(new NameFromString(table.getName())).value() + DOT_HTML;
-                    pages.put(table.getName(), tablePath);
-                });
-    }
 
-    public static String pagePath(String page) {
-        return pages.get(page);
-    }
 
-    private String addReferenceLink() {
-        StringBuilder text = new StringBuilder(markdownText);
+    @Override
+    protected String addReferenceLink(final String markupText, final String rootPath) {
+        StringBuilder text = new StringBuilder(markupText);
         String newLine = "\r\n";
 
         Pattern p = Pattern.compile("\\[(.*?)]");
-        Matcher m = p.matcher(markdownText);
+        Matcher m = p.matcher(markupText);
 
         List<String> links = new ArrayList<>();
 

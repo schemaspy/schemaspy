@@ -20,7 +20,7 @@
 package org.schemaspy.view;
 
 import org.schemaspy.model.Schema;
-import org.schemaspy.util.Markdown;
+import org.schemaspy.util.markup.MarkupProcessor;
 
 /**
  * Created by rkasa on 2016-12-17.
@@ -34,7 +34,7 @@ public class MustacheSchema {
 
     public MustacheSchema(Schema schema,String rootPath) {
         this.name = schema.getName();
-        this.comment = new Markdown(schema.getComment(), rootPath).toHtml();
+        this.comment = MarkupProcessor.getInstance().toHtml(schema.getComment(), rootPath);
     }
 
     public String getName() {

@@ -57,11 +57,11 @@ import org.schemaspy.progress.ConditionalProgress;
 import org.schemaspy.progress.IfUpdateAfter;
 import org.schemaspy.util.DataTableConfig;
 import org.schemaspy.util.DefaultPrintWriter;
-import org.schemaspy.util.Markdown;
 import org.schemaspy.util.copy.CopyFromUrl;
 import org.schemaspy.util.filefilter.NotHtml;
 import org.schemaspy.util.naming.NameFromString;
 import org.schemaspy.util.naming.SanitizedFileName;
+import org.schemaspy.util.markup.MarkupProcessor;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -337,7 +337,7 @@ public class SchemaAnalyzer {
         FileUtils.forceMkdir(new File(outputDir, "tables"));
         FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
-        Markdown.registryPage(tables);
+        MarkupProcessor.getInstance().registryPage(tables);
 
         new CopyFromUrl(layoutFolder.url(), outputDir, new NotHtml()).copy();
 

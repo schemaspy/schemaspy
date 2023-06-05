@@ -27,7 +27,7 @@ package org.schemaspy.view;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
-import org.schemaspy.util.Markdown;
+import org.schemaspy.util.markup.MarkupProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +84,7 @@ public class HtmlTablePage {
                 .templateName("tables/table.html")
                 .scriptName("table.js")
                 .addToScope("table", table)
-                .addToScope("comments", new Markdown(table.getComments(), mustacheCompiler.getRootPath(1)).toHtml())
+                .addToScope("comments", MarkupProcessor.getInstance().toHtml(table.getComments(), mustacheCompiler.getRootPath(1)))
                 .addToScope("primaries", primaries)
                 .addToScope("columns", tableColumns)
                 .addToScope("indexes", indexedColumns)

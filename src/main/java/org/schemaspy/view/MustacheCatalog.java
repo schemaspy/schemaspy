@@ -19,7 +19,7 @@
 package org.schemaspy.view;
 
 import org.schemaspy.model.Catalog;
-import org.schemaspy.util.Markdown;
+import org.schemaspy.util.markup.MarkupProcessor;
 
 /**
  * Created by rkasa on 2016-12-17.
@@ -32,7 +32,7 @@ public class MustacheCatalog {
 
     public MustacheCatalog(Catalog catalog,String rootPath) {
         this.name = catalog.getName();
-        this.comment = new Markdown(catalog.getComment(), rootPath).toHtml();
+        this.comment = MarkupProcessor.getInstance().toHtml(catalog.getComment(), rootPath);
     }
 	
     public String getComment() {
