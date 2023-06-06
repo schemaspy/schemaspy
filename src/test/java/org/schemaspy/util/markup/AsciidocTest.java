@@ -46,7 +46,7 @@ class AsciidocTest {
                 "<p>Refer to <a href=\"./schema2/document-b.html#section-b\">Section B</a> for more information.</p>\n" +
                 "</div>";
 
-        String actualHtml = new Asciidoc().toHtml(sourceAsciiDoc, "./schema2");
+        String actualHtml = new Asciidoc().toHtml(sourceAsciiDoc, "schema2");
         assertThat(actualHtml).isEqualTo(expectedHtml);
     }
 }
