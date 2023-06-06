@@ -89,6 +89,11 @@
                 <version>0.34.32</version>
             </dependency>
             <dependency>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctorj</artifactId>
+                <version>2.5.10</version>
+            </dependency>
+            <dependency>
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
                 <version>20231013</version>
@@ -130,6 +135,10 @@
         <dependency>
             <groupId>com.vladsch.flexmark</groupId>
             <artifactId>flexmark-profile-pegdown</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.asciidoctor</groupId>
+            <artifactId>asciidoctorj</artifactId>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
