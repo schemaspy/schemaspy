@@ -65,7 +65,7 @@ public class Markdown extends MarkupProcessor {
     }
 
     @Override
-    protected String parseToHtml(final String markupText, final String rootPath) {
+    protected String parseToHtml(final String markupText) {
         if (markupText == null) {
             return null;
         }
