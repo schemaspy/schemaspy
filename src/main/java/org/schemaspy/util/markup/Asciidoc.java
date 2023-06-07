@@ -44,12 +44,15 @@ public class Asciidoc extends MarkupProcessor {
 
     @Override
     protected String addReferenceLink(String markupText, String rootPath) {
+        if(rootPath == null || rootPath.length() == 0) {
+            return markupText;
+        }
+
         final String regex = "xref:(.+)(\\[.+])";
-        final String string = "Refer to xref:document-b.adoc#section-b[Section B] for more information.";
         final String subst = String.format("xref:./%s/$1$2", rootPath);
 
         final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        final Matcher matcher = pattern.matcher(string);
+        final Matcher matcher = pattern.matcher(markupText);
 
         return matcher.replaceAll(subst);
     }
