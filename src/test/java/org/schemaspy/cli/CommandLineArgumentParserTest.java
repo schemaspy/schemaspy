@@ -265,7 +265,7 @@ class CommandLineArgumentParserTest {
     }
 
     @Test
-    void unkownOptionsAreStoredInArgument() {
+    void unknownOptionsAreStoredInArgument() {
         String[] args = {
             "-o", "aFolder",
             "-sso",
@@ -276,6 +276,51 @@ class CommandLineArgumentParserTest {
                 args
         ).commandLineArguments();
         assertThat(arguments.getConnectionConfig().getRemainingArguments()).containsExactly("-server", "xds");
+    }
+
+    @Test
+    void asciidocOptionIsOptional() {
+        String[] args = {
+            "-o", "aFolder",
+            "-sso"
+        };
+
+        CommandLineArguments commandLineArguments = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args).commandLineArguments();
+        assertThat(commandLineArguments.isAsciidoc()).isFalse();
+    }
+
+    @Test
+    void asciidocOptionEnabledByArg() {
+        String[] args = {
+            "-o", "aFolder",
+            "-sso",
+            "-asciidoc"
+        };
+
+        CommandLineArguments commandLineArguments = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args).commandLineArguments();
+        assertThat(commandLineArguments.isAsciidoc()).isTrue();
+    }
+
+    @Test
+    void asciidocOptionEnabledByProperty() {
+        String[] args = {
+            "-o", "aFolder",
+            "-sso"
+        };
+
+        CommandLineArguments commandLineArguments =
+            new CommandLineArgumentParser(
+                new CombinedDefaultProvider(
+                    (string) -> {
+                        if ("schemaspy.asciidoc".equals(string)) {
+                            return "";
+                        }
+                        return null;
+                    }
+                ),
+                args
+            ).commandLineArguments();
+        assertThat(commandLineArguments.isAsciidoc()).isTrue();
     }
 
     //TODO Implement integration tests (?) for following scenarios, addressing the behavior of ApplicationStartListener.

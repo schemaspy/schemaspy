@@ -473,6 +473,15 @@ public class CommandLineArguments {
     )
     private boolean anomaliesLengthChange = false;
 
+    @Parameter(
+            names = {
+                    "-asciidoc", "--asciidoc",
+                    "schemaspy.asciidoc"
+            },
+            descriptionKey = "asciidoc"
+    )
+    private boolean asciidoc = false;
+
     public boolean isHelpRequired() {
         return helpRequired;
     }
@@ -667,6 +676,10 @@ public class CommandLineArguments {
 
     public boolean isAnomaliesLengthChange() {
         return anomaliesLengthChange;
+    }
+
+    public boolean isAsciidoc() {
+        return asciidoc;
     }
 
     void setUnknownArgs(List<String> unknownArgs) {
