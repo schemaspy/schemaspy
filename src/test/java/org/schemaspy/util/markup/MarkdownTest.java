@@ -1,7 +1,6 @@
-package org.schemaspy.util;
+package org.schemaspy.util.markup;
 
 import org.junit.jupiter.api.Test;
-import org.schemaspy.util.markup.Markdown;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
