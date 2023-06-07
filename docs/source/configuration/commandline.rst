@@ -106,6 +106,8 @@ Html report related
     Use a custom stylesheet. Bundled stylesheet can be extracted from jar(using zip capable tool), path '/layout/schemaSpy.css'
 [-desc description]
     Add a description to the index page.
+[-asciidoc]
+    Uses asciidoc rather than markdown when processing descriptions
 
 DataTables related
 ------------------
