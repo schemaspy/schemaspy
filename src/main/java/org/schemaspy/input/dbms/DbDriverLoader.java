@@ -28,6 +28,7 @@ import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcClassloader;
+import org.schemaspy.input.dbms.driverclass.DcErrorLogged;
 import org.schemaspy.input.dbms.driverpath.*;
 import org.schemaspy.input.dbms.drivers.LoadAdditionalJarsForDriver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -179,9 +180,10 @@ public class DbDriverLoader {
         Class<Driver> driverClass = null;
         for(String potentialDriverClass : driverClasses) {
             try {
-                driverClass = new DcClassloader(potentialDriverClass, loader).value();
+                driverClass = new DcErrorLogged(
+                    new DcClassloader(potentialDriverClass, loader)
+                ).value();
             } catch (ClassNotFoundException e) {
-                LOGGER.debug("Unable to find driverClass '{}'", potentialDriverClass);
             }
             if (Objects.nonNull(driverClass)) {
                 return driverClass;

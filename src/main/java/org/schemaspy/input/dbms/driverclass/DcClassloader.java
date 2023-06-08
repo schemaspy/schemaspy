@@ -19,4 +19,9 @@ public class DcClassloader implements Driverclass {
     public Class<Driver> value() throws ClassNotFoundException {
         return (Class<Driver>) Class.forName(this.candidate, true, this.loader);
     }
+
+    @Override
+    public String toString() {
+        return this.candidate;
+    }
 }
