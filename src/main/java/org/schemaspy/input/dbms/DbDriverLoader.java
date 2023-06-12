@@ -29,6 +29,7 @@ import org.schemaspy.connection.WithUser;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcClassloader;
 import org.schemaspy.input.dbms.driverclass.DcErrorLogged;
+import org.schemaspy.input.dbms.driverclass.DcIterator;
 import org.schemaspy.input.dbms.driverclass.Driverclass;
 import org.schemaspy.input.dbms.driverpath.*;
 import org.schemaspy.input.dbms.drivers.LoadAdditionalJarsForDriver;
@@ -184,17 +185,11 @@ public class DbDriverLoader {
             ))
             .collect(Collectors.toList());
 
-        Class<Driver> driverClass = null;
-        for(Driverclass candidate : candidates) {
-            try {
-                driverClass = candidate.value();
-            } catch (ClassNotFoundException e) {
-            }
-            if (Objects.nonNull(driverClass)) {
-                return driverClass;
-            }
+        try {
+            return new DcIterator(candidates.iterator()).value();
+        } catch (NoSuchElementException e) {
+            return null;
         }
-        return null;
     }
 
     private String createMessage(String []driverClass, String driverPath, Set<URI> classpath) {
