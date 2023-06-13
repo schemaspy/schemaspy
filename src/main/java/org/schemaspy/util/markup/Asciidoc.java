@@ -19,14 +19,7 @@
 package org.schemaspy.util.markup;
 
 import org.asciidoctor.Asciidoctor;
-import org.asciidoctor.Attributes;
 import org.asciidoctor.Options;
-import org.w3c.dom.Attr;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by samdus on 2023-06-05
@@ -42,18 +35,7 @@ public class Asciidoc extends MarkupProcessor {
         }
     }
 
-    @Override
-    protected String addReferenceLink(String markupText, String rootPath) {
-        if(rootPath == null || rootPath.length() == 0) {
-            return markupText;
-        }
-
-        final String regex = "xref:(.+)(\\[.+])";
-        final String subst = String.format("xref:./%s/$1$2", rootPath);
-
-        final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-        final Matcher matcher = pattern.matcher(markupText);
-
-        return matcher.replaceAll(subst);
+    protected String formatLink(String pageName, String pagePath) {
+        return String.format("link:%s[%s]", pagePath, pageName);
     }
 }

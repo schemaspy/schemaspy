@@ -26,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,8 +38,8 @@ import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
 class MarkupProcessorIT {
 
     @Test
-    void defaultMarkupIsMarkdown() throws SQLException, IOException {
-        Path outDir = Paths.get("target","integrationtesting","sqlite-markdown");
+    void defaultMarkupIsMarkdown() throws IOException {
+        Path outDir = Paths.get("target","testout", "integrationtesting","sqlite-markdown");
         String description = "## Title in Markdown";
         String expectedHtmlDescription = "<h2><a href=\"#title-in-markdown\" id=\"title-in-markdown\">Title in Markdown</a></h2>";
 
@@ -62,8 +61,8 @@ class MarkupProcessorIT {
     }
 
     @Test
-    void asciiDocParameterGeneratesHtmlFromAsciidocDescription() throws SQLException, IOException {
-        Path outDir = Paths.get("target","integrationtesting","sqlite-asciidoc");
+    void asciiDocParameterGeneratesHtmlFromAsciidocDescription() throws IOException {
+        Path outDir = Paths.get("target","testout", "integrationtesting","sqlite-asciidoc");
         String description = "== Title in Asciidoc";
         String expectedHtmlDescription = "<h2 id=\"_title_in_asciidoc\">Title in Asciidoc</h2>";
 

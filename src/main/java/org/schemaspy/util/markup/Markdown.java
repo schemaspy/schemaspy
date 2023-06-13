@@ -25,16 +25,12 @@ import com.vladsch.flexmark.profiles.pegdown.Extensions;
 import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.options.DataHolder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Created by rkasa on 2016-04-11.
  *
  * @author Rafal Kasa
  * @author Daniel Watt
+ * @author Samuel Dussault
  */
 public class Markdown extends MarkupProcessor {
 
@@ -66,10 +62,6 @@ public class Markdown extends MarkupProcessor {
 
     @Override
     protected String parseToHtml(final String markupText) {
-        if (markupText == null) {
-            return null;
-        }
-
         return renderer.render(
             parser.parse(
                 markupText
@@ -77,43 +69,7 @@ public class Markdown extends MarkupProcessor {
         ).trim();
     }
 
-
-
-    @Override
-    protected String addReferenceLink(final String markupText, final String rootPath) {
-        StringBuilder text = new StringBuilder(markupText);
-        String newLine = "\r\n";
-
-        Pattern p = Pattern.compile("\\[(.*?)]");
-        Matcher m = p.matcher(markupText);
-
-        List<String> links = new ArrayList<>();
-
-        while(m.find()) {
-            links.add(m.group(1));
-        }
-
-        if (!links.isEmpty()) {
-            text.append(newLine).append(newLine);
-        }
-
-        for (String link : links) {
-            String anchorLink = "";
-            String pageLink = link;
-            int anchorPosition = link.lastIndexOf('.');
-
-            if (anchorPosition > -1) {
-                anchorLink = link.substring(anchorPosition + 1).trim();
-                pageLink = link.substring(0, anchorPosition);
-            }
-
-            String path = rootPath+pagePath(pageLink);
-            if (!"".equals(anchorLink)) {
-                path = path + "#" + anchorLink;
-            }
-            text.append("[").append(link).append("]: ./").append(path).append(newLine);
-        }
-
-        return text.toString();
+    protected String formatLink(String pageName, String pagePath) {
+        return String.format("[%1$s](%2$s)", pageName, pagePath);
     }
 }
