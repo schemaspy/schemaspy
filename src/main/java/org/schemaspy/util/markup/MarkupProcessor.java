@@ -26,7 +26,10 @@ import org.schemaspy.util.naming.SanitizedFileName;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Extracted from Markdown class by samdus on 2023-06-05
@@ -41,7 +44,7 @@ public abstract class MarkupProcessor {
     private static Optional<MarkupProcessor> instance = Optional.empty();
 
     public static MarkupProcessor getInstance() {
-        if(!instance.isPresent()) {
+        if (!instance.isPresent()) {
             instance = Optional.of(new Markdown());
         }
         return instance.get();
@@ -61,18 +64,57 @@ public abstract class MarkupProcessor {
                 });
     }
 
-    public String pagePath(String page) {
-        return pages.get(page);
-    }
-
     public String toHtml(final String markupText, final String rootPath) {
-        if(markupText == null) {
+        if (markupText == null) {
             return null;
         }
         return parseToHtml(addReferenceLink(markupText, rootPath)).trim();
     }
 
+    /**
+     * Adds pages reference links to the given markup text. Links in the format [page] or [page.anchor]
+     * are replaced with reference-style links, for example: [page.anchor](./pagePath#anchor) in Markdown.
+     * The page paths are obtained from the registry page registered using the {@link #registryPage} method.
+     *
+     * @param markupText The markup text to which page links will be added.
+     * @param rootPathArg The root path used for constructing the page paths (defaults to ".").
+     * @return The modified markup text with added reference links.
+     */
+    protected String addReferenceLink(final String markupText, final String rootPathArg) {
+        //TODO: Use the rootPath and add a test for it
+        String markupTextWithReferenceLink = markupText;
+        String rootPath = (rootPathArg == null || rootPathArg.isEmpty()) ? "." : rootPathArg;
+
+        Pattern p = Pattern.compile("\\[(.*?)]");
+        Matcher m = p.matcher(markupText);
+
+        while (m.find()) {
+            String pageLink = m.group(1);
+            String tableName = pageLink;
+
+            String anchorLink = "";
+            int anchorPosition = pageLink.lastIndexOf('.');
+
+            if (anchorPosition > -1) {
+                anchorLink = pageLink.substring(anchorPosition + 1).trim();
+                tableName = pageLink.substring(0, anchorPosition);
+            }
+
+            String pagePath = pages.get(tableName);
+            if (pagePath != null) {
+                pagePath = String.format("%s/%s", rootPath, pages.get(tableName));
+                if (!"".equals(anchorLink)) {
+                    pagePath += "#" + anchorLink;
+                }
+
+                markupTextWithReferenceLink = markupTextWithReferenceLink.replace(String.format("[%s]", pageLink), formatLink(pageLink, pagePath));
+            }
+        }
+
+        return markupTextWithReferenceLink;
+    }
+
     protected abstract String parseToHtml(final String markupText);
 
-    protected abstract String addReferenceLink(final String markupText, final String rootPath);
+    protected abstract String formatLink(final String pageName, final String pagePath);
 }

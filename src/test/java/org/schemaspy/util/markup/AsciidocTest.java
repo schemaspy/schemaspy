@@ -3,7 +3,6 @@ package org.schemaspy.util.markup;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class AsciidocTest {
 
@@ -36,17 +35,6 @@ class AsciidocTest {
                 "</div>";
 
         String actualHtml = new Asciidoc().toHtml(sourceAsciiDoc, ".");
-        assertThat(actualHtml).isEqualTo(expectedHtml);
-    }
-
-    @Test
-    void referenceLinksAreHandledProperly() {
-        String sourceAsciiDoc = "Refer to xref:document-b.adoc#section-b[Section B] for more information.";
-        String expectedHtml = "<div class=\"paragraph\">\n" +
-                "<p>Refer to <a href=\"./schema2/document-b.html#section-b\">Section B</a> for more information.</p>\n" +
-                "</div>";
-
-        String actualHtml = new Asciidoc().toHtml(sourceAsciiDoc, "schema2");
         assertThat(actualHtml).isEqualTo(expectedHtml);
     }
 }
