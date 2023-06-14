@@ -162,7 +162,19 @@ public class DbDriverLoader {
 
 
         ClassLoader loader = getDriverClassLoader(classpath);
-        Class<Driver> driverClass = getDriverClass(driverClasses, loader);
+        Class<Driver> driverClass;
+
+        final List<Driverclass> candidates = Arrays.stream(driverClasses)
+                .map(candidate -> new DcErrorLogged(
+                        new DcClassloader(candidate, loader)
+                ))
+                .collect(Collectors.toList());
+
+        try {
+            driverClass = new DcIterator(candidates.iterator()).value();
+        } catch (NoSuchElementException e) {
+            driverClass = null;
+        }
 
         if (Objects.isNull(driverClass)) {
             throw new ConnectionFailure(createMessage(driverClasses, driverPath, classpath));
@@ -176,20 +188,6 @@ public class DbDriverLoader {
         driverCache.put(driverClass.getName() + "|" + driverPath, driver);
 
         return driver;
-    }
-
-    private Class<Driver> getDriverClass(String[] driverClasses, ClassLoader loader) {
-        final List<Driverclass> candidates = Arrays.stream(driverClasses)
-            .map(candidate -> new DcErrorLogged(
-                new DcClassloader(candidate, loader)
-            ))
-            .collect(Collectors.toList());
-
-        try {
-            return new DcIterator(candidates.iterator()).value();
-        } catch (NoSuchElementException e) {
-            return null;
-        }
     }
 
     private String createMessage(String []driverClass, String driverPath, Set<URI> classpath) {
