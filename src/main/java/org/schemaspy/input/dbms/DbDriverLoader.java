@@ -173,10 +173,6 @@ public class DbDriverLoader {
         try {
             driverClass = new DcIterator(candidates.iterator()).value();
         } catch (NoSuchElementException e) {
-            driverClass = null;
-        }
-
-        if (Objects.isNull(driverClass)) {
             throw new ConnectionFailure(createMessage(driverClasses, driverPath, classpath));
         }
 
