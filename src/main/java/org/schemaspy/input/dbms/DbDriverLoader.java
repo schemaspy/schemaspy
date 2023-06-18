@@ -27,10 +27,7 @@ import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
-import org.schemaspy.input.dbms.driverclass.DcClassloader;
-import org.schemaspy.input.dbms.driverclass.DcErrorLogged;
-import org.schemaspy.input.dbms.driverclass.DcIterator;
-import org.schemaspy.input.dbms.driverclass.Driverclass;
+import org.schemaspy.input.dbms.driverclass.DcFacade;
 import org.schemaspy.input.dbms.driverpath.*;
 import org.schemaspy.input.dbms.drivers.LoadAdditionalJarsForDriver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -162,19 +159,11 @@ public class DbDriverLoader {
 
 
         ClassLoader loader = getDriverClassLoader(classpath);
-        Class<Driver> driverClass;
-
-        final List<Driverclass> candidates = Arrays.stream(driverClasses)
-                .map(candidate -> new DcErrorLogged(
-                        new DcClassloader(candidate, loader)
-                ))
-                .collect(Collectors.toList());
-
-        try {
-            driverClass = new DcIterator(candidates.iterator()).value();
-        } catch (NoSuchElementException e) {
-            throw new ConnectionFailure(createMessage(driverClasses, driverPath, classpath));
-        }
+        Class<Driver> driverClass = new DcFacade(
+            driverClasses,
+            loader,
+            createMessage(driverClasses, driverPath, classpath)
+        ).value();
 
         // @see DriverManager.setLogStream(PrintStream)
         //TODO implement PrintStream to Logger bridge.
