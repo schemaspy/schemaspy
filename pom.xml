@@ -4,7 +4,7 @@
     <artifactId>schemaspy</artifactId>
     <packaging>jar</packaging>
     <name>SchemaSpy</name>
-    <version>6.2.3-SNAPSHOT</version>
+    <version>6.2.3</version>
     <url>http://schemaspy.org</url>
     <description>SchemaSpy generates HTML and PNG-based entity relationship diagrams from JDBC-enabled databases.
     </description>
@@ -37,7 +37,7 @@
         <url>https://github.com/schemaspy/schemaspy</url>
         <connection>scm:git:https://github.com/schemaspy/schemaspy.git</connection>
         <developerConnection>scm:git:https://github.com/schemaspy/schemaspy.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v6.2.3</tag>
     </scm>
     <distributionManagement>
         <snapshotRepository>
