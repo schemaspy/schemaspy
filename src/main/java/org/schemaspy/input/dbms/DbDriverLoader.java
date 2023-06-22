@@ -144,11 +144,11 @@ public class DbDriverLoader {
                 return driver;
             }
         }
-        Set<URI> classpath = new GetExistingUrls().getExistingUrls(driverPath);
+        Set<URI> classpath = new GetExistingUrls(driverPath).paths();
         if (classpath.isEmpty()) {
             URL url = getClass().getResource(driverPath);
             if (url != null) {
-                classpath = new GetExistingUrls().getExistingUrls(url.getPath());
+                classpath = new GetExistingUrls(url.getPath()).paths();
             }
         }
 
