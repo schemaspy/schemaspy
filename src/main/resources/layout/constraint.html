@@ -37,7 +37,7 @@
                                             <table border='0' cellspacing='0' cellpadding='0'>
                                                 {{#childColumns}}
                                                 <tr>
-                                                    <td><a href='tables/{{#toFileName}}{{table.name}}{{/toFileName}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
+                                                    <td><a href='tables/{{#toFileName}}{{{table.name}}}{{/toFileName}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
                                                 </tr>
                                                 {{/childColumns}}
                                             </table>
@@ -46,7 +46,7 @@
                                             <table border='0' cellspacing='0' cellpadding='0'>
                                                 {{#parentColumns}}
                                                 <tr>
-                                                    <td><a href='tables/{{#toFileName}}{{table.name}}{{/toFileName}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
+                                                    <td><a href='tables/{{#toFileName}}{{{table.name}}}{{/toFileName}}.html'>{{table.name}}</a><span>.{{name}}</span></td>
                                                 </tr>
                                                 {{/parentColumns}}
                                             </table>
@@ -85,7 +85,7 @@
                                 <tbody>
                                     {{#checkConstraints}}
                                     <tr>
-                                        <td><a href='tables/{{#toFileName}}{{tableName}}{{/toFileName}}.html'>{{tableName}}</a></td>
+                                        <td><a href='tables/{{#toFileName}}{{{tableName}}}{{/toFileName}}.html'>{{tableName}}</a></td>
                                         <td>{{name}}</td>
                                         <td>{{definition}}</td>
                                     </tr>

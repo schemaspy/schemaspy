@@ -48,6 +48,20 @@ public class HtmlRoutinesPageTest {
         assertThat(actual.toString()).contains("<p>normal <em>emp</em> <strong>strong</strong></p>");
     }
 
+    @Test
+    public void rawValueToFileName() {
+        CommandLineArguments arguments = parse("");
+        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
+        MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", "markdownTest", arguments.getHtmlConfig(), false, dataTableConfig);
+        HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
+        Collection<Routine> routines = Collections.singletonList(new Routine("demofn(arg1 text, arg2 mytype DEFAULT 'one'::mytype)", "Function", "Integer", "SQL", "SELECT 1", true, "IMMUTABLE", "INVOKER", "normal *emp* **strong**"));
+        StringWriter actual = new StringWriter();
+
+        htmlRoutinesPage.write(routines, actual);
+
+        assertThat(actual.toString()).contains("demofn_arg1_text__arg2_mytype_D_2c10faf9");
+    }
+
     private CommandLineArguments parse(String...args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(
