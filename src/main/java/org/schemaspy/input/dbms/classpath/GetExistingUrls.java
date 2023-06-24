@@ -1,4 +1,4 @@
-package org.schemaspy.input.dbms;
+package org.schemaspy.input.dbms.classpath;
 
 import org.schemaspy.input.dbms.classpath.Classpath;
 
