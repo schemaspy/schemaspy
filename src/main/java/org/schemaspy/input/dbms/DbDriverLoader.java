@@ -145,13 +145,8 @@ public class DbDriverLoader {
                 return driver;
             }
         }
+
         Set<URI> classpath = new GetExistingUrls(driverPath).paths();
-        if (classpath.isEmpty()) {
-            URL url = getClass().getResource(driverPath);
-            if (url != null) {
-                classpath = new GetExistingUrls(url.getPath()).paths();
-            }
-        }
 
         //If this option is true additional jars used by JDBC Driver will be loaded to the classpath
         if (connectionConfig.withLoadSiblings()) {
