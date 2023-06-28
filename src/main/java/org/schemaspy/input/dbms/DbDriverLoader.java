@@ -30,7 +30,7 @@ import org.schemaspy.input.dbms.classpath.GetExistingUrls;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
 import org.schemaspy.input.dbms.driverpath.*;
-import org.schemaspy.input.dbms.drivers.LoadAdditionalJarsForDriver;
+import org.schemaspy.input.dbms.classpath.LoadAdditionalJarsForDriver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,7 +150,7 @@ public class DbDriverLoader {
 
         //If this option is true additional jars used by JDBC Driver will be loaded to the classpath
         if (connectionConfig.withLoadSiblings()) {
-            classpath.addAll(new LoadAdditionalJarsForDriver(driverPath).value());
+            classpath.addAll(new LoadAdditionalJarsForDriver(driverPath).paths());
         }
 
 
