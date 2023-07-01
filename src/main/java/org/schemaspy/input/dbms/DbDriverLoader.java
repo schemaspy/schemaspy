@@ -26,7 +26,9 @@ package org.schemaspy.input.dbms;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
+import org.schemaspy.input.dbms.classpath.Classpath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
+import org.schemaspy.input.dbms.classpath.WithSiblings;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
 import org.schemaspy.input.dbms.driverpath.*;
@@ -146,13 +148,11 @@ public class DbDriverLoader {
             }
         }
 
-        Set<URI> classpath = new GetExistingUrls(driverPath).paths();
-
-        //If this option is true additional jars used by JDBC Driver will be loaded to the classpath
-        if (connectionConfig.withLoadSiblings()) {
-            classpath.addAll(new LoadAdditionalJarsForDriver(driverPath).paths());
-        }
-
+        Set<URI> classpath = new WithSiblings(
+            connectionConfig,
+            new GetExistingUrls(driverPath),
+            new LoadAdditionalJarsForDriver(driverPath)
+        ).paths();
 
         ClassLoader loader = getDriverClassLoader(classpath);
         Class<Driver> driverClass = new DcFacade(
