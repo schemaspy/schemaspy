@@ -26,6 +26,7 @@ package org.schemaspy.input.dbms;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
+import org.schemaspy.input.dbms.classloader.ClDefault;
 import org.schemaspy.input.dbms.classpath.Classpath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
 import org.schemaspy.input.dbms.classpath.WithSiblings;
@@ -227,7 +228,7 @@ public class DbDriverLoader {
             }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(new URL[classpath.size()]);
             loader = new URLClassLoader(urls);
         } else {
-            loader = getClass().getClassLoader();
+            loader = new ClDefault().classloader();
         }
 
         return loader;
