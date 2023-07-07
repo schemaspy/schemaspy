@@ -218,15 +218,17 @@ public class DbDriverLoader {
         // otherwise use whatever was used to load this class.
         // thanks to Bruno Leonardo Gonalves for this implementation that he
         // used to resolve issues when running under Maven
-        if (!classpath.isEmpty()) {
-            URL[] urls = classpath.stream().map(uri -> {
-                try {
-                    return uri.toURL();
-                } catch (MalformedURLException e) {
-                    return null;
-                }
-            }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(new URL[classpath.size()]);
-            loader = new URLClassLoader(urls);
+
+        final List<URL> urls = classpath.stream().map(uri -> {
+            try {
+                return uri.toURL();
+            } catch (MalformedURLException e) {
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+
+        if (!urls.isEmpty()) {
+            loader = new URLClassLoader(urls.toArray(new URL[classpath.size()]));
         } else {
             loader = new ClDefault().classloader();
         }
