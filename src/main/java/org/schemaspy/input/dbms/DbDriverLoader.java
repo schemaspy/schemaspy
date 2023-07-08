@@ -227,13 +227,10 @@ public class DbDriverLoader {
             }
         }).filter(Objects::nonNull).collect(Collectors.toList());
 
-        if (!urls.isEmpty()) {
-            loader = new URLClassLoader(urls.toArray(new URL[classpath.size()]));
-        } else {
-            loader = new ClDefault().classloader();
-        }
-
-        return loader;
+        return new URLClassLoader(
+                urls.toArray(new URL[classpath.size()]),
+                new ClDefault().classloader()
+        );
     }
 
     /**
