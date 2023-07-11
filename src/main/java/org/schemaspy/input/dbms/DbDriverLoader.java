@@ -159,50 +159,20 @@ public class DbDriverLoader {
         Class<Driver> driverClass = new DcFacade(
             driverClasses,
             loader,
-            createMessage(driverClasses, driverPath, classpath)
+            new DbDriverLoaderErrorMessage(driverClasses, driverPath, classpath, connectionConfig).createMessage()
         ).value();
 
         // @see DriverManager.setLogStream(PrintStream)
         //TODO implement PrintStream to Logger bridge.
         // setLogStream should only be called once maybe in SpringConfig or Main?
-        driver = new DsDriverClass(driverClass, createMessage(driverClasses, driverPath, classpath)).driver();
+        driver = new DsDriverClass(
+                driverClass,
+                new DbDriverLoaderErrorMessage(driverClasses, driverPath, classpath, connectionConfig).createMessage()
+        ).driver();
 
         driverCache.put(driverClass.getName() + "|" + driverPath, driver);
 
         return driver;
-    }
-
-    private String createMessage(String []driverClass, String driverPath, Set<URI> classpath) {
-        StringBuilder sb = new StringBuilder()
-                .append("Failed to create any of '")
-                .append(Arrays.stream(driverClass).collect(Collectors.joining(", ")))
-                .append("' driver from driverPath '")
-                .append(driverPath)
-                .append("' with sibling jars ")
-                .append((connectionConfig.withLoadSiblings() ? "yes": "no"))
-                .append(".")
-                .append(System.lineSeparator())
-                .append("Resulting in classpath:");
-        if (classpath.isEmpty()) {
-            sb.append(" empty").append(System.lineSeparator());
-        } else {
-            sb.append(System.lineSeparator());
-            for (URI uri : classpath) {
-                sb.append("\t").append(uri.toString()).append(System.lineSeparator());
-            }
-        }
-        List<String> missingPaths = getMissingPaths(driverPath);
-        if (!missingPaths.isEmpty()) {
-            sb.append("There were missing paths in driverPath:").append(System.lineSeparator());
-            for (String path : missingPaths) {
-                sb.append("\t").append(path).append(System.lineSeparator());
-            }
-            sb
-                    .append("Use commandline option '-dp' to specify driver location.")
-                    .append(System.lineSeparator())
-                    .append("If you need to load sibling jars used '-loadjars'");
-        }
-        return sb.toString();
     }
 
     /**
@@ -231,24 +201,5 @@ public class DbDriverLoader {
                 urls.toArray(new URL[classpath.size()]),
                 new ClDefault().classloader()
         );
-    }
-
-    /**
-     * Returns a list of {@link File}s in <code>path</code> that do not exist.
-     * The intent is to aid in diagnosing invalid paths.
-     *
-     * @param path
-     * @return
-     */
-    private List<String> getMissingPaths(String path) {
-        List<String> missingFiles = new ArrayList<>();
-
-        String[] pieces = path.split(File.pathSeparator);
-        for (String piece : pieces) {
-            if (!new File(piece).exists())
-                missingFiles.add(piece);
-        }
-
-        return missingFiles;
     }
 }
