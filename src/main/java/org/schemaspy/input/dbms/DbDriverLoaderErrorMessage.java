@@ -53,9 +53,7 @@ public class DbDriverLoaderErrorMessage {
                 sb.append("\t").append(path).append(System.lineSeparator());
             }
             sb
-                    .append("Use commandline option '-dp' to specify driver location.")
-                    .append(System.lineSeparator())
-                    .append("If you need to load sibling jars used '-loadjars'");
+                    .append("Use commandline option '-dp' to specify driver location.");
         }
         return sb.toString();
     }
