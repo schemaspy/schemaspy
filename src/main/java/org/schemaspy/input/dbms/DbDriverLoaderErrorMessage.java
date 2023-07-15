@@ -46,6 +46,12 @@ public class DbDriverLoaderErrorMessage {
                 sb.append("\t").append(uri.toString()).append(System.lineSeparator());
             }
         }
+        sb.append(missingPathsMessage());
+        return sb.toString();
+    }
+
+    public String missingPathsMessage() {
+        StringBuilder sb = new StringBuilder();
         List<String> missingPaths = getMissingPaths(driverPath);
         if (!missingPaths.isEmpty()) {
             sb.append("There were missing paths in driverPath:").append(System.lineSeparator());
