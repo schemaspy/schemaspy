@@ -155,7 +155,24 @@ public class DbDriverLoader {
             new LoadAdditionalJarsForDriver(driverPath)
         ).paths();
 
-        ClassLoader loader = getDriverClassLoader(classpath);
+        // if a classpath has been specified then use it to find the driver,
+        // otherwise use whatever was used to load this class.
+        // thanks to Bruno Leonardo Gonalves for this implementation that he
+        // used to resolve issues when running under Maven
+
+        final List<URL> urls = classpath.stream().map(uri -> {
+            try {
+                return uri.toURL();
+            } catch (MalformedURLException e) {
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+
+        final ClassLoader loader = new URLClassLoader(
+                urls.toArray(new URL[classpath.size()]),
+                new ClDefault().classloader()
+        );
+
         Class<Driver> driverClass = new DcFacade(
             driverClasses,
             loader,
@@ -173,33 +190,5 @@ public class DbDriverLoader {
         driverCache.put(driverClass.getName() + "|" + driverPath, driver);
 
         return driver;
-    }
-
-    /**
-     * Returns a {@link ClassLoader class loader} to use for resolving {@link Driver}s.
-     *
-     * @param classpath
-     * @return
-     */
-    private ClassLoader getDriverClassLoader(Set<URI> classpath) {
-        ClassLoader loader;
-
-        // if a classpath has been specified then use it to find the driver,
-        // otherwise use whatever was used to load this class.
-        // thanks to Bruno Leonardo Gonalves for this implementation that he
-        // used to resolve issues when running under Maven
-
-        final List<URL> urls = classpath.stream().map(uri -> {
-            try {
-                return uri.toURL();
-            } catch (MalformedURLException e) {
-                return null;
-            }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-
-        return new URLClassLoader(
-                urls.toArray(new URL[classpath.size()]),
-                new ClDefault().classloader()
-        );
     }
 }
