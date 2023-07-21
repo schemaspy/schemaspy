@@ -3,10 +3,8 @@ package org.schemaspy.input.dbms;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DbDriverLoaderErrorMessage {
 
@@ -30,7 +28,7 @@ public class DbDriverLoaderErrorMessage {
     public String createMessage() {
         StringBuilder sb = new StringBuilder()
                 .append("Failed to create any of '")
-                .append(Arrays.stream(driverClass).collect(Collectors.joining(", ")))
+                .append(String.join(", ", driverClass))
                 .append("' driver from driverPath '")
                 .append(driverPath)
                 .append("' with sibling jars ")
