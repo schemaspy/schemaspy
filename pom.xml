@@ -16,7 +16,7 @@
         <sonar.junit.reportPaths>target/surefire-reports,target/failsafe-reports</sonar.junit.reportPaths>
 
         <spring-boot.version>2.2.11.RELEASE</spring-boot.version>
-        <testcontainers-java.version>1.16.3</testcontainers-java.version>
+        <testcontainers-java.version>1.18.3</testcontainers-java.version>
         <testcontainers-junit.version>1.10.1.0.0</testcontainers-junit.version>
 
         <java.version>1.8</java.version>
@@ -107,7 +107,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.8.2</version>
+                <version>5.9.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -259,6 +259,12 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>jdbc</artifactId>
+            <version>${testcontainers-java.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <version>${testcontainers-java.version}</version>
             <scope>test</scope>
         </dependency>
@@ -474,7 +480,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.1.2</version>
                 <configuration>
                     <skipTests>${skip.surefire}</skipTests>
                 </configuration>
@@ -482,7 +488,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.2</version>
                 <configuration>
                     <includes>
                         <include>**/*IT.java</include>
