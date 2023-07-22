@@ -18,13 +18,11 @@
  */
 package org.schemaspy.integrationtesting.informix;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
@@ -33,27 +31,29 @@ import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
-import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.InformixContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.function.Supplier;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
+@DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @DirtiesContext
+@Testcontainers(disabledWithoutDocker = true)
 public class InformixCheckConstraintIT {
+
     @Autowired
     private SqlService sqlService;
 
@@ -62,21 +62,12 @@ public class InformixCheckConstraintIT {
 
     private static Database database;
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
-
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
-            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
+    @Container
+    public static InformixContainer informixContainer =
+            new InformixContainer()
                     .withInitScript("integrationTesting/informix/dbScripts/informixcc.sql");
 
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
-
-    @Before
+    @BeforeEach
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
         if (database == null) {
             createDatabaseRepresentation();
@@ -91,10 +82,10 @@ public class InformixCheckConstraintIT {
                 "-cat", "test",
                 "-server", "dev",
                 "-o", "target/testout/integrationtesting/informix/cc",
-                "-u", jdbcContainerRule.getContainer().getUsername(),
-                "-p", jdbcContainerRule.getContainer().getPassword(),
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getJdbcPort().toString()
+                "-u", informixContainer.getUsername(),
+                "-p", informixContainer.getPassword(),
+                "-host", informixContainer.getContainerIpAddress(),
+                "-port", informixContainer.getJdbcPort().toString()
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(
             new CommandLineArguments(),
@@ -112,13 +103,13 @@ public class InformixCheckConstraintIT {
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTest() {
+    void databaseShouldBePopulatedWithTableTest() {
         Table table = getTable("test");
         assertThat(table).isNotNull();
     }
 
     @Test
-    public void tableTesShouldContainCheckConstraint() {
+    void tableTesShouldContainCheckConstraint() {
         String expecting = "((((((LENGTH (firstname ) > 10 ) AND (LENGTH (lastname ) > 10 ) ) AND ((age >= 100 ) AND (age <= 105 ) ) ) AND ((weight >= 100 ) AND (weight <= 105 ) ) ) AND ((height >= 100 ) AND (height <= 105 ) ) ) OR (((((LENGTH (firstname ) > 13 ) AND (LENGTH (lastname ) > 13 ) ) AND ((age >= 106 ) AND (age <= 108 ) ) ) AND ((weight >= 106 ) AND (weight <= 108 ) ) ) AND ((height >= 106 ) AND (height <= 108 ) ) ) )";
         Table table = getTable("test");
         String actual = table.getCheckConstraints().get("big_check").trim();
