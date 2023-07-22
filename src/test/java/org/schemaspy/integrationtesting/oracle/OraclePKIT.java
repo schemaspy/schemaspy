@@ -18,13 +18,11 @@
  */
 package org.schemaspy.integrationtesting.oracle;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
@@ -34,12 +32,13 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableIndex;
-import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.OracleContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -48,15 +47,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
+@DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @DirtiesContext
+@Testcontainers(disabledWithoutDocker = true)
 public class OraclePKIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","oracle","pk");
@@ -69,21 +69,13 @@ public class OraclePKIT {
 
     private static Database database;
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+    @Container
+    public static OracleContainer oracleContainer =
+            new OracleContainer("gvenzl/oracle-xe:11-slim")
+                    .usingSid()
+                    .withInitScript("integrationTesting/oracle/dbScripts/pklogging.sql");
 
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer("gvenzl/oracle-xe:11-slim").usingSid())
-            .assumeDockerIsPresent()
-            .withAssumptions(assumeDriverIsPresent())
-            .withInitScript("integrationTesting/oracle/dbScripts/pklogging.sql");
-
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
-
-    @Before
+    @BeforeEach
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
         if (database == null) {
             createDatabaseRepresentation();
@@ -93,14 +85,14 @@ public class OraclePKIT {
     private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "orathin",
-                "-db", jdbcContainerRule.getContainer().getSid(),
+                "-db", oracleContainer.getSid(),
                 "-s", "DBUSER",
                 "-cat", "%",
                 "-o", outputPath.toString(),
                 "-u", "dbuser",
                 "-p", "dbuser123",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
+                "-host", oracleContainer.getContainerIpAddress(),
+                "-port", oracleContainer.getOraclePort().toString()
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(
             new CommandLineArguments(),
@@ -118,13 +110,13 @@ public class OraclePKIT {
     }
 
     @Test
-    public void databaseShouldHaveTable() {
+    void databaseShouldHaveTable() {
         Table table = getTable("GIWSDURATIONHISTORY");
         assertThat(table).isNotNull();
     }
 
     @Test
-    public void tableShouldHavePKIndex() {
+    void tableShouldHavePKIndex() {
         Table table = getTable("GIWSDURATIONHISTORY");
         assertThat(table.getIndexes().stream().filter(TableIndex::isPrimaryKey).count()).isEqualTo(1);
     }
