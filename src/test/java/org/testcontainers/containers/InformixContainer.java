@@ -23,6 +23,7 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.utility.DockerImageName;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -32,7 +33,7 @@ import java.util.Set;
 /**
  * @author Nils Petzaell
  */
-public class InformixContainer<SELF extends InformixContainer<SELF>> extends JdbcDatabaseContainer<SELF> {
+public class InformixContainer extends JdbcDatabaseContainer<InformixContainer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -44,7 +45,7 @@ public class InformixContainer<SELF extends InformixContainer<SELF>> extends Jdb
     }
 
     public InformixContainer(final String dockerImageName) {
-        super(dockerImageName);
+        super(DockerImageName.parse(dockerImageName));
     }
 
     @Override
