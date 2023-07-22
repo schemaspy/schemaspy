@@ -19,22 +19,22 @@
  */
 package org.schemaspy.integrationtesting.mssqlserver;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.schemaspy.cli.SchemaSpyRunner;
-import org.schemaspy.integrationtesting.MssqlServerSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.schemaspy.testing.XmlOutputDiff;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.MSSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
 
@@ -45,50 +45,45 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
+@DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @DirtiesContext
+@Testcontainers(disabledWithoutDocker = true)
 public class MSSQLServerHTMLIT {
 
     private static URL expectedXML = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/htmlit.htmlit.xml");
     private static URL expectedDeletionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/deletionOrder.txt");
     private static URL expectedInsertionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/insertionOrder.txt");
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MSSQLContainer>(
-                    MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql")
-            );
+    @Container
+    public static MSSQLContainer mssqlContainer =
+            new MSSQLContainer(IMAGE_NAME)
+                    .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql");
 
     @Autowired
     private SchemaSpyRunner schemaSpyRunner;
 
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
-    @Before
-    public void generateHTML() throws Exception {
+    @BeforeEach
+    public void generateHTML() {
         if (shouldRun.get()) {
             String[] args = new String[]{
                     "-t", "mssql17",
                     "-db", "htmlit",
                     "-s", "htmlit",
                     "-cat", "htmlit",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(1433),
-                    "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(1433)),
-                    "-u", jdbcContainerRule.getContainer().getUsername(),
-                    "-p", jdbcContainerRule.getContainer().getPassword(),
+                    "-host", mssqlContainer.getContainerIpAddress() + ":" + mssqlContainer.getMappedPort(1433),
+                    "-port", String.valueOf(mssqlContainer.getMappedPort(1433)),
+                    "-u", mssqlContainer.getUsername(),
+                    "-p", mssqlContainer.getPassword(),
                     "-o", "target/testout/integrationtesting/mssql/html"
             };
             schemaSpyRunner.run(args);

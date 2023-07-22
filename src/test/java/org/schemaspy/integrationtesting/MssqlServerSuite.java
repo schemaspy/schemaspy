@@ -18,34 +18,13 @@
  */
 package org.schemaspy.integrationtesting;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.ClassRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.schemaspy.integrationtesting.mssqlserver.MSSQLServerCheckConstraintIT;
-import org.schemaspy.integrationtesting.mssqlserver.MSSQLServerCommentsIT;
-import org.schemaspy.integrationtesting.mssqlserver.MSSQLServerHTMLIT;
-import org.schemaspy.integrationtesting.mssqlserver.MSSQLServerRemoteTablesIT;
-import org.schemaspy.testing.SQLScriptsRunner;
-import org.testcontainers.containers.MSSQLContainer;
+import org.junit.platform.suite.api.*;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        MSSQLServerCheckConstraintIT.class,
-        MSSQLServerHTMLIT.class,
-        MSSQLServerCommentsIT.class,
-        MSSQLServerRemoteTablesIT.class
-})
+@Suite
+@SuiteDisplayName("MSSQL Test Suite")
+@SelectPackages("org.schemaspy.integrationtesting.mssqlserver")
+@IncludeClassNamePatterns(".*IT$")
+@IncludeEngines("junit-jupiter")
 public class MssqlServerSuite {
-
     public static final String IMAGE_NAME = "mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-16.04";
-
-    @ClassRule
-    public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitFunctions(new SQLScriptsRunner("integrationTesting/mssqlserver/dbScripts/"));
 }
