@@ -67,9 +67,9 @@ public class MysqlHTMLVizJsIT {
     public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle"))
                         .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
-                        .withQueryString("?useSSL=false")
+                        .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
                         .withInitScript("integrationTesting/mysql/dbScripts/htmlit.sql")
                         .withInitUser("root", "test")
             );
@@ -92,7 +92,7 @@ public class MysqlHTMLVizJsIT {
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-o", outputPath.toString(),
                     "-vizjs",
-                    "-connprops", "useSSL\\=false"
+                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
             };
             schemaSpyRunner.run(args);
             shouldRun.set(false);

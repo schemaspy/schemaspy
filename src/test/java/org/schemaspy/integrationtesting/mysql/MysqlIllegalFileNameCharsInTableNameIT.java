@@ -67,9 +67,9 @@ public class MysqlIllegalFileNameCharsInTableNameIT {
     public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5").withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle").withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"))
                         .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
-                        .withQueryString("?useSSL=false")
+                        .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
                         .withInitScript("integrationTesting/mysql/dbScripts/filenameillegal.sql")
                         .withInitUser("root", "test")
             );
@@ -91,7 +91,7 @@ public class MysqlIllegalFileNameCharsInTableNameIT {
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-o", outputPath.toString(),
-                    "-connprops", "useSSL\\=false"
+                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
             };
             schemaSpyRunner.run(args);
             shouldRun.set(false);
