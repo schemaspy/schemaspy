@@ -57,10 +57,10 @@ public class MysqlMultiSchemaIT {
     public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
-                            .withQueryString("?useSSL=false")
+                            .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
                             .withInitFunctions(new SQLScriptsRunner("integrationTesting/mysql/dbScripts/"))
                             .withInitUser("root", "test")
             );
@@ -83,7 +83,7 @@ public class MysqlMultiSchemaIT {
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-o", outputPath.toString(),
-                    "-connprops", "useSSL\\=false"
+                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
             };
             schemaSpyRunner.run(args);
             shouldRun.set(false);

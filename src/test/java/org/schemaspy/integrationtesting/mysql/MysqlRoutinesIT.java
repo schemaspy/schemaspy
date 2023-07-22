@@ -69,10 +69,10 @@ public class MysqlRoutinesIT {
     public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
-                            .withQueryString("?useSSL=false")
+                            .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
                             .withInitScript("integrationTesting/mysql/dbScripts/routinesit.sql")
                             .withInitUser("root", "test")
             );
@@ -95,7 +95,7 @@ public class MysqlRoutinesIT {
                 "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
                 "-o", outputPath.toString(),
-                "-connprops", "useSSL\\=false"
+                "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(
             new CommandLineArguments(),
