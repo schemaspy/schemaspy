@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.schemaspy.Main;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
@@ -46,7 +47,7 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
  * @author Nils Petzaell
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 public class MysqlMultiSchemaIT {
 
@@ -71,14 +72,14 @@ public class MysqlMultiSchemaIT {
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @Before
-    public synchronized void generateHTML() throws Exception {
+    public synchronized void generateHTML() {
         if (shouldRun.get()) {
             String[] args = new String[]{
                     "-t", "mysql",
                     "-db", "htmlit",
                     "-all",
                     "-schemaSpec", "(?!^mysql$|^performance_schema$|^information_schema$).*",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
+                    "-host", jdbcContainerRule.getContainer().getHost() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),

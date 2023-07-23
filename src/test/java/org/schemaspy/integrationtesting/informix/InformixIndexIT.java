@@ -24,6 +24,7 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -47,7 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class InformixIndexIT {
@@ -81,7 +82,7 @@ public class InformixIndexIT {
                 "-o", "target/testout/integrationtesting/informix/index",
                 "-u", informixContainer.getUsername(),
                 "-p", informixContainer.getPassword(),
-                "-host", informixContainer.getContainerIpAddress(),
+                "-host", informixContainer.getHost(),
                 "-port", informixContainer.getJdbcPort().toString()
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(
@@ -100,26 +101,26 @@ public class InformixIndexIT {
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTest() {
+    void databaseShouldBePopulatedWithTableTest() {
         Table table = getTable("test");
         assertThat(table).isNotNull();
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
+    void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
         Table table = getTable("test");
         TableColumn column = table.getColumn("firstname");
         assertThat(column).isNotNull();
     }
 
     @Test
-    public void tableTestShouldHaveTwoIndexes() {
+    void tableTestShouldHaveTwoIndexes() {
         Table table = getTable("test");
         assertThat(table.getIndexes()).hasSize(2);
     }
 
     @Test
-    public void tableTestIndex_test_index_shouldHaveThreeColumns() {
+    void tableTestIndex_test_index_shouldHaveThreeColumns() {
         TableIndex index = getTable("test").getIndex("test_index");
         assertThat(index.getColumns()).hasSize(3);
     }

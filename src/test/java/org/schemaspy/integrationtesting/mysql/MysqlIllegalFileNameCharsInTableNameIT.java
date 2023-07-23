@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.schemaspy.Main;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
@@ -52,15 +53,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nils Petzaell
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 public class MysqlIllegalFileNameCharsInTableNameIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","htmlillegal");
 
-    private static URL expectedXML = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/illegal.illegal.xml");
-    private static URL expectedDeletionOrder = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/deletionOrder.txt");
-    private static URL expectedInsertionOrder = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/insertionOrder.txt");
+    private static final URL expectedXML = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/illegal.illegal.xml");
+    private static final URL expectedDeletionOrder = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/deletionOrder.txt");
+    private static final URL expectedInsertionOrder = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/insertionOrder.txt");
 
     @SuppressWarnings("unchecked")
     @ClassRule
@@ -80,13 +81,13 @@ public class MysqlIllegalFileNameCharsInTableNameIT {
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @Before
-    public synchronized void generateHTML() throws Exception {
+    public synchronized void generateHTML() {
         if (shouldRun.get()) {
             String[] args = new String[]{
                     "-t", "mysql",
                     "-db", "illegal",
                     "-s", "illegal",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
+                    "-host", jdbcContainerRule.getContainer().getHost() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),

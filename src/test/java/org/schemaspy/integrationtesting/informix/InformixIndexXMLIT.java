@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.schemaspy.Main;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.testing.IgnoreNonPrintedInCData;
 import org.schemaspy.testing.IgnoreUsingXPath;
@@ -52,14 +53,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class InformixIndexXMLIT {
 
-    private static URL expectedXML = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/test.informix.xml");
-    private static URL expectedDeletionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/deletionOrder.txt");
-    private static URL expectedInsertionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/insertionOrder.txt");
+    private static final URL expectedXML = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/test.informix.xml");
+    private static final URL expectedDeletionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/deletionOrder.txt");
+    private static final URL expectedInsertionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/insertionOrder.txt");
 
     @Container
     public static InformixContainer informixContainer =
@@ -83,7 +84,7 @@ public class InformixIndexXMLIT {
                     "-o", "target/testout/integrationtesting/informix/xml",
                     "-u", informixContainer.getUsername(),
                     "-p", informixContainer.getPassword(),
-                    "-host", informixContainer.getContainerIpAddress(),
+                    "-host", informixContainer.getHost(),
                     "-port", informixContainer.getJdbcPort().toString(),
                     "-nohtml"
             };
@@ -93,7 +94,7 @@ public class InformixIndexXMLIT {
     }
 
     @Test
-    public void verifyXML() {
+    void verifyXML() {
         Diff d = DiffBuilder.compare(Input.fromURL(expectedXML))
                 .withTest(Input.fromFile("target/testout/integrationtesting/informix/xml/test.informix.xml"))
                 .withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, new IgnoreUsingXPath("/database[1]/@type"), new IgnoreNonPrintedInCData()))
@@ -102,12 +103,12 @@ public class InformixIndexXMLIT {
     }
 
     @Test
-    public void verifyDeletionOrder() throws IOException {
+    void verifyDeletionOrder() throws IOException {
         assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/informix/xml/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
     }
 
     @Test
-    public void verifyInsertionOrder() throws IOException {
+    void verifyInsertionOrder() throws IOException {
         assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/informix/xml/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
     }
 

@@ -23,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
@@ -42,13 +43,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Thomas Traude
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 public class DatabaseServiceIT {
 
-    private static String CREATE_SCHEMA = "CREATE SCHEMA DATABASESERVICEIT AUTHORIZATION SA";
-    private static String SET_SCHEMA = "SET SCHEMA DATABASESERVICEIT";
-    private static String CREATE_TABLE = "CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))";
-    private static String CREATE_SEQUENCE = "CREATE SEQUENCE SEQ_CLIENT start with 5 increment by 2";
+    private static final String CREATE_SCHEMA = "CREATE SCHEMA DATABASESERVICEIT AUTHORIZATION SA";
+    private static final String SET_SCHEMA = "SET SCHEMA DATABASESERVICEIT";
+    private static final String CREATE_TABLE = "CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))";
+    private static final String CREATE_SEQUENCE = "CREATE SEQUENCE SEQ_CLIENT start with 5 increment by 2";
 
     @Rule
     public H2MemoryRule h2MemoryRule = new H2MemoryRule("DatabaseServiceIT").addSqls(
@@ -93,7 +94,7 @@ public class DatabaseServiceIT {
 
         //check sequence
         Collection<Sequence> sequences = database.getSequences();
-        assertThat(sequences.stream().map(seq -> seq.getName())).containsExactlyInAnyOrder("SEQ_CLIENT");
+        assertThat(sequences.stream().map(Sequence::getName)).containsExactlyInAnyOrder("SEQ_CLIENT");
         assertThat(sequences.iterator().next().getStartValue()).isEqualTo(5);
         assertThat(sequences.iterator().next().getIncrement()).isEqualTo(2);
     }

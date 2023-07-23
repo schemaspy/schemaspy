@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.schemaspy.Main;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
@@ -52,15 +53,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nils Petzaell
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 public class MysqlHTMLGvSvgIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","html_gv_svg");
 
-    private static URL expectedXML = MysqlHTMLGvSvgIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_gv_svg/htmlit.htmlit.xml");
-    private static URL expectedDeletionOrder = MysqlHTMLGvSvgIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_gv_svg/deletionOrder.txt");
-    private static URL expectedInsertionOrder = MysqlHTMLGvSvgIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_gv_svg/insertionOrder.txt");
+    private static final URL expectedXML = MysqlHTMLGvSvgIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_gv_svg/htmlit.htmlit.xml");
+    private static final URL expectedDeletionOrder = MysqlHTMLGvSvgIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_gv_svg/deletionOrder.txt");
+    private static final URL expectedInsertionOrder = MysqlHTMLGvSvgIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_gv_svg/insertionOrder.txt");
 
     @SuppressWarnings("unchecked")
     @ClassRule
@@ -87,7 +88,7 @@ public class MysqlHTMLGvSvgIT {
                     "-db", "htmlit",
                     "-s", "htmlit",
                     "-imageformat", "svg",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
+                    "-host", jdbcContainerRule.getContainer().getHost() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),

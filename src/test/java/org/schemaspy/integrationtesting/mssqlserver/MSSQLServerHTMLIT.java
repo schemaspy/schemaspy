@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.schemaspy.Main;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.XmlOutputDiff;
@@ -53,14 +54,14 @@ import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class MSSQLServerHTMLIT {
 
-    private static URL expectedXML = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/htmlit.htmlit.xml");
-    private static URL expectedDeletionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/deletionOrder.txt");
-    private static URL expectedInsertionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/insertionOrder.txt");
+    private static final URL expectedXML = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/htmlit.htmlit.xml");
+    private static final URL expectedDeletionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/deletionOrder.txt");
+    private static final URL expectedInsertionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/insertionOrder.txt");
 
     @Container
     public static MSSQLContainer mssqlContainer =
@@ -80,7 +81,7 @@ public class MSSQLServerHTMLIT {
                     "-db", "htmlit",
                     "-s", "htmlit",
                     "-cat", "htmlit",
-                    "-host", mssqlContainer.getContainerIpAddress() + ":" + mssqlContainer.getMappedPort(1433),
+                    "-host", mssqlContainer.getHost() + ":" + mssqlContainer.getMappedPort(1433),
                     "-port", String.valueOf(mssqlContainer.getMappedPort(1433)),
                     "-u", mssqlContainer.getUsername(),
                     "-p", mssqlContainer.getPassword(),
@@ -92,7 +93,7 @@ public class MSSQLServerHTMLIT {
     }
 
     @Test
-    public void verifyXML() {
+    void verifyXML() {
         Diff d = XmlOutputDiff.diffXmlOutput(
                 Input.fromFile("target/testout/integrationtesting/mssql/html/htmlit.htmlit.xml"),
                 Input.fromURL(expectedXML)
@@ -101,17 +102,17 @@ public class MSSQLServerHTMLIT {
     }
 
     @Test
-    public void verifyDeletionOrder() throws IOException {
+    void verifyDeletionOrder() throws IOException {
         assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/mssql/html/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
     }
 
     @Test
-    public void verifyInsertionOrder() throws IOException {
+    void verifyInsertionOrder() throws IOException {
         assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/mssql/html/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
     }
 
     @Test
-    public void producesSameContent() throws IOException {
+    void producesSameContent() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
                         Paths.get("target","testout","integrationtesting","mssql","html"),
