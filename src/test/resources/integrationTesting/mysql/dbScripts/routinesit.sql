@@ -5,11 +5,11 @@ CREATE TABLE `routinesit`.issue222 (
 ) engine=InnoDB COMMENT 'Only to avoid issue 222';
 
 CREATE FUNCTION `routinesit`.no_det (s CHAR(20))
-RETURNS CHAR(50) NOT DETERMINISTIC
+RETURNS CHAR(50) NO SQL NOT DETERMINISTIC
 RETURN CONCAT('Hello, ',s,'!');
 
 CREATE FUNCTION `routinesit`.yes_det (s CHAR(20))
-RETURNS CHAR(50) DETERMINISTIC
+RETURNS CHAR(50) NO SQL DETERMINISTIC
 RETURN CONCAT('Hello, ',s,'!');
 
 GRANT SELECT, EXECUTE on `routinesit`.* to test@`%`;

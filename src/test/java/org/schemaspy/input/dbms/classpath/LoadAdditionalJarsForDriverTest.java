@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.input.dbms.drivers;
+package org.schemaspy.input.dbms.classpath;
 
 import org.junit.Test;
 
@@ -29,7 +29,7 @@ public class LoadAdditionalJarsForDriverTest {
   @Test
   public void testLoadAdditionalJarsForDriver() {
     String driverPath = "src/test/resources/driverFolder/dummy.jar";
-    assertThat(new LoadAdditionalJarsForDriver(driverPath).value())
+    assertThat(new LoadAdditionalJarsForDriver(driverPath).paths())
             .contains(Paths.get(driverPath).toUri())
             .contains(Paths.get(driverPath).resolveSibling("dummy.nar").toUri())
             .doesNotContain(Paths.get(driverPath).resolveSibling("nar.jar.war.not.included").toUri());

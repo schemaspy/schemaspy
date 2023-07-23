@@ -13,7 +13,7 @@ CREATE TABLE `xmlit`.users (
   email VARCHAR(40) NOT NULL,
   PRIMARY KEY (uid, gid),
   UNIQUE email_unique (email),
-  FOREIGN KEY groups_gid_fk (gid) REFERENCES groups(gid)
+  FOREIGN KEY groups_gid_fk (gid) REFERENCES `xmlit`.groups(gid)
 ) engine=InnoDB COMMENT 'Users of the system';
 CREATE TABLE `xmlit`.resources (
   rid INTEGER NOT NULL,
@@ -27,8 +27,8 @@ CREATE TABLE `xmlit`.group_resources (
   rid INTEGER NOT NULL,
   access ENUM('n','r','rw') DEFAULT 'n',
   PRIMARY KEY (gid, rid),
-  FOREIGN KEY groups_gid_fk(gid) REFERENCES groups(gid),
-  FOREIGN KEY resource_rid_fk(rid) REFERENCES resources(rid)
+  FOREIGN KEY groups_gid_fk(gid) REFERENCES `xmlit`.groups(gid),
+  FOREIGN KEY resource_rid_fk(rid) REFERENCES `xmlit`.resources(rid)
 ) engine=InnoDB COMMENT 'Group access to resource';
 
 CREATE VIEW `xmlit`.userAndGroup AS SELECT u.name AS UserName, g.name AS GroupName FROM `xmlit`.`users` u LEFT JOIN `xmlit`.`groups` g ON u.gid = g.gid;

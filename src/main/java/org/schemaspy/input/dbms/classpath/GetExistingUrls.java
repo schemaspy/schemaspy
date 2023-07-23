@@ -1,25 +1,27 @@
-package org.schemaspy.input.dbms;
+package org.schemaspy.input.dbms.classpath;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class GetExistingUrls {
+public class GetExistingUrls implements Classpath {
 
-    /**
-     * Returns a list of {@link URL}s in <code>path</code> that point to files that
-     * exist.
-     *
-     * @param path
-     * @return
-     */
-    public Set<URI> getExistingUrls(String path) {
-        String[] pieces = path.split(File.pathSeparator);
-        Iterable<File> files = Arrays.stream(pieces).map(File::new).collect(Collectors.toList());
+    private final String[] pieces;
+
+    public GetExistingUrls(final String path) {
+        this(path.split(File.pathSeparator));
+    }
+
+    public GetExistingUrls(final String[] pieces) {
+        this.pieces = pieces;
+    }
+
+    @Override
+    public Set<URI> paths() {
+        Iterable<File> files = Arrays.stream(this.pieces).map(File::new).collect(Collectors.toList());
         return consider(files);
     }
 

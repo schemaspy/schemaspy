@@ -34,8 +34,8 @@
                                         <tbody>
                                             {{#impliedConstraints}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{childTable.name}}{{/toFileName}}.html'>{{childTable.name}}</a>.{{childColumns}}</td>
-                                                <td><a href='tables/{{#toFileName}}{{parentTable.name}}{{/toFileName}}.html'>{{parentTable.name}}</a>.{{parentColumns}}</td>
+                                                <td><a href='tables/{{#toFileName}}{{{childTable.name}}}{{/toFileName}}.html'>{{childTable.name}}</a>.{{childColumns}}</td>
+                                                <td><a href='tables/{{#toFileName}}{{{parentTable.name}}}{{/toFileName}}.html'>{{parentTable.name}}</a>.{{parentColumns}}</td>
                                             </tr>
                                             {{/impliedConstraints}}
                                             {{^impliedConstraints}}
@@ -76,7 +76,7 @@
                                         <tbody>
                                             {{#unIndexedTables}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{name}}{{/toFileName}}.html'>{{name}}</a></td>
+                                                <td><a href='tables/{{#toFileName}}{{{name}}}{{/toFileName}}.html'>{{name}}</a></td>
                                                 {{#displayNumRows}}
                                                 <td>{{numRows}}</td>
                                                 {{/displayNumRows}}
@@ -118,7 +118,7 @@
                                         <tbody>
                                             {{#oneColumnTables}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{name}}{{/toFileName}}.html'>{{name}}</a></td>
+                                                <td><a href='tables/{{#toFileName}}{{{name}}}{{/toFileName}}.html'>{{name}}</a></td>
                                                 {{#columns}}
                                                 <td>{{name}}</td>
                                                 {{/columns}}
@@ -159,7 +159,7 @@
                                         <tbody>
                                             {{#incrementingColumnNames}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{name}}{{/toFileName}}.html'>{{name}}</a></td>
+                                                <td><a href='tables/{{#toFileName}}{{{name}}}{{/toFileName}}.html'>{{name}}</a></td>
                                             </tr>
                                             {{/incrementingColumnNames}}
                                             {{^incrementingColumnNames}}
@@ -197,7 +197,7 @@
                                         <tbody>
                                             {{#uniqueNullables}}
                                             <tr>
-                                                <td><a href='tables/{{#toFileName}}{{table.name}}{{/toFileName}}.html'>{{table.name}}</a>.{{name}}</td>
+                                                <td><a href='tables/{{#toFileName}}{{{table.name}}}{{/toFileName}}.html'>{{table.name}}</a>.{{name}}</td>
                                             </tr>
                                             {{/uniqueNullables}}
                                             {{^uniqueNullables}}

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.input.dbms;
+package org.schemaspy.input.dbms.classpath;
 
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class GetExistingUrlsTest {
                                        .toUri();
 
     String dp = Paths.get("src", "test", "resources", "driverFolder").toString();
-    Set<URI> uris = new GetExistingUrls().getExistingUrls(dp);
+    Set<URI> uris = new GetExistingUrls(dp).paths();
 
     assertThat(uris)
         .hasSize(4)
@@ -50,7 +50,7 @@ public class GetExistingUrlsTest {
     URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
 
     String dp = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
-    Set<URI> uris = new GetExistingUrls().getExistingUrls(dp);
+    Set<URI> uris = new GetExistingUrls(dp).paths();
 
     assertThat(uris)
         .hasSize(1)
@@ -67,7 +67,7 @@ public class GetExistingUrlsTest {
 
     String dpFile = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
     String dpDir = Paths.get("src", "test", "resources", "driverFolder").toString();
-    Set<URI> uris = new GetExistingUrls().getExistingUrls(dpFile + File.pathSeparator + dpDir);
+    Set<URI> uris = new GetExistingUrls(dpFile + File.pathSeparator + dpDir).paths();
 
     assertThat(uris)
         .hasSize(4)

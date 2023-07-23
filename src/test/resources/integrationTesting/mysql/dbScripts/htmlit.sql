@@ -19,11 +19,11 @@ CREATE TABLE `htmlit`.`user` (
 CREATE VIEW `htmlit`.userAndGroup AS SELECT u.name AS UserName, g.name AS GroupName FROM `htmlit`.`user` u LEFT JOIN `htmlit`.`group` g ON u.groupId = g.groupId;
 
 CREATE FUNCTION `htmlit`.no_det (s CHAR(20))
-RETURNS CHAR(50) NOT DETERMINISTIC
+RETURNS CHAR(50) NO SQL NOT DETERMINISTIC
 RETURN CONCAT('Hello, ',s,'!');
 
 CREATE DEFINER = 'test'@'%' FUNCTION `htmlit`.yes_det (s CHAR(20))
-RETURNS CHAR(50) DETERMINISTIC COMMENT 'is deterministic'
+RETURNS CHAR(50) NO SQL DETERMINISTIC COMMENT 'is deterministic'
 RETURN CONCAT('Hello, ',s,'!');
 
 GRANT SELECT, EXECUTE, SHOW VIEW on `htmlit`.* to test@`%`;

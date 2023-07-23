@@ -18,22 +18,21 @@
  */
 package org.schemaspy.integrationtesting.informix;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.schemaspy.cli.SchemaSpyRunner;
-import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.schemaspy.testing.IgnoreNonPrintedInCData;
 import org.schemaspy.testing.IgnoreUsingXPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.InformixContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
@@ -45,43 +44,34 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @DirtiesContext
+@Testcontainers(disabledWithoutDocker = true)
 public class InformixIndexXMLIT {
 
     private static URL expectedXML = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/test.informix.xml");
     private static URL expectedDeletionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/deletionOrder.txt");
     private static URL expectedInsertionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/insertionOrder.txt");
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
-
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
-            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
+    @Container
+    public static InformixContainer informixContainer =
+            new InformixContainer()
                     .withInitScript("integrationTesting/informix/dbScripts/informix.sql");
-
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
 
     @Autowired
     private SchemaSpyRunner schemaSpyRunner;
 
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
-    @Before
+    @BeforeEach
     public void createXML() {
         if (shouldRun.get()) {
             String[] args = {
@@ -91,10 +81,10 @@ public class InformixIndexXMLIT {
                     "-cat", "test",
                     "-server", "dev",
                     "-o", "target/testout/integrationtesting/informix/xml",
-                    "-u", jdbcContainerRule.getContainer().getUsername(),
-                    "-p", jdbcContainerRule.getContainer().getPassword(),
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                    "-port", jdbcContainerRule.getContainer().getJdbcPort().toString(),
+                    "-u", informixContainer.getUsername(),
+                    "-p", informixContainer.getPassword(),
+                    "-host", informixContainer.getContainerIpAddress(),
+                    "-port", informixContainer.getJdbcPort().toString(),
                     "-nohtml"
             };
             schemaSpyRunner.run(args);

@@ -65,9 +65,9 @@ public class MysqlXMLIT {
     public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle"))
                             .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
-                            .withQueryString("?useSSL=false")
+                            .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
                             .withInitScript("integrationTesting/mysql/dbScripts/xmlit.sql")
                             .withInitUser("root", "test")
             );
@@ -91,7 +91,7 @@ public class MysqlXMLIT {
                     "-p", container.getPassword(),
                     "-nohtml",
                     "-o", outputPath.toString(),
-                    "-connprops", "useSSL\\=false"
+                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
             };
             schemaSpyRunner.run(args);
             shouldRun.set(false);
