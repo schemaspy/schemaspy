@@ -45,7 +45,7 @@ public class GraphvizVersion implements Comparable<GraphvizVersion> {
             StringTokenizer tokenizer = new StringTokenizer(version, ". -_");
 
             while (tokenizer.hasMoreTokens()) {
-                Integer segment = new Integer(tokenizer.nextToken());
+                Integer segment = Integer.valueOf(tokenizer.nextToken());
                 segments.add(segment);
                 hash += segment;
             }
