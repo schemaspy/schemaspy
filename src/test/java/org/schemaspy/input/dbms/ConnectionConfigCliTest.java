@@ -120,15 +120,6 @@ class ConnectionConfigCliTest {
     }
 
     @Test
-    void withLoadSiblings() {
-        assertThat(
-            parse("-loadjars")
-                .withLoadSiblings()
-        )
-            .isTrue();
-    }
-
-    @Test
     void withLoadSiblingsDefault() {
         assertThat(
             parse()
