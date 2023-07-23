@@ -24,6 +24,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -48,7 +49,7 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 public class PgSqlCheckConstraintsIT {
 
@@ -89,7 +90,7 @@ public class PgSqlCheckConstraintsIT {
                 "-o", outputPath.toString(),
                 "-u", "test",
                 "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
+                "-host", jdbcContainerRule.getContainer().getHost(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(

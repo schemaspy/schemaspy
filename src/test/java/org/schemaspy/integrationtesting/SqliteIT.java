@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -42,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nils Petzaell
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 public class SqliteIT {
 

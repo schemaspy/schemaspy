@@ -24,6 +24,7 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -54,7 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class OracleIT {
@@ -91,7 +92,7 @@ public class OracleIT {
                 "-o", outputPath.toString(),
                 "-u", "orait",
                 "-p", "orait123",
-                "-host", oracleContainer.getContainerIpAddress(),
+                "-host", oracleContainer.getHost(),
                 "-port", oracleContainer.getOraclePort().toString()
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(

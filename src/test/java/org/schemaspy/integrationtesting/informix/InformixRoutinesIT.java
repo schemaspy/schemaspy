@@ -25,6 +25,7 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -51,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class InformixRoutinesIT {
@@ -93,7 +94,7 @@ public class InformixRoutinesIT {
                 "-o", "target/testout/integrationtesting/informix/routines",
                 "-u", informixContainer.getUsername(),
                 "-p", informixContainer.getPassword(),
-                "-host", informixContainer.getContainerIpAddress(),
+                "-host", informixContainer.getHost(),
                 "-port", informixContainer.getJdbcPort().toString()
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(

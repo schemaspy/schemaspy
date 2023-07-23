@@ -25,6 +25,7 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.schemaspy.Main;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -52,7 +53,7 @@ import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class MSSQLServerCommentsIT {
@@ -133,7 +134,7 @@ public class MSSQLServerCommentsIT {
                 "-o", "target/testout/integrationtesting/mssql/comments",
                 "-u", "sa",
                 "-p", mssqlContainer.getPassword(),
-                "-host", mssqlContainer.getContainerIpAddress(),
+                "-host", mssqlContainer.getHost(),
                 "-port", mssqlContainer.getMappedPort(1433).toString()
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(

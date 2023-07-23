@@ -23,6 +23,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.schemaspy.Main;
 import org.schemaspy.SimpleRuntimeDotConfig;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArgumentParser;
@@ -53,12 +54,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nils Petzaell
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 public class SchemaMetaIT {
 
-    private static String BY_SCRIPT_COMMENT = "Set by script";
-    private static String BY_SCHEMA_META_COMMENT = "Set from SchemaMeta";
+    private static final String BY_SCRIPT_COMMENT = "Set by script";
+    private static final String BY_SCHEMA_META_COMMENT = "Set from SchemaMeta";
 
     @ClassRule
     public static H2MemoryRule h2MemoryRule = new H2MemoryRule("SchemaMetaIT").addSqlScript("src/test/resources/integrationTesting/schemaMetaIT/dbScripts/shemaMetaIT.h2.sql");

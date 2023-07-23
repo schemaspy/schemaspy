@@ -55,7 +55,7 @@ public class InformixContainer extends JdbcDatabaseContainer<InformixContainer> 
 
     @Override
     public String getJdbcUrl() {
-        return "jdbc:informix-sqli://"+ getContainerIpAddress() + ":" + getJdbcPort()+ "/sysmaster:INFORMIXSERVER=dev";
+        return "jdbc:informix-sqli://"+ getHost() + ":" + getJdbcPort()+ "/sysmaster:INFORMIXSERVER=dev";
     }
 
     @Override

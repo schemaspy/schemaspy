@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.schemaspy.Main;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
@@ -50,15 +51,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Nils Petzaell
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 @DirtiesContext
 public class MysqlXMLIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","xml");
 
-    private static URL expectedXML = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/xmlit.xmlit.xml");
-    private static URL expectedDeletionOrder = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/deletionOrder.txt");
-    private static URL expectedInsertionOrder = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/insertionOrder.txt");
+    private static final URL expectedXML = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/xmlit.xmlit.xml");
+    private static final URL expectedDeletionOrder = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/deletionOrder.txt");
+    private static final URL expectedInsertionOrder = MysqlXMLIT.class.getResource("/integrationTesting/mysql/expecting/mysqlxmlit/insertionOrder.txt");
 
     @SuppressWarnings("unchecked")
     @ClassRule
@@ -85,7 +86,7 @@ public class MysqlXMLIT {
                     "-t", "mysql",
                     "-db", "xmlit",
                     "-s", "xmlit",
-                    "-host", container.getContainerIpAddress() + ":" + container.getMappedPort(3306),
+                    "-host", container.getHost() + ":" + container.getMappedPort(3306),
                     "-port", String.valueOf(container.getMappedPort(3306)),
                     "-u", container.getUsername(),
                     "-p", container.getPassword(),

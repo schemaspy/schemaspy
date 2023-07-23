@@ -22,6 +22,7 @@ import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.schemaspy.Main;
 import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.input.dbms.MissingParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -42,7 +43,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Main.class)
 public class SchemaSpyRunnerTest {
 
     @Rule
