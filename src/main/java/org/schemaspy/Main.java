@@ -25,12 +25,15 @@
  */
 package org.schemaspy;
 
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.logging.StackTraceOmitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.lang.invoke.MethodHandles;
@@ -51,12 +54,18 @@ public class Main {
 
     public static void main(String... args) {
         ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
-        SchemaSpyRunner schemaSpyRunner = context.getBean(SchemaSpyRunner.class);
+        SchemaSpyRunner schemaSpyRunner =
+                new SchemaSpyRunner(
+                        context.getBean(SchemaAnalyzer.class),
+                        context.getBean(CommandLineArguments.class),
+                        context.getBean(CommandLineArgumentParser.class),
+                        context.getBean(LoggingSystem.class)
+        );
         schemaSpyRunner.run(args);
         if (StackTraceOmitter.hasOmittedStackTrace()) {
             LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
         }
-        int exitCode = SpringApplication.exit(context, () -> 0);
+        int exitCode = schemaSpyRunner.getExitCode();
         System.exit(exitCode);
     }
 

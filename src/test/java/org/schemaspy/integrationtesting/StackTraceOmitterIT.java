@@ -22,6 +22,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.Main;
+import org.schemaspy.SchemaAnalyzer;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
@@ -46,16 +49,23 @@ public class StackTraceOmitterIT {
     public LoggingRule loggingRule = new LoggingRule();
 
     @Autowired
-    private SchemaSpyRunner schemaSpyRunner;
-
+    private SchemaAnalyzer schemaAnalyzer;
+    @Autowired
+    private CommandLineArguments commandLineArguments;
+    @Autowired
+    private CommandLineArgumentParser commandLineArgumentParser;
     @Autowired
     private LoggingSystem loggingSystem;
+
+    private SchemaSpyRunner schemaSpyRunner() {
+        return new SchemaSpyRunner(schemaAnalyzer, commandLineArguments, commandLineArgumentParser, loggingSystem);
+    }
 
     @Test
     @DirtiesContext
     @Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
     public void noStacktraceWhenLoggingIsOf() {
-        schemaSpyRunner.run("-sso","-o","target/somefolder", "-t", "doesnt-exist");
+        schemaSpyRunner().run("-sso","-o","target/somefolder", "-t", "doesnt-exist");
         String log = loggingRule.getLog();
         assertThat(log)
                 .isNotEmpty()
@@ -67,7 +77,7 @@ public class StackTraceOmitterIT {
     @Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
     public void stacktraceWhenLoggingIsOn() {
         try {
-            schemaSpyRunner.run("-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug");
+            schemaSpyRunner().run("-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug");
             String log = loggingRule.getLog();
             assertThat(log)
                     .isNotEmpty()

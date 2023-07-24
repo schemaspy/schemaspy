@@ -26,10 +26,14 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.schemaspy.Main;
+import org.schemaspy.SchemaAnalyzer;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.XmlOutputDiff;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -69,7 +73,17 @@ public class MSSQLServerHTMLIT {
                     .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql");
 
     @Autowired
-    private SchemaSpyRunner schemaSpyRunner;
+    private SchemaAnalyzer schemaAnalyzer;
+    @Autowired
+    private CommandLineArguments commandLineArguments;
+    @Autowired
+    private CommandLineArgumentParser commandLineArgumentParser;
+    @Autowired
+    private LoggingSystem loggingSystem;
+
+    private SchemaSpyRunner schemaSpyRunner() {
+        return new SchemaSpyRunner(schemaAnalyzer, commandLineArguments, commandLineArgumentParser, loggingSystem);
+    }
 
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
@@ -87,7 +101,7 @@ public class MSSQLServerHTMLIT {
                     "-p", mssqlContainer.getPassword(),
                     "-o", "target/testout/integrationtesting/mssql/html"
             };
-            schemaSpyRunner.run(args);
+            schemaSpyRunner().run(args);
             shouldRun.set(false);
         }
     }
