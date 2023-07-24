@@ -27,19 +27,15 @@ import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-@Component
-public class SchemaSpyRunner implements ExitCodeGenerator {
+public class SchemaSpyRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -60,7 +56,6 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
 
     private int exitCode = EXIT_CODE_OK;
 
-    @Autowired
     public SchemaSpyRunner(
         SchemaAnalyzer analyzer,
         CommandLineArguments arguments,
@@ -137,8 +132,6 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
             LOGGER.error("IOException", e);
         }
     }
-
-    @Override
     public int getExitCode() {
         return exitCode;
     }
