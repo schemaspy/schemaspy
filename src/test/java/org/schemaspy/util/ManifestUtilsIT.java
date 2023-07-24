@@ -18,16 +18,13 @@
  */
 package org.schemaspy.util;
 
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.schemaspy.testing.AssumeClassIsPresentRule;
+import org.junit.jupiter.api.Test;
+import org.schemaspy.testing.EnableIfClassAvailable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 //Only run from maven
+@EnableIfClassAvailable("org.apache.maven.surefire.booter.StartupConfiguration")
 public class ManifestUtilsIT {
-
-    @ClassRule
-    public static AssumeClassIsPresentRule rule = new AssumeClassIsPresentRule("org.apache.maven.surefire.providerapi.SurefireProvider");
 
     @Test
     public void getImplementationVersion() {
@@ -36,6 +33,6 @@ public class ManifestUtilsIT {
 
     @Test
     public void getImplementationBuild() {
-        assertThat(ManifestUtils.getImplementationBuild()).isEqualTo(System.getProperty("pomImplementationBuild"));
+        assertThat(ManifestUtils.getImplementationRevision()).isEqualTo(System.getProperty("pomImplementationRevision"));
     }
 }

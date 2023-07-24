@@ -59,7 +59,7 @@ public class ManifestUtils {
         return Optional.ofNullable(manifestAttributes.getValue("Implementation-Version")).orElse("IDE");
     }
 
-    public static String getImplementationBuild() {
-        return Optional.ofNullable(manifestAttributes.getValue("Implementation-Build")).orElse("IDE");
+    public static String getImplementationRevision() {
+        return Optional.ofNullable(manifestAttributes.getValue("Implementation-Revision")).orElse("IDE");
     }
 }

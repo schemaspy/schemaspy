@@ -32,6 +32,7 @@ jobs:
           --show-version
           -P release
           verify
+          -Dscm.revision=$GITHUB_SHA
       - name: Upload test output
         uses: actions/upload-artifact@v3
         if: failure()

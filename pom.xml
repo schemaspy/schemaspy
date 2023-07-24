@@ -21,6 +21,7 @@
 
         <java.version>17</java.version>
         <skip.surefire>false</skip.surefire>
+        <scm.revision>${project.scm.tag}</scm.revision>
     </properties>
     <issueManagement>
         <url>https://github.com/schemaspy/schemaspy/issues</url>
@@ -387,9 +388,13 @@
                 <version>3.2.0</version>
                 <configuration>
                     <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
+                        </manifest>
                         <manifestEntries>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                            <Implementation-Build>${buildNumber}</Implementation-Build>
+                            <Implementation-Revision>${scm.revision}</Implementation-Revision>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -417,27 +422,6 @@
                         <nonFilteredFileExtension>woff</nonFilteredFileExtension>
                         <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
                     </nonFilteredFileExtensions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>create</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <doCheck>true</doCheck>
-                    <format>${project.version}.{0,number} {1,date,yyyy-MM-dd HH:mm:ss}</format>
-                    <items>
-                        <item>buildNumber</item>
-                        <item>timestamp</item>
-                    </items>
                 </configuration>
             </plugin>
             <plugin>
@@ -490,7 +474,7 @@
                     </excludes>
                     <systemPropertyVariables>
                         <pomImplementationVersion>${project.version}</pomImplementationVersion>
-                        <pomImplementationBuild>${buildNumber}</pomImplementationBuild>
+                        <pomImplementationRevision>${scm.revision}</pomImplementationRevision>
                         <oracle.jdbc.timezoneAsRegion>false</oracle.jdbc.timezoneAsRegion>
                     </systemPropertyVariables>
                 </configuration>
