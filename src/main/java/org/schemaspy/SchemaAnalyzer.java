@@ -351,7 +351,7 @@ public class SchemaAnalyzer {
         writeInfo("date", ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ")), htmlInfoFile);
         writeInfo("os", System.getProperty("os.name") + " " + System.getProperty("os.version"), htmlInfoFile);
         writeInfo("schemaspy-version", ManifestUtils.getImplementationVersion(), htmlInfoFile);
-        writeInfo("schemaspy-build", ManifestUtils.getImplementationBuild(), htmlInfoFile);
+        writeInfo("schemaspy-revision", ManifestUtils.getImplementationRevision(), htmlInfoFile);
         writeInfo("renderer", renderer.identifier(), htmlInfoFile);
         progressListener.graphingSummaryProgressed();
 
