@@ -34,7 +34,6 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.SQLScriptsRunner;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -58,8 +57,7 @@ public class PgSqlMaterializedViewsIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","pgsql","materialized_views");
 
-    @Autowired
-    private SqlService sqlService;
+    private SqlService sqlService = new SqlService();
 
     @Mock
     private ProgressListener progressListener;

@@ -57,7 +57,7 @@ public class Main {
 
     public static void main(String... args) {
         ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
-        SqlService sqlService = context.getBean(SqlService.class);
+        SqlService sqlService = new SqlService();
         CommandLineArguments commandLineArguments = context.getBean(CommandLineArguments.class);
         SchemaSpyRunner schemaSpyRunner =
                 new SchemaSpyRunner(

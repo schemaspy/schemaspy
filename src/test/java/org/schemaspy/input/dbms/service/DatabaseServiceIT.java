@@ -30,7 +30,6 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Sequence;
 import org.schemaspy.testing.H2MemoryRule;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -59,8 +58,7 @@ public class DatabaseServiceIT {
         CREATE_SEQUENCE
     );
 
-    @Autowired
-    private SqlService sqlService;
+    private SqlService sqlService = new SqlService();
 
     @Mock
     private ProgressListener progressListener;

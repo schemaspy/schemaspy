@@ -32,7 +32,6 @@ import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -55,8 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers(disabledWithoutDocker = true)
 public class InformixCheckConstraintIT {
 
-    @Autowired
-    private SqlService sqlService;
+    private SqlService sqlService = new SqlService();
 
     @Mock
     private ProgressListener progressListener;

@@ -31,7 +31,6 @@ import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -58,8 +57,8 @@ import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class MSSQLServerRemoteTablesIT {
-    @Autowired
-    private SqlService sqlService;
+
+    private SqlService sqlService = new SqlService();
 
     @Mock
     private ProgressListener progressListener;
