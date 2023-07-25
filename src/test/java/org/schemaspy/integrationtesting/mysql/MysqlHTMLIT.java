@@ -24,12 +24,16 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.schemaspy.LayoutFolder;
 import org.schemaspy.Main;
 import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
+import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.integrationtesting.MysqlSuite;
+import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.schemaspy.testing.XmlOutputDiff;
@@ -80,7 +84,7 @@ public class MysqlHTMLIT {
             );
 
     @Autowired
-    private SchemaAnalyzer schemaAnalyzer;
+    private SqlService sqlService;
     @Autowired
     private CommandLineArguments commandLineArguments;
     @Autowired
@@ -89,7 +93,18 @@ public class MysqlHTMLIT {
     private LoggingSystem loggingSystem;
 
     private SchemaSpyRunner schemaSpyRunner() {
-        return new SchemaSpyRunner(schemaAnalyzer, commandLineArguments, commandLineArgumentParser, loggingSystem);
+        return new SchemaSpyRunner(
+                new SchemaAnalyzer(
+                        sqlService,
+                        new DatabaseServiceFactory(sqlService),
+                        commandLineArguments,
+                        new XmlProducerUsingDOM(),
+                        new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
+                ),
+                commandLineArguments,
+                commandLineArgumentParser,
+                loggingSystem
+        );
     }
 
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);

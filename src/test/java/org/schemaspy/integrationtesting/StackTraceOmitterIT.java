@@ -21,11 +21,15 @@ package org.schemaspy.integrationtesting;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.schemaspy.LayoutFolder;
 import org.schemaspy.Main;
 import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
+import org.schemaspy.input.dbms.service.SqlService;
+import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.testing.Logger;
 import org.schemaspy.testing.LoggingRule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +53,7 @@ public class StackTraceOmitterIT {
     public LoggingRule loggingRule = new LoggingRule();
 
     @Autowired
-    private SchemaAnalyzer schemaAnalyzer;
+    private SqlService sqlService;
     @Autowired
     private CommandLineArguments commandLineArguments;
     @Autowired
@@ -58,7 +62,18 @@ public class StackTraceOmitterIT {
     private LoggingSystem loggingSystem;
 
     private SchemaSpyRunner schemaSpyRunner() {
-        return new SchemaSpyRunner(schemaAnalyzer, commandLineArguments, commandLineArgumentParser, loggingSystem);
+        return new SchemaSpyRunner(
+                new SchemaAnalyzer(
+                        sqlService,
+                        new DatabaseServiceFactory(sqlService),
+                        commandLineArguments,
+                        new XmlProducerUsingDOM(),
+                        new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
+                ),
+                commandLineArguments,
+                commandLineArgumentParser,
+                loggingSystem
+        );
     }
 
     @Test

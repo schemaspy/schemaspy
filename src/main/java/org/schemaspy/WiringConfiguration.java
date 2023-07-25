@@ -18,10 +18,7 @@
  */
 package org.schemaspy;
 
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -34,17 +31,6 @@ public class WiringConfiguration {
     @Bean
     public SqlService sqlService() {
         return new SqlService();
-    }
-
-    @Bean
-    public SchemaAnalyzer schemaAnalyzer(SqlService sqlService, CommandLineArguments commandLineArguments) {
-        return new SchemaAnalyzer(
-                sqlService,
-                new DatabaseServiceFactory(sqlService),
-                commandLineArguments,
-                new XmlProducerUsingDOM(),
-                new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
-        );
     }
 
 }

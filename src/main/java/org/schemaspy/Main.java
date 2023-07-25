@@ -28,7 +28,10 @@ package org.schemaspy;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
+import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.logging.StackTraceOmitter;
+import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -54,10 +57,18 @@ public class Main {
 
     public static void main(String... args) {
         ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
+        SqlService sqlService = context.getBean(SqlService.class);
+        CommandLineArguments commandLineArguments = context.getBean(CommandLineArguments.class);
         SchemaSpyRunner schemaSpyRunner =
                 new SchemaSpyRunner(
-                        context.getBean(SchemaAnalyzer.class),
-                        context.getBean(CommandLineArguments.class),
+                        new SchemaAnalyzer(
+                                sqlService,
+                                new DatabaseServiceFactory(sqlService),
+                                commandLineArguments,
+                                new XmlProducerUsingDOM(),
+                                new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
+                        ),
+                        commandLineArguments,
                         context.getBean(CommandLineArgumentParser.class),
                         context.getBean(LoggingSystem.class)
         );
