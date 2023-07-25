@@ -52,8 +52,7 @@ public class StackTraceOmitterIT {
     @Rule
     public LoggingRule loggingRule = new LoggingRule();
 
-    @Autowired
-    private SqlService sqlService;
+    private SqlService sqlService = new SqlService();
     @Autowired
     private CommandLineArguments commandLineArguments;
     @Autowired

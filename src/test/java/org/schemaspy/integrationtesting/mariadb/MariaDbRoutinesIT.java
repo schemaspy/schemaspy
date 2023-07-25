@@ -34,7 +34,6 @@ import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -55,8 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Ignore
 public class MariaDbRoutinesIT {
 
-    @Autowired
-    private SqlService sqlService;
+    private SqlService sqlService = new SqlService();
 
     @Mock
     private ProgressListener progressListener;

@@ -75,8 +75,7 @@ public class InformixIndexXMLIT {
             new InformixContainer()
                     .withInitScript("integrationTesting/informix/dbScripts/informix.sql");
 
-    @Autowired
-    private SqlService sqlService;
+    private SqlService sqlService = new SqlService();
     @Autowired
     private CommandLineArguments commandLineArguments;
     @Autowired

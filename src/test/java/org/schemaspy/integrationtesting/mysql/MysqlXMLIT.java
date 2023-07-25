@@ -81,8 +81,7 @@ public class MysqlXMLIT {
                             .withInitUser("root", "test")
             );
 
-    @Autowired
-    private SqlService sqlService;
+    private SqlService sqlService = new SqlService();
     @Autowired
     private CommandLineArguments commandLineArguments;
     @Autowired

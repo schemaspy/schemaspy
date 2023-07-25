@@ -76,8 +76,7 @@ public class MSSQLServerHTMLIT {
             new MSSQLContainer(IMAGE_NAME)
                     .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql");
 
-    @Autowired
-    private SqlService sqlService;
+    private SqlService sqlService = new SqlService();
     @Autowired
     private CommandLineArguments commandLineArguments;
     @Autowired
