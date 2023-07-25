@@ -58,7 +58,7 @@ public class SimplePropertiesResolverTest {
     }
 
     private static URL getResource(String resource) {
-        return PropertiesFinder.class.getResource("/org/schemaspy/types/" + resource + ".properties");
+        return PropertiesFinder.class.getResource("/org/schemaspy/test_types/" + resource + ".properties");
     }
 
     @Test
