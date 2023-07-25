@@ -37,7 +37,6 @@ import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.XmlOutputDiff;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -76,15 +75,12 @@ public class MSSQLServerHTMLIT {
             new MSSQLContainer(IMAGE_NAME)
                     .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql");
 
-    private SqlService sqlService = new SqlService();
-    @Autowired
-    private CommandLineArguments commandLineArguments;
     @Autowired
     private CommandLineArgumentParser commandLineArgumentParser;
-    @Autowired
-    private LoggingSystem loggingSystem;
 
-    private SchemaSpyRunner schemaSpyRunner() {
+    private SchemaSpyRunner schemaSpyRunner(String...args) {
+        CommandLineArguments commandLineArguments = commandLineArgumentParser.parse(args);
+        SqlService sqlService = new SqlService();
         return new SchemaSpyRunner(
                 new SchemaAnalyzer(
                         sqlService,
@@ -93,9 +89,7 @@ public class MSSQLServerHTMLIT {
                         new XmlProducerUsingDOM(),
                         new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
                 ),
-                commandLineArguments,
-                commandLineArgumentParser,
-                loggingSystem
+                commandLineArguments
         );
     }
 
@@ -115,7 +109,7 @@ public class MSSQLServerHTMLIT {
                     "-p", mssqlContainer.getPassword(),
                     "-o", "target/testout/integrationtesting/mssql/html"
             };
-            schemaSpyRunner().run(args);
+            schemaSpyRunner(args).run();
             shouldRun.set(false);
         }
     }

@@ -18,7 +18,6 @@
  */
 package org.schemaspy.cli;
 
-import com.beust.jcommander.ParameterException;
 import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.input.dbms.MissingParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -27,8 +26,6 @@ import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -50,55 +47,21 @@ public class SchemaSpyRunner {
 
     private final CommandLineArguments arguments;
 
-    private final CommandLineArgumentParser commandLineArgumentParser;
-
-    private final LoggingSystem loggingSystem;
+    private final String[] args;
 
     private int exitCode = EXIT_CODE_OK;
 
     public SchemaSpyRunner(
         SchemaAnalyzer analyzer,
         CommandLineArguments arguments,
-        CommandLineArgumentParser commandLineArgumentParser,
-        LoggingSystem loggingSystem
+        String...args
     ) {
         this.analyzer = analyzer;
         this.arguments = arguments;
-        this.commandLineArgumentParser = commandLineArgumentParser;
-        this.loggingSystem = loggingSystem;
+        this.args = args;
     }
 
-    public void run(String... args) {
-        try {
-            commandLineArgumentParser.parse(args);
-        } catch (ParameterException e) {
-            LOGGER.error(e.getLocalizedMessage(),e);
-            exitCode = 1;
-            return;
-        }
-        if (arguments.isHelpRequired()) {
-            commandLineArgumentParser.printUsage();
-            return;
-        }
-
-        if (arguments.isDbHelpRequired()) {
-            commandLineArgumentParser.printDatabaseTypesHelp();
-            return;
-        }
-
-        if (arguments.isDebug()) {
-            enableDebug();
-        }
-
-        runAnalyzer(args);
-    }
-
-    public void enableDebug() {
-        loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
-        LOGGER.debug("Debug enabled");
-    }
-
-    private void runAnalyzer(String... args) {
+    public void run() {
         exitCode = EXIT_CODE_GENERIC_ERROR;
         try {
             exitCode = analyzer.analyze() == null ? EXIT_CODE_GENERIC_ERROR : EXIT_CODE_OK;

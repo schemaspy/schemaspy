@@ -48,19 +48,14 @@ public class SchemaSpyConfiguration {
     private DefaultProviderFactory factory;
 
     @Bean
-    public CommandLineArguments commandLineArguments() {
-        return new CommandLineArguments();
-    }
-
-    @Bean
-    public CommandLineArgumentParser commandLineArgumentParser(ApplicationArguments applicationArguments, CommandLineArguments commandLineArguments) {
+    public CommandLineArgumentParser commandLineArgumentParser(ApplicationArguments applicationArguments) {
         Objects.requireNonNull(applicationArguments);
 
         String[] args = applicationArguments.getSourceArgs();
 
         Objects.requireNonNull(args);
         IDefaultProvider iDefaultProvider = findDefaultProvider(args);
-        return new CommandLineArgumentParser(commandLineArguments, iDefaultProvider);
+        return new CommandLineArgumentParser(new CommandLineArguments(), iDefaultProvider);
     }
 
     private IDefaultProvider findDefaultProvider(String... args) {
