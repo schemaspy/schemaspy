@@ -454,7 +454,7 @@
                 <configuration>
                     <skipTests>${skip.surefire}</skipTests>
                     <argLine>
-                        -Djava.security.manager=allow
+                        @{argLine} -Djava.security.manager=allow
                     </argLine>
                 </configuration>
             </plugin>
