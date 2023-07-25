@@ -35,7 +35,6 @@ import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.testing.IgnoreNonPrintedInCData;
 import org.schemaspy.testing.IgnoreUsingXPath;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -75,15 +74,12 @@ public class InformixIndexXMLIT {
             new InformixContainer()
                     .withInitScript("integrationTesting/informix/dbScripts/informix.sql");
 
-    private SqlService sqlService = new SqlService();
-    @Autowired
-    private CommandLineArguments commandLineArguments;
     @Autowired
     private CommandLineArgumentParser commandLineArgumentParser;
-    @Autowired
-    private LoggingSystem loggingSystem;
 
-    private SchemaSpyRunner schemaSpyRunner() {
+    private SchemaSpyRunner schemaSpyRunner(String...args) {
+        CommandLineArguments commandLineArguments = commandLineArgumentParser.parse(args);
+        SqlService sqlService = new SqlService();
         return new SchemaSpyRunner(
                 new SchemaAnalyzer(
                         sqlService,
@@ -92,9 +88,7 @@ public class InformixIndexXMLIT {
                         new XmlProducerUsingDOM(),
                         new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
                 ),
-                commandLineArguments,
-                commandLineArgumentParser,
-                loggingSystem
+                commandLineArguments
         );
     }
 
@@ -116,7 +110,7 @@ public class InformixIndexXMLIT {
                     "-port", informixContainer.getJdbcPort().toString(),
                     "-nohtml"
             };
-            schemaSpyRunner().run(args);
+            schemaSpyRunner(args).run();
             shouldRun.set(false);
         }
     }

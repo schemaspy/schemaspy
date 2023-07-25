@@ -52,15 +52,17 @@ public class StackTraceOmitterIT {
     @Rule
     public LoggingRule loggingRule = new LoggingRule();
 
-    private SqlService sqlService = new SqlService();
-    @Autowired
-    private CommandLineArguments commandLineArguments;
     @Autowired
     private CommandLineArgumentParser commandLineArgumentParser;
     @Autowired
     private LoggingSystem loggingSystem;
 
-    private SchemaSpyRunner schemaSpyRunner() {
+    private SchemaSpyRunner schemaSpyRunner(String...args) {
+        CommandLineArguments commandLineArguments = commandLineArgumentParser.parse(args);
+        if (commandLineArguments.isDebug()) {
+            loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
+        }
+        SqlService sqlService = new SqlService();
         return new SchemaSpyRunner(
                 new SchemaAnalyzer(
                         sqlService,
@@ -69,9 +71,7 @@ public class StackTraceOmitterIT {
                         new XmlProducerUsingDOM(),
                         new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
                 ),
-                commandLineArguments,
-                commandLineArgumentParser,
-                loggingSystem
+                commandLineArguments
         );
     }
 
@@ -79,7 +79,7 @@ public class StackTraceOmitterIT {
     @DirtiesContext
     @Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
     public void noStacktraceWhenLoggingIsOf() {
-        schemaSpyRunner().run("-sso","-o","target/somefolder", "-t", "doesnt-exist");
+        schemaSpyRunner("-sso","-o","target/somefolder", "-t", "doesnt-exist").run();
         String log = loggingRule.getLog();
         assertThat(log)
                 .isNotEmpty()
@@ -91,7 +91,7 @@ public class StackTraceOmitterIT {
     @Logger(value = SchemaSpyRunner.class, pattern = "%msg%n%debugEx")
     public void stacktraceWhenLoggingIsOn() {
         try {
-            schemaSpyRunner().run("-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug");
+            schemaSpyRunner("-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug").run();
             String log = loggingRule.getLog();
             assertThat(log)
                     .isNotEmpty()

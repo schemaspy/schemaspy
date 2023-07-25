@@ -29,7 +29,6 @@ import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.system.OutputCaptureRule;
@@ -59,13 +58,10 @@ public class SchemaSpyRunnerTest {
     private SchemaAnalyzer schemaAnalyzer;
 
     @Autowired
-    private CommandLineArguments commandLineArguments;
-    @Autowired
     private CommandLineArgumentParser commandLineArgumentParser;
-    @Autowired
-    private LoggingSystem loggingSystem;
+
     private SchemaSpyRunner schemaSpyRunner() {
-        return new SchemaSpyRunner(schemaAnalyzer, commandLineArguments, commandLineArgumentParser, loggingSystem);
+        return new SchemaSpyRunner(schemaAnalyzer, commandLineArgumentParser.parse(args), args);
     }
 
     @Test
@@ -73,7 +69,7 @@ public class SchemaSpyRunnerTest {
     public void ioExceptionExitCode_1() throws IOException, SQLException {
         when(schemaAnalyzer.analyze()).thenThrow(new IOException("file permission error"));
         SchemaSpyRunner schemaSpyRunner = schemaSpyRunner();
-        schemaSpyRunner.run(args);
+        schemaSpyRunner.run();
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(1);
     }
 
@@ -82,7 +78,7 @@ public class SchemaSpyRunnerTest {
     public void emptySchemaExitCode_2() throws IOException, SQLException {
         when(schemaAnalyzer.analyze()).thenThrow(new EmptySchemaException());
         SchemaSpyRunner schemaSpyRunner = schemaSpyRunner();
-        schemaSpyRunner.run(args);
+        schemaSpyRunner.run();
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(2);
     }
 
@@ -91,7 +87,7 @@ public class SchemaSpyRunnerTest {
     public void connectionFailureExitCode_3() throws IOException, SQLException {
         when(schemaAnalyzer.analyze()).thenThrow(new ConnectionFailure("failed to connect"));
         SchemaSpyRunner schemaSpyRunner = schemaSpyRunner();
-        schemaSpyRunner.run(args);
+        schemaSpyRunner.run();
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(3);
     }
 
@@ -101,7 +97,7 @@ public class SchemaSpyRunnerTest {
         Database database = mock(Database.class);
         when(schemaAnalyzer.analyze()).thenReturn(database);
         SchemaSpyRunner schemaSpyRunner = schemaSpyRunner();
-        schemaSpyRunner.run(args);
+        schemaSpyRunner.run();
         assertThat(schemaSpyRunner.getExitCode()).isZero();
     }
 
@@ -112,7 +108,7 @@ public class SchemaSpyRunnerTest {
         outputCapture.expect(Matchers.not(Matchers.containsString("'-t mssql")));
         when(schemaAnalyzer.analyze()).thenThrow(new MissingParameterException("host", "Host is missing"));
         SchemaSpyRunner schemaSpyRunner = schemaSpyRunner();
-        schemaSpyRunner.run(args);
+        schemaSpyRunner.run();
         assertThat(schemaSpyRunner.getExitCode()).isEqualTo(5);
     }
 }

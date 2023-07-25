@@ -25,6 +25,7 @@
  */
 package org.schemaspy;
 
+import com.beust.jcommander.ParameterException;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.SchemaSpyRunner;
@@ -36,10 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Objects;
 
 /**
  * @author John Currier
@@ -57,27 +60,57 @@ public class Main {
 
     public static void main(String... args) {
         ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
+        CommandLineArgumentParser commandLineArgumentParser = context.getBean(CommandLineArgumentParser.class);
+        CommandLineArguments arguments = parse(commandLineArgumentParser, args);
+        if (Objects.isNull(arguments)) {
+            System.exit(1);
+        }
+        if (arguments.isHelpRequired()) {
+            commandLineArgumentParser.printUsage();
+            return;
+        }
+
+        if (arguments.isDbHelpRequired()) {
+            commandLineArgumentParser.printDatabaseTypesHelp();
+            return;
+        }
+
+        if (arguments.isDebug()) {
+            enableDebug(context.getBean(LoggingSystem.class));
+        }
         SqlService sqlService = new SqlService();
-        CommandLineArguments commandLineArguments = context.getBean(CommandLineArguments.class);
         SchemaSpyRunner schemaSpyRunner =
                 new SchemaSpyRunner(
                         new SchemaAnalyzer(
                                 sqlService,
                                 new DatabaseServiceFactory(sqlService),
-                                commandLineArguments,
+                                arguments,
                                 new XmlProducerUsingDOM(),
                                 new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
                         ),
-                        commandLineArguments,
-                        context.getBean(CommandLineArgumentParser.class),
-                        context.getBean(LoggingSystem.class)
+                        arguments,
+                        args
         );
-        schemaSpyRunner.run(args);
+        schemaSpyRunner.run();
         if (StackTraceOmitter.hasOmittedStackTrace()) {
             LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
         }
         int exitCode = schemaSpyRunner.getExitCode();
         System.exit(exitCode);
+    }
+
+    private static CommandLineArguments parse(CommandLineArgumentParser commandLineArgumentParser, String...args) {
+        try {
+            return commandLineArgumentParser.parse(args);
+        } catch (ParameterException e) {
+            LOGGER.error("Invalid command line arguments:",e);
+            return null;
+        }
+    }
+
+    private static void enableDebug(LoggingSystem loggingSystem) {
+        loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
+        LOGGER.debug("Debug enabled");
     }
 
 }
