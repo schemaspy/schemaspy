@@ -26,9 +26,7 @@
 package org.schemaspy;
 
 import com.beust.jcommander.ParameterException;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.cli.*;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.logging.StackTraceOmitter;
@@ -60,8 +58,14 @@ public class Main {
 
     public static void main(String... args) {
         ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
-        CommandLineArgumentParser commandLineArgumentParser = context.getBean(CommandLineArgumentParser.class);
-        CommandLineArguments arguments = parse(commandLineArgumentParser, args);
+        CommandLineArgumentParser commandLineArgumentParser =
+                new CommandLineArgumentParser(
+                        new DefaultProviderFactory(
+                                new ConfigFileArgumentParser(args).configFile()
+                        ).defaultProvider(),
+                        args
+                );
+        CommandLineArguments arguments = parse(commandLineArgumentParser);
         int exitCode = Objects.nonNull(arguments)
                 ? run(commandLineArgumentParser, arguments, context.getBean(LoggingSystem.class), args)
                 : 1;
@@ -71,9 +75,9 @@ public class Main {
         System.exit(exitCode);
     }
 
-    private static CommandLineArguments parse(CommandLineArgumentParser commandLineArgumentParser, String...args) {
+    private static CommandLineArguments parse(CommandLineArgumentParser commandLineArgumentParser) {
         try {
-            return commandLineArgumentParser.parse(args);
+            return commandLineArgumentParser.commandLineArguments();
         } catch (ParameterException e) {
             LOGGER.error("Invalid command line arguments:",e);
             return null;

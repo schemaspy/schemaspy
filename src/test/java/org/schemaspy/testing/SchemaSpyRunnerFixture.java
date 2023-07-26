@@ -2,9 +2,7 @@ package org.schemaspy.testing;
 
 import org.schemaspy.LayoutFolder;
 import org.schemaspy.SchemaAnalyzer;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.cli.SchemaSpyRunner;
+import org.schemaspy.cli.*;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
@@ -13,10 +11,15 @@ public class SchemaSpyRunnerFixture {
     private SchemaSpyRunnerFixture() {}
 
     public static SchemaSpyRunner schemaSpyRunner(
-            CommandLineArgumentParser commandLineArgumentParser,
             String...args
     ) {
-        CommandLineArguments commandLineArguments = commandLineArgumentParser.parse(args);
+        CommandLineArguments commandLineArguments =
+                new CommandLineArgumentParser(
+                        new DefaultProviderFactory(
+                                new ConfigFileArgumentParser(args).configFile()
+                        ).defaultProvider(),
+                        args
+                ).commandLineArguments();
         SqlService sqlService = new SqlService();
         return new SchemaSpyRunner(
                 new SchemaAnalyzer(
@@ -33,13 +36,18 @@ public class SchemaSpyRunnerFixture {
 
     public static SchemaSpyRunner schemaSpyRunner(
             SchemaAnalyzer schemaAnalyzer,
-            CommandLineArgumentParser commandLineArgumentParser,
             String...args
     ) {
-        CommandLineArguments commandLineArguments = commandLineArgumentParser.parse(args);
+        CommandLineArgumentParser commandLineArgumentParser =
+                new CommandLineArgumentParser(
+                        new DefaultProviderFactory(
+                                new ConfigFileArgumentParser(args).configFile()
+                        ).defaultProvider(),
+                        args
+                );
         return new SchemaSpyRunner(
                 schemaAnalyzer,
-                commandLineArguments,
+                commandLineArgumentParser.commandLineArguments(),
                 args
        );
     }

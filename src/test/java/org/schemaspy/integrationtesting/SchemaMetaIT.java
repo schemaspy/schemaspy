@@ -82,8 +82,8 @@ public class SchemaMetaIT {
                 "-u", "sa"
         };
         commandLineArguments = new CommandLineArgumentParser(
-            (option) -> null
-        ).parse(args);
+                args
+        ).commandLineArguments();
         sqlService.connect(commandLineArguments.getConnectionConfig());
         dbmsMeta = sqlService.getDbmsMeta();
         schema = h2MemoryRule.getConnection().getSchema();

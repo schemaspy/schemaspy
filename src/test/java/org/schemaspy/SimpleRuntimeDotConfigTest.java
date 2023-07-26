@@ -48,16 +48,14 @@ class SimpleRuntimeDotConfigTest {
     private RuntimeDotConfig parse(String... args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         DotConfig dotConfig = new CommandLineArgumentParser(
-            (noop) -> null
-        )
-            .parse(
                 Stream
-                    .concat(
-                        Arrays.stream(defaultArgs),
-                        Arrays.stream(args)
-                    )
-                    .toArray(String[]::new)
-            )
+                        .concat(
+                                Arrays.stream(defaultArgs),
+                                Arrays.stream(args)
+                        )
+                        .toArray(String[]::new)
+        )
+            .commandLineArguments()
             .getDotConfig();
         return new SimpleRuntimeDotConfig(
             new DefaultFontConfig(dotConfig),

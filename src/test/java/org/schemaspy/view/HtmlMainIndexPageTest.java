@@ -85,14 +85,13 @@ class HtmlMainIndexPageTest {
     private CommandLineArguments parse(String...args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(
-            (option) -> null
-        )
-            .parse(
                 Stream
-                    .concat(
-                        Arrays.stream(defaultArgs),
-                        Arrays.stream(args)
-                    ).toArray(String[]::new));
+                        .concat(
+                                Arrays.stream(defaultArgs),
+                                Arrays.stream(args)
+                        ).toArray(String[]::new)
+        )
+            .commandLineArguments();
     }
 
 }

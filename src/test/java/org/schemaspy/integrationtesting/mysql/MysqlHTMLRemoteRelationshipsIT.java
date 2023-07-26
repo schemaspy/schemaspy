@@ -25,12 +25,10 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.Main;
-import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.schemaspy.testing.XmlOutputDiff;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -76,9 +74,6 @@ public class MysqlHTMLRemoteRelationshipsIT {
                         .withInitUser("root", "test")
             );
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @Before
@@ -96,7 +91,7 @@ public class MysqlHTMLRemoteRelationshipsIT {
                     "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true",
                     "-meta", Paths.get("src","test","resources","integrationTesting","mysql","metadata","remote_relationships.xml").toString()
             };
-            schemaSpyRunner(commandLineArgumentParser, args).run();
+            schemaSpyRunner(args).run();
             shouldRun.set(false);
         }
     }

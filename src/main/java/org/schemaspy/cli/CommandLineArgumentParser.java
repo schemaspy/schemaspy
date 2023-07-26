@@ -52,16 +52,20 @@ import java.util.stream.Collectors;
 public class CommandLineArgumentParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static final PropertiesResolver propertiesResolver = new SimplePropertiesResolver();
-
-    private final JCommander jCommander;
+    private static final String[] requiredFields = {"outputDirectory"};
 
     private final CommandLineArguments arguments = new CommandLineArguments();
 
-    private static final String[] requiredFields = {"outputDirectory"};
+    private final String[] args;
+    private final JCommander jCommander;
 
-    public CommandLineArgumentParser(IDefaultProvider defaultProvider) {
+    public CommandLineArgumentParser(String...args) {
+        this(null, args);
+    }
+
+    public CommandLineArgumentParser(IDefaultProvider defaultProvider, String...args) {
+        this.args = args;
         jCommander = JCommander.newBuilder()
                 .acceptUnknownOptions(true)
                 .programName("java -jar \"" + Paths.get("").toAbsolutePath().relativize(new SchemaSpyJarFile().path()) + "\"")
@@ -72,11 +76,11 @@ public class CommandLineArgumentParser {
         jCommander.addObject(arguments);
     }
 
-    public CommandLineArguments parse(String... localArgs) {
-        jCommander.parse(localArgs);
+    public CommandLineArguments commandLineArguments() {
+        jCommander.parse(args);
         arguments.setUnknownArgs(jCommander.getUnknownOptions());
         if (shouldValidate()) {
-            validate(arguments);
+            validate();
         }
         return arguments;
     }
@@ -85,7 +89,7 @@ public class CommandLineArgumentParser {
         List<ParameterDescription> helpParameters = jCommander.getParameters()
                 .stream()
                 .filter(ParameterDescription::isHelp)
-                .collect(Collectors.toList());
+                .toList();
         for(ParameterDescription parameterDescription: helpParameters) {
             if (parameterDescription.isAssigned()) {
                 return false;
@@ -94,8 +98,8 @@ public class CommandLineArgumentParser {
         return true;
     }
 
-    private void validate(CommandLineArguments arguments) {
-        List<String> runtimeRequiredFields = computeRequiredFields(arguments);
+    private void validate() {
+        List<String> runtimeRequiredFields = computeRequiredFields();
 
         List<String> missingFields = new ArrayList<>();
         Map<String, ParameterDescription> fieldToParameterDescription = jCommander.getParameters()
@@ -103,7 +107,10 @@ public class CommandLineArgumentParser {
                         parameterDescription -> parameterDescription.getParameterized().getName(),
                         parameterDescription -> parameterDescription ));
         for (String field : runtimeRequiredFields) {
-            ParameterDescription parameterDescription = fieldToParameterDescription.get(field);
+            ParameterDescription parameterDescription = Objects.requireNonNull(
+                    fieldToParameterDescription.get(field),
+                    String.format("%s is declared required, but there is no ParameterDescription", field)
+            );
             if (valueIsMissing(parameterDescription)) {
                 missingFields.add("[" + String.join(" | ", parameterDescription.getParameter().names()) + "]");
             }
@@ -116,7 +123,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static List<String> computeRequiredFields(CommandLineArguments arguments) {
+    private List<String> computeRequiredFields() {
         List<String> computedRequiredFields = new ArrayList<>(Arrays.asList(requiredFields));
         if (!arguments.isSingleSignOn()) {
             computedRequiredFields.add("user");
@@ -135,9 +142,7 @@ public class CommandLineArgumentParser {
 
     /**
      * Prints documentation about the usage of command line arguments to the console.
-     * <p>
      */
-    //TODO consider extracting dump generation to other class
     public void printUsage() {
         StringBuilder builder = new StringBuilder();
 

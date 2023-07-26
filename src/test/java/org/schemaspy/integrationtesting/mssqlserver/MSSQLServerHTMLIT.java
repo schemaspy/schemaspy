@@ -26,10 +26,8 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.schemaspy.Main;
-import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.XmlOutputDiff;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -69,9 +67,6 @@ public class MSSQLServerHTMLIT {
             new MSSQLContainer(IMAGE_NAME)
                     .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql");
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @BeforeEach
@@ -88,7 +83,7 @@ public class MSSQLServerHTMLIT {
                     "-p", mssqlContainer.getPassword(),
                     "-o", "target/testout/integrationtesting/mssql/html"
             };
-            schemaSpyRunner(commandLineArgumentParser, args).run();
+            schemaSpyRunner(args).run();
             shouldRun.set(false);
         }
     }

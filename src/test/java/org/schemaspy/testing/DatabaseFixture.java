@@ -27,8 +27,8 @@ public class DatabaseFixture {
     ) throws SQLException, IOException {
         SqlService sqlService = new SqlService();
         CommandLineArguments arguments = new CommandLineArgumentParser(
-                (option) -> null
-        ).parse(args);
+                args
+        ).commandLineArguments();
         DatabaseMetaData metaData = sqlService.connect(arguments.getConnectionConfig());
         Database database = new Database(
                 sqlService.getDbmsMeta(),
