@@ -149,11 +149,7 @@ public class DbDriverLoader {
             }
         }
 
-        Set<URI> classpath = new WithSiblings(
-            connectionConfig,
-            new GetExistingUrls(driverPath),
-            new LoadAdditionalJarsForDriver(driverPath)
-        ).paths();
+        Set<URI> classpath = new GetExistingUrls(driverPath).paths();
 
         // if a classpath has been specified then use it to find the driver,
         // otherwise use whatever was used to load this class.
