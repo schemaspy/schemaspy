@@ -20,18 +20,15 @@
  */
 package org.schemaspy;
 
-import com.beust.jcommander.IDefaultProvider;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.ConfigFileArgumentParser;
 import org.schemaspy.cli.DefaultProviderFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Thomas Traude
@@ -41,9 +38,6 @@ import java.util.Optional;
 @Configuration
 public class SchemaSpyConfiguration {
 
-    @Autowired
-    private ConfigFileArgumentParser configFileArgumentParser;
-
     @Bean
     public CommandLineArgumentParser commandLineArgumentParser(ApplicationArguments applicationArguments) {
         Objects.requireNonNull(applicationArguments);
@@ -51,13 +45,13 @@ public class SchemaSpyConfiguration {
         String[] args = applicationArguments.getSourceArgs();
 
         Objects.requireNonNull(args);
-        IDefaultProvider iDefaultProvider = findDefaultProvider(args);
-        return new CommandLineArgumentParser(new CommandLineArguments(), iDefaultProvider);
-    }
-
-    private IDefaultProvider findDefaultProvider(String... args) {
-        Optional<String> configFileName = configFileArgumentParser.parseConfigFileArgumentValue(args);
-        return new DefaultProviderFactory(configFileName).defaultProvider();
+        return new CommandLineArgumentParser(
+                new CommandLineArguments(),
+                new DefaultProviderFactory(
+                        new ConfigFileArgumentParser(args)
+                                .configFile()
+                ).defaultProvider()
+        );
     }
 
 }

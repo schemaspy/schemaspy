@@ -19,7 +19,6 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.JCommander;
-import org.springframework.stereotype.Component;
 
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -28,20 +27,23 @@ import java.util.Optional;
 /**
  * @author Thomas Traude
  */
-@Component
 public class ConfigFileArgumentParser {
 
-    public Optional<String> parseConfigFileArgumentValue(String... args) {
-        Objects.requireNonNull(args, "Command line arguments must not be null.");
+    private final String[] args;
+    private final JCommander jCommander;
+    private final ConfigFileArgument configFileArgument = new ConfigFileArgument();
 
-        JCommander jCommander = JCommander.newBuilder()
+    public ConfigFileArgumentParser(String...args) {
+        this.args = Objects.requireNonNull(args, "Command line arguments must not be null.");
+        this.jCommander = JCommander.newBuilder()
                 .acceptUnknownOptions(true)
                 .programName("java -jar \"" + Paths.get("").toAbsolutePath().relativize(new SchemaSpyJarFile().path()) + "\"")
                 .columnSize(120)
                 .build();
-
-        ConfigFileArgument configFileArgument = new ConfigFileArgument();
         jCommander.addObject(configFileArgument);
+    }
+
+    public Optional<String> configFile() {
         jCommander.parse(args);
         return configFileArgument.getConfigFile();
     }
