@@ -5,3 +5,4 @@ docs/
 src/main/resources/layout
 target/
 """
+ignoreRules = [ "PATH_TRAVERSAL_IN" ]
