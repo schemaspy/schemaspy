@@ -78,4 +78,20 @@ public class MainTest {
         assertThat(exitCodeRule.getExitCode()).isOne();
     }
 
+    @Test
+    public void noStacktraceWhenLoggingIsOf() {
+        resettingOutputCapture.expect(Matchers.not(Matchers.containsString("Caused by:")));
+        try {
+            Main.main("-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "--logging.config=" + Paths.get("src", "test", "resources", "logback-debugEx.xml"));
+        } catch (SecurityException ignored) {}
+    }
+
+    @Test
+    public void stacktraceWhenLoggingIsOn() {
+        resettingOutputCapture.expect(Matchers.containsString("Caused by:"));
+        try {
+            Main.main("-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug", "--logging.config="+ Paths.get("src","test","resources","logback-debugEx.xml"));
+        } catch (SecurityException ignored) {}
+    }
+
 }

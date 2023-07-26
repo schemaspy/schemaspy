@@ -62,21 +62,43 @@ public class Main {
         ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
         CommandLineArgumentParser commandLineArgumentParser = context.getBean(CommandLineArgumentParser.class);
         CommandLineArguments arguments = parse(commandLineArgumentParser, args);
-        if (Objects.isNull(arguments)) {
-            System.exit(1);
+        int exitCode = Objects.nonNull(arguments)
+                ? run(commandLineArgumentParser, arguments, context.getBean(LoggingSystem.class), args)
+                : 1;
+        if (StackTraceOmitter.hasOmittedStackTrace()) {
+            LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
         }
+        System.exit(exitCode);
+    }
+
+    private static CommandLineArguments parse(CommandLineArgumentParser commandLineArgumentParser, String...args) {
+        try {
+            return commandLineArgumentParser.parse(args);
+        } catch (ParameterException e) {
+            LOGGER.error("Invalid command line arguments:",e);
+            return null;
+        }
+    }
+
+    private static int run(
+            CommandLineArgumentParser commandLineArgumentParser,
+            CommandLineArguments arguments,
+            LoggingSystem loggingSystem,
+            String...args
+    ) {
         if (arguments.isHelpRequired()) {
             commandLineArgumentParser.printUsage();
-            return;
+            return 0;
         }
 
         if (arguments.isDbHelpRequired()) {
             commandLineArgumentParser.printDatabaseTypesHelp();
-            return;
+            return 0;
         }
 
         if (arguments.isDebug()) {
-            enableDebug(context.getBean(LoggingSystem.class));
+            loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
+            LOGGER.debug("Debug enabled");
         }
         SqlService sqlService = new SqlService();
         SchemaSpyRunner schemaSpyRunner =
@@ -90,27 +112,9 @@ public class Main {
                         ),
                         arguments,
                         args
-        );
+                );
         schemaSpyRunner.run();
-        if (StackTraceOmitter.hasOmittedStackTrace()) {
-            LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
-        }
-        int exitCode = schemaSpyRunner.getExitCode();
-        System.exit(exitCode);
-    }
-
-    private static CommandLineArguments parse(CommandLineArgumentParser commandLineArgumentParser, String...args) {
-        try {
-            return commandLineArgumentParser.parse(args);
-        } catch (ParameterException e) {
-            LOGGER.error("Invalid command line arguments:",e);
-            return null;
-        }
-    }
-
-    private static void enableDebug(LoggingSystem loggingSystem) {
-        loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
-        LOGGER.debug("Debug enabled");
+        return schemaSpyRunner.getExitCode();
     }
 
 }
