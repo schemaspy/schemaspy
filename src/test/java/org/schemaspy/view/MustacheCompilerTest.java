@@ -54,7 +54,6 @@ public class MustacheCompilerTest {
     private static CommandLineArguments parse(String...args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(
-            new CommandLineArguments(),
             (option) -> null
         )
             .parse(

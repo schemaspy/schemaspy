@@ -57,12 +57,11 @@ public class CommandLineArgumentParser {
 
     private final JCommander jCommander;
 
-    private final CommandLineArguments arguments;
+    private final CommandLineArguments arguments = new CommandLineArguments();
 
     private static final String[] requiredFields = {"outputDirectory"};
 
-    public CommandLineArgumentParser(CommandLineArguments commandLineArguments, IDefaultProvider defaultProvider) {
-        this.arguments = commandLineArguments;
+    public CommandLineArgumentParser(IDefaultProvider defaultProvider) {
         jCommander = JCommander.newBuilder()
                 .acceptUnknownOptions(true)
                 .programName("java -jar \"" + Paths.get("").toAbsolutePath().relativize(new SchemaSpyJarFile().path()) + "\"")
