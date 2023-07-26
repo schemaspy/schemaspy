@@ -82,7 +82,6 @@ public class SchemaMetaIT {
                 "-u", "sa"
         };
         commandLineArguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
             (option) -> null
         ).parse(args);
         sqlService.connect(commandLineArguments.getConnectionConfig());

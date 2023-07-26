@@ -21,7 +21,6 @@
 package org.schemaspy;
 
 import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.cli.ConfigFileArgumentParser;
 import org.schemaspy.cli.DefaultProviderFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -46,7 +45,6 @@ public class SchemaSpyConfiguration {
 
         Objects.requireNonNull(args);
         return new CommandLineArgumentParser(
-                new CommandLineArguments(),
                 new DefaultProviderFactory(
                         new ConfigFileArgumentParser(args)
                                 .configFile()

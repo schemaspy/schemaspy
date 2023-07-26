@@ -44,7 +44,6 @@ public class HtmlAnomaliesPageTest {
     }
 
     private static CommandLineArguments commandLineArguments = new CommandLineArgumentParser(
-        new CommandLineArguments(),
         (option) -> null
     )
         .parse("-o", "out", "-sso");

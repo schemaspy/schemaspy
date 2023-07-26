@@ -2,7 +2,6 @@ package org.schemaspy.view;
 
 import org.junit.jupiter.api.Test;
 import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -70,7 +69,6 @@ class HtmlConfigCliTest {
     private HtmlConfig parse(String... args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(
-            new CommandLineArguments(),
             (option) -> null
         )
             .parse(
