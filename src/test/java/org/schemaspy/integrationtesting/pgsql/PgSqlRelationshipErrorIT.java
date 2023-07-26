@@ -23,15 +23,9 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Main;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.integrationtesting.PgSqlSuite;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.SQLScriptsRunner;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +40,7 @@ import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
@@ -69,11 +64,6 @@ public class PgSqlRelationshipErrorIT {
                             .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/relationship_error.sql", "\n\n\n"))
             );
 
-    private SqlService sqlService = new SqlService();
-
-    @Mock
-    private ProgressListener progressListener;
-
     private static Database database;
 
     @Before
@@ -95,19 +85,7 @@ public class PgSqlRelationshipErrorIT {
                 "-host", jdbcContainerRule.getContainer().getHost(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
         };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-            sqlService.getDbmsMeta(),
-            arguments.getConnectionConfig().getDatabaseName(),
-            arguments.getCatalog(),
-            arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
-        PgSqlRelationshipErrorIT.database = database;
+        database = database(args);
     }
 
     @Test

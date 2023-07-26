@@ -23,14 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.schemaspy.Main;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -43,6 +37,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
@@ -53,11 +48,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class InformixCheckConstraintIT {
-
-    private SqlService sqlService = new SqlService();
-
-    @Mock
-    private ProgressListener progressListener;
 
     private static Database database;
 
@@ -86,19 +76,7 @@ public class InformixCheckConstraintIT {
                 "-host", informixContainer.getHost(),
                 "-port", informixContainer.getJdbcPort().toString()
         };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-            sqlService.getDbmsMeta(),
-            arguments.getConnectionConfig().getDatabaseName(),
-            arguments.getCatalog(),
-            arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
-        InformixCheckConstraintIT.database = database;
+        database = database(args);
     }
 
     @Test

@@ -24,14 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.schemaspy.Main;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -45,6 +39,7 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Rafal Kasa
@@ -57,10 +52,6 @@ import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 @Testcontainers(disabledWithoutDocker = true)
 public class MSSQLServerCommentsIT {
 
-    private SqlService sqlService = new SqlService();
-
-    @Mock
-    private ProgressListener progressListener;
     private static Database abc_dbo;
     private static Database abc_a;
     private static Database abc_b;
@@ -135,19 +126,7 @@ public class MSSQLServerCommentsIT {
                 "-host", mssqlContainer.getHost(),
                 "-port", mssqlContainer.getMappedPort(1433).toString()
         };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-            sqlService.getDbmsMeta(),
-            arguments.getConnectionConfig().getDatabaseName(),
-            arguments.getCatalog(),
-            arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
-        return database;
+        return database(args);
     }
 
     @Test
