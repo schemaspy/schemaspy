@@ -20,12 +20,14 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.IDefaultProvider;
+import org.schemaspy.model.InvalidConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 /**
  * This class creates instances of {@link CombinedDefaultProvider}
@@ -36,15 +38,21 @@ import java.lang.invoke.MethodHandles;
  * @author Thomas Traude
  * @author Daniel Watt
  */
-@Component
 public class DefaultProviderFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static final String DEFAULT_PROPERTIES_FILE_NAME = "schemaspy.properties";
 
-    private static boolean exists(String propertiesFilename) {
-        return new File(propertiesFilename).exists();
+    private final Optional<String> propertiesFileName;
+    private final String defaultPropertiesFileName;
+
+    public DefaultProviderFactory(Optional<String> propertiesFileName) {
+        this(propertiesFileName, DEFAULT_PROPERTIES_FILE_NAME);
+    }
+
+    public DefaultProviderFactory(Optional<String> propertiesFileName, String defaultPropertiesFileName) {
+        this.propertiesFileName = propertiesFileName;
+        this.defaultPropertiesFileName = defaultPropertiesFileName;
     }
 
     /**
@@ -57,32 +65,35 @@ public class DefaultProviderFactory {
      * If a properties file exists it will return CombinedDefaultProvider search order Properties then Env
      * If this file does not exist the method returns CombinedDefaultProvider with only EnvDefaultProvider
      *
-     * @param propertiesFilename
      * @return IDefaultProvider
      */
-    public IDefaultProvider create(String propertiesFilename) {
-        if (propertiesFilename != null) {
-            if (exists(propertiesFilename)) {
-				LOGGER.info("Found configuration file: {}", propertiesFilename);
+    public IDefaultProvider defaultProvider() {
+        if (propertiesFileName.isPresent()) {
+            String fileName = propertiesFileName.get();
+            if (exists(fileName)) {
+				LOGGER.info("Found configuration file: {}", fileName);
                 return new CombinedDefaultProvider(
-                        new PropertyFileDefaultProvider(propertiesFilename),
+                        new PropertyFileDefaultProvider(fileName),
                         new EnvDefaultProvider()
                 );
             } else {
-				LOGGER.error("Could not find config file: {}", propertiesFilename);
-                System.exit(0);
-                return null;
+				LOGGER.error("Could not find config file: {}", fileName);
+                throw new InvalidConfigurationException("File not found", new FileNotFoundException(fileName),"-configFile", fileName);
             }
         }
 
-        if (exists(DEFAULT_PROPERTIES_FILE_NAME)) {
-            LOGGER.info("Found configuration file: {}",DEFAULT_PROPERTIES_FILE_NAME);
+        if (exists(defaultPropertiesFileName)) {
+            LOGGER.info("Found default configuration file: {}",defaultPropertiesFileName);
             return new CombinedDefaultProvider(
-                    new PropertyFileDefaultProvider(DEFAULT_PROPERTIES_FILE_NAME),
+                    new PropertyFileDefaultProvider(defaultPropertiesFileName),
                     new EnvDefaultProvider()
             );
         }
         return new CombinedDefaultProvider(new EnvDefaultProvider());
+    }
+
+    private static boolean exists(String fileName) {
+        return new File(fileName).exists();
     }
 
 }

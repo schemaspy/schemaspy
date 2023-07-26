@@ -44,9 +44,6 @@ public class SchemaSpyConfiguration {
     @Autowired
     private ConfigFileArgumentParser configFileArgumentParser;
 
-    @Autowired
-    private DefaultProviderFactory factory;
-
     @Bean
     public CommandLineArgumentParser commandLineArgumentParser(ApplicationArguments applicationArguments) {
         Objects.requireNonNull(applicationArguments);
@@ -60,7 +57,7 @@ public class SchemaSpyConfiguration {
 
     private IDefaultProvider findDefaultProvider(String... args) {
         Optional<String> configFileName = configFileArgumentParser.parseConfigFileArgumentValue(args);
-        return factory.create(configFileName.orElse(null));
+        return new DefaultProviderFactory(configFileName).defaultProvider();
     }
 
 }
