@@ -25,15 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.schemaspy.LayoutFolder;
 import org.schemaspy.Main;
-import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.cli.SchemaSpyRunner;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.XmlOutputDiff;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
+import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
 
 /**
  * @author Nils Petzaell
@@ -78,21 +72,6 @@ public class MSSQLServerHTMLIT {
     @Autowired
     private CommandLineArgumentParser commandLineArgumentParser;
 
-    private SchemaSpyRunner schemaSpyRunner(String...args) {
-        CommandLineArguments commandLineArguments = commandLineArgumentParser.parse(args);
-        SqlService sqlService = new SqlService();
-        return new SchemaSpyRunner(
-                new SchemaAnalyzer(
-                        sqlService,
-                        new DatabaseServiceFactory(sqlService),
-                        commandLineArguments,
-                        new XmlProducerUsingDOM(),
-                        new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
-                ),
-                commandLineArguments
-        );
-    }
-
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @BeforeEach
@@ -109,7 +88,7 @@ public class MSSQLServerHTMLIT {
                     "-p", mssqlContainer.getPassword(),
                     "-o", "target/testout/integrationtesting/mssql/html"
             };
-            schemaSpyRunner(args).run();
+            schemaSpyRunner(commandLineArgumentParser, args).run();
             shouldRun.set(false);
         }
     }

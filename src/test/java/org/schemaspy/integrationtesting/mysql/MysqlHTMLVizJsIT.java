@@ -24,16 +24,9 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.schemaspy.LayoutFolder;
 import org.schemaspy.Main;
-import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.cli.SchemaSpyRunner;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.integrationtesting.MysqlSuite;
-import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.schemaspy.testing.XmlOutputDiff;
@@ -55,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
 
 /**
  * @author Nils Petzaell
@@ -85,21 +79,6 @@ public class MysqlHTMLVizJsIT {
     @Autowired
     private CommandLineArgumentParser commandLineArgumentParser;
 
-    private SchemaSpyRunner schemaSpyRunner(String...args) {
-        CommandLineArguments commandLineArguments = commandLineArgumentParser.parse(args);
-        SqlService sqlService = new SqlService();
-        return new SchemaSpyRunner(
-                new SchemaAnalyzer(
-                        sqlService,
-                        new DatabaseServiceFactory(sqlService),
-                        commandLineArguments,
-                        new XmlProducerUsingDOM(),
-                        new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
-                ),
-                commandLineArguments
-        );
-    }
-
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @Before
@@ -117,7 +96,7 @@ public class MysqlHTMLVizJsIT {
                     "-vizjs",
                     "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
             };
-            schemaSpyRunner(args).run();
+            schemaSpyRunner(commandLineArgumentParser, args).run();
             shouldRun.set(false);
         }
     }
