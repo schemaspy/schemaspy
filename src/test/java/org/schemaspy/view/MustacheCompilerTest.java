@@ -54,14 +54,13 @@ public class MustacheCompilerTest {
     private static CommandLineArguments parse(String...args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(
-            (option) -> null
-        )
-            .parse(
                 Stream
-                    .concat(
-                        Arrays.stream(defaultArgs),
-                        Arrays.stream(args)
-                    ).toArray(String[]::new));
+                        .concat(
+                                Arrays.stream(defaultArgs),
+                                Arrays.stream(args)
+                        ).toArray(String[]::new)
+        )
+                .commandLineArguments();
     }
 
     private PageData pageData = new PageData.Builder()

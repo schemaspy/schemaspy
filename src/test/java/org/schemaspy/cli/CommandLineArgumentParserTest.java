@@ -41,7 +41,7 @@ public class CommandLineArgumentParserTest {
     public void givenNoRequiredParameterProvided_AndNoDefaultProvider_ExpectError() {
         CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
 
-        assertThatThrownBy(parser::parse)
+        assertThatThrownBy(parser::commandLineArguments)
                 .isInstanceOf(ParameterException.class)
                 .hasMessageContaining("The following options are required:");
     }
@@ -53,7 +53,7 @@ public class CommandLineArgumentParserTest {
 
         CommandLineArgumentParser parser = new CommandLineArgumentParser(defaultProvider);
 
-        assertThatThrownBy(parser::parse)
+        assertThatThrownBy(parser::commandLineArguments)
                 .isInstanceOf(ParameterException.class)
                 .hasMessageContaining("The following options are required:");
     }
@@ -67,9 +67,9 @@ public class CommandLineArgumentParserTest {
                 "-o", "aFolder",
                 "-u", "MyUser"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
 
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArguments arguments = parser.commandLineArguments();
 
         assertThat(arguments.getOutputDirectory().getPath()).isEqualTo("aFolder");
     }
@@ -82,7 +82,7 @@ public class CommandLineArgumentParserTest {
 
         CommandLineArgumentParser parser = new CommandLineArgumentParser(defaultProvider);
 
-        CommandLineArguments commandLineArguments = parser.parse();
+        CommandLineArguments commandLineArguments = parser.commandLineArguments();
 
         assertThat(commandLineArguments.getOutputDirectory()).isNotNull();
     }
@@ -93,9 +93,9 @@ public class CommandLineArgumentParserTest {
                 "-o", "aFolder",
                 "-sso"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
 
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArguments arguments = parser.commandLineArguments();
 
         assertThat(arguments.getOutputDirectory().getPath()).isEqualTo("aFolder");
     }
@@ -108,7 +108,7 @@ public class CommandLineArgumentParserTest {
 
         CommandLineArgumentParser parser = new CommandLineArgumentParser(defaultProvider);
 
-        CommandLineArguments commandLineArguments = parser.parse();
+        CommandLineArguments commandLineArguments = parser.commandLineArguments();
 
         assertThat(commandLineArguments.getOutputDirectory()).isNotNull();
     }
@@ -120,9 +120,9 @@ public class CommandLineArgumentParserTest {
                 "-o", "aFolder",
                 "-sso"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
 
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArguments arguments = parser.commandLineArguments();
         parser.printUsage();
         assertThat(loggingRule.getLog()).contains("Options:");
     }
@@ -132,8 +132,8 @@ public class CommandLineArgumentParserTest {
         String[] args = {
                 "-help"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
+        CommandLineArguments arguments = parser.commandLineArguments();
         assertThat(arguments.isHelpRequired()).isTrue();
     }
 
@@ -142,8 +142,8 @@ public class CommandLineArgumentParserTest {
         String[] args = {
                 "-dbHelp"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
+        CommandLineArguments arguments = parser.commandLineArguments();
         assertThat(arguments.isDbHelpRequired()).isTrue();
     }
 
@@ -152,8 +152,8 @@ public class CommandLineArgumentParserTest {
         String[] args = {
                 "--license"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
+        CommandLineArguments arguments = parser.commandLineArguments();
         assertThat(arguments.isPrintLicense()).isTrue();
     }
 
@@ -174,8 +174,8 @@ public class CommandLineArgumentParserTest {
                 "-o", "aFolder",
                 "-sso"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
+        CommandLineArguments arguments = parser.commandLineArguments();
         assertThat(arguments.isHtmlDisabled()).isFalse();
         assertThat(arguments.isHtmlEnabled()).isTrue();
     }
@@ -187,8 +187,8 @@ public class CommandLineArgumentParserTest {
                 "-sso",
                 "-nohtml"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
+        CommandLineArguments arguments = parser.commandLineArguments();
         assertThat(arguments.isHtmlDisabled()).isTrue();
         assertThat(arguments.isHtmlEnabled()).isFalse();
     }
@@ -199,8 +199,8 @@ public class CommandLineArgumentParserTest {
                 "-o", "aFolder",
                 "-sso"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
+        CommandLineArguments arguments = parser.commandLineArguments();
         assertThat(arguments.getDegreeOfSeparation()).isEqualTo(2);
     }
 
@@ -211,8 +211,8 @@ public class CommandLineArgumentParserTest {
                 "-sso",
                 "-degree", "1"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
-        CommandLineArguments arguments = parser.parse(args);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
+        CommandLineArguments arguments = parser.commandLineArguments();
         assertThat(arguments.getDegreeOfSeparation()).isEqualTo(1);
     }
 
@@ -223,9 +223,9 @@ public class CommandLineArgumentParserTest {
                 "-sso",
                 "-degree", "3"
         };
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
         assertThatExceptionOfType(ParameterException.class)
-                .isThrownBy(() ->parser.parse(args));
+                .isThrownBy(() ->parser.commandLineArguments());
     }
 
     @Test
@@ -235,8 +235,8 @@ public class CommandLineArgumentParserTest {
                 "-indexLengthChange -noCheckPaging -routineLengthChange")
                 .split(" ");
 
-        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
-        CommandLineArguments commandLine = parser.parse(args);
+        CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
+        CommandLineArguments commandLine = parser.commandLineArguments();
 
         assertThat(commandLine.isNoDbObjectPaging()).isTrue();
         assertThat(commandLine.isNoCheckPaging()).isTrue();
@@ -261,9 +261,9 @@ public class CommandLineArgumentParserTest {
             "-p", "user",
             "-o", "aFolder",
         };
-        CommandLineArgumentParser commandLineArgumentParser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
+        CommandLineArgumentParser commandLineArgumentParser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
 
-        assertThatCode(() -> commandLineArgumentParser.parse(args)).doesNotThrowAnyException();
+        assertThatCode(() -> commandLineArgumentParser.commandLineArguments()).doesNotThrowAnyException();
     }
 
     @Test
@@ -274,8 +274,9 @@ public class CommandLineArgumentParserTest {
             "-server", "xds"
         };
         CommandLineArguments arguments = new CommandLineArgumentParser(
-            NO_DEFAULT_PROVIDER
-        ).parse(args);
+                NO_DEFAULT_PROVIDER,
+                args
+        ).commandLineArguments();
         assertThat(arguments.getConnectionConfig().getRemainingArguments()).containsExactly("-server", "xds");
     }
 

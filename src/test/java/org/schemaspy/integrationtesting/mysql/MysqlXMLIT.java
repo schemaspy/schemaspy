@@ -24,11 +24,9 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.schemaspy.Main;
-import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.schemaspy.testing.XmlOutputDiff;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -74,9 +72,6 @@ public class MysqlXMLIT {
                             .withInitUser("root", "test")
             );
 
-    @Autowired
-    private CommandLineArgumentParser commandLineArgumentParser;
-
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @Before
@@ -95,7 +90,7 @@ public class MysqlXMLIT {
                     "-o", outputPath.toString(),
                     "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
             };
-            schemaSpyRunner(commandLineArgumentParser, args).run();
+            schemaSpyRunner(args).run();
             shouldRun.set(false);
         }
     }
