@@ -22,14 +22,8 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.Main;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.H2MemoryRule;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +34,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
@@ -51,11 +46,6 @@ public class H2ViewIT {
 
     @ClassRule
     public static H2MemoryRule h2MemoryRule = new H2MemoryRule("h2view").addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/2tables1view.sql");
-
-    private SqlService sqlService = new SqlService();
-
-    @Mock
-    private ProgressListener progressListener;
 
     private static Database database;
 
@@ -75,19 +65,7 @@ public class H2ViewIT {
             "-o", "target/testout/integrationtesting/h2/view",
             "-u", "sa"
         };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-            sqlService.getDbmsMeta(),
-            arguments.getConnectionConfig().getDatabaseName(),
-            arguments.getCatalog(),
-            arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
-        H2ViewIT.database = database;
+        database = database(args);
     }
 
     @Test

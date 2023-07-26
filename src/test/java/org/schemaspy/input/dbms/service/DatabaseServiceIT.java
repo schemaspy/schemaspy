@@ -24,8 +24,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.schemaspy.Main;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Sequence;
@@ -36,6 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
@@ -73,20 +72,7 @@ public class DatabaseServiceIT {
             "-o", "target/integrationtesting/databaseServiceIT",
             "-u", "sa"
         };
-
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-            sqlService.getDbmsMeta(),
-            arguments.getConnectionConfig().getDatabaseName(),
-            arguments.getCatalog(),
-            arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig())
-                                              .gatherSchemaDetails(database, null, progressListener);
+        Database database = database(progressListener, args);
 
         assertThat(database.getTables()).hasSize(1);
 
