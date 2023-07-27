@@ -1,0 +1,3 @@
+This is a line in the banner_test.txt
+
+I want one to be two
