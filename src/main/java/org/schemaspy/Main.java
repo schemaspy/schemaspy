@@ -31,6 +31,7 @@ import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.logging.StackTraceOmitter;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
+import org.schemaspy.util.ManifestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -40,6 +41,7 @@ import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -57,6 +59,11 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static void main(String... args) {
+        System.out.println(new Banner( //NOSONAR
+                "/banner.txt",
+                Map.of("${application.version}", ManifestUtils.getImplementationVersion())
+                ).banner()
+        );
         ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
         CommandLineArgumentParser commandLineArgumentParser =
                 new CommandLineArgumentParser(
