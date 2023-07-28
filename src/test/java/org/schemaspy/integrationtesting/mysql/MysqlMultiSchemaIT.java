@@ -23,15 +23,10 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.Main;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.SQLScriptsRunner;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 
 import java.io.IOException;
@@ -45,9 +40,6 @@ import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Main.class)
-@DirtiesContext
 public class MysqlMultiSchemaIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","multischema");
