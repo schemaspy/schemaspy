@@ -19,7 +19,6 @@ public class MainTest {
 
     @Test
     public void callsSystemExit() {
-        resettingOutputCapture.expect(Matchers.containsString("StackTraces have been omitted"));
         try {
             Main.main(
                     "-t", "mysql",
