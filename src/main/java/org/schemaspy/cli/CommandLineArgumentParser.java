@@ -30,8 +30,6 @@ import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -184,14 +182,28 @@ public class CommandLineArgumentParser {
     }
 
     public void printLicense() {
-        Resource gpl = new ClassPathResource("COPYING");
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gpl.getInputStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader bufferedReader =
+                     new BufferedReader(
+                             new InputStreamReader(
+                                     this.getClass().getResourceAsStream("/COPYING"),
+                                     StandardCharsets.UTF_8
+                             )
+                     )
+        ) {
             bufferedReader.lines().forEachOrdered(LOGGER::info);
         } catch (IOException e) {
             LOGGER.error("Failed to read COPYING (GPL)", e);
         }
-        Resource lgpl = new ClassPathResource("COPYING.LESSER");
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(lgpl.getInputStream(), StandardCharsets.UTF_8))) {
+        LOGGER.info("");
+        LOGGER.info("");
+        try (BufferedReader bufferedReader =
+                     new BufferedReader(
+                             new InputStreamReader(
+                                     this.getClass().getResourceAsStream("/COPYING.LESSER"),
+                                     StandardCharsets.UTF_8
+                             )
+                     )
+        ) {
             bufferedReader.lines().forEachOrdered(LOGGER::info);
         } catch (IOException e) {
             LOGGER.error("Failed to read COPYING.LESSER (LGPL)", e);
