@@ -19,20 +19,15 @@
 package org.schemaspy.cli;
 
 import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.Main;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.input.dbms.MissingParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.EmptySchemaException;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.system.OutputCaptureRule;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.schemaspy.testing.logback.Logback;
+import org.schemaspy.testing.logback.LogbackExtension;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -42,66 +37,64 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Main.class)
 public class SchemaSpyRunnerTest {
 
-    @Rule
-    public OutputCaptureRule outputCapture = new OutputCaptureRule();
+    @RegisterExtension
+    public static LogbackExtension logback = new LogbackExtension();
 
     private static final String[] args = {
             "-t","mysql",
             "-o","target/tmp",
             "-sso"};
 
-    @MockBean
-    private SchemaAnalyzer schemaAnalyzer;
+    private SchemaAnalyzer schemaAnalyzer = mock(SchemaAnalyzer.class);
 
     @Test
-    @DirtiesContext
-    public void ioExceptionExitCode_1() throws IOException, SQLException {
-        when(schemaAnalyzer.analyze()).thenThrow(new IOException("file permission error"));
-        SchemaSpyRunner schemaSpyRunner = schemaSpyRunner(schemaAnalyzer, args);
-        schemaSpyRunner.run();
-        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(1);
-    }
-
-    @Test
-    @DirtiesContext
     public void emptySchemaExitCode_2() throws IOException, SQLException {
         when(schemaAnalyzer.analyze()).thenThrow(new EmptySchemaException());
-        SchemaSpyRunner schemaSpyRunner = schemaSpyRunner(schemaAnalyzer, args);
-        schemaSpyRunner.run();
-        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(2);
+        assertThat(
+                schemaSpyRunner(schemaAnalyzer, args)
+                        .run()
+        ).isEqualTo(2);
     }
 
     @Test
-    @DirtiesContext
     public void connectionFailureExitCode_3() throws IOException, SQLException {
         when(schemaAnalyzer.analyze()).thenThrow(new ConnectionFailure("failed to connect"));
-        SchemaSpyRunner schemaSpyRunner = schemaSpyRunner(schemaAnalyzer, args);
-        schemaSpyRunner.run();
-        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(3);
+        assertThat(
+                schemaSpyRunner(schemaAnalyzer, args)
+                        .run()
+        ).isEqualTo(3);
     }
 
     @Test
-    @DirtiesContext
     public void returnsNoneNullExitCode_0() throws IOException, SQLException {
         Database database = mock(Database.class);
         when(schemaAnalyzer.analyze()).thenReturn(database);
-        SchemaSpyRunner schemaSpyRunner = schemaSpyRunner(schemaAnalyzer, args);
-        schemaSpyRunner.run();
-        assertThat(schemaSpyRunner.getExitCode()).isZero();
+        assertThat(
+                schemaSpyRunner(schemaAnalyzer, args)
+                        .run()
+        ).isZero();
     }
 
     @Test
-    @DirtiesContext
+    @Logback(logger = "root")
     public void exitCode_5_withLogging() throws IOException, SQLException {
-        outputCapture.expect(Matchers.containsString("'-t mysql"));
-        outputCapture.expect(Matchers.not(Matchers.containsString("'-t mssql")));
+        logback.expect(Matchers.containsString("'-t mysql"));
+        logback.expect(Matchers.not(Matchers.containsString("'-t mssql")));
         when(schemaAnalyzer.analyze()).thenThrow(new MissingParameterException("host", "Host is missing"));
-        SchemaSpyRunner schemaSpyRunner = schemaSpyRunner(schemaAnalyzer, args);
-        schemaSpyRunner.run();
-        assertThat(schemaSpyRunner.getExitCode()).isEqualTo(5);
+        assertThat(
+                schemaSpyRunner(schemaAnalyzer, args)
+                        .run()
+        ).isEqualTo(5);
+    }
+
+    @Test
+    public void ioExceptionExitCode_7() throws IOException, SQLException {
+        when(schemaAnalyzer.analyze()).thenThrow(new IOException("file permission error"));
+        assertThat(
+                schemaSpyRunner(schemaAnalyzer, args)
+                        .run()
+        ).isEqualTo(7);
     }
 }

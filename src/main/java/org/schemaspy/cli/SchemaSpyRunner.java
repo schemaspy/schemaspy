@@ -42,14 +42,14 @@ public class SchemaSpyRunner {
     private static final int EXIT_CODE_CONNECTION_ERROR = 3;
     private static final int EXIT_CODE_CONFIG_ERROR = 4;
     private static final int EXIT_CODE_MISSING_PARAMETER = 5;
+    private static final int EXIT_CODE_SQL_EXCEPTION = 6;
+    private static final int EXIT_IO_ERROR = 7;
 
     private final SchemaAnalyzer analyzer;
 
     private final CommandLineArguments arguments;
 
     private final String[] args;
-
-    private int exitCode = EXIT_CODE_OK;
 
     public SchemaSpyRunner(
         SchemaAnalyzer analyzer,
@@ -61,18 +61,16 @@ public class SchemaSpyRunner {
         this.args = args;
     }
 
-    public void run() {
-        exitCode = EXIT_CODE_GENERIC_ERROR;
+    public int run() {
         try {
-            exitCode = analyzer.analyze() == null ? EXIT_CODE_GENERIC_ERROR : EXIT_CODE_OK;
+            return analyzer.analyze() == null ? EXIT_CODE_GENERIC_ERROR : EXIT_CODE_OK;
         } catch (ConnectionFailure couldntConnect) {
             LOGGER.warn("Connection Failure", couldntConnect);
-            exitCode = EXIT_CODE_CONNECTION_ERROR;
+            return EXIT_CODE_CONNECTION_ERROR;
         } catch (EmptySchemaException noData) {
             LOGGER.warn("Empty schema", noData);
-            exitCode = EXIT_CODE_EMPTY_SCHEMA;
+            return EXIT_CODE_EMPTY_SCHEMA;
         } catch (InvalidConfigurationException badConfig) {
-            exitCode = EXIT_CODE_CONFIG_ERROR;
             LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
             if (badConfig.getParamName() != null) {
                 LOGGER.error(
@@ -84,18 +82,18 @@ public class SchemaSpyRunner {
             } else {
                 LOGGER.error("Bad config", badConfig);
             }
+            return EXIT_CODE_CONFIG_ERROR;
         } catch (MissingParameterException mrpe) {
-            exitCode = EXIT_CODE_MISSING_PARAMETER;
             LOGGER.error("*** {} ***", mrpe.getMessage());
             LOGGER.info("Missing required connection parameters for '-t {}'", arguments.getConnectionConfig().getDatabaseType());
             new DbSpecificConfig(arguments.getConnectionConfig().getDatabaseType(), arguments.getConnectionConfig().getDatabaseTypeProperties()).dumpUsage();
+            return EXIT_CODE_MISSING_PARAMETER;
         } catch (SQLException e) {
             LOGGER.error("SqlException", e);
+            return EXIT_CODE_SQL_EXCEPTION;
         } catch (IOException e) {
             LOGGER.error("IOException", e);
+            return EXIT_IO_ERROR;
         }
-    }
-    public int getExitCode() {
-        return exitCode;
     }
 }

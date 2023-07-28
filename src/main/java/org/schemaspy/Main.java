@@ -72,16 +72,14 @@ public class Main {
                             args
                     );
             CommandLineArguments arguments = commandLineArgumentParser.commandLineArguments();
-            System.exit(
-                    run(commandLineArgumentParser, arguments, context.getBean(LoggingSystem.class), args)
-            );
+            run(commandLineArgumentParser, arguments, context.getBean(LoggingSystem.class), args);
         } catch (ParameterException pe) {
-            LOGGER.error("Configuration failure", pe);
+            LOGGER.error("Invalid command line arguments:", pe);
             System.exit(1);
         }
     }
 
-    private static int run(
+    private static void run(
             CommandLineArgumentParser commandLineArgumentParser,
             CommandLineArguments arguments,
             LoggingSystem loggingSystem,
@@ -89,12 +87,12 @@ public class Main {
     ) {
         if (arguments.isHelpRequired()) {
             commandLineArgumentParser.printUsage();
-            return 0;
+             System.exit(0);
         }
 
         if (arguments.isDbHelpRequired()) {
             commandLineArgumentParser.printDatabaseTypesHelp();
-            return 0;
+            System.exit(0);
         }
 
         if (arguments.isDebug()) {
@@ -114,8 +112,7 @@ public class Main {
                         arguments,
                         args
                 );
-        schemaSpyRunner.run();
-        return schemaSpyRunner.getExitCode();
+        System.exit(schemaSpyRunner.run());
     }
 
 }
