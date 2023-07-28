@@ -99,6 +99,11 @@ public class Main {
             System.exit(0);
         }
 
+        if (arguments.isPrintLicense()) {
+            commandLineArgumentParser.printLicense();
+            System.exit(0);
+        }
+
         if (arguments.isDebug()) {
             enableDebug();
             LOGGER.debug("Debug enabled");

@@ -42,6 +42,15 @@ public class MainIT {
     }
 
     @Test
+    @AssertExitCode
+    @Logback(logger = "org.schemaspy.cli.CommandLineArgumentParser")
+    void printLicense() {
+        logback.expect(Matchers.containsString("GNU GENERAL PUBLIC LICENSE"));
+        logback.expect(Matchers.containsString("GNU LESSER GENERAL PUBLIC LICENSE"));
+        Main.main("-l");
+    }
+
+    @Test
     @AssertExitCode(1)
     public void parsingError() { //NOSONAR AssertionHandled by @AssertExitCode
         Main.main("-t", "-t");
