@@ -27,18 +27,16 @@ import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
 import org.schemaspy.input.dbms.classloader.ClDefault;
-import org.schemaspy.input.dbms.classpath.Classpath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
+import org.schemaspy.input.dbms.classpath.LoadAdditionalJarsForDriver;
 import org.schemaspy.input.dbms.classpath.WithSiblings;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
 import org.schemaspy.input.dbms.driverpath.*;
-import org.schemaspy.input.dbms.classpath.LoadAdditionalJarsForDriver;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
@@ -177,7 +175,7 @@ public class DbDriverLoader {
 
         // @see DriverManager.setLogStream(PrintStream)
         //TODO implement PrintStream to Logger bridge.
-        // setLogStream should only be called once maybe in SpringConfig or Main?
+        // setLogStream should only be called once maybe in Main
         driver = new DsDriverClass(
                 driverClass,
                 new DbDriverLoaderErrorMessage(driverClasses, driverPath, classpath, connectionConfig).createMessage()
