@@ -1,46 +1,27 @@
 package org.schemaspy.testing;
 
 import org.junit.rules.ExternalResource;
-
-import java.security.Permission;
+import org.schemaspy.testing.exit.PreventSystemExitSecurityManager;
 
 public class ExitCodeRule extends ExternalResource {
 
-    private SecurityManager securityManager;
-    private int exitCode;
+    private SecurityManager original;
+    private PreventSystemExitSecurityManager our = new PreventSystemExitSecurityManager();
 
-    public int getExitCode() {
-        return exitCode;
+    public Integer getExitCode() {
+        return our.getExitCode();
     }
 
     @Override
     protected void before() throws Throwable {
-        securityManager = System.getSecurityManager();
-        System.setSecurityManager(new ExitPreventionSecurityManager());
+        original = System.getSecurityManager();
+        System.setSecurityManager(our.reset());
     }
 
     @Override
     protected void after() {
-        System.setSecurityManager(securityManager);
-    }
-
-    class ExitPreventionSecurityManager extends SecurityManager {
-
-        @Override
-        public void checkPermission(Permission perm) {
-
-        }
-
-        @Override
-        public void checkPermission(Permission perm, Object context) {
-
-        }
-
-        @Override
-        public void checkExit(int status) {
-            exitCode = status;
-            throw new SecurityException("Exit prevented by ExitCodeRule");
-        }
+        our.reset();
+        System.setSecurityManager(original);
     }
 
 }
