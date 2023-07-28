@@ -35,8 +35,6 @@ import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.util.ManifestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
@@ -51,20 +49,19 @@ import java.util.stream.Stream;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-@SpringBootApplication
+
 public class Main {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static void main(String... args) {
-        System.setProperty("org.springframework.boot.logging.LoggingSystem", "none");
+        System.setProperty("java.awt.headless", "true");
         System.out.println(new Banner( //NOSONAR
                 "/banner.txt",
                 Map.of("${application.version}", ManifestUtils.getImplementationVersion())
                 ).banner()
         );
         LOGGER.info("{}", new RuntimeInfo("SchemaSpy", ManifestUtils.getImplementationVersion()));
-        SpringApplication.run(Main.class, args);
         if (Stream.of(args).anyMatch(arg -> arg.equals("-debug") || arg.equals("--debug"))) {
             enableDebug();
         }
