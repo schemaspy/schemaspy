@@ -21,14 +21,9 @@ package org.schemaspy.integrationtesting.h2;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.Main;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.H2MemoryRule;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -39,9 +34,6 @@ import static org.schemaspy.testing.DatabaseFixture.database;
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Main.class)
-@DirtiesContext
 public class H2ViewIT {
 
     @ClassRule

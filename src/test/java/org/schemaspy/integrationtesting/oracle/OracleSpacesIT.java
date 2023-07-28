@@ -22,13 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.schemaspy.Main;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -47,9 +42,6 @@ import static org.schemaspy.testing.DatabaseFixture.database;
  * @author Nils Petzaell
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Main.class)
-@DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class OracleSpacesIT {
 

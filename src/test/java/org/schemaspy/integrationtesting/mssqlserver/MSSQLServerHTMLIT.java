@@ -24,13 +24,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.schemaspy.Main;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.XmlOutputDiff;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.MSSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -52,9 +47,6 @@ import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
  * @author Nils Petzaell
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Main.class)
-@DirtiesContext
 @Testcontainers(disabledWithoutDocker = true)
 public class MSSQLServerHTMLIT {
 

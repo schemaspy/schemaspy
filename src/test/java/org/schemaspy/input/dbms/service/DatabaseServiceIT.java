@@ -21,15 +21,9 @@ package org.schemaspy.input.dbms.service;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Main;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Sequence;
 import org.schemaspy.testing.H2MemoryRule;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collection;
 
@@ -40,8 +34,6 @@ import static org.schemaspy.testing.DatabaseFixture.database;
  * @author Nils Petzaell
  * @author Thomas Traude
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Main.class)
 public class DatabaseServiceIT {
 
     private static final String CREATE_SCHEMA = "CREATE SCHEMA DATABASESERVICEIT AUTHORIZATION SA";
@@ -57,11 +49,6 @@ public class DatabaseServiceIT {
         CREATE_SEQUENCE
     );
 
-    private SqlService sqlService = new SqlService();
-
-    @Mock
-    private ProgressListener progressListener;
-
     @Test
     public void gatheringSchemaDetailsTest() throws Exception {
         String[] args = {
@@ -72,7 +59,7 @@ public class DatabaseServiceIT {
             "-o", "target/integrationtesting/databaseServiceIT",
             "-u", "sa"
         };
-        Database database = database(progressListener, args);
+        Database database = database(args);
 
         assertThat(database.getTables()).hasSize(1);
 

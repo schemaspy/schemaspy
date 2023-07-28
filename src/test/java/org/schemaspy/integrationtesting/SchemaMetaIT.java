@@ -21,9 +21,6 @@ package org.schemaspy.integrationtesting;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.Main;
 import org.schemaspy.SimpleRuntimeDotConfig;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArgumentParser;
@@ -37,9 +34,6 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.testing.H2MemoryRule;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -48,13 +42,11 @@ import java.sql.SQLException;
 import java.util.concurrent.atomic.LongAdder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Main.class)
-@DirtiesContext
 public class SchemaMetaIT {
 
     private static final String BY_SCRIPT_COMMENT = "Set by script";
@@ -65,8 +57,7 @@ public class SchemaMetaIT {
 
     private SqlService sqlService = new SqlService();
 
-    @Mock
-    private ProgressListener progressListener;
+    private ProgressListener progressListener = mock(ProgressListener.class);
     private CommandLineArguments commandLineArguments;
     private DbmsMeta dbmsMeta;
     private String schema;

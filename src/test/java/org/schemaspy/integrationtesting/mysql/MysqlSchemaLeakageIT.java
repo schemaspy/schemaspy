@@ -22,14 +22,9 @@ import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.Main;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 
 import javax.script.ScriptException;
@@ -43,9 +38,6 @@ import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assu
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.DatabaseFixture.database;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Main.class)
-@DirtiesContext
 public class MysqlSchemaLeakageIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","schema_leakage");
