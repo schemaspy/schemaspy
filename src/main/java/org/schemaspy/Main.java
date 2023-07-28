@@ -63,6 +63,7 @@ public class Main {
                 Map.of("${application.version}", ManifestUtils.getImplementationVersion())
                 ).banner()
         );
+        LOGGER.info("{}", new RuntimeInfo("SchemaSpy", ManifestUtils.getImplementationVersion()));
         SpringApplication.run(Main.class, args);
         if (Stream.of(args).anyMatch(arg -> arg.equals("-debug") || arg.equals("--debug"))) {
             enableDebug();
