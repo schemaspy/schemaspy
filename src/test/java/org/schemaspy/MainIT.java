@@ -27,7 +27,7 @@ public class MainIT {
 
     @Test
     @AssertExitCode
-    @Logback(logger = "root")
+    @Logback(logger = "org.schemaspy.cli.CommandLineArgumentParser")
     public void printUsage() {
         logback.expect(Matchers.containsString("-u, --user, schemaspy.u, schemaspy.user"));
         Main.main("-h");
@@ -35,7 +35,7 @@ public class MainIT {
 
     @Test
     @AssertExitCode
-    @Logback(logger = "root")
+    @Logback(logger = "org.schemaspy.cli.CommandLineArgumentParser")
     public void printDbHelp() {
         logback.expect(Matchers.containsString("You can use your own database types"));
         Main.main("-dbhelp");

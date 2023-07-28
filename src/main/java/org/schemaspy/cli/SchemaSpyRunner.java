@@ -85,8 +85,14 @@ public class SchemaSpyRunner {
             return EXIT_CODE_CONFIG_ERROR;
         } catch (MissingParameterException mrpe) {
             LOGGER.error("*** {} ***", mrpe.getMessage());
-            LOGGER.info("Missing required connection parameters for '-t {}'", arguments.getConnectionConfig().getDatabaseType());
-            new DbSpecificConfig(arguments.getConnectionConfig().getDatabaseType(), arguments.getConnectionConfig().getDatabaseTypeProperties()).dumpUsage();
+            LOGGER.info(
+                    "Missing required connection parameters for '-t {}'",
+                    arguments.getConnectionConfig().getDatabaseType()
+            );
+            new DbSpecificConfig(
+                    arguments.getConnectionConfig().getDatabaseType(),
+                    arguments.getConnectionConfig().getDatabaseTypeProperties()
+            ).dumpUsage(LOGGER);
             return EXIT_CODE_MISSING_PARAMETER;
         } catch (SQLException e) {
             LOGGER.error("SqlException", e);
