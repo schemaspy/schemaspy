@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class StackTraceOmitter extends ThrowableProxyConverter implements ApplicationListener<ApplicationStartingEvent> { //NOSONAR
 
+    private static final Thread shutdownHook = new Thread(new ShutdownHook());
     private static final Logger SCHEMA_SPY_LOGGER = LoggerFactory.getLogger("org.schemaspy");
 
     private static AtomicBoolean omittedStackTrace = new AtomicBoolean(false);
@@ -47,6 +48,10 @@ public class StackTraceOmitter extends ThrowableProxyConverter implements Applic
         return omittedStackTrace.get();
     }
 
+    static {
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+    }
+
     @Override
     public String convert(ILoggingEvent event) {
         if (SCHEMA_SPY_LOGGER.isDebugEnabled())
@@ -56,6 +61,15 @@ public class StackTraceOmitter extends ThrowableProxyConverter implements Applic
             return event.getThrowableProxy().getMessage() + CoreConstants.LINE_SEPARATOR;
         }
         return CoreConstants.EMPTY_STRING;
+    }
+
+    private static class ShutdownHook implements Runnable {
+        @Override
+        public void run() {
+            if (StackTraceOmitter.hasOmittedStackTrace()) {
+                SCHEMA_SPY_LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
+            }
+        }
     }
 
     @Override

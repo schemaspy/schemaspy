@@ -29,7 +29,6 @@ import com.beust.jcommander.ParameterException;
 import org.schemaspy.cli.*;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.logging.StackTraceOmitter;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.util.ManifestUtils;
 import org.slf4j.Logger;
@@ -42,7 +41,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author John Currier
@@ -65,29 +63,21 @@ public class Main {
                 ).banner()
         );
         ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
-        CommandLineArgumentParser commandLineArgumentParser =
-                new CommandLineArgumentParser(
-                        new DefaultProviderFactory(
-                                new ConfigFileArgumentParser(args).configFile()
-                        ).defaultProvider(),
-                        args
-                );
-        CommandLineArguments arguments = parse(commandLineArgumentParser);
-        int exitCode = Objects.nonNull(arguments)
-                ? run(commandLineArgumentParser, arguments, context.getBean(LoggingSystem.class), args)
-                : 1;
-        if (StackTraceOmitter.hasOmittedStackTrace()) {
-            LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
-        }
-        System.exit(exitCode);
-    }
-
-    private static CommandLineArguments parse(CommandLineArgumentParser commandLineArgumentParser) {
         try {
-            return commandLineArgumentParser.commandLineArguments();
-        } catch (ParameterException e) {
-            LOGGER.error("Invalid command line arguments:",e);
-            return null;
+            CommandLineArgumentParser commandLineArgumentParser =
+                    new CommandLineArgumentParser(
+                            new DefaultProviderFactory(
+                                    new ConfigFileArgumentParser(args).configFile()
+                            ).defaultProvider(),
+                            args
+                    );
+            CommandLineArguments arguments = commandLineArgumentParser.commandLineArguments();
+            System.exit(
+                    run(commandLineArgumentParser, arguments, context.getBean(LoggingSystem.class), args)
+            );
+        } catch (ParameterException pe) {
+            LOGGER.error("Configuration failure", pe);
+            System.exit(1);
         }
     }
 

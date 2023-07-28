@@ -20,12 +20,11 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.IDefaultProvider;
-import org.schemaspy.model.InvalidConfigurationException;
+import com.beust.jcommander.ParameterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
@@ -77,8 +76,7 @@ public class DefaultProviderFactory {
                         new EnvDefaultProvider()
                 );
             } else {
-				LOGGER.error("Could not find config file: {}", fileName);
-                throw new InvalidConfigurationException("File not found", new FileNotFoundException(fileName),"-configFile", fileName);
+                throw new ParameterException("Could not find -configFile: " + fileName);
             }
         }
 
