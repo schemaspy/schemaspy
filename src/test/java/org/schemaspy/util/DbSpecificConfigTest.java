@@ -18,11 +18,9 @@
  */
 package org.schemaspy.util;
 
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.schemaspy.testing.Logger;
-import org.schemaspy.testing.LoggingRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.schemaspy.testing.RecordingLogger;
 
 import java.util.Properties;
 
@@ -30,13 +28,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DbSpecificConfigTest {
 
-    @Rule
-    public LoggingRule loggingRule = new LoggingRule();
-
     private static Properties withoutHostAndOptionalPort = new Properties();
     private static Properties withHostAndOptionalPort = new Properties();
 
-    @BeforeClass
+    @BeforeAll
     public static void setupProperties() {
         withoutHostAndOptionalPort.setProperty("description","MySQL");
         withoutHostAndOptionalPort.setProperty("connectionSpec","jdbc:mysql://<host>/<db>?socketFactory=<socketFactory>&socket=<socket>");
@@ -65,11 +60,13 @@ public class DbSpecificConfigTest {
     }
 
     @Test
-    @Logger(DbSpecificConfig.class)
     public void dumpUsageWithoutHostAndOptionalPort() {
-        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withoutHostAndOptionalPort", withoutHostAndOptionalPort);
-        dbSpecificConfig.dumpUsage();
-        assertThat(loggingRule.getLog()).isEqualTo("   MySQL (-t withoutHostAndOptionalPort)      -host   \t\thost where database resides with optional port      -db   \t\tdatabase name      -socketFactory   \t\tClassName of socket factory which must be in your classpath      -socket   \t\tPath To Socket");
+        RecordingLogger recordingLogger = new RecordingLogger();
+        new DbSpecificConfig(
+                "withoutHostAndOptionalPort",
+                withoutHostAndOptionalPort
+        ).dumpUsage(recordingLogger);
+        assertThat(recordingLogger.toString()).isEqualTo("   MySQL (-t withoutHostAndOptionalPort)      -host   \t\thost where database resides with optional port      -db   \t\tdatabase name      -socketFactory   \t\tClassName of socket factory which must be in your classpath      -socket   \t\tPath To Socket");
     }
 
     @Test
@@ -82,11 +79,13 @@ public class DbSpecificConfigTest {
     }
 
     @Test
-    @Logger(DbSpecificConfig.class)
     public void dumpUsageWithHostAndOptionalPort(){
-        DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withHostAndOptionalPort", withHostAndOptionalPort);
-        dbSpecificConfig.dumpUsage();
-        assertThat(loggingRule.getLog()).isEqualTo("   MySQL (-t withHostAndOptionalPort)      -host   \t\thost of database, may contain port      -port   \t\toptional port if not default      -db   \t\tdatabase name");
+        RecordingLogger recordingLogger = new RecordingLogger();
+        new DbSpecificConfig(
+                "withHostAndOptionalPort",
+                withHostAndOptionalPort
+        ).dumpUsage(recordingLogger);
+        assertThat(recordingLogger.toString()).isEqualTo("   MySQL (-t withHostAndOptionalPort)      -host   \t\thost of database, may contain port      -port   \t\toptional port if not default      -db   \t\tdatabase name");
     }
 
 }

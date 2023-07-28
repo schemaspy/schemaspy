@@ -23,9 +23,7 @@
 package org.schemaspy.util;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,8 +39,6 @@ import java.util.stream.Stream;
  * @author Nils Petzaell
  */
 public class DbSpecificConfig {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final Pattern OPTION_PATTER = Pattern.compile("<([a-zA-Z0-9.\\-_]+)>");
     private static final String DUMP_FORMAT = "      -%s   \t\t%s";
@@ -86,8 +82,8 @@ public class DbSpecificConfig {
     /**
      * Dump usage details associated with the associated type of database
      */
-    public void dumpUsage() {
-        LOGGER.info("   {} (-t {})", this, dbType);
+    public void dumpUsage(Logger logger) {
+        logger.info("   {} (-t {})", this, dbType);
         getOptions().stream().flatMap(option -> {
             if ("hostOptionalPort".equals(option.getName())) {
                 return Stream.of(
@@ -99,7 +95,7 @@ public class DbSpecificConfig {
                     String.format(DUMP_FORMAT, option.getName(), getDescription(option))
                 );
             }
-        }).forEach(LOGGER::info);
+        }).forEach(logger::info);
     }
 
     private static String getDescription(DbSpecificOption option) {

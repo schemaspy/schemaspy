@@ -177,7 +177,7 @@ public class CommandLineArgumentParser {
         }
         builtIns.forEach((key, types) -> {
             LOGGER.info(key);
-            types.forEach(DbSpecificConfig::dumpUsage);
+            types.forEach(dbSpecificConfig -> dbSpecificConfig.dumpUsage(LOGGER));
         });
         LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
         LOGGER.info("Grab one out of {} and modify it to suit your needs.", new SchemaSpyJarFile().path());
