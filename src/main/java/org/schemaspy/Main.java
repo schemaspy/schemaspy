@@ -25,6 +25,8 @@
  */
 package org.schemaspy;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.cli.*;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -35,12 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author John Currier
@@ -57,12 +57,16 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static void main(String... args) {
+        System.setProperty("org.springframework.boot.logging.LoggingSystem", "none");
         System.out.println(new Banner( //NOSONAR
                 "/banner.txt",
                 Map.of("${application.version}", ManifestUtils.getImplementationVersion())
                 ).banner()
         );
-        ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
+        SpringApplication.run(Main.class, args);
+        if (Stream.of(args).anyMatch(arg -> arg.equals("-debug") || arg.equals("--debug"))) {
+            enableDebug();
+        }
         try {
             CommandLineArgumentParser commandLineArgumentParser =
                     new CommandLineArgumentParser(
@@ -72,7 +76,7 @@ public class Main {
                             args
                     );
             CommandLineArguments arguments = commandLineArgumentParser.commandLineArguments();
-            run(commandLineArgumentParser, arguments, context.getBean(LoggingSystem.class), args);
+            run(commandLineArgumentParser, arguments, args);
         } catch (ParameterException pe) {
             LOGGER.error("Invalid command line arguments:", pe);
             System.exit(1);
@@ -82,7 +86,6 @@ public class Main {
     private static void run(
             CommandLineArgumentParser commandLineArgumentParser,
             CommandLineArguments arguments,
-            LoggingSystem loggingSystem,
             String...args
     ) {
         if (arguments.isHelpRequired()) {
@@ -96,7 +99,7 @@ public class Main {
         }
 
         if (arguments.isDebug()) {
-            loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
+            enableDebug();
             LOGGER.debug("Debug enabled");
         }
         SqlService sqlService = new SqlService();
@@ -115,4 +118,12 @@ public class Main {
         System.exit(schemaSpyRunner.run());
     }
 
+    private static void enableDebug() {
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        ch.qos.logback.classic.Logger logger = context.getLogger("org.schemaspy");
+        if (!logger.isDebugEnabled()) {
+            logger.setLevel(Level.DEBUG);
+            LOGGER.debug("Debug enabled");
+        }
+    }
 }

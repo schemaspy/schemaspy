@@ -1,21 +1,20 @@
 <configuration>
+
     <conversionRule conversionWord="clr"
                     converterClass="org.schemaspy.logging.ColorConverter" />
     <conversionRule conversionWord="debugEx"
                     converterClass="org.schemaspy.logging.StackTraceOmitter" />
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- <withJansi>true</withJansi>  Causes issues with Surefire/Failsafe -->
+        <withJansi>true</withJansi>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %clr(%-5level) %logger - %msg%n%debugEx</pattern>
+            <pattern>%clr(%-5level) - %msg%n%debugEx</pattern>
         </encoder>
     </appender>
+
+    <logger name="org.schemaspy" level="INFO"/>
 
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
-
-    <logger name="org.testcontainers" level="INFO"/>
-    <logger name="org.apache.http" level="WARN"/>
-    <logger name="com.github.dockerjava" level="WARN"/>
-    <logger name="org.zeroturnaround.exec" level="WARN"/>
 </configuration>
