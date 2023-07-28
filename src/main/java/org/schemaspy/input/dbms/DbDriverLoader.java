@@ -28,8 +28,6 @@ import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
 import org.schemaspy.input.dbms.classloader.ClDefault;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
-import org.schemaspy.input.dbms.classpath.LoadAdditionalJarsForDriver;
-import org.schemaspy.input.dbms.classpath.WithSiblings;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
 import org.schemaspy.input.dbms.driverpath.*;
