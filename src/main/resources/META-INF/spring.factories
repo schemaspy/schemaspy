@@ -1,1 +1,0 @@
-org.springframework.context.ApplicationListener=org.schemaspy.logging.StackTraceOmitter
