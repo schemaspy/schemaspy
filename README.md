@@ -15,12 +15,12 @@
 # Installation
 
 SchemaSpy is a stand alone tool. Just download the lastest
-[JAR file](https://github.com/schemaspy/schemaspy/releases/download/v6.2.3/schemaspy-6.2.3.jar)
+[JAR file](https://github.com/schemaspy/schemaspy/releases/download/v6.2.4/schemaspy-6.2.4.jar)
 or [Docker image](https://hub.docker.com/r/schemaspy/schemaspy/) and you're
 ready to go!
 
 ```
-curl -L https://github.com/schemaspy/schemaspy/releases/download/v6.2.3/schemaspy-6.2.3.jar \
+curl -L https://github.com/schemaspy/schemaspy/releases/download/v6.2.4/schemaspy-6.2.4.jar \
     --output ~/Downloads/schemaspy.jar
 ```
 
