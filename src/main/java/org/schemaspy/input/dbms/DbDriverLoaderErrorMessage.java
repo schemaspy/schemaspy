@@ -31,8 +31,6 @@ public class DbDriverLoaderErrorMessage {
                 .append(String.join(", ", driverClass))
                 .append("' driver from driverPath '")
                 .append(driverPath)
-                .append("' with sibling jars ")
-                .append((connectionConfig.withLoadSiblings() ? "yes" : "no"))
                 .append(".")
                 .append(System.lineSeparator())
                 .append("Resulting in classpath:");
