@@ -22,7 +22,7 @@ public class DefaultFontConfig implements FontConfig {
     public DefaultFontConfig(String fontName, int fontSize) {
         this.name = fontName;
         this.size = fontSize;
-        font = new Font(fontName, Font.BOLD, fontSize +1);
+        font = new Font(fontName, Font.BOLD, fontSize + 2);
     }
 
     @Override
