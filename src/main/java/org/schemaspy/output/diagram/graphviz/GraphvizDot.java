@@ -276,7 +276,7 @@ public class GraphvizDot implements Renderer {
                 while ((line = processReader.readLine()) != null) {
                     // don't report port id unrecognized or unrecognized port
                     if (!line.contains("unrecognized") && !line.contains("port"))
-                        LOGGER.error("{}: {}", command, line);
+                        LOGGER.warn("{}: {}", command, line);
                 }
             } catch (IOException ioException) {
                 LOGGER.error("Error reading from process",ioException);
