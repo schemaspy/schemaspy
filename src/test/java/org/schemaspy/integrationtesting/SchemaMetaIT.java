@@ -70,7 +70,8 @@ public class SchemaMetaIT {
                 "-db", "SchemaMetaIT",
                 "-s", "SCHEMAMETAIT",
                 "-o", "target/integrationtesting/schemaMetaIT",
-                "-u", "sa"
+                "-u", "sa",
+                "--no-orphans"
         };
         commandLineArguments = new CommandLineArgumentParser(
                 args

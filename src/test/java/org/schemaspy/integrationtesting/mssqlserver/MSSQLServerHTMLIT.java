@@ -73,7 +73,8 @@ public class MSSQLServerHTMLIT {
                     "-port", String.valueOf(mssqlContainer.getMappedPort(1433)),
                     "-u", mssqlContainer.getUsername(),
                     "-p", mssqlContainer.getPassword(),
-                    "-o", "target/testout/integrationtesting/mssql/html"
+                    "-o", "target/testout/integrationtesting/mssql/html",
+                    "--no-orphans"
             };
             schemaSpyRunner(args).run();
             shouldRun.set(false);

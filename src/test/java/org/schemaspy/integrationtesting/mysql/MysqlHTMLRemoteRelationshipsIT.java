@@ -81,7 +81,8 @@ public class MysqlHTMLRemoteRelationshipsIT {
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-o", outputPath.toString(),
                     "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true",
-                    "-meta", Paths.get("src","test","resources","integrationTesting","mysql","metadata","remote_relationships.xml").toString()
+                    "-meta", Paths.get("src","test","resources","integrationTesting","mysql","metadata","remote_relationships.xml").toString(),
+                    "--no-orphans"
             };
             schemaSpyRunner(args).run();
             shouldRun.set(false);
