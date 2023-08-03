@@ -104,6 +104,15 @@ public class CommandLineArguments {
 
     @Parameter(
         names = {
+            "--no-orphans",
+            "schemaspy.no-orphans"
+        },
+        descriptionKey = "noorphans"
+    )
+    private boolean noOrphans = false;
+
+    @Parameter(
+        names = {
             "-rails",
             "schemaspy.rails"
         },
@@ -491,6 +500,8 @@ public class CommandLineArguments {
     public boolean withImpliedRelationships() {
         return !noImplied;
     }
+
+    public boolean withOrphans() { return !noOrphans; }
 
     public boolean isRailsEnabled() {
         return railsEnabled;

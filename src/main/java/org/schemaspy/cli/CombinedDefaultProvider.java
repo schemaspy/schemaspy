@@ -14,6 +14,7 @@ public class CombinedDefaultProvider implements IDefaultProvider {
         "schemaspy.debug",
         "schemaspy.nohtml",
         "schemaspy.noimplied",
+        "schemaspy.no-orphans",
         "schemaspy.vizjs",
         "schemaspy.all",
         "schemaspy.rails",
