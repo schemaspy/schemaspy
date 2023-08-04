@@ -303,7 +303,8 @@ public class SchemaMetaIT {
                 commandLineArguments.getDotConfig(),
                 false,
                 false
-            )
+            ),
+            commandLineArguments.withOrphans()
         );
 
         StringWriter withoutSchemaMetaOutput = new StringWriter();

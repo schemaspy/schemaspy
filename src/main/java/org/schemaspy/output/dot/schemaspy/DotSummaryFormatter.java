@@ -45,9 +45,11 @@ import java.util.*;
 public class DotSummaryFormatter {
 
     private final RuntimeDotConfig runtimeDotConfig;
+    private final boolean includeOrphans;
 
-    public DotSummaryFormatter(RuntimeDotConfig runtimeDotConfig) {
+    public DotSummaryFormatter(RuntimeDotConfig runtimeDotConfig, final boolean includeOrphans) {
         this.runtimeDotConfig = runtimeDotConfig;
+        this.includeOrphans = includeOrphans;
     }
 
     public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, PrintWriter dot) {
@@ -76,8 +78,12 @@ public class DotSummaryFormatter {
         List<DotNode> nodes = new LinkedList<>();
 
         for (Table table : tables) {
-            if (!table.isOrphan(includeImplied)) {
+            if (this.includeOrphans) {
                 nodes.add(new DotNode(table, true, nodeConfig, runtimeDotConfig));
+            } else {
+                if (!table.isOrphan(includeImplied)) {
+                    nodes.add(new DotNode(table, true, nodeConfig, runtimeDotConfig));
+                }
             }
         }
 
