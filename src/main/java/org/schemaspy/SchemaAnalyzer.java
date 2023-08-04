@@ -382,7 +382,7 @@ public class SchemaAnalyzer {
             isOneOfMultipleSchemas
         );
 
-        DotFormatter dotProducer = new DotFormatter(runtimeDotConfig);
+        DotFormatter dotProducer = new DotFormatter(runtimeDotConfig, commandLineArguments.withOrphans());
 
         File diagramDir = new File(outputDir, "diagrams");
         diagramDir.mkdirs();
