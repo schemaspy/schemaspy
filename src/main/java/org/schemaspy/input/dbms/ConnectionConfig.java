@@ -17,6 +17,5 @@ public interface ConnectionConfig {
     String getConnectionProperties();
     DbSpecificConfig getDbSpecificConfig();
     String getDriverPath();
-    boolean withLoadSiblings();
     List<String> getRemainingArguments();
 }
