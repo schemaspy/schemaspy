@@ -141,11 +141,6 @@ public class ConnectionConfigCli implements ConnectionConfig {
         return driverPath;
     }
 
-    @Override
-    public boolean withLoadSiblings() {
-        return false;
-    }
-
     public void setRemainingArguments(List<String> remainingArguments) {
         this.remainingArguments = remainingArguments;
     }
