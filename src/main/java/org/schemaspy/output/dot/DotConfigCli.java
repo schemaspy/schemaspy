@@ -46,10 +46,10 @@ public class DotConfigCli implements DotConfig {
 
     @Parameter(
         names = {
-            "-hidelabel",
-            "schemaspy.hidelabel"
+            "-hideLabel",
+            "schemaspy.hideLabel"
         },
-        descriptionKey = "hidelabel"
+        descriptionKey = "hideLabel"
     )
     private boolean hideLabelEnabled = false;
 
