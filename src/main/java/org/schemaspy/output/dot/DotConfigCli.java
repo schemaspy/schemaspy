@@ -46,6 +46,15 @@ public class DotConfigCli implements DotConfig {
 
     @Parameter(
         names = {
+            "-hidelabel",
+            "schemaspy.hidelabel"
+        },
+        descriptionKey = "hidelabel"
+    )
+    private boolean hideLabelEnabled = false;
+
+    @Parameter(
+        names = {
             "-maxdet", "--max-details",
             "schemaspy.maxdet", "schemaspy.max-details"
         },
@@ -94,5 +103,10 @@ public class DotConfigCli implements DotConfig {
     @Override
     public int getMaxDetailedTables() {
         return maxDetails;
+    }
+
+    @Override
+    public boolean isHideLabelEnabled() {
+        return hideLabelEnabled;
     }
 }

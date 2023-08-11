@@ -77,10 +77,7 @@ public class DotTableFormatter implements Relationships {
                 stats,
                 includeImplied,
                 dot,
-                new DotConfigHeader(
-                    runtimeDotConfig,
-                        true
-                ),
+                new DotConfigHeader(runtimeDotConfig),
                 new Concatenation(
                         new Degree(twoDegreesOfSeparation),
                         new Concatenation(

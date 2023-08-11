@@ -33,4 +33,5 @@ public interface RuntimeDotConfig {
     boolean isOneOfMultipleSchemas();
     StyleSheet styleSheet();
     boolean showDetails(Collection<Table> table);
+    boolean isHideLabelEnabled();
 }

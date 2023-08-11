@@ -42,6 +42,13 @@ public final class DotConfigHeader implements Header {
         this.showLabel = showLabel;
     }
 
+    public DotConfigHeader(
+            final RuntimeDotConfig runtimeDotConfig
+    ) {
+        this.runtimeDotConfig = runtimeDotConfig;
+        this.showLabel = !runtimeDotConfig.isHideLabelEnabled();
+    }
+
     @Override
     public String value() {
         final StringBuilder header = new StringBuilder();

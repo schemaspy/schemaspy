@@ -98,7 +98,7 @@ public class DotSummaryFormatter {
         dot.println(
             new Digraph(
                     name,
-                    new DotConfigHeader(runtimeDotConfig, true),
+                    new DotConfigHeader(runtimeDotConfig),
                     elements.stream().toArray(Element[]::new)
             ).dot()
         );

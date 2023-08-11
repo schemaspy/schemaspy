@@ -8,4 +8,5 @@ public interface DotConfig {
     String getTemplateDirectory();
     boolean isNumRowsEnabled();
     int getMaxDetailedTables();
+    boolean isHideLabelEnabled();
 }

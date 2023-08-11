@@ -84,4 +84,9 @@ public class SimpleRuntimeDotConfig implements RuntimeDotConfig {
     public boolean showDetails(Collection<Table> table) {
         return table.size() <= dotConfig.getMaxDetailedTables();
     }
+
+    @Override
+    public boolean isHideLabelEnabled() {
+        return dotConfig.isHideLabelEnabled();
+    }
 }
