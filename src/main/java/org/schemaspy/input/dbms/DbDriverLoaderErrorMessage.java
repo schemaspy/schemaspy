@@ -11,18 +11,15 @@ public class DbDriverLoaderErrorMessage {
     private final String[] driverClass;
     private final String driverPath;
     private final Set<URI> classpath;
-    private final ConnectionConfig connectionConfig;
 
     public DbDriverLoaderErrorMessage(
             final String []driverClass,
             final String driverPath,
-            final Set<URI> classpath,
-            final ConnectionConfig connectionConfig
+            final Set<URI> classpath
     ) {
         this.driverClass = driverClass;
         this.driverPath = driverPath;
         this.classpath = classpath;
-        this.connectionConfig = connectionConfig;
     }
 
     public String createMessage() {

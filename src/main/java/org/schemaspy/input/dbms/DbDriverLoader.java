@@ -168,7 +168,7 @@ public class DbDriverLoader {
         Class<Driver> driverClass = new DcFacade(
             driverClasses,
             loader,
-            new DbDriverLoaderErrorMessage(driverClasses, driverPath, classpath, connectionConfig).createMessage()
+            new DbDriverLoaderErrorMessage(driverClasses, driverPath, classpath).createMessage()
         ).value();
 
         // @see DriverManager.setLogStream(PrintStream)
@@ -176,7 +176,7 @@ public class DbDriverLoader {
         // setLogStream should only be called once maybe in Main
         driver = new DsDriverClass(
                 driverClass,
-                new DbDriverLoaderErrorMessage(driverClasses, driverPath, classpath, connectionConfig).createMessage()
+                new DbDriverLoaderErrorMessage(driverClasses, driverPath, classpath).createMessage()
         ).driver();
 
         driverCache.put(driverClass.getName() + "|" + driverPath, driver);
