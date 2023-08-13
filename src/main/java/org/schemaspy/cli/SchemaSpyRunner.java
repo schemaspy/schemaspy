@@ -68,7 +68,7 @@ public class SchemaSpyRunner {
             LOGGER.warn("Connection Failure", couldntConnect);
             return EXIT_CODE_CONNECTION_ERROR;
         } catch (EmptySchemaException noData) {
-            LOGGER.warn("Empty schema", noData);
+            LOGGER.warn("Empty schema");
             return EXIT_CODE_EMPTY_SCHEMA;
         } catch (InvalidConfigurationException badConfig) {
             LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
