@@ -19,8 +19,6 @@
  */
 package org.schemaspy.model;
 
-import java.util.Collection;
-
 /**
  * Listener of schema analysis and ERD generation progress.
  * Overall intent is to allow various views to render progress details appropriately.
@@ -29,34 +27,17 @@ import java.util.Collection;
  */
 public interface ProgressListener {
 
-	void startedGatheringDetails();
-	void gatheringDetailsProgressed(Table table);
-
-	/**
-	 * @return detail gathering duration in milliseconds
-	 */
-	long startedConnectingTables();
-	void connectingTablesProgressed(Table table);
-
-	/**
-	 * @return table connection duration in milliseconds
-	 */
-	long startedGraphingSummaries();
-	void graphingSummaryProgressed();
-
-	/**
-	 * @return summary graphing duration in milliseconds
-	 */
-	long startedGraphingDetails();
-	void graphingDetailsProgressed(Table table);
-
-	/**
-	 * @return detail graphing duration in milliseconds
-	 */
-	long finishedGatheringDetails();
-
-	/**
-	 * @return overall duration duration in milliseconds
-	 */
-	long finished(Collection<Table> tables);
+	void startCollectingTablesViews();
+	void tableViewCollected(Table table);
+	void finishedCollectingTablesViews();
+	void startedConnectingTablesViews();
+	void connectedTableView(Table table);
+	void finishedConnectingTablesViews();
+	void startCreatingSummaries();
+	void createdSummary(String summary);
+	void finishedCreatingSummaries();
+	void startCreatingTablePages();
+	void createdTablePage(Table table);
+	void finishedCreatingTablePages();
+	void finished(Database database);
 }

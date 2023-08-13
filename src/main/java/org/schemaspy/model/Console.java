@@ -1,101 +1,117 @@
 package org.schemaspy.model;
 
-import org.schemaspy.cli.CommandLineArguments;
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.atomic.LongAdder;
 
-import java.io.File;
-import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Decorator for rendering console-based details.
  */
 public class Console implements ProgressListener {
 
-    private final CommandLineArguments commandLineArguments;
-    private final ProgressListener origin;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final String output;
+    private final LongAdder tableDetails = new LongAdder();
+    private final LongAdder connectingProgress = new LongAdder();
+    private final LongAdder tablePages = new LongAdder();
+    private final long startedAt;
+    private long startedGatheringSchemaDetailsAt;
+    private long startedConnectingTablesAt;
+    private long startedGraphingSummariesAt;
+    private long startedGraphingTablesAt;
 
-    public Console(final CommandLineArguments commandLineArguments, final ProgressListener origin) {
-        this.commandLineArguments = commandLineArguments;
-        this.origin = origin;
+    public Console(final String output) {
+        this.output = output;
+        this.startedAt = System.currentTimeMillis();
     }
 
     @Override
-    public void startedGatheringDetails() {
-        origin.startedGatheringDetails();
-        System.out.print("Gathering schema details...");
+    public void startCollectingTablesViews() {
+        this.startedGatheringSchemaDetailsAt = System.currentTimeMillis();
+        LOGGER.info("Gathering schema details");
     }
 
     @Override
-    public void gatheringDetailsProgressed(Table table) {
-        origin.gatheringDetailsProgressed(table);
-        System.out.print('.');
+    public void tableViewCollected(Table table) {
+        tableDetails.increment();
+        if (tableDetails.sum() % 10 == 0) {
+            LOGGER.info("Found {} tables/views...", tableDetails.sum());
+        }
     }
 
     @Override
-    public long startedConnectingTables() {
-        long result = origin.startedConnectingTables();
-        System.err.flush();
-        System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        System.out.print("Connecting relationships...");
-        return result;
+    public void finishedCollectingTablesViews() {
+        final long duration = System.currentTimeMillis() - this.startedGatheringSchemaDetailsAt;
+        LOGGER.info("Found total of {} tables/views in {} seconds", tableDetails.sum(), duration/1000);
     }
 
     @Override
-    public void connectingTablesProgressed(Table table) {
-        origin.connectingTablesProgressed(table);
-        System.out.print('.');
+    public void startedConnectingTablesViews() {
+        this.startedConnectingTablesAt = System.currentTimeMillis();
+        LOGGER.info("Connecting relationships");
     }
 
     @Override
-    public long startedGraphingSummaries() {
-        long result = origin.startedGraphingSummaries();
-        System.err.flush();
-        System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        System.out.print("Writing/graphing summary");
-        System.out.print('.');
-        return result;
-
+    public void connectedTableView(Table table) {
+        connectingProgress.increment();
+        if (connectingProgress.sum() % 10 == 0){
+            LOGGER.info("Connected {} tables/views...", connectingProgress.sum());
+        }
     }
 
     @Override
-    public void graphingSummaryProgressed() {
-        origin.graphingSummaryProgressed();
-        System.out.print('.');
+    public void finishedConnectingTablesViews() {
+        final long duration = System.currentTimeMillis() - this.startedConnectingTablesAt;
+        LOGGER.info("Connected a total of {} tables/views in {} seconds", connectingProgress.sum(), duration/1000);
     }
 
     @Override
-    public long startedGraphingDetails() {
-        long result = origin.startedGraphingDetails();
-        System.err.flush();
-        System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        System.out.print("Writing/diagramming details");
-        return result;
+    public void startCreatingSummaries() {
+        this.startedGraphingSummariesAt = System.currentTimeMillis();
+        LOGGER.info("Writing/graphing summary");
     }
 
     @Override
-    public void graphingDetailsProgressed(Table table) {
-        origin.graphingDetailsProgressed(table);
-        System.out.print('.');
+    public void createdSummary(String summary) {
+        LOGGER.info("Created summary diagram {}", summary);
     }
 
     @Override
-    public long finishedGatheringDetails() {
-        long result = origin.finishedGatheringDetails();
-        System.err.flush();
-        System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        return result;
+    public void finishedCreatingSummaries() {
+        final long duration = System.currentTimeMillis() - this.startedGraphingSummariesAt;
+        LOGGER.info("Summary completed in {} seconds", duration / 1000);
     }
 
     @Override
-    public long finished(Collection<Table> tables) {
-        long result = origin.finished(tables);
-        System.err.flush();
-        System.out.flush();
-        System.out.println("Wrote relationship details of " + tables.size() + " tables/views to directory '" + commandLineArguments.getOutputDirectory() + "' in " + result / 1000 + " seconds.");
-        System.out.println("View the results by opening " + new File(commandLineArguments.getOutputDirectory(), "index.html"));
-        return result;
+    public void startCreatingTablePages() {
+        this.startedGraphingTablesAt = System.currentTimeMillis();
+        LOGGER.info("Writing table/view pages");
+    }
+
+    @Override
+    public void createdTablePage(Table table) {
+        tablePages.increment();
+        if (tablePages.sum() % 10 == 0) {
+            LOGGER.info("Written {} table/view pages...", tablePages.sum());
+        }
+    }
+
+    @Override
+    public void finishedCreatingTablePages() {
+        long result = System.currentTimeMillis() - startedGraphingTablesAt;
+        LOGGER.info("Wrote {} table/view pages in {} seconds", tablePages.sum(), result / 1000);
+    }
+
+    @Override
+    public void finished(Database database) {
+        long duration = System.currentTimeMillis() - startedAt;
+        LOGGER.info(
+            "Finished documenting '{}' in {} after {} seconds",
+            database.getCatalog().getName() + "." + database.getSchema().getName(),
+            output,
+            duration / 1000
+        );
     }
 }

@@ -67,7 +67,6 @@ import org.schemaspy.model.ImpliedForeignKeyConstraint;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Routine;
 import org.schemaspy.model.Table;
-import org.schemaspy.model.Tracked;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.diagram.Renderer;
@@ -118,7 +117,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SchemaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int SECONDS_IN_MS = 1000;
     private static final String DOT_HTML = ".html";
     private static final String INDEX_DOT_HTML = "index.html";
     private static final String LOG_SCHEMAS_FORMAT = "\t'{}'";
@@ -147,12 +145,7 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze() throws SQLException, IOException {
-        ProgressListener progressListener = new Tracked();
-        // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
-        // and not already logging fine details (to keep from obfuscating those)
-        if (commandLineArguments.isHtmlEnabled()) {
-            progressListener = new Console(commandLineArguments, progressListener);
-        }
+        ProgressListener progressListener = new Console(commandLineArguments.getOutputDirectory().getAbsolutePath());
 
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
@@ -320,7 +313,6 @@ public class SchemaAnalyzer {
                 throw new EmptySchemaException();
         }
 
-        long duration = progressListener.startedGraphingSummaries();
         if (commandLineArguments.isHtmlEnabled()) {
             generateHtmlDoc(
                     schema,
@@ -329,7 +321,6 @@ public class SchemaAnalyzer {
                     progressListener,
                     outputDir,
                     db,
-                    duration,
                     tables
             );
         }
@@ -350,15 +341,7 @@ public class SchemaAnalyzer {
 
         new OrderingReport(outputDir, orderedTables).write();
 
-        duration = progressListener.finishedGatheringDetails();
-        long overallDuration = progressListener.finished(tables);
-
-        if (commandLineArguments.isHtmlEnabled()) {
-            LOGGER.info("Wrote table details in {} seconds", duration / SECONDS_IN_MS);
-
-            LOGGER.info("Wrote relationship details of {} tables/views to directory '{}' in {} seconds.", tables.size(), outputDir, overallDuration / SECONDS_IN_MS);
-            LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
-        }
+        progressListener.finished(db);
 
         return db;
     }
@@ -370,11 +353,8 @@ public class SchemaAnalyzer {
             ProgressListener progressListener,
             File outputDir,
             Database db,
-            long duration,
             Collection<Table> tables
     ) throws IOException {
-        LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
-        LOGGER.info("Writing/graphing summary");
 
         FileUtils.forceMkdir(new File(outputDir, "tables"));
         FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
@@ -392,7 +372,6 @@ public class SchemaAnalyzer {
         writeInfo("schemaspy-version", ManifestUtils.getImplementationVersion(), htmlInfoFile);
         writeInfo("schemaspy-revision", ManifestUtils.getImplementationRevision(), htmlInfoFile);
         writeInfo("renderer", renderer.identifier(), htmlInfoFile);
-        progressListener.graphingSummaryProgressed();
 
         boolean hasRealConstraints = !db.getRemoteTables().isEmpty() || tables.stream().anyMatch(table -> !table.isOrphan(false));
 
@@ -429,9 +408,10 @@ public class SchemaAnalyzer {
         summaryDir.mkdirs();
         SummaryDiagram summaryDiagram = new SummaryDiagram(renderer, summaryDir);
 
+        progressListener.startCreatingSummaries();
 
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, hasRealConstraints, !impliedConstraints.isEmpty() , outputDir);
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, progressListener);
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, hasRealConstraints, !impliedConstraints.isEmpty() , outputDir, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables);
         results.getOutputExceptions().stream().forEachOrdered(exception ->
                 LOGGER.error("RelationShipDiagramError", exception)
         );
@@ -449,8 +429,6 @@ public class SchemaAnalyzer {
             htmlRelationshipsPage.write(results, writer);
         }
 
-        progressListener.graphingSummaryProgressed();
-
         HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(
                 mustacheCompiler,
                 new OrphanDiagram(
@@ -463,8 +441,6 @@ public class SchemaAnalyzer {
             htmlOrphansPage.write(writer);
         }
 
-        progressListener.graphingSummaryProgressed();
-
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(
             mustacheCompiler,
             commandLineArguments.getHtmlConfig().getDescription()
@@ -473,8 +449,6 @@ public class SchemaAnalyzer {
             htmlMainIndexPage.write(db, tables, impliedConstraints, writer);
         }
 
-        progressListener.graphingSummaryProgressed();
-
         List<ForeignKeyConstraint> constraints = DbAnalyzer.getForeignKeyConstraints(tables);
 
         HtmlConstraintsPage htmlConstraintsPage = new HtmlConstraintsPage(mustacheCompiler);
@@ -482,21 +456,16 @@ public class SchemaAnalyzer {
             htmlConstraintsPage.write(constraints, tables, writer);
         }
 
-        progressListener.graphingSummaryProgressed();
 
         HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("anomalies.html").toFile())) {
             htmlAnomaliesPage.write(tables, impliedConstraints, writer);
         }
 
-        progressListener.graphingSummaryProgressed();
-
         HtmlColumnsPage htmlColumnsPage = new HtmlColumnsPage(mustacheCompiler);
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("columns.html").toFile())) {
             htmlColumnsPage.write(tables, writer);
         }
-
-        progressListener.graphingSummaryProgressed();
 
         HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("routines.html").toFile())) {
@@ -510,12 +479,12 @@ public class SchemaAnalyzer {
             }
         }
 
+        progressListener.finishedCreatingSummaries();
+
         // create detailed diagrams
 
-        duration = progressListener.startedGraphingDetails();
+        progressListener.startCreatingTablePages();
 
-        LOGGER.info("Completed summary in {} seconds", duration / SECONDS_IN_MS);
-        LOGGER.info("Writing/diagramming details");
         SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getIdentifierQuoteString(), db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
 
         File tablesDir = new File(diagramDir, "tables");
@@ -525,12 +494,13 @@ public class SchemaAnalyzer {
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, sqlAnalyzer);
         for (Table table : tables) {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table);
-            progressListener.graphingDetailsProgressed(table);
+            progressListener.createdTablePage(table);
             LOGGER.debug("Writing details of {}", table.getName());
             try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("tables").resolve(new FileNameGenerator(table.getName()).value() + DOT_HTML).toFile())) {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
             }
         }
+        progressListener.finishedCreatingTablePages();
     }
 
     private FileFilter notHtml() {
