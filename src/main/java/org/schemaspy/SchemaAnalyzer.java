@@ -91,6 +91,7 @@ public class SchemaAnalyzer {
     private static final int SECONDS_IN_MS = 1000;
     private static final String DOT_HTML = ".html";
     private static final String INDEX_DOT_HTML = "index.html";
+    private static final String LOG_SCHEMAS_FORMAT = "\t'{}'";
 
     private final SqlService sqlService;
     private final DatabaseServiceFactory databaseServiceFactory;
@@ -165,9 +166,10 @@ public class SchemaAnalyzer {
                 schemas.add(commandLineArguments.getConnectionConfig().getUser());
         }
 
-        LOGGER.info("Analyzing schemas: {}{}",
-                System.lineSeparator(),
-                schemas.stream().map(s -> String.format("'%s'", s)).collect(Collectors.joining(System.lineSeparator())));
+        LOGGER.info("Analyzing schemas:");
+        schemas.forEach(
+            schemaName -> LOGGER.info(LOG_SCHEMAS_FORMAT, schemaName)
+        );
 
         File outputDir = commandLineArguments.getOutputDirectory();
 
@@ -524,9 +526,7 @@ public class SchemaAnalyzer {
             return;
         }
 
-        if (Objects.isNull(schemas)) {
-            LOGGER.error("Failed to retrieve any schemas");
-        } else if (schemas.contains(schema)) {
+        if (schemas.contains(schema)) {
             LOGGER.error(
                     "The schema exists in the database, but the user you specified '{}'" +
                     "might not have rights to read its contents.",
@@ -537,23 +537,26 @@ public class SchemaAnalyzer {
                         "for what to include (via -i) didn't match any tables.");
             }
         } else {
-            LOGGER.error(
-                    "The schema '{}' could not be read/found, schema is specified using the -s option." +
-                    "Make sure user '{}' has the correct privileges to read the schema." +
-                    "Also not that schema names are usually case sensitive.",
-                    schema, user);
-            LOGGER.info(
-                    "Available schemas(Some of these may be user or system schemas):{}{}",
-                    System.lineSeparator(),
-                    schemas.stream().collect(Collectors.joining(System.lineSeparator())));
+            LOGGER.error("The schema '{}' could not be read/found, schema is specified using the -s option.", schema);
+            LOGGER.error("Make sure user '{}' has the correct privileges to read the schema.", user);
+            LOGGER.error("Also not that schema names are usually case sensitive.");
             List<String> populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta);
             if (populatedSchemas.isEmpty()) {
-                LOGGER.error("Unable to determine if any of the schemas contain tables/views");
+                LOGGER.error("Unable to determine if any of the schemas are visible to '{}'", user);
             } else {
-                LOGGER.info("Schemas with tables/views visible to '{}':{}{}",
-                        user,
-                        System.lineSeparator(),
-                        populatedSchemas.stream().map(s -> String.format("'%s'", s)).collect(Collectors.joining(System.lineSeparator())));
+                LOGGER.info("Schemas with tables/views visible to '{}':", user);
+                populatedSchemas
+                    .forEach(
+                        schemaName -> LOGGER.info(LOG_SCHEMAS_FORMAT, schemaName)
+                    );
+            }
+            List<String> otherSchemas = schemas
+                .stream()
+                .filter(Predicate.not(populatedSchemas::contains))
+                .toList();
+            if (!otherSchemas.isEmpty()) {
+                LOGGER.info("Other available schemas(Some of these may be system schemas):");
+                otherSchemas.forEach(schemaName -> LOGGER.info(LOG_SCHEMAS_FORMAT, schemaName));
             }
         }
     }
