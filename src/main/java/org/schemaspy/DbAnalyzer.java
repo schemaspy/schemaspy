@@ -242,11 +242,19 @@ public class DbAnalyzer {
     public static List<String> getSchemas(DatabaseMetaData meta) throws SQLException {
         List<String> schemas = new ArrayList<>();
 
-        ResultSet rs = meta.getSchemas();
-        while (rs.next()) {
-            schemas.add(rs.getString("TABLE_SCHEM"));
+        try (ResultSet rs = meta.getSchemas()) {
+            while (rs.next()) {
+                schemas.add(rs.getString("TABLE_SCHEM"));
+            }
         }
-        rs.close();
+
+        if (schemas.isEmpty() && meta.getDatabaseProductName().equalsIgnoreCase("mysql")) {
+            try (ResultSet rs = meta.getCatalogs()) {
+                while (rs.next()) {
+                    schemas.add(rs.getString("TABLE_CAT"));
+                }
+            }
+        }
 
         return schemas;
     }
