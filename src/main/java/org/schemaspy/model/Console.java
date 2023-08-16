@@ -19,20 +19,20 @@ public class Console implements ProgressListener {
     }
 
     @Override
-    public void startedGatheringDetails() {
-        origin.startedGatheringDetails();
+    public void startCollectingTablesViews() {
+        origin.startCollectingTablesViews();
         System.out.print("Gathering schema details...");
     }
 
     @Override
-    public void gatheringDetailsProgressed(Table table) {
-        origin.gatheringDetailsProgressed(table);
+    public void tableViewCollected(Table table) {
+        origin.tableViewCollected(table);
         System.out.print('.');
     }
 
     @Override
-    public long startedConnectingTables() {
-        long result = origin.startedConnectingTables();
+    public long startConnectingTablesViews() {
+        long result = origin.startConnectingTablesViews();
         System.err.flush();
         System.out.flush();
         System.out.println("(" + result / 1000 + "sec)");
@@ -41,14 +41,14 @@ public class Console implements ProgressListener {
     }
 
     @Override
-    public void connectingTablesProgressed(Table table) {
-        origin.connectingTablesProgressed(table);
+    public void connectedTableView(Table table) {
+        origin.connectedTableView(table);
         System.out.print('.');
     }
 
     @Override
-    public long startedGraphingSummaries() {
-        long result = origin.startedGraphingSummaries();
+    public long startCreatingSummaries() {
+        long result = origin.startCreatingSummaries();
         System.err.flush();
         System.out.flush();
         System.out.println("(" + result / 1000 + "sec)");
@@ -59,14 +59,14 @@ public class Console implements ProgressListener {
     }
 
     @Override
-    public void graphingSummaryProgressed() {
-        origin.graphingSummaryProgressed();
+    public void createdSummary() {
+        origin.createdSummary();
         System.out.print('.');
     }
 
     @Override
-    public long startedGraphingDetails() {
-        long result = origin.startedGraphingDetails();
+    public long startCreatingTablePages() {
+        long result = origin.startCreatingTablePages();
         System.err.flush();
         System.out.flush();
         System.out.println("(" + result / 1000 + "sec)");
@@ -75,14 +75,14 @@ public class Console implements ProgressListener {
     }
 
     @Override
-    public void graphingDetailsProgressed(Table table) {
-        origin.graphingDetailsProgressed(table);
+    public void createdTablePage(Table table) {
+        origin.createdTablePage(table);
         System.out.print('.');
     }
 
     @Override
-    public long finishedGatheringDetails() {
-        long result = origin.finishedGatheringDetails();
+    public long finishedCreatingTablePages() {
+        long result = origin.finishedCreatingTablePages();
         System.err.flush();
         System.out.flush();
         System.out.println("(" + result / 1000 + "sec)");

@@ -99,7 +99,7 @@ public class MustacheSummaryDiagramFactory {
             generateRealLarge(database, tables, diagrams, outputExceptions);
         }
 
-        progressListener.graphingSummaryProgressed();
+        progressListener.createdSummary();
         if (hasImpliedConstraints) {
             generateImpliedCompact(database, tables, diagrams, outputExceptions);
             generateImpliedLarge(database, tables, diagrams, outputExceptions);

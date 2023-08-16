@@ -30,11 +30,11 @@ import java.util.Collection;
  */
 public class Tracked implements ProgressListener {
 
-    private long startedAt;
-    private long startedGatheringAt;
-    private long startedConnectingAt;
-    private long startedGraphingSummariesAt;
-    private long startedGraphingDetailsAt;
+    private final long startedAt;
+    private long startedCollectingTablesViewsAt;
+    private long startedConnectingTablesViewsAt;
+    private long startedCreatingSummariesAt;
+    private long startedCreatingTablePagesAt;
     private long finishedAt;
 
     public Tracked() {
@@ -42,56 +42,56 @@ public class Tracked implements ProgressListener {
     }
 
     @Override
-    public void startedGatheringDetails() {
-        startedGatheringAt = System.currentTimeMillis();
+    public void startCollectingTablesViews() {
+        startedCollectingTablesViewsAt = System.currentTimeMillis();
     }
 
     @Override
-    public void gatheringDetailsProgressed(Table table) { }
+    public void tableViewCollected(Table table) { }
 
     /**
      * Assumes <code>startedGatheringDetails</code> has already been called.
      */
     @Override
-    public long startedConnectingTables() {
-        startedConnectingAt = System.currentTimeMillis();
-        return startedConnectingAt - startedGatheringAt;
+    public long startConnectingTablesViews() {
+        startedConnectingTablesViewsAt = System.currentTimeMillis();
+        return startedConnectingTablesViewsAt - startedCollectingTablesViewsAt;
     }
 
     @Override
-    public void connectingTablesProgressed(Table table) { }
+    public void connectedTableView(Table table) { }
 
     /**
      * Assumes <code>startedConnectingTables</code> has already been called.
      */
     @Override
-    public long startedGraphingSummaries() {
-        startedGraphingSummariesAt = System.currentTimeMillis();
-        return startedGraphingSummariesAt - startedConnectingAt;
+    public long startCreatingSummaries() {
+        startedCreatingSummariesAt = System.currentTimeMillis();
+        return startedCreatingSummariesAt - startedConnectingTablesViewsAt;
     }
 
     @Override
-    public void graphingSummaryProgressed() { }
+    public void createdSummary() { }
 
     /**
      * Assumes <code>startedGraphingSummaries</code> has already been called.
      */
     @Override
-    public long startedGraphingDetails() {
-        startedGraphingDetailsAt = System.currentTimeMillis();
-        return startedGraphingDetailsAt - startedGraphingSummariesAt;
+    public long startCreatingTablePages() {
+        startedCreatingTablePagesAt = System.currentTimeMillis();
+        return startedCreatingTablePagesAt - startedCreatingSummariesAt;
     }
 
     @Override
-    public void graphingDetailsProgressed(Table table) { }
+    public void createdTablePage(Table table) { }
 
     /**
      * Assumes <code>startedGraphingDetails</code> has already been called.
      */
     @Override
-    public long finishedGatheringDetails() {
+    public long finishedCreatingTablePages() {
         finishedAt = System.currentTimeMillis();
-        return finishedAt - startedGraphingDetailsAt;
+        return finishedAt - startedCreatingTablePagesAt;
     }
 
     @Override

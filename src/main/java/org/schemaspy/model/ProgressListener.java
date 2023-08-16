@@ -29,31 +29,31 @@ import java.util.Collection;
  */
 public interface ProgressListener {
 
-	void startedGatheringDetails();
-	void gatheringDetailsProgressed(Table table);
+	void startCollectingTablesViews();
+	void tableViewCollected(Table table);
 
 	/**
 	 * @return detail gathering duration in milliseconds
 	 */
-	long startedConnectingTables();
-	void connectingTablesProgressed(Table table);
+	long startConnectingTablesViews();
+	void connectedTableView(Table table);
 
 	/**
 	 * @return table connection duration in milliseconds
 	 */
-	long startedGraphingSummaries();
-	void graphingSummaryProgressed();
+	long startCreatingSummaries();
+	void createdSummary();
 
 	/**
 	 * @return summary graphing duration in milliseconds
 	 */
-	long startedGraphingDetails();
-	void graphingDetailsProgressed(Table table);
+	long startCreatingTablePages();
+	void createdTablePage(Table table);
 
 	/**
 	 * @return detail graphing duration in milliseconds
 	 */
-	long finishedGatheringDetails();
+	long finishedCreatingTablePages();
 
 	/**
 	 * @return overall duration duration in milliseconds
