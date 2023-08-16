@@ -52,19 +52,27 @@ public class MustacheSummaryDiagramFactory {
     private final boolean hasRealConstraints;
     private final boolean hasImpliedConstraints;
     private final Path summaryDir;
+    private final ProgressListener progressListener;
 
-    public MustacheSummaryDiagramFactory(DotFormatter dotProducer, SummaryDiagram diagramFactory,boolean hasRealConstraints, boolean hasImpliedConstraints, File outputDir) {
+    public MustacheSummaryDiagramFactory(
+        DotFormatter dotProducer,
+        SummaryDiagram diagramFactory,
+        boolean hasRealConstraints,
+        boolean hasImpliedConstraints,
+        File outputDir,
+        ProgressListener progressListener
+    ) {
         this.dotProducer = dotProducer;
         this.diagramFactory = diagramFactory;
         this.hasRealConstraints = hasRealConstraints;
         this.hasImpliedConstraints = hasImpliedConstraints;
         this.summaryDir = outputDir.toPath().resolve("diagrams").resolve("summary");
+        this.progressListener = progressListener;
     }
 
     public MustacheSummaryDiagramResults generateSummaryDiagrams(
             Database database,
-            Collection<Table> tables,
-            ProgressListener progressListener
+            Collection<Table> tables
     ) throws IOException {
         if (tables.isEmpty()) {
             return new MustacheSummaryDiagramResults(Collections.emptyList(), Collections.emptyList());
