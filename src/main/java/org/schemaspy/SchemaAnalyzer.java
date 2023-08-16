@@ -278,6 +278,7 @@ public class SchemaAnalyzer {
 
         DatabaseMetaData databaseMetaData = sqlService.connect(commandLineArguments.getConnectionConfig());
         DbmsMeta dbmsMeta = sqlService.getDbmsMeta();
+        LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
 
         LOGGER.debug("supportsSchemasInTableDefinitions: {}", databaseMetaData.supportsSchemasInTableDefinitions());
         LOGGER.debug("supportsCatalogsInTableDefinitions: {}", databaseMetaData.supportsCatalogsInTableDefinitions());
@@ -286,13 +287,16 @@ public class SchemaAnalyzer {
         catalog = new CatalogResolver(databaseMetaData).resolveCatalog(catalog);
         schema = new SchemaResolver(databaseMetaData).resolveSchema(schema);
 
-        SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, isOneOfMultipleSchemas);
-        if (commandLineArguments.isHtmlEnabled()) {
-            LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
-
-            if (schemaMeta != null && schemaMeta.getFile() != null) {
-                LOGGER.info("Using additional metadata from {}", schemaMeta.getFile());
-            }
+        SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null
+            ? null
+            : new SchemaMeta(
+                commandLineArguments.getSchemaMeta(),
+                dbName,
+                schema,
+                isOneOfMultipleSchemas
+            );
+        if (schemaMeta != null && schemaMeta.getFile() != null) {
+            LOGGER.info("Using additional metadata from {}", schemaMeta.getFile());
         }
 
         //
