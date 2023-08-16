@@ -33,19 +33,27 @@ public class MustacheSummaryDiagramFactoryTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+    private ProgressListener progressListener = mock(ProgressListener.class);
+
     @Test
     public void noDiagrams() throws IOException {
         DotFormatter dotProducer = mock(DotFormatter.class);
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory,false,false, temporaryFolder.newFolder("noDiagrams"));
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory =
+            new MustacheSummaryDiagramFactory(
+                dotProducer,
+                mustacheDiagramFactory,
+                false,
+                false,
+                temporaryFolder.newFolder("noDiagrams"),
+                progressListener
+            );
 
         Database database = mock(Database.class);
         List<Table> noTables = Collections.emptyList();
-        ProgressListener progressListener = mock(ProgressListener.class);
 
-
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, noTables, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, noTables);
         assertThat(results.getDiagrams()).isEmpty();
     }
 
@@ -55,17 +63,23 @@ public class MustacheSummaryDiagramFactoryTest {
 
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, true,false, temporaryFolder.newFolder("noDiagrams"));
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory =
+            new MustacheSummaryDiagramFactory(
+                dotProducer,
+                mustacheDiagramFactory,
+                true,
+                false,
+                temporaryFolder.newFolder("noDiagrams"),
+                progressListener
+            );
 
         Database database = mock(Database.class);
         when(database.getRemoteTables()).thenReturn(Collections.emptyList());
         Table tableReal = mock(Table.class);
         when(tableReal.isOrphan(false)).thenReturn(false);
         List<Table> tables = Collections.singletonList(tableReal);
-        ProgressListener progressListener = mock(ProgressListener.class);
 
-
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables);
         assertThat(results.getDiagrams()).hasSize(2);
         assertThat(results.getDiagrams().get(0).getActive()).isNotEmpty();
         assertThat(results.getDiagrams().get(1).getActive()).isNullOrEmpty();
@@ -78,17 +92,23 @@ public class MustacheSummaryDiagramFactoryTest {
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
 
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, mustacheDiagramFactory, true,true, temporaryFolder.newFolder("noDiagrams"));
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory =
+            new MustacheSummaryDiagramFactory(
+                dotProducer,
+                mustacheDiagramFactory,
+                true,
+                true,
+                temporaryFolder.newFolder("noDiagrams"),
+                progressListener
+            );
 
         Database database = mock(Database.class);
         when(database.getRemoteTables()).thenReturn(Collections.emptyList());
         Table tableReal = mock(Table.class);
         when(tableReal.isOrphan(false)).thenReturn(false);
         List<Table> tables = Collections.singletonList(tableReal);
-        ProgressListener progressListener = mock(ProgressListener.class);
 
-
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables);
         assertThat(results.getDiagrams()).hasSize(4);
         assertThat(results.getDiagrams().get(0).getActive()).isNotEmpty();
         assertThat(results.getDiagrams().get(1).getActive()).isNullOrEmpty();
@@ -115,17 +135,23 @@ public class MustacheSummaryDiagramFactoryTest {
         Files.createFile(summaryPath.resolve(FILE_PREFIX + ".implied.compact.dot"), PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r--r--r--")));
         Files.createFile(summaryPath.resolve(FILE_PREFIX + ".implied.large.dot"), PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("r--r--r--")));
 
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(mock(DotFormatter.class),  mustacheDiagramFactory, true,true, outputDir);
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory =
+            new MustacheSummaryDiagramFactory(
+                mock(DotFormatter.class),
+                mustacheDiagramFactory,
+                true,
+                true,
+                outputDir,
+                progressListener
+            );
 
         Database database = mock(Database.class);
         when(database.getRemoteTables()).thenReturn(Collections.emptyList());
         Table tableReal = mock(Table.class);
         when(tableReal.isOrphan(false)).thenReturn(false);
         List<Table> tables = Collections.singletonList(tableReal);
-        ProgressListener progressListener = mock(ProgressListener.class);
 
-
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables, progressListener);
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(database, tables);
         assertThat(results.getDiagrams()).isEmpty();
         assertThat(results.getOutputExceptions()).hasSize(4);
     }
