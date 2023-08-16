@@ -28,6 +28,10 @@ import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
 import org.schemaspy.output.dot.RuntimeDotConfig;
+import org.schemaspy.output.dot.schemaspy.node.Footer;
+import org.schemaspy.output.dot.schemaspy.node.footer.Children;
+import org.schemaspy.output.dot.schemaspy.node.footer.Parents;
+import org.schemaspy.output.dot.schemaspy.node.footer.Rows;
 import org.schemaspy.util.naming.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +40,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -123,7 +126,7 @@ public class DotNode implements Node {
 
         buf.append(columnsToString());
         if (!table.isView()) {
-            buf.append(tableToString());
+            buf.append(footerToString());
         }
 
         buf.append("    </TABLE>>" + lineSeparator);
@@ -228,35 +231,29 @@ public class DotNode implements Node {
         return buf.toString();
     }
 
-    private String tableToString() {
+    private String footerToString() {
+        String colspan = config.showColumnDetails ? "COLSPAN=\"4\" " : "COLSPAN=\"3\" ";
         StringBuilder buf = new StringBuilder();
         buf.append(INDENT_6 + Html.TR_START);
-        buf.append("<TD ALIGN=\"LEFT\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\">");
-        int numParents = showImpliedRelationships ? table.getNumParents() : table.getNumNonImpliedParents();
-        if (numParents > 0 || config.showColumnDetails)
-            buf.append("&lt; " + numParents);
-        else
-            buf.append("  ");
+        buf.append("<TD ALIGN=\"LEFT\" CELLPADDING=\"0\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\" " + colspan + ">");
+        buf.append(
+            new Footer(
+                runtimeDotConfig.styleSheet().getBodyBackground(),
+                new Parents(
+                    showImpliedRelationships ? table.getNumParents() : table.getNumNonImpliedParents(),
+                    config.showColumnDetails
+                ),
+                new Rows(
+                    table.getNumRows(),
+                    runtimeDotConfig.isNumRowsEnabled()
+                ),
+                new Children(
+                    showImpliedRelationships ? table.getNumChildren() : table.getNumNonImpliedChildren(),
+                    config.showColumnDetails
+                )
+            ).value()
+        );
 
-        buf.append(Html.TD_END);
-        buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\">");
-        final long numRows = table.getNumRows();
-        if (runtimeDotConfig.isNumRowsEnabled() && numRows >= 0) {
-            buf.append(NumberFormat.getInstance().format(numRows));
-            buf.append(" row");
-            if (numRows != 1)
-                buf.append('s');
-        } else {
-            buf.append("  ");
-        }
-        buf.append(Html.TD_END);
-
-        buf.append("<TD ALIGN=\"RIGHT\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\">");
-        int numChildren = showImpliedRelationships ? table.getNumChildren() : table.getNumNonImpliedChildren();
-        if (numChildren > 0 || config.showColumnDetails)
-            buf.append(numChildren + " &gt;");
-        else
-            buf.append("  ");
         buf.append(Html.TD_END + Html.TR_END + lineSeparator);
         return buf.toString();
     }
