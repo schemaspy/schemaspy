@@ -288,9 +288,6 @@ public class SchemaAnalyzer {
 
         SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, isOneOfMultipleSchemas);
         if (commandLineArguments.isHtmlEnabled()) {
-            FileUtils.forceMkdir(new File(outputDir, "tables"));
-            FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
-
             LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
 
             if (schemaMeta != null && schemaMeta.getFile() != null) {
@@ -374,6 +371,9 @@ public class SchemaAnalyzer {
     ) throws IOException {
         LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
         LOGGER.info("Writing/graphing summary");
+
+        FileUtils.forceMkdir(new File(outputDir, "tables"));
+        FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
         Markdown.registryPage(tables);
 
