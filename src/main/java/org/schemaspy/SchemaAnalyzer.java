@@ -190,8 +190,13 @@ public class SchemaAnalyzer {
                     "(use -schemaSpec on command line or in .properties to exclude other schemas)",
                     new Sanitize(schemaSpec));
             schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec);
-            if (schemas.isEmpty())
+            if (schemas.isEmpty() && Objects.nonNull(commandLineArguments.getConnectionConfig().getUser())) {
                 schemas.add(commandLineArguments.getConnectionConfig().getUser());
+            }
+            if (schemas.isEmpty()) {
+                LOGGER.error("Couldn't find any schemas to analyze using schemaSpec '{}'", new Sanitize(schemaSpec));
+                return null;
+            }
         }
 
         LOGGER.info("Analyzing schemas:");
