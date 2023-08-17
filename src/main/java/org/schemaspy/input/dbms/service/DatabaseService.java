@@ -108,7 +108,6 @@ public class DatabaseService {
     }
 
     public void gatherSchemaDetails(Database db, SchemaMeta schemaMeta, ProgressListener listener) throws SQLException {
-        LOGGER.info("Gathering schema details");
 
         listener.startCollectingTablesViews();
 
@@ -308,7 +307,7 @@ public class DatabaseService {
         }
     }
 
-    private void connectTables(Database db, ProgressListener listener) throws SQLException {
+    private void connectTables(Database db, ProgressListener listener) {
         Instant startTables = clock.instant();
         Duration durationOneTable = null;
         for (Table table : db.getTables()) {

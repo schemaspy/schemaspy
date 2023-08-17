@@ -1,15 +1,17 @@
 package org.schemaspy.model;
 
 import org.schemaspy.cli.CommandLineArguments;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
 /**
  * Decorator for rendering console-based details.
  */
 public class Console implements ProgressListener {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final CommandLineArguments commandLineArguments;
     private final ProgressListener origin;
 
@@ -21,7 +23,7 @@ public class Console implements ProgressListener {
     @Override
     public void startCollectingTablesViews() {
         origin.startCollectingTablesViews();
-        System.out.print("Gathering schema details...");
+        LOGGER.info("Collecting schema information from database");
     }
 
     @Override
@@ -33,10 +35,11 @@ public class Console implements ProgressListener {
     @Override
     public long startConnectingTablesViews() {
         long result = origin.startConnectingTablesViews();
+        System.out.println();
         System.err.flush();
         System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        System.out.print("Connecting relationships...");
+        LOGGER.info("Collection of schema information finished after {} seconds", result/1000);
+        LOGGER.info("Connecting tables and views");
         return result;
     }
 
@@ -49,11 +52,11 @@ public class Console implements ProgressListener {
     @Override
     public long startCreatingSummaries() {
         long result = origin.startCreatingSummaries();
+        System.out.println();
         System.err.flush();
         System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        System.out.print("Writing/graphing summary");
-        System.out.print('.');
+        LOGGER.info("Tables and views connected after {} seconds", result/1000);
+        LOGGER.info("Writing/graphing summaries");
         return result;
 
     }
@@ -67,10 +70,11 @@ public class Console implements ProgressListener {
     @Override
     public long startCreatingTablePages() {
         long result = origin.startCreatingTablePages();
+        System.out.println();
         System.err.flush();
         System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        System.out.print("Writing/diagramming details");
+        LOGGER.info("Summaries created after {} seconds", result/1000);
+        LOGGER.info("Creating table/view pages");
         return result;
     }
 
@@ -83,9 +87,10 @@ public class Console implements ProgressListener {
     @Override
     public long finishedCreatingTablePages() {
         long result = origin.finishedCreatingTablePages();
+        System.out.println();
         System.err.flush();
         System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
+        LOGGER.info("Created table/view pages after {} seconds", result/1000);
         return result;
     }
 
@@ -94,8 +99,7 @@ public class Console implements ProgressListener {
         long result = origin.finished(tables);
         System.err.flush();
         System.out.flush();
-        System.out.println("Wrote relationship details of " + tables.size() + " tables/views to directory '" + commandLineArguments.getOutputDirectory() + "' in " + result / 1000 + " seconds.");
-        System.out.println("View the results by opening " + new File(commandLineArguments.getOutputDirectory(), "index.html"));
+        LOGGER.info("Wrote relationship details of {} tables/view to directory '{}' in {} seconds", tables.size(), commandLineArguments.getOutputDirectory(), result/1000);
         return result;
     }
 }
