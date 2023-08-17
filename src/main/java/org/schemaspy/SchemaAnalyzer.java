@@ -218,25 +218,20 @@ public class SchemaAnalyzer {
             mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
         }
 
-        new CopyFromUrl(layoutFolder.url(), outputDir, notHtml()).copy();
+        if (commandLineArguments.isHtmlEnabled()) {
+            new CopyFromUrl(layoutFolder.url(), outputDir, notHtml()).copy();
 
-        DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler(
-            commandLineArguments.getConnectionConfig().getDatabaseName(),
-            null,
-            commandLineArguments.getHtmlConfig(),
-            true,
-            dataTableConfig
-        );
-        HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
-        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
-            htmlMultipleSchemasIndexPage.write(
-                mustacheCatalog,
-                mustacheSchemas,
-                commandLineArguments.getHtmlConfig().getDescription(),
-                getDatabaseProduct(meta),
-                writer
+            DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
+            MustacheCompiler mustacheCompiler = new MustacheCompiler(commandLineArguments.getConnectionConfig().getDatabaseName(),
+                null, commandLineArguments.getHtmlConfig(), true, dataTableConfig
             );
+            HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(
+                mustacheCompiler);
+            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
+                htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas,
+                    commandLineArguments.getHtmlConfig().getDescription(), getDatabaseProduct(meta), writer
+                );
+            }
         }
         return db;
     }
