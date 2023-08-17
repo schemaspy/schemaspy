@@ -146,12 +146,10 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze() throws SQLException, IOException {
-        ProgressListener progressListener = new Console(commandLineArguments.getOutputDirectory(), new Tracked());
 
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
-                    databaseServiceFactory.forMultipleSchemas(commandLineArguments.getProcessingConfig()),
-                    progressListener
+                    databaseServiceFactory.forMultipleSchemas(commandLineArguments.getProcessingConfig())
             );
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
@@ -162,15 +160,13 @@ public class SchemaAnalyzer {
                     schema,
                     false,
                     outputDirectory,
-                    databaseServiceFactory.forSingleSchema(commandLineArguments.getProcessingConfig()),
-                    progressListener
+                    databaseServiceFactory.forSingleSchema(commandLineArguments.getProcessingConfig())
             );
         }
     }
 
     public Database analyzeMultipleSchemas(
-            DatabaseService databaseService,
-            ProgressListener progressListener
+            DatabaseService databaseService
     ) throws SQLException, IOException {
         List<String> schemas = commandLineArguments.getSchemas();
         Database db = null;
@@ -215,7 +211,7 @@ public class SchemaAnalyzer {
 
             LOGGER.info("Analyzing '{}'", new Sanitize(schema));
             File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
-            db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService, progressListener);
+            db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService);
             if (db == null) //if any of analysed schema returns null
                 return null;
             mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
@@ -264,10 +260,10 @@ public class SchemaAnalyzer {
             String schema,
             boolean isOneOfMultipleSchemas,
             File outputDir,
-            DatabaseService databaseService,
-            ProgressListener progressListener
+            DatabaseService databaseService
     ) throws SQLException, IOException {
         LOGGER.info("Starting schema analysis");
+        ProgressListener progressListener = new Console(outputDir, new Tracked());
 
         FileUtils.forceMkdir(outputDir);
 
