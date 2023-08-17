@@ -31,32 +31,35 @@ public interface ProgressListener {
 
 	void startCollectingTablesViews();
 	void tableViewCollected(Table table);
-
 	/**
-	 * @return detail gathering duration in milliseconds
+	 * @return duration of CollectingTablesViews in milliseconds
 	 */
-	long startConnectingTablesViews();
+	long finishedCollectingTablesViews();
+
+	void startConnectingTablesViews();
 	void connectedTableView(Table table);
-
 	/**
-	 * @return table connection duration in milliseconds
+	 * @return duration of ConnectingTablesViews in milliseconds
 	 */
-	long startCreatingSummaries();
+	long finishedConnectingTablesViews();
+
+	void startCreatingSummaries();
 	void createdSummary();
-
 	/**
-	 * @return summary graphing duration in milliseconds
+	 * @return duration of CreatingSummaries in milliseconds
 	 */
-	long startCreatingTablePages();
+	long finishedCreatingSummaries();
+
+	void startCreatingTablePages();
 	void createdTablePage(Table table);
 
 	/**
-	 * @return detail graphing duration in milliseconds
+	 * @return duration of CreatingTablePages in milliseconds
 	 */
 	long finishedCreatingTablePages();
 
 	/**
-	 * @return overall duration duration in milliseconds
+	 * @return overall duration in milliseconds
 	 */
 	long finished(Collection<Table> tables);
 }

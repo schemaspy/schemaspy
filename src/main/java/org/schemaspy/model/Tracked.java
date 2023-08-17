@@ -35,7 +35,6 @@ public class Tracked implements ProgressListener {
     private long startedConnectingTablesViewsAt;
     private long startedCreatingSummariesAt;
     private long startedCreatingTablePagesAt;
-    private long finishedAt;
 
     public Tracked() {
         startedAt = System.currentTimeMillis();
@@ -50,36 +49,48 @@ public class Tracked implements ProgressListener {
     public void tableViewCollected(Table table) { }
 
     /**
-     * Assumes <code>startedGatheringDetails</code> has already been called.
+     * Assumes <code>startCollectingTablesViews</code> has already been called.
      */
     @Override
-    public long startConnectingTablesViews() {
+    public long finishedCollectingTablesViews() {
+        return System.currentTimeMillis() - startedCollectingTablesViewsAt;
+    }
+
+    @Override
+    public void startConnectingTablesViews() {
         startedConnectingTablesViewsAt = System.currentTimeMillis();
-        return startedConnectingTablesViewsAt - startedCollectingTablesViewsAt;
     }
 
     @Override
     public void connectedTableView(Table table) { }
 
     /**
-     * Assumes <code>startedConnectingTables</code> has already been called.
+     * Assumes <code>startConnectingTablesViews</code> has already been called.
      */
     @Override
-    public long startCreatingSummaries() {
+    public long finishedConnectingTablesViews() {
+        return System.currentTimeMillis() - startedConnectingTablesViewsAt;
+    }
+
+    @Override
+    public void startCreatingSummaries() {
         startedCreatingSummariesAt = System.currentTimeMillis();
-        return startedCreatingSummariesAt - startedConnectingTablesViewsAt;
     }
 
     @Override
     public void createdSummary() { }
 
     /**
-     * Assumes <code>startedGraphingSummaries</code> has already been called.
+     * Assumes <code>startCreatingSummaries</code> has already been called.
      */
     @Override
-    public long startCreatingTablePages() {
+    public long finishedCreatingSummaries() {
+        return System.currentTimeMillis() - startedCreatingSummariesAt;
+    }
+
+    @Override
+    public void startCreatingTablePages() {
         startedCreatingTablePagesAt = System.currentTimeMillis();
-        return startedCreatingTablePagesAt - startedCreatingSummariesAt;
     }
 
     @Override
@@ -90,13 +101,11 @@ public class Tracked implements ProgressListener {
      */
     @Override
     public long finishedCreatingTablePages() {
-        finishedAt = System.currentTimeMillis();
-        return finishedAt - startedCreatingTablePagesAt;
+        return System.currentTimeMillis() - startedCreatingTablePagesAt;
     }
 
     @Override
     public long finished(Collection<Table> tablesg) {
-        finishedAt = System.currentTimeMillis();
-        return finishedAt - startedAt;
+        return System.currentTimeMillis() - startedAt;
     }
 }
