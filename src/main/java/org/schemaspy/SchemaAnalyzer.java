@@ -322,7 +322,6 @@ public class SchemaAnalyzer {
                 throw new EmptySchemaException();
         }
 
-        progressListener.startCreatingSummaries();
         if (commandLineArguments.isHtmlEnabled()) {
             generateHtmlDoc(
                     schema,
@@ -382,7 +381,7 @@ public class SchemaAnalyzer {
         writeInfo("schemaspy-version", ManifestUtils.getImplementationVersion(), htmlInfoFile);
         writeInfo("schemaspy-revision", ManifestUtils.getImplementationRevision(), htmlInfoFile);
         writeInfo("renderer", renderer.identifier(), htmlInfoFile);
-        progressListener.createdSummary();
+        progressListener.startCreatingSummaries();
 
         boolean hasRealConstraints = !db.getRemoteTables().isEmpty() || tables.stream().anyMatch(table -> !table.isOrphan(false));
 
