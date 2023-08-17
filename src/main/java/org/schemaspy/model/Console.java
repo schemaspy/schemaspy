@@ -33,14 +33,19 @@ public class Console implements ProgressListener {
     }
 
     @Override
-    public long startConnectingTablesViews() {
-        long result = origin.startConnectingTablesViews();
+    public long finishedCollectingTablesViews() {
+        long result = origin.finishedCollectingTablesViews();
         System.out.println();
         System.err.flush();
         System.out.flush();
         LOGGER.info("Collection of schema information finished after {} seconds", result/1000);
-        LOGGER.info("Connecting tables and views");
         return result;
+    }
+
+    @Override
+    public void startConnectingTablesViews() {
+        origin.startConnectingTablesViews();
+        LOGGER.info("Connecting tables and views");
     }
 
     @Override
@@ -50,15 +55,19 @@ public class Console implements ProgressListener {
     }
 
     @Override
-    public long startCreatingSummaries() {
-        long result = origin.startCreatingSummaries();
+    public long finishedConnectingTablesViews() {
+        long result = origin.finishedConnectingTablesViews();
         System.out.println();
         System.err.flush();
         System.out.flush();
         LOGGER.info("Tables and views connected after {} seconds", result/1000);
-        LOGGER.info("Writing/graphing summaries");
         return result;
+    }
 
+    @Override
+    public void startCreatingSummaries() {
+        origin.startCreatingSummaries();
+        LOGGER.info("Writing/graphing summaries");
     }
 
     @Override
@@ -68,14 +77,19 @@ public class Console implements ProgressListener {
     }
 
     @Override
-    public long startCreatingTablePages() {
-        long result = origin.startCreatingTablePages();
+    public long finishedCreatingSummaries() {
+        long result = origin.finishedCreatingSummaries();
         System.out.println();
         System.err.flush();
         System.out.flush();
         LOGGER.info("Summaries created after {} seconds", result/1000);
-        LOGGER.info("Creating table/view pages");
         return result;
+    }
+
+    @Override
+    public void startCreatingTablePages() {
+        origin.startCreatingTablePages();
+        LOGGER.info("Creating table/view pages");
     }
 
     @Override

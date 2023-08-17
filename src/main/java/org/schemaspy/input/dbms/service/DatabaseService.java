@@ -131,10 +131,13 @@ public class DatabaseService {
         routineService.gatherRoutines(db);
         sequenceService.gatherSequences(db);
 
+        listener.finishedCollectingTablesViews();
         listener.startConnectingTablesViews();
 
         connectTables(db, listener);
         updateFromXmlMetadata(db, schemaMeta);
+
+        listener.finishedConnectingTablesViews();
     }
     
     private void initCatalogs(Database db) throws SQLException {

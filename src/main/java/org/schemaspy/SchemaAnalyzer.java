@@ -508,6 +508,8 @@ public class SchemaAnalyzer {
             }
         }
 
+        progressListener.finishedCreatingSummaries();
+
         // create detailed diagrams
 
         progressListener.startCreatingTablePages();
