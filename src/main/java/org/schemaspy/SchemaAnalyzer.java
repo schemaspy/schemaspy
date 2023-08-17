@@ -231,6 +231,10 @@ public class SchemaAnalyzer {
                 htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas,
                     commandLineArguments.getHtmlConfig().getDescription(), getDatabaseProduct(meta), writer
                 );
+                LOGGER.info(
+                    "Access navigation to reports by opening {}",
+                    new File(outputDir, INDEX_DOT_HTML)
+                );
             }
         }
         return db;
