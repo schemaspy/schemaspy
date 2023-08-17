@@ -150,7 +150,7 @@ public class SchemaAnalyzer {
         // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
         // and not already logging fine details (to keep from obfuscating those)
         if (commandLineArguments.isHtmlEnabled()) {
-            progressListener = new Console(commandLineArguments, progressListener);
+            progressListener = new Console(commandLineArguments.getOutputDirectory(), progressListener);
         }
 
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {

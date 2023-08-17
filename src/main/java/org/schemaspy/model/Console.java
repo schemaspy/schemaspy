@@ -1,9 +1,9 @@
 package org.schemaspy.model;
 
-import org.schemaspy.cli.CommandLineArguments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
@@ -12,11 +12,11 @@ import java.util.Collection;
  */
 public class Console implements ProgressListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final CommandLineArguments commandLineArguments;
+    private final File outputDirectory;
     private final ProgressListener origin;
 
-    public Console(final CommandLineArguments commandLineArguments, final ProgressListener origin) {
-        this.commandLineArguments = commandLineArguments;
+    public Console(final File outputDirectory, final ProgressListener origin) {
+        this.outputDirectory = outputDirectory;
         this.origin = origin;
     }
 
@@ -113,7 +113,7 @@ public class Console implements ProgressListener {
         long result = origin.finished(tables);
         System.err.flush();
         System.out.flush();
-        LOGGER.info("Wrote relationship details of {} tables/view to directory '{}' in {} seconds", tables.size(), commandLineArguments.getOutputDirectory(), result/1000);
+        LOGGER.info("Wrote relationship details of {} tables/view to directory '{}' in {} seconds", tables.size(), outputDirectory, result/1000);
         return result;
     }
 }
