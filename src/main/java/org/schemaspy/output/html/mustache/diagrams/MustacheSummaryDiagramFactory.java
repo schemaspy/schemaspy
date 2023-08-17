@@ -90,6 +90,7 @@ public class MustacheSummaryDiagramFactory {
                 MustacheTableDiagram realCompactDiagram = new MustacheTableDiagram("Compact", results, false);
                 realCompactDiagram.setActive(true);
                 diagrams.add(realCompactDiagram);
+                progressListener.createdSummary();
             } catch (IOException ioexception) {
                 outputExceptions.add(new OutputException(FAILED_DOT + realCompactDot.toString(), ioexception));
             } catch (RenderException renderException) {
@@ -99,7 +100,6 @@ public class MustacheSummaryDiagramFactory {
             generateRealLarge(database, tables, diagrams, outputExceptions);
         }
 
-        progressListener.createdSummary();
         if (hasImpliedConstraints) {
             generateImpliedCompact(database, tables, diagrams, outputExceptions);
             generateImpliedLarge(database, tables, diagrams, outputExceptions);
@@ -117,6 +117,7 @@ public class MustacheSummaryDiagramFactory {
             DiagramResult results = diagramFactory.generateSummaryDiagram(realLargeDot, FILE_PREFIX + ".real.large");
             MustacheTableDiagram realLargeDiagram = new MustacheTableDiagram("Large", results, false);
             diagrams.add(realLargeDiagram);
+            progressListener.createdSummary();
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + realLargeDot.toString(), ioexception));
         } catch (RenderException renderException) {
@@ -131,6 +132,7 @@ public class MustacheSummaryDiagramFactory {
             DiagramResult results = diagramFactory.generateSummaryDiagram(impliedCompactDot, FILE_PREFIX + ".implied.compact");
             MustacheTableDiagram impliedCompactDiagram = new MustacheTableDiagram("Compact Implied", results, true);
             diagrams.add(impliedCompactDiagram);
+            progressListener.createdSummary();
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + impliedCompactDot.toString(), ioexception));
         } catch (RenderException renderException) {
@@ -145,6 +147,7 @@ public class MustacheSummaryDiagramFactory {
             DiagramResult results = diagramFactory.generateSummaryDiagram(impliedLargeDot, FILE_PREFIX + ".implied.large");
             MustacheTableDiagram impliedLargeDiagram = new MustacheTableDiagram("Large Implied", results, true);
             diagrams.add(impliedLargeDiagram);
+            progressListener.createdSummary();
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + impliedLargeDot.toString(), ioexception));
         } catch (RenderException renderException) {
