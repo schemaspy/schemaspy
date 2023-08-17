@@ -146,12 +146,7 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze() throws SQLException, IOException {
-        ProgressListener progressListener = new Tracked();
-        // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
-        // and not already logging fine details (to keep from obfuscating those)
-        if (commandLineArguments.isHtmlEnabled()) {
-            progressListener = new Console(commandLineArguments.getOutputDirectory(), progressListener);
-        }
+        ProgressListener progressListener = new Console(commandLineArguments.getOutputDirectory(), new Tracked());
 
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
