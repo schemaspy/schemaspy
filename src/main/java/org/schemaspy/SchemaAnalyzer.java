@@ -118,7 +118,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SchemaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int SECONDS_IN_MS = 1000;
     private static final String DOT_HTML = ".html";
     private static final String INDEX_DOT_HTML = "index.html";
     private static final String LOG_SCHEMAS_FORMAT = "\t'{}'";
@@ -320,7 +319,7 @@ public class SchemaAnalyzer {
                 throw new EmptySchemaException();
         }
 
-        long duration = progressListener.startCreatingSummaries();
+        progressListener.startCreatingSummaries();
         if (commandLineArguments.isHtmlEnabled()) {
             generateHtmlDoc(
                     schema,
@@ -329,7 +328,6 @@ public class SchemaAnalyzer {
                     progressListener,
                     outputDir,
                     db,
-                    duration,
                     tables
             );
         }
@@ -350,15 +348,7 @@ public class SchemaAnalyzer {
 
         new OrderingReport(outputDir, orderedTables).write();
 
-        duration = progressListener.finishedCreatingTablePages();
-        long overallDuration = progressListener.finished(tables);
-
-        if (commandLineArguments.isHtmlEnabled()) {
-            LOGGER.info("Wrote table details in {} seconds", duration / SECONDS_IN_MS);
-
-            LOGGER.info("Wrote relationship details of {} tables/views to directory '{}' in {} seconds.", tables.size(), outputDir, overallDuration / SECONDS_IN_MS);
-            LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
-        }
+        progressListener.finished(tables);
 
         return db;
     }
@@ -370,11 +360,8 @@ public class SchemaAnalyzer {
             ProgressListener progressListener,
             File outputDir,
             Database db,
-            long duration,
             Collection<Table> tables
     ) throws IOException {
-        LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
-        LOGGER.info("Writing/graphing summary");
 
         FileUtils.forceMkdir(new File(outputDir, "tables"));
         FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
@@ -520,10 +507,7 @@ public class SchemaAnalyzer {
 
         // create detailed diagrams
 
-        duration = progressListener.startCreatingTablePages();
-
-        LOGGER.info("Completed summary in {} seconds", duration / SECONDS_IN_MS);
-        LOGGER.info("Writing/diagramming details");
+        progressListener.startCreatingTablePages();
         SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getIdentifierQuoteString(), db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
 
         File tablesDir = new File(diagramDir, "tables");
@@ -539,6 +523,8 @@ public class SchemaAnalyzer {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
             }
         }
+        progressListener.finishedCreatingTablePages();
+        LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
     }
 
     private FileFilter notHtml() {
