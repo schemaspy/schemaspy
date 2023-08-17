@@ -189,9 +189,7 @@ public class SchemaAnalyzer {
                     "Analyzing schemas that match regular expression '{}'. " +
                     "(use -schemaSpec on command line or in .properties to exclude other schemas)",
                     new Sanitize(schemaSpec));
-            schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false);
-            if (schemas.isEmpty())
-                schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
+            schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec);
             if (schemas.isEmpty())
                 schemas.add(commandLineArguments.getConnectionConfig().getUser());
         }
@@ -598,6 +596,19 @@ public class SchemaAnalyzer {
                 exc
             );
             return;
+        }
+
+        if (schemas.isEmpty()) {
+            try {
+                schemas = DbAnalyzer.getCatalogs(meta);
+            } catch (SQLException | RuntimeException exc) {
+                LOGGER.error(
+                    "The user you specified '{}' might not have rights to read the database metadata.",
+                    new Sanitize(user),
+                    exc
+                );
+                return;
+            }
         }
 
         if (schemas.contains(schema)) {
