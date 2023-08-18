@@ -37,6 +37,8 @@ import java.nio.file.StandardOpenOption;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.time.Clock;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -83,6 +85,8 @@ import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramFactory
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
 import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
 import org.schemaspy.output.html.mustache.diagrams.OrphanDiagram;
+import org.schemaspy.progress.ConditionalProgress;
+import org.schemaspy.progress.IfUpdateAfter;
 import org.schemaspy.util.DataTableConfig;
 import org.schemaspy.util.DefaultPrintWriter;
 import org.schemaspy.util.ManifestUtils;
@@ -475,20 +479,51 @@ public class SchemaAnalyzer {
             htmlColumnsPage.write(tables, writer);
         }
 
+        progressListener.finishedCreatingSummaries();
+
         HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("routines.html").toFile())) {
             htmlRoutinesPage.write(db.getRoutines(), writer);
         }
+        new ConditionalProgress<>(
+            (increments -> LOGGER.info(
+                "Written {} routines pages...",
+                increments)
+            ),
+            (increments, duration) -> LOGGER.info(
+                "Wrote {} routines pages in {} seconds",
+                increments,
+                duration.toSeconds()
+            ),
+            new IfUpdateAfter(
+                Duration.ofSeconds(10),
+                Clock.systemDefaultZone()
+            ),
+            progress -> {
+                LOGGER.info("Writing routines pages");
+                HtmlRoutinePage htmlRoutinePage =
+                    new HtmlRoutinePage(mustacheCompiler);
+                for (Routine routine : db.getRoutines()) {
+                    try (Writer writer =
+                        new DefaultPrintWriter(
+                            outputDir
+                                .toPath()
+                                .resolve("routines")
+                                .resolve(
+                                    new FileNameGenerator(routine.getName()).value()
+                                        + DOT_HTML
+                                )
+                                .toFile()
+                        )
+                    ) {
+                        htmlRoutinePage.write(routine, writer);
+                        progress.progressed();
+                    }
+                }
+            },
+            Clock.systemDefaultZone()
+        ).execute();
 
-        HtmlRoutinePage htmlRoutinePage = new HtmlRoutinePage(mustacheCompiler);
-        for (Routine routine : db.getRoutines()) {
-            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("routines").resolve(new FileNameGenerator(routine.getName()).value() + DOT_HTML).toFile())) {
-                htmlRoutinePage.write(routine, writer);
-                progressListener.createdSummary();
-            }
-        }
-
-        progressListener.finishedCreatingSummaries();
 
         // create detailed diagrams
 
