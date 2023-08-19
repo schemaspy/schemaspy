@@ -62,7 +62,6 @@ public final class DotConfigHeader implements Header {
         header.append("    fontname=\"" + runtimeDotConfig.getFont() + "\"");
         header.append("    fontsize=\"" + runtimeDotConfig.getFontSize() + "\"");
         header.append("    packmode=\"graph\"");
-        header.append("    ration=\"compress\"");
         header.append("  ];");
         header.append("  node [");
         header.append("    fontname=\"" + runtimeDotConfig.getFont() + "\"");
