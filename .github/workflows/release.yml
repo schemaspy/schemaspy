@@ -131,7 +131,7 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./target/checkout
           push: true
           tags: |
             "${{ github.repository }}:${{ github.event.inputs.release_version }}"

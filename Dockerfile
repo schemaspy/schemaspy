@@ -40,7 +40,7 @@ RUN adduser java -h / -D && \
     apk del curl
 
 
-ADD target/schema*-app.jar /usr/local/lib/schemaspy/
+ADD target/schema*-app.jar /usr/local/lib/schemaspy/schemaspy-app.jar
 ADD docker/schemaspy.sh /usr/local/bin/schemaspy
 
 USER java
