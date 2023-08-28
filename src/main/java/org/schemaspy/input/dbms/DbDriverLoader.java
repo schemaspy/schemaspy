@@ -57,7 +57,7 @@ public class DbDriverLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static Map<String, Driver> driverCache = new HashMap<>();
-    private final ConnectionConfig connectionConfig;
+    private final org.schemaspy.connection.Connection con;
     private final ConnectionURLBuilder urlBuilder;
     private final String[] driverClass;
     private Driverpath driverPath;
@@ -95,7 +95,27 @@ public class DbDriverLoader {
         final String[] driverClass,
         final Driverpath driverPath
     ) {
-        this.connectionConfig = connectionConfig;
+        this(
+            new WithPassword(
+                connectionConfig.getPassword(),
+                new WithUser(
+                    connectionConfig.getUser(),
+                    new PreferencesConnection(connectionConfig.getConnectionProperties())
+                )
+            ),
+            urlBuilder,
+            driverClass,
+            driverPath
+        );
+    }
+
+    public DbDriverLoader(
+            final org.schemaspy.connection.Connection con,
+            final ConnectionURLBuilder urlBuilder,
+            final String[] driverClass,
+            final Driverpath driverPath
+    ) {
+        this.con = con;
         this.urlBuilder = urlBuilder;
         this.driverClass = driverClass;
         this.driverPath = driverPath;
@@ -105,13 +125,7 @@ public class DbDriverLoader {
         String connectionURL = urlBuilder.build();
         String[] driverClasses = driverClass;
 
-        final Properties connectionProperties = new WithPassword(
-            connectionConfig.getPassword(),
-            new WithUser(
-                connectionConfig.getUser(),
-                new PreferencesConnection(connectionConfig.getConnectionProperties())
-            )
-        ).properties();
+        final Properties connectionProperties = this.con.properties();
 
         Connection connection;
         try {
