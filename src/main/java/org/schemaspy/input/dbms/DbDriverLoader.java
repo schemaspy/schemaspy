@@ -23,6 +23,7 @@
  */
 package org.schemaspy.input.dbms;
 
+import org.schemaspy.connection.Connection;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
@@ -41,7 +42,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.sql.Connection;
 import java.sql.Driver;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,7 +57,7 @@ public class DbDriverLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static Map<String, Driver> driverCache = new HashMap<>();
-    private final org.schemaspy.connection.Connection con;
+    private final Connection con;
     private final ConnectionURLBuilder urlBuilder;
     private final String[] driverClass;
     private Driverpath driverPath;
@@ -110,7 +110,7 @@ public class DbDriverLoader {
     }
 
     public DbDriverLoader(
-            final org.schemaspy.connection.Connection con,
+            final Connection con,
             final ConnectionURLBuilder urlBuilder,
             final String[] driverClass,
             final Driverpath driverPath
@@ -121,13 +121,13 @@ public class DbDriverLoader {
         this.driverPath = driverPath;
     }
 
-    public Connection getConnection() throws IOException {
+    public java.sql.Connection getConnection() throws IOException {
         String connectionURL = urlBuilder.build();
         String[] driverClasses = driverClass;
 
         final Properties connectionProperties = this.con.properties();
 
-        Connection connection;
+        java.sql.Connection connection;
         try {
             Driver driver = getDriver();
             connection = driver.connect(connectionURL, connectionProperties);
