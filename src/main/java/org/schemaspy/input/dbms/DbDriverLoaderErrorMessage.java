@@ -10,16 +10,13 @@ public class DbDriverLoaderErrorMessage {
 
     private final String[] driverClass;
     private final String driverPath;
-    private final Set<URI> classpath;
 
     public DbDriverLoaderErrorMessage(
             final String []driverClass,
-            final String driverPath,
-            final Set<URI> classpath
+            final String driverPath
     ) {
         this.driverClass = driverClass;
         this.driverPath = driverPath;
-        this.classpath = classpath;
     }
 
     public String createMessage() {
@@ -30,16 +27,7 @@ public class DbDriverLoaderErrorMessage {
                 .append(driverPath)
                 .append(".")
                 .append(System.lineSeparator())
-                .append("Resulting in classpath:");
-        if (classpath.isEmpty()) {
-            sb.append(" empty").append(System.lineSeparator());
-        } else {
-            sb.append(System.lineSeparator());
-            for (URI uri : classpath) {
-                sb.append("\t").append(uri.toString()).append(System.lineSeparator());
-            }
-        }
-        sb.append(missingPathsMessage());
+                .append(missingPathsMessage());
         return sb.toString();
     }
 
