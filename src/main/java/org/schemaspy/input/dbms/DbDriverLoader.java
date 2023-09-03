@@ -175,7 +175,7 @@ public class DbDriverLoader {
         }).filter(Objects::nonNull).collect(Collectors.toList());
 
         final ClassLoader loader = new URLClassLoader(
-                urls.toArray(new URL[classpath.size()]),
+                urls.toArray(new URL[urls.size()]),
                 new ClDefault().classloader()
         );
 
