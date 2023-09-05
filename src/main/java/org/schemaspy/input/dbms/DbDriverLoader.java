@@ -28,6 +28,7 @@ import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
 import org.schemaspy.input.dbms.classloader.ClDefault;
+import org.schemaspy.input.dbms.classpath.Classpath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
@@ -159,14 +160,14 @@ public class DbDriverLoader {
             }
         }
 
-        Set<URI> classpath = new GetExistingUrls(driverPath).paths();
+        final Classpath classpath = new GetExistingUrls(driverPath);
 
         // if a classpath has been specified then use it to find the driver,
         // otherwise use whatever was used to load this class.
         // thanks to Bruno Leonardo Gonalves for this implementation that he
         // used to resolve issues when running under Maven
 
-        final List<URL> urls = classpath.stream().map(uri -> {
+        final List<URL> urls = classpath.paths().stream().map(uri -> {
             try {
                 return uri.toURL();
             } catch (MalformedURLException e) {
