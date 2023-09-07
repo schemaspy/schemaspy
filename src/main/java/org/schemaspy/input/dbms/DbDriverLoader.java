@@ -27,7 +27,7 @@ import org.schemaspy.connection.Connection;
 import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
-import org.schemaspy.input.dbms.classloader.ClDefault;
+import org.schemaspy.input.dbms.classloader.ClClasspath;
 import org.schemaspy.input.dbms.classpath.Classpath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
@@ -39,13 +39,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.Driver;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author John Currier
@@ -161,24 +156,7 @@ public class DbDriverLoader {
         }
 
         final Classpath classpath = new GetExistingUrls(driverPath);
-
-        // if a classpath has been specified then use it to find the driver,
-        // otherwise use whatever was used to load this class.
-        // thanks to Bruno Leonardo Gonalves for this implementation that he
-        // used to resolve issues when running under Maven
-
-        final List<URL> urls = classpath.paths().stream().map(uri -> {
-            try {
-                return uri.toURL();
-            } catch (MalformedURLException e) {
-                return null;
-            }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-
-        final ClassLoader loader = new URLClassLoader(
-                urls.toArray(new URL[urls.size()]),
-                new ClDefault().classloader()
-        );
+        final ClassLoader loader = new ClClasspath(classpath).classloader();
 
         Class<Driver> driverClass = new DcFacade(
             driverClasses,
