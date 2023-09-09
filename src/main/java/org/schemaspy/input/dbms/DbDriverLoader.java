@@ -156,11 +156,10 @@ public class DbDriverLoader {
         }
 
         final Classpath classpath = new GetExistingUrls(driverPath);
-        final ClassLoader loader = new ClClasspath(classpath).classloader();
 
         Class<Driver> driverClass = new DcFacade(
             driverClasses,
-            loader,
+            new ClClasspath(classpath),
             new DbDriverLoaderErrorMessage(driverClasses, driverPath).createMessage()
         ).value();
 

@@ -1,5 +1,6 @@
 package org.schemaspy.input.dbms.driverclass;
 
+import org.schemaspy.input.dbms.classloader.ClassloaderSource;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 
 import java.sql.Driver;
@@ -13,10 +14,10 @@ import java.util.stream.Collectors;
  */
 public class DcFacade implements Driverclass {
     private final String[] driverClasses;
-    private final ClassLoader loader;
+    private final ClassloaderSource loader;
     private final String message;
 
-    public DcFacade(final String[] driverClasses, final ClassLoader loader, final String message) {
+    public DcFacade(final String[] driverClasses, final ClassloaderSource loader, final String message) {
         this.driverClasses = driverClasses;
         this.loader = loader;
         this.message = message;
@@ -25,7 +26,7 @@ public class DcFacade implements Driverclass {
     @Override
     public Class<Driver> value() {
         List<Driverclass> candidates = Arrays.stream(this.driverClasses)
-                .map(candidate -> new DcErrorLogged(new DcClassloader(candidate, this.loader)))
+                .map(candidate -> new DcErrorLogged(new DcClassloader(candidate, this.loader.classloader())))
                 .collect(Collectors.toList());
         try {
             return new DcIterator(candidates.iterator()).value();
