@@ -28,7 +28,6 @@ import org.schemaspy.connection.PreferencesConnection;
 import org.schemaspy.connection.WithPassword;
 import org.schemaspy.connection.WithUser;
 import org.schemaspy.input.dbms.classloader.ClClasspath;
-import org.schemaspy.input.dbms.classpath.Classpath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
@@ -155,11 +154,11 @@ public class DbDriverLoader {
             }
         }
 
-        final Classpath classpath = new GetExistingUrls(driverPath);
-
         Class<Driver> driverClass = new DcFacade(
             driverClasses,
-            new ClClasspath(classpath),
+            new ClClasspath(
+                new GetExistingUrls(driverPath)
+            ),
             new DbDriverLoaderErrorMessage(driverClasses, driverPath).createMessage()
         ).value();
 
