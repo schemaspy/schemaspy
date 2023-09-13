@@ -74,11 +74,13 @@ public class DbDriverLoader {
             connectionConfig,
             urlBuilder,
             properties.getProperty("driver").split(","),
-            new DpFallback(
-                new DpConnectionConfig(connectionConfig),
+            new DpMissingPathChecked(
                 new DpFallback(
-                    new DpProperties(properties),
-                    new DpNull()
+                    new DpConnectionConfig(connectionConfig),
+                    new DpFallback(
+                        new DpProperties(properties),
+                        new DpNull()
+                    )
                 )
             )
         );
