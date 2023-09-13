@@ -26,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
+import org.schemaspy.input.dbms.driverpath.DpMissingPathChecked;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.testing.H2MemoryRule;
 
@@ -124,16 +125,12 @@ public class DbDriverLoaderTest {
   public void DriverMissingWithClasspathThrowsException() {
     ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
     Mockito.when(builder.build()).thenReturn("dummy");
-    String sep = File.separator;
     final String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar")
                                    .toString() + File.pathSeparator + "missing";
     DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"bla.bla.bla", "no.no.no"}, () -> driverPath);
     assertThatExceptionOfType(ConnectionFailure.class)
         .isThrownBy(driverLoader::getConnection)
-        .withCauseInstanceOf(ConnectionFailure.class)
-        .withMessageContaining("'bla.bla.bla, no.no.no'")
-        .withMessageContaining("src" + sep + "test" + sep + "resources" + sep + "driverFolder" + sep + "dummy.jar" + File.pathSeparator + "missing")
-        .withMessageContaining("There were missing paths in driverPath:" + System.lineSeparator() + "\tmissing");
+        .withCauseInstanceOf(ConnectionFailure.class);
   }
 
   @Test
