@@ -161,7 +161,7 @@ public class DbDriverLoader {
             new ClClasspath(
                 new GetExistingUrls(driverPath)
             ),
-            new DbDriverLoaderErrorMessage(driverClasses, driverPath).createMessage()
+            new DbDriverLoaderErrorMessage(driverClasses).createMessage()
         ).value();
 
         // @see DriverManager.setLogStream(PrintStream)
@@ -169,7 +169,7 @@ public class DbDriverLoader {
         // setLogStream should only be called once maybe in Main
         driver = new DsDriverClass(
                 driverClass,
-                new DbDriverLoaderErrorMessage(driverClasses, driverPath).createMessage()
+                new DbDriverLoaderErrorMessage(driverClasses).createMessage()
         ).driver();
 
         driverCache.put(driverClass.getName() + "|" + driverPath, driver);
