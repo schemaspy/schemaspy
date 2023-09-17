@@ -11,10 +11,9 @@ public class DbDriverLoaderErrorMessage {
     }
 
     public String createMessage() {
-        StringBuilder sb = new StringBuilder()
-                .append("Failed to create any of '")
-                .append(String.join(", ", driverClass))
-                .append("' driver from driver path.");
-        return sb.toString();
+        return String.format(
+            "Failed to create any of '%s' driver from driver path.",
+            String.join(", ", driverClass)
+        );
     }
 }
