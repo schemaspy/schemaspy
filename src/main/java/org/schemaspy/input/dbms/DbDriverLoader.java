@@ -161,7 +161,9 @@ public class DbDriverLoader {
             new ClClasspath(
                 new GetExistingUrls(driverPath)
             ),
-            new DbDriverLoaderErrorMessage(driverClasses).createMessage()
+            String.format(
+                "Failed to create any of '%s' driver from driver path.", String.join(", ", driverClasses)
+            )
         ).value();
 
         // @see DriverManager.setLogStream(PrintStream)
@@ -169,7 +171,9 @@ public class DbDriverLoader {
         // setLogStream should only be called once maybe in Main
         driver = new DsDriverClass(
                 driverClass,
-                new DbDriverLoaderErrorMessage(driverClasses).createMessage()
+                String.format(
+                    "Failed to create any of '%s' driver from driver path.", String.join(", ", driverClasses)
+                )
         ).driver();
 
         driverCache.put(driverClass.getName() + "|" + driverPath, driver);
