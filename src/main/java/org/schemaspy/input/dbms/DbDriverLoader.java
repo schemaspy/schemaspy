@@ -160,9 +160,6 @@ public class DbDriverLoader {
             driverClasses,
             new ClClasspath(
                 new GetExistingUrls(driverPath)
-            ),
-            String.format(
-                "Failed to create any of '%s' driver from driver path.", String.join(", ", driverClasses)
             )
         ).value();
 

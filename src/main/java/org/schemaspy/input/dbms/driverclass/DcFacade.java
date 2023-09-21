@@ -15,12 +15,10 @@ import java.util.stream.Collectors;
 public class DcFacade implements Driverclass {
     private final String[] driverClasses;
     private final ClassloaderSource loader;
-    private final String message;
 
-    public DcFacade(final String[] driverClasses, final ClassloaderSource loader, final String message) {
+    public DcFacade(final String[] driverClasses, final ClassloaderSource loader) {
         this.driverClasses = driverClasses;
         this.loader = loader;
-        this.message = message;
     }
 
     @Override
@@ -31,7 +29,11 @@ public class DcFacade implements Driverclass {
         try {
             return new DcIterator(candidates.iterator()).value();
         } catch (NoSuchElementException e) {
-            throw new ConnectionFailure(this.message);
+            throw new ConnectionFailure(
+                String.format(
+                    "Failed to create any of '%s' driver from driver path.", String.join(", ", this.driverClasses)
+                )
+            );
         }
     }
 }
