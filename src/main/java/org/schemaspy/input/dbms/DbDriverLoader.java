@@ -169,7 +169,7 @@ public class DbDriverLoader {
         driver = new DsDriverClass(
                 driverClass,
                 String.format(
-                    "Failed to create any of '%s' driver from driver path.", String.join(", ", driverClasses)
+                    "Failed to create driver from driver class '%s'.", driverClass
                 )
         ).driver();
 
