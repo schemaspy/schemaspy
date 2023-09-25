@@ -166,12 +166,7 @@ public class DbDriverLoader {
         // @see DriverManager.setLogStream(PrintStream)
         //TODO implement PrintStream to Logger bridge.
         // setLogStream should only be called once maybe in Main
-        driver = new DsDriverClass(
-                driverClass,
-                String.format(
-                    "Failed to create driver from driver class '%s'.", driverClass
-                )
-        ).driver();
+        driver = new DsDriverClass(driverClass).driver();
 
         driverCache.put(driverClass.getName() + "|" + driverPath, driver);
 
