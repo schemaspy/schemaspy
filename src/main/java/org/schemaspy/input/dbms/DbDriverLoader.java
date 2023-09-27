@@ -23,16 +23,12 @@
  */
 package org.schemaspy.input.dbms;
 
-import org.schemaspy.connection.Connection;
-import org.schemaspy.connection.PreferencesConnection;
-import org.schemaspy.connection.WithPassword;
-import org.schemaspy.connection.WithUser;
+import org.schemaspy.connection.*;
 import org.schemaspy.input.dbms.classloader.ClClasspath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
 import org.schemaspy.input.dbms.driverpath.*;
-import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,24 +115,7 @@ public class DbDriverLoader {
     }
 
     public java.sql.Connection getConnection() throws IOException {
-        String connectionURL = urlBuilder.build();
-        String[] driverClasses = driverClass;
-
-        final Properties connectionProperties = this.con.properties();
-
-        java.sql.Connection connection;
-        try {
-            Driver driver = getDriver();
-            connection = driver.connect(connectionURL, connectionProperties);
-            if (connection == null) {
-                throw new ConnectionFailure("Cannot connect to '" + connectionURL + "' with driver '" + String.join(",", driverClasses) + "'");
-            }
-        } catch (UnsatisfiedLinkError badPath) {
-            throw new ConnectionFailure("Error with native library occurred while trying to use driver '" + String.join(",", driverClasses) + "'", badPath);
-        } catch (Exception exc) {
-            throw new ConnectionFailure("Failed to connect to database URL [" + connectionURL + "]", exc);
-        }
-        return connection;
+        return new SqlConnection(this.con, this.urlBuilder, this.driverClass, this::getDriver).connection();
     }
 
     /**
