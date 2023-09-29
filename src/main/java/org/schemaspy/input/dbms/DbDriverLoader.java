@@ -26,6 +26,7 @@ package org.schemaspy.input.dbms;
 import org.schemaspy.connection.*;
 import org.schemaspy.input.dbms.classloader.ClClasspath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
+import org.schemaspy.input.dbms.driver.DsCached;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
 import org.schemaspy.input.dbms.driverpath.*;
@@ -47,7 +48,6 @@ import java.util.*;
 public class DbDriverLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static Map<String, Driver> driverCache = new HashMap<>();
     private final Connection con;
     private final ConnectionURLBuilder urlBuilder;
     private final String[] driverClass;
@@ -127,13 +127,6 @@ public class DbDriverLoader {
     protected synchronized Driver getDriver() {
         String[] driverClasses = this.driverClass;
         String driverPath = this.driverPath.value();
-        Driver driver;
-        for (String driverClass: driverClasses) {
-            driver = driverCache.get(driverClass + "|" + driverPath);
-            if (Objects.nonNull(driver)) {
-                return driver;
-            }
-        }
 
         Class<Driver> driverClass = new DcFacade(
             driverClasses,
@@ -145,10 +138,11 @@ public class DbDriverLoader {
         // @see DriverManager.setLogStream(PrintStream)
         //TODO implement PrintStream to Logger bridge.
         // setLogStream should only be called once maybe in Main
-        driver = new DsDriverClass(driverClass).driver();
-
-        driverCache.put(driverClass.getName() + "|" + driverPath, driver);
-
-        return driver;
+        return new DsCached(
+            driverClasses,
+            driverPath,
+            driverClass,
+            new DsDriverClass(driverClass)
+        ).driver();
     }
 }
