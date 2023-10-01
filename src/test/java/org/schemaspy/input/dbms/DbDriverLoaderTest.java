@@ -96,29 +96,23 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void nativeErrorInDriverCreationThrowsException() {
+  public void nativeErrorInDriverCreationPassesUncaught() {
     ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
     Mockito.when(builder.build()).thenReturn("dummy");
     String[] drivers = new String[]{DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"};
     DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, drivers, () -> "");
-    assertThatExceptionOfType(ConnectionFailure.class)
-        .isThrownBy(driverLoader::getConnection)
-        .withCauseInstanceOf(UnsatisfiedLinkError.class)
-        .withMessageContaining(
-            "Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedCtor,dummy.dummy'");
+    assertThatExceptionOfType(UnsatisfiedLinkError.class)
+        .isThrownBy(driverLoader::getConnection);
   }
 
   @Test
-  public void nativeErrorInConnectThrowsException() {
+  public void nativeErrorInConnectPassesUncaught() {
     ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
     Mockito.when(builder.build()).thenReturn("dummy");
     String[] drivers = new String[]{DummyDriverUnsatisfiedConnect.class.getName()};
     DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, drivers, () -> "");
-    assertThatExceptionOfType(ConnectionFailure.class)
-        .isThrownBy(driverLoader::getConnection)
-        .withCauseInstanceOf(UnsatisfiedLinkError.class)
-        .withMessageContaining(
-            "Error with native library occurred while trying to use driver 'org.dummy.DummyDriverUnsatisfiedConnect'");
+    assertThatExceptionOfType(UnsatisfiedLinkError.class)
+        .isThrownBy(() -> driverLoader.getConnection());
   }
 
   @Test

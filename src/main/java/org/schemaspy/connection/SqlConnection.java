@@ -40,8 +40,6 @@ public final class SqlConnection {
             if (connection == null) {
                 throw new ConnectionFailure("Cannot connect to '" + connectionURL + "' with driver '" + String.join(",", driverClasses) + "'");
             }
-        } catch (UnsatisfiedLinkError badPath) {
-            throw new ConnectionFailure("Error with native library occurred while trying to use driver '" + String.join(",", driverClasses) + "'", badPath);
         } catch (Exception exc) {
             throw new ConnectionFailure("Failed to connect to database URL [" + connectionURL + "]", exc);
         }
