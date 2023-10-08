@@ -115,7 +115,7 @@ public class DbDriverLoader {
     }
 
     public java.sql.Connection getConnection() throws IOException {
-        return new SqlConnection(this.con, this.urlBuilder, this.driverClass, this::getDriver).connection();
+        return new SqlConnection(this.con, this.urlBuilder, this::getDriver).connection();
     }
 
     /**
