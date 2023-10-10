@@ -139,7 +139,6 @@ public class DbDriverLoader {
         //TODO implement PrintStream to Logger bridge.
         // setLogStream should only be called once maybe in Main
         return new DsCached(
-            driverClasses,
             driverPath,
             driverClass,
             new DsDriverClass(driverClass)
