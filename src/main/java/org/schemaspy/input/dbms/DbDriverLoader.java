@@ -125,11 +125,10 @@ public class DbDriverLoader {
      * @return
      */
     protected synchronized Driver getDriver() {
-        String[] driverClasses = this.driverClass;
         String driverPath = this.driverPath.value();
 
         Class<Driver> driverClass = new DcFacade(
-            driverClasses,
+            this.driverClass,
             new ClClasspath(
                 new GetExistingUrls(driverPath)
             )
