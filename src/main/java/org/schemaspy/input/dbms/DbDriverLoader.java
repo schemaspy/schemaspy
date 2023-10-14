@@ -23,7 +23,8 @@
  */
 package org.schemaspy.input.dbms;
 
-import org.schemaspy.connection.*;
+import java.sql.Connection;
+import org.schemaspy.connection.SqlConnection;
 import org.schemaspy.input.dbms.classloader.ClClasspath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
 import org.schemaspy.input.dbms.driver.DsCached;
@@ -48,7 +49,7 @@ import java.util.*;
 public class DbDriverLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final Connection con;
+    private final ConnectionConfig connectionConfig;
     private final ConnectionURLBuilder urlBuilder;
     private final String[] driverClass;
     private Driverpath driverPath;
@@ -88,34 +89,14 @@ public class DbDriverLoader {
         final String[] driverClass,
         final Driverpath driverPath
     ) {
-        this(
-            new WithPassword(
-                connectionConfig.getPassword(),
-                new WithUser(
-                    connectionConfig.getUser(),
-                    new PreferencesConnection(connectionConfig.getConnectionProperties())
-                )
-            ),
-            urlBuilder,
-            driverClass,
-            driverPath
-        );
-    }
-
-    public DbDriverLoader(
-            final Connection con,
-            final ConnectionURLBuilder urlBuilder,
-            final String[] driverClass,
-            final Driverpath driverPath
-    ) {
-        this.con = con;
+        this.connectionConfig = connectionConfig;
         this.urlBuilder = urlBuilder;
         this.driverClass = driverClass;
         this.driverPath = driverPath;
     }
 
-    public java.sql.Connection getConnection() throws IOException {
-        return new SqlConnection(this.con, this.urlBuilder, this::getDriver).connection();
+    public Connection getConnection() throws IOException {
+        return new SqlConnection(this.connectionConfig, this.urlBuilder, this::getDriver).connection();
     }
 
     /**
