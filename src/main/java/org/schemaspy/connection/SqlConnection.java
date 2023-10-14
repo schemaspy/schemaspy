@@ -1,5 +1,6 @@
 package org.schemaspy.connection;
 
+import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.driver.Driversource;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -13,6 +14,24 @@ public final class SqlConnection {
     private final Connection con;
     private final ConnectionURLBuilder urlBuilder;
     private final Driversource driversource;
+
+    public SqlConnection(
+        final ConnectionConfig connectionConfig,
+        final ConnectionURLBuilder urlBuilder,
+        final Driversource driversource
+    ) {
+        this(
+            new WithPassword(
+                connectionConfig.getPassword(),
+                new WithUser(
+                    connectionConfig.getUser(),
+                    new PreferencesConnection(connectionConfig.getConnectionProperties())
+                )
+            ),
+            urlBuilder,
+            driversource
+        );
+    }
 
     public SqlConnection(
         final Connection con,
