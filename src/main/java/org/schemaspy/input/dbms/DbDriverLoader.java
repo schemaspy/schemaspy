@@ -24,6 +24,7 @@
 package org.schemaspy.input.dbms;
 
 import java.sql.Connection;
+import org.schemaspy.connection.ScExceptionChecked;
 import org.schemaspy.connection.ScSimple;
 import org.schemaspy.input.dbms.classloader.ClClasspath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
@@ -96,7 +97,10 @@ public class DbDriverLoader {
     }
 
     public Connection getConnection() throws IOException {
-        return new ScSimple(this.connectionConfig, this.urlBuilder, this::getDriver).connection();
+        return new ScExceptionChecked(
+            this.urlBuilder,
+            new ScSimple(this.connectionConfig, this.urlBuilder, this::getDriver)
+        ).connection();
     }
 
     /**

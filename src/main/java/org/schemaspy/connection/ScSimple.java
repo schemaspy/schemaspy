@@ -1,5 +1,6 @@
 package org.schemaspy.connection;
 
+import java.sql.SQLException;
 import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.driver.Driversource;
@@ -44,20 +45,16 @@ public final class ScSimple implements SqlConnection{
     }
 
     @Override
-    public java.sql.Connection connection() throws IOException {
+    public java.sql.Connection connection() throws IOException, SQLException {
         String connectionURL = urlBuilder.build();
 
         final Properties connectionProperties = this.con.properties();
 
         java.sql.Connection connection;
-        try {
-            Driver driver = driversource.driver();
-            connection = driver.connect(connectionURL, connectionProperties);
-            if (connection == null) {
-                throw new ConnectionFailure("Cannot connect to '" + connectionURL + "'");
-            }
-        } catch (Exception exc) {
-            throw new ConnectionFailure("Failed to connect to database URL [" + connectionURL + "]", exc);
+        Driver driver = driversource.driver();
+        connection = driver.connect(connectionURL, connectionProperties);
+        if (connection == null) {
+            throw new ConnectionFailure("Cannot connect to '" + connectionURL + "'");
         }
         return connection;
     }
