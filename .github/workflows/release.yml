@@ -126,16 +126,20 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build docker image
-        if: success()
-        id: docker_build
-        uses: docker/build-push-action@v4
+      - name: Set up QEMU (Docker)
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set GIT_BRANCH, GIT_REVISION
+        run: |
+          echo "GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> "$GITHUB_ENV"
+          echo "GIT_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+        working-directory: ./target/checkout
+      - name: Docker Buildx Bake(Temurin-snapshot)
+        uses: docker/bake-action@v4
         with:
-          context: ./target/checkout
+          files: docker-bake.hcl
           push: true
-          tags: |
-            "${{ github.repository }}:${{ github.event.inputs.release_version }}"
-            "${{ github.repository }}:latest"
-          build-args: |
-            GIT_BRANCH=${{ github.ref_name }}
-            GIT_REVISION=${{ github.sha }}
+          targets: release
+        env:
+          VERSION: ${{ github.event.inputs.release_version }}"

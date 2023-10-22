@@ -45,3 +45,18 @@ jobs:
             !target/testout/**/fonts/
             !target/testout/**/*.js
           retention-days: 7
+      - name: Set up QEMU (Docker)
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker Buildx Bake(Temurin-snapshot)
+        uses: docker/bake-action@v4
+        with:
+          files: docker-bake.hcl
+          push: false
+          targets: pr
+          set: |
+            *.cache-to=
+      - name: "Test Image: Print help"
+        run: |
+          docker run --rm schemaspy/schemaspy:pr --help
