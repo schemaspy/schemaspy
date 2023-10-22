@@ -87,14 +87,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build docker image
-        if: success()
-        id: docker_build
-        uses: docker/build-push-action@v4
+      - name: Set up QEMU (Docker)
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker Buildx Bake(Temurin-snapshot)
+        uses: docker/bake-action@v4
         with:
-          context: .
+          files: docker-bake.hcl
           push: true
-          tags: "${{ github.repository }}:snapshot"
-          build-args: |
-            GIT_BRANCH=${{ github.ref_name }}
-            GIT_REVISION=${{ github.sha }}
+          targets: snapshot

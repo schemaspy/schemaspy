@@ -2,3 +2,4 @@
 !docker/open-sans.tar.gz
 !docker/schemaspy.sh
 !target/schema*.jar
+!target/checkout/target/schema*.jar
