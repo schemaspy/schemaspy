@@ -53,9 +53,6 @@ public final class ScSimple implements SqlConnection{
         java.sql.Connection connection;
         Driver driver = driversource.driver();
         connection = driver.connect(connectionURL, connectionProperties);
-        if (connection == null) {
-            throw new ConnectionFailure("Cannot connect to '" + connectionURL + "'");
-        }
         return connection;
     }
 }
