@@ -18,18 +18,16 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Test;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.Routine;
-import org.schemaspy.model.Type;
-import org.schemaspy.util.DataTableConfig;
-
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Stream;
+import org.junit.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.model.Type;
+import org.schemaspy.util.DataTableConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -55,17 +53,15 @@ public class HtmlTypesPageTest {
         assertThat(actual.toString()).contains("<td><p>Description for domain <strong>type_tests.test_domain</strong></p></td>");
     }
 
-    private CommandLineArguments parse(String... args) {
+    private CommandLineArguments parse(String...args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(
-                new CommandLineArguments(),
-                (option) -> null
+            Stream
+                .concat(
+                    Arrays.stream(defaultArgs),
+                    Arrays.stream(args)
+                ).toArray(String[]::new)
         )
-                .parse(
-                        Stream
-                                .concat(
-                                        Arrays.stream(defaultArgs),
-                                        Arrays.stream(args)
-                                ).toArray(String[]::new));
+            .commandLineArguments();
     }
 }

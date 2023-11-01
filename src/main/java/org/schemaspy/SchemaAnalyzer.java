@@ -103,6 +103,7 @@ import org.schemaspy.view.HtmlRelationshipsPage;
 import org.schemaspy.view.HtmlRoutinePage;
 import org.schemaspy.view.HtmlRoutinesPage;
 import org.schemaspy.view.HtmlTablePage;
+import org.schemaspy.view.HtmlTypesPage;
 import org.schemaspy.view.MustacheCatalog;
 import org.schemaspy.view.MustacheCompiler;
 import org.schemaspy.view.MustacheSchema;
