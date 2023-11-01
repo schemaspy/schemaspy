@@ -36,12 +36,12 @@ public class PropertiesFinderTest {
 
     @Test
     public void findOnClassPathWithExtension() {
-        URL url = propertiesFinder.find("A0.properties");
+        URL url = propertiesFinder.find("mssql.properties");
         assertThat(url).isNotNull();
     }
     @Test
     public void findOnClassPathWithNoExtension() {
-        URL url = propertiesFinder.find("A0");
+        URL url = propertiesFinder.find("mssql");
         assertThat(url).isNotNull();
     }
 

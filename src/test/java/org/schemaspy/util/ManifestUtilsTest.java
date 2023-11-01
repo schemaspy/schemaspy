@@ -18,7 +18,7 @@
  */
 package org.schemaspy.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,7 +30,7 @@ public class ManifestUtilsTest {
     }
 
     @Test
-    public void getImplementationBuild() {
-        assertThat(ManifestUtils.getImplementationBuild()).isEqualTo("IDE");
+    public void getImplementationRevision() {
+        assertThat(ManifestUtils.getImplementationRevision()).isEqualTo("IDE");
     }
 }

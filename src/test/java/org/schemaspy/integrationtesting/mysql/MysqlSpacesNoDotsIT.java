@@ -22,19 +22,9 @@ import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.model.*;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 
 import javax.script.ScriptException;
@@ -46,22 +36,14 @@ import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class MysqlSpacesNoDotsIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","spaces_no_dots");
-
-    @Autowired
-    private SqlService sqlService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     private static Database database;
 
@@ -70,10 +52,10 @@ public class MysqlSpacesNoDotsIT {
     public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle"))
                             .assumeDockerIsPresent()
                             .withAssumptions(assumeDriverIsPresent())
-                            .withQueryString("?useSSL=false")
+                            .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
                             .withInitScript("integrationTesting/mysql/dbScripts/spacesnodotsit.sql")
                             .withInitUser("root", "test")
             );
@@ -93,24 +75,12 @@ public class MysqlSpacesNoDotsIT {
                 "-cat", "%",
                 "-u", "test",
                 "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
+                "-host", jdbcContainerRule.getContainer().getHost(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
                 "-o", outputPath.toString(),
-                "-connprops", "useSSL\\=false"
+                "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
         };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-                sqlService.getDbmsMeta(),
-                arguments.getConnectionConfig().getDatabaseName(),
-                arguments.getCatalog(),
-                arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
-        MysqlSpacesNoDotsIT.database = database;
+        database = database(args);
     }
 
     @Test

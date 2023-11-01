@@ -23,16 +23,10 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.schemaspy.testing.XmlOutputDiff;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
@@ -47,53 +41,50 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
+
 public class MysqlIllegalFileNameCharsInTableNameIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","htmlillegal");
 
-    private static URL expectedXML = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/illegal.illegal.xml");
-    private static URL expectedDeletionOrder = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/deletionOrder.txt");
-    private static URL expectedInsertionOrder = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/insertionOrder.txt");
+    private static final URL expectedXML = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/illegal.illegal.xml");
+    private static final URL expectedDeletionOrder = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/deletionOrder.txt");
+    private static final URL expectedInsertionOrder = MysqlIllegalFileNameCharsInTableNameIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlillegal/insertionOrder.txt");
 
     @SuppressWarnings("unchecked")
     @ClassRule
     public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5").withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle").withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"))
                         .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
-                        .withQueryString("?useSSL=false")
+                        .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
                         .withInitScript("integrationTesting/mysql/dbScripts/filenameillegal.sql")
                         .withInitUser("root", "test")
             );
 
-    @Autowired
-    private SchemaSpyRunner schemaSpyRunner;
-
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @Before
-    public synchronized void generateHTML() throws Exception {
+    public synchronized void generateHTML() {
         if (shouldRun.get()) {
             String[] args = new String[]{
                     "-t", "mysql",
                     "-db", "illegal",
                     "-s", "illegal",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
+                    "-host", jdbcContainerRule.getContainer().getHost() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-o", outputPath.toString(),
-                    "-connprops", "useSSL\\=false"
+                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true",
+                    "--no-orphans"
             };
-            schemaSpyRunner.run(args);
+            schemaSpyRunner(args).run();
             shouldRun.set(false);
         }
     }

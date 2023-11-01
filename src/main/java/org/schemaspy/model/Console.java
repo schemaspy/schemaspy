@@ -1,91 +1,110 @@
 package org.schemaspy.model;
 
-import org.schemaspy.cli.CommandLineArguments;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
 /**
  * Decorator for rendering console-based details.
  */
 public class Console implements ProgressListener {
-
-    private final CommandLineArguments commandLineArguments;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final File outputDirectory;
     private final ProgressListener origin;
 
-    public Console(final CommandLineArguments commandLineArguments, final ProgressListener origin) {
-        this.commandLineArguments = commandLineArguments;
+    public Console(final File outputDirectory, final ProgressListener origin) {
+        this.outputDirectory = outputDirectory;
         this.origin = origin;
     }
 
     @Override
-    public void startedGatheringDetails() {
-        origin.startedGatheringDetails();
-        System.out.print("Gathering schema details...");
+    public void startCollectingTablesViews() {
+        origin.startCollectingTablesViews();
+        LOGGER.info("Collecting schema information from database");
     }
 
     @Override
-    public void gatheringDetailsProgressed(Table table) {
-        origin.gatheringDetailsProgressed(table);
+    public void tableViewCollected(Table table) {
+        origin.tableViewCollected(table);
         System.out.print('.');
     }
 
     @Override
-    public long startedConnectingTables() {
-        long result = origin.startedConnectingTables();
+    public long finishedCollectingTablesViews() {
+        long result = origin.finishedCollectingTablesViews();
+        System.out.println();
         System.err.flush();
         System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        System.out.print("Connecting relationships...");
+        LOGGER.info("Collection of schema information finished after {} seconds", result/1000);
         return result;
     }
 
     @Override
-    public void connectingTablesProgressed(Table table) {
-        origin.connectingTablesProgressed(table);
+    public void startConnectingTablesViews() {
+        origin.startConnectingTablesViews();
+        LOGGER.info("Connecting tables and views");
+    }
+
+    @Override
+    public void connectedTableView(Table table) {
+        origin.connectedTableView(table);
         System.out.print('.');
     }
 
     @Override
-    public long startedGraphingSummaries() {
-        long result = origin.startedGraphingSummaries();
+    public long finishedConnectingTablesViews() {
+        long result = origin.finishedConnectingTablesViews();
+        System.out.println();
         System.err.flush();
         System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        System.out.print("Writing/graphing summary");
-        System.out.print('.');
-        return result;
-
-    }
-
-    @Override
-    public void graphingSummaryProgressed() {
-        origin.graphingSummaryProgressed();
-        System.out.print('.');
-    }
-
-    @Override
-    public long startedGraphingDetails() {
-        long result = origin.startedGraphingDetails();
-        System.err.flush();
-        System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
-        System.out.print("Writing/diagramming details");
+        LOGGER.info("Tables and views connected after {} seconds", result/1000);
         return result;
     }
 
     @Override
-    public void graphingDetailsProgressed(Table table) {
-        origin.graphingDetailsProgressed(table);
+    public void startCreatingSummaries() {
+        origin.startCreatingSummaries();
+        LOGGER.info("Writing/graphing summaries");
+    }
+
+    @Override
+    public void createdSummary() {
+        origin.createdSummary();
         System.out.print('.');
     }
 
     @Override
-    public long finishedGatheringDetails() {
-        long result = origin.finishedGatheringDetails();
+    public long finishedCreatingSummaries() {
+        long result = origin.finishedCreatingSummaries();
+        System.out.println();
         System.err.flush();
         System.out.flush();
-        System.out.println("(" + result / 1000 + "sec)");
+        LOGGER.info("Summaries created after {} seconds", result/1000);
+        return result;
+    }
+
+    @Override
+    public void startCreatingTablePages() {
+        origin.startCreatingTablePages();
+        LOGGER.info("Creating table/view pages");
+    }
+
+    @Override
+    public void createdTablePage(Table table) {
+        origin.createdTablePage(table);
+        System.out.print('.');
+    }
+
+    @Override
+    public long finishedCreatingTablePages() {
+        long result = origin.finishedCreatingTablePages();
+        System.out.println();
+        System.err.flush();
+        System.out.flush();
+        LOGGER.info("Created table/view pages after {} seconds", result/1000);
         return result;
     }
 
@@ -94,8 +113,7 @@ public class Console implements ProgressListener {
         long result = origin.finished(tables);
         System.err.flush();
         System.out.flush();
-        System.out.println("Wrote relationship details of " + tables.size() + " tables/views to directory '" + commandLineArguments.getOutputDirectory() + "' in " + result / 1000 + " seconds.");
-        System.out.println("View the results by opening " + new File(commandLineArguments.getOutputDirectory(), "index.html"));
+        LOGGER.info("Wrote relationship details of {} tables/view to directory '{}' in {} seconds", tables.size(), outputDirectory, result/1000);
         return result;
     }
 }

@@ -35,22 +35,7 @@ import java.io.File;
 import java.util.*;
 
 /**
- * Holds all supported command line arguments.
- * <p>
- * An instance of this class registered as singleton bean in {@link org.schemaspy.SchemaSpyConfiguration} via {@link CommandLineArgumentParser}.
- * Therefore it can be injected in other beans, for example:
- * </p>
- * <pre>
- *     public class MyService {
- *         private CommandLineArguments arguments;
- *
- *         // use constructor injection
- *         public MyService(CommandLineArguments arguments) {
- *             this.arguments = arguments
- *         }
- *     }
- * </pre>
- *
+ * Coordinating object for command line arguments.
  *
  * @author Thomas Traude
  * @author Nils Petzaell
@@ -116,6 +101,15 @@ public class CommandLineArguments {
         descriptionKey = "noimplied"
     )
     private boolean noImplied = false;
+
+    @Parameter(
+        names = {
+            "--no-orphans",
+            "schemaspy.no-orphans"
+        },
+        descriptionKey = "noorphans"
+    )
+    private boolean noOrphans = false;
 
     @Parameter(
         names = {
@@ -506,6 +500,8 @@ public class CommandLineArguments {
     public boolean withImpliedRelationships() {
         return !noImplied;
     }
+
+    public boolean withOrphans() { return !noOrphans; }
 
     public boolean isRailsEnabled() {
         return railsEnabled;

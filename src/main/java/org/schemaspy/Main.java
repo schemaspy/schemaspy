@@ -25,15 +25,20 @@
  */
 package org.schemaspy;
 
-import org.schemaspy.cli.SchemaSpyRunner;
-import org.schemaspy.logging.StackTraceOmitter;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import com.beust.jcommander.ParameterException;
+import org.schemaspy.cli.*;
+import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
+import org.schemaspy.input.dbms.service.SqlService;
+import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
+import org.schemaspy.util.ManifestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author John Currier
@@ -44,20 +49,84 @@ import java.lang.invoke.MethodHandles;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-@SpringBootApplication
+
 public class Main {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static void main(String... args) {
-        ConfigurableApplicationContext context = SpringApplication.run(Main.class, args);
-        SchemaSpyRunner schemaSpyRunner = context.getBean(SchemaSpyRunner.class);
-        schemaSpyRunner.run(args);
-        if (StackTraceOmitter.hasOmittedStackTrace()) {
-            LOGGER.info("StackTraces have been omitted, use `-debug` when executing SchemaSpy to see them");
+        System.setProperty("java.awt.headless", "true");
+        System.out.println(new Banner( //NOSONAR
+                "/banner.txt",
+                Map.of("${application.version}", ManifestUtils.getImplementationVersion())
+                ).banner()
+        );
+        LOGGER.info("{}", new RuntimeInfo("SchemaSpy", ManifestUtils.getImplementationVersion()));
+        if (Stream.of(args).anyMatch(arg -> arg.equals("-debug") || arg.equals("--debug"))) {
+            enableDebug();
         }
-        int exitCode = SpringApplication.exit(context, () -> 0);
-        System.exit(exitCode);
+        try {
+            CommandLineArgumentParser commandLineArgumentParser =
+                    new CommandLineArgumentParser(
+                            new DefaultProviderFactory(
+                                    new ConfigFileArgumentParser(args).configFile()
+                            ).defaultProvider(),
+                            args
+                    );
+            CommandLineArguments arguments = commandLineArgumentParser.commandLineArguments();
+            run(commandLineArgumentParser, arguments, args);
+        } catch (ParameterException pe) {
+            LOGGER.error("Invalid command line arguments:", pe);
+            System.exit(1);
+        }
     }
 
+    private static void run(
+            CommandLineArgumentParser commandLineArgumentParser,
+            CommandLineArguments arguments,
+            String...args
+    ) {
+        if (arguments.isHelpRequired()) {
+            commandLineArgumentParser.printUsage();
+             System.exit(0);
+        }
+
+        if (arguments.isDbHelpRequired()) {
+            commandLineArgumentParser.printDatabaseTypesHelp();
+            System.exit(0);
+        }
+
+        if (arguments.isPrintLicense()) {
+            commandLineArgumentParser.printLicense();
+            System.exit(0);
+        }
+
+        if (arguments.isDebug()) {
+            enableDebug();
+            LOGGER.debug("Debug enabled");
+        }
+        SqlService sqlService = new SqlService();
+        SchemaSpyRunner schemaSpyRunner =
+                new SchemaSpyRunner(
+                        new SchemaAnalyzer(
+                                sqlService,
+                                new DatabaseServiceFactory(sqlService),
+                                arguments,
+                                new XmlProducerUsingDOM(),
+                                new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
+                        ),
+                        arguments,
+                        args
+                );
+        System.exit(schemaSpyRunner.run());
+    }
+
+    private static void enableDebug() {
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        ch.qos.logback.classic.Logger logger = context.getLogger("org.schemaspy");
+        if (!logger.isDebugEnabled()) {
+            logger.setLevel(Level.DEBUG);
+            LOGGER.debug("Debug enabled");
+        }
+    }
 }

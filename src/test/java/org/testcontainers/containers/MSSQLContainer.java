@@ -54,4 +54,10 @@ public class MSSQLContainer extends MSSQLServerContainer {
     public String getUsername() {
         return "sa";
     }
+
+    @Override
+    public MSSQLContainer withInitScript(String initScriptPath) {
+        super.withInitScript(initScriptPath);
+        return this;
+    }
 }

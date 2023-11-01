@@ -18,28 +18,16 @@
  */
 package org.schemaspy.integrationtesting.oracle;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
-import org.schemaspy.testing.AssumeClassIsPresentRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.OracleContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -48,42 +36,27 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
+@DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
+@Testcontainers(disabledWithoutDocker = true)
 public class OracleIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","oracle","oracle");
 
-    @Autowired
-    private SqlService sqlService;
-
-    @Mock
-    private ProgressListener progressListener;
-
     private static Database database;
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("oracle.jdbc.OracleDriver");
+    @Container
+    public static final OracleContainer oracleContainer =
+            new OracleContainer("gvenzl/oracle-xe:11")
+                    .usingSid()
+                    .withInitScript("integrationTesting/oracle/dbScripts/oracle.sql");
 
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<OracleContainer> jdbcContainerRule =
-            new JdbcContainerRule<>(() -> new OracleContainer("gvenzl/oracle-xe:11").usingSid())
-            .assumeDockerIsPresent()
-            .withAssumptions(assumeDriverIsPresent())
-            .withInitScript("integrationTesting/oracle/dbScripts/oracle.sql");
-
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
-
-    @Before
+    @BeforeEach
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
         if (database == null) {
             createDatabaseRepresentation();
@@ -93,45 +66,33 @@ public class OracleIT {
     private void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "orathin",
-                "-db", jdbcContainerRule.getContainer().getSid(),
+                "-db", oracleContainer.getSid(),
                 "-s", "ORAIT",
                 "-cat", "%",
                 "-o", outputPath.toString(),
                 "-u", "orait",
                 "-p", "orait123",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getOraclePort().toString()
+                "-host", oracleContainer.getHost(),
+                "-port", oracleContainer.getOraclePort().toString()
         };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-            sqlService.getDbmsMeta(),
-            arguments.getConnectionConfig().getDatabaseName(),
-            arguments.getCatalog(),
-            arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
-        OracleIT.database = database;
+        database = database(args);
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTest() {
+    void databaseShouldBePopulatedWithTableTest() {
         Table table = getTable("TEST");
         assertThat(table).isNotNull();
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
+    void databaseShouldBePopulatedWithTableTestAndHaveColumnName() {
         Table table = getTable("TEST");
         TableColumn column = table.getColumn("NAME");
         assertThat(column).isNotNull();
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTestAndHaveColumnNameWithComment() {
+    void databaseShouldBePopulatedWithTableTestAndHaveColumnNameWithComment() {
         Table table = getTable("TEST");
         TableColumn column = table.getColumn("NAME");
         assertThat(column.getComments()).isEqualToIgnoringCase("the name");
@@ -141,3 +102,9 @@ public class OracleIT {
         return database.getTablesMap().get(tableName);
     }
 }
+
+
+
+
+
+

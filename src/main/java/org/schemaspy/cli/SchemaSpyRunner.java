@@ -18,7 +18,6 @@
  */
 package org.schemaspy.cli;
 
-import com.beust.jcommander.ParameterException;
 import org.schemaspy.SchemaAnalyzer;
 import org.schemaspy.input.dbms.MissingParameterException;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
@@ -27,19 +26,13 @@ import org.schemaspy.model.InvalidConfigurationException;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ExitCodeGenerator;
-import org.springframework.boot.logging.LogLevel;
-import org.springframework.boot.logging.LoggingSystem;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-@Component
-public class SchemaSpyRunner implements ExitCodeGenerator {
+public class SchemaSpyRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -49,72 +42,35 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
     private static final int EXIT_CODE_CONNECTION_ERROR = 3;
     private static final int EXIT_CODE_CONFIG_ERROR = 4;
     private static final int EXIT_CODE_MISSING_PARAMETER = 5;
+    private static final int EXIT_CODE_SQL_EXCEPTION = 6;
+    private static final int EXIT_IO_ERROR = 7;
 
     private final SchemaAnalyzer analyzer;
 
     private final CommandLineArguments arguments;
 
-    private final CommandLineArgumentParser commandLineArgumentParser;
+    private final String[] args;
 
-    private final LoggingSystem loggingSystem;
-
-    private int exitCode = EXIT_CODE_OK;
-
-    @Autowired
     public SchemaSpyRunner(
         SchemaAnalyzer analyzer,
         CommandLineArguments arguments,
-        CommandLineArgumentParser commandLineArgumentParser,
-        LoggingSystem loggingSystem
+        String...args
     ) {
         this.analyzer = analyzer;
         this.arguments = arguments;
-        this.commandLineArgumentParser = commandLineArgumentParser;
-        this.loggingSystem = loggingSystem;
+        this.args = args;
     }
 
-    public void run(String... args) {
+    public int run() {
         try {
-            commandLineArgumentParser.parse(args);
-        } catch (ParameterException e) {
-            LOGGER.error(e.getLocalizedMessage(),e);
-            exitCode = 1;
-            return;
-        }
-        if (arguments.isHelpRequired()) {
-            commandLineArgumentParser.printUsage();
-            return;
-        }
-
-        if (arguments.isDbHelpRequired()) {
-            commandLineArgumentParser.printDatabaseTypesHelp();
-            return;
-        }
-
-        if (arguments.isDebug()) {
-            enableDebug();
-        }
-
-        runAnalyzer(args);
-    }
-
-    public void enableDebug() {
-        loggingSystem.setLogLevel("org.schemaspy", LogLevel.DEBUG);
-        LOGGER.debug("Debug enabled");
-    }
-
-    private void runAnalyzer(String... args) {
-        exitCode = EXIT_CODE_GENERIC_ERROR;
-        try {
-            exitCode = analyzer.analyze() == null ? EXIT_CODE_GENERIC_ERROR : EXIT_CODE_OK;
+            return analyzer.analyze() == null ? EXIT_CODE_GENERIC_ERROR : EXIT_CODE_OK;
         } catch (ConnectionFailure couldntConnect) {
             LOGGER.warn("Connection Failure", couldntConnect);
-            exitCode = EXIT_CODE_CONNECTION_ERROR;
+            return EXIT_CODE_CONNECTION_ERROR;
         } catch (EmptySchemaException noData) {
-            LOGGER.warn("Empty schema", noData);
-            exitCode = EXIT_CODE_EMPTY_SCHEMA;
+            LOGGER.warn("Empty schema");
+            return EXIT_CODE_EMPTY_SCHEMA;
         } catch (InvalidConfigurationException badConfig) {
-            exitCode = EXIT_CODE_CONFIG_ERROR;
             LOGGER.debug("Command line parameters: {}", Arrays.asList(args));
             if (badConfig.getParamName() != null) {
                 LOGGER.error(
@@ -126,20 +82,24 @@ public class SchemaSpyRunner implements ExitCodeGenerator {
             } else {
                 LOGGER.error("Bad config", badConfig);
             }
+            return EXIT_CODE_CONFIG_ERROR;
         } catch (MissingParameterException mrpe) {
-            exitCode = EXIT_CODE_MISSING_PARAMETER;
             LOGGER.error("*** {} ***", mrpe.getMessage());
-            LOGGER.info("Missing required connection parameters for '-t {}'", arguments.getConnectionConfig().getDatabaseType());
-            new DbSpecificConfig(arguments.getConnectionConfig().getDatabaseType(), arguments.getConnectionConfig().getDatabaseTypeProperties()).dumpUsage();
+            LOGGER.info(
+                    "Missing required connection parameters for '-t {}'",
+                    arguments.getConnectionConfig().getDatabaseType()
+            );
+            new DbSpecificConfig(
+                    arguments.getConnectionConfig().getDatabaseType(),
+                    arguments.getConnectionConfig().getDatabaseTypeProperties()
+            ).dumpUsage(LOGGER);
+            return EXIT_CODE_MISSING_PARAMETER;
         } catch (SQLException e) {
             LOGGER.error("SqlException", e);
+            return EXIT_CODE_SQL_EXCEPTION;
         } catch (IOException e) {
             LOGGER.error("IOException", e);
+            return EXIT_IO_ERROR;
         }
-    }
-
-    @Override
-    public int getExitCode() {
-        return exitCode;
     }
 }

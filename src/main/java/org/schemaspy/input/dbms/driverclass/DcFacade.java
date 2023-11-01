@@ -1,5 +1,7 @@
 package org.schemaspy.input.dbms.driverclass;
 
+import java.lang.invoke.MethodHandles;
+import org.schemaspy.input.dbms.classloader.ClassloaderSource;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 
 import java.sql.Driver;
@@ -7,30 +9,43 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simplifies the logic for obtaining a JDBC driver's class.
  */
 public class DcFacade implements Driverclass {
+    private final Logger logger;
     private final String[] driverClasses;
-    private final ClassLoader loader;
-    private final String message;
+    private final ClassloaderSource loader;
 
-    public DcFacade(final String[] driverClasses, final ClassLoader loader, final String message) {
+    public DcFacade(final String[] driverClasses, final ClassloaderSource loader) {
+        this(LoggerFactory.getLogger(MethodHandles.lookup().lookupClass()), driverClasses, loader);
+    }
+
+    public DcFacade(final Logger logger, final String[] driverClasses, final ClassloaderSource loader) {
+        this.logger = logger;
         this.driverClasses = driverClasses;
         this.loader = loader;
-        this.message = message;
     }
 
     @Override
     public Class<Driver> value() {
         List<Driverclass> candidates = Arrays.stream(this.driverClasses)
-                .map(candidate -> new DcErrorLogged(new DcClassloader(candidate, this.loader)))
+                .map(candidate -> new DcErrorLogged(new DcClassloader(candidate, this.loader.classloader())))
                 .collect(Collectors.toList());
+        final Class<Driver> result;
         try {
-            return new DcIterator(candidates.iterator()).value();
+            result = new DcIterator(candidates.iterator()).value();
         } catch (NoSuchElementException e) {
-            throw new ConnectionFailure(this.message);
+            throw new ConnectionFailure(
+                String.format(
+                    "Failed to create any of '%s' driver from driver path.", String.join(", ", this.driverClasses)
+                )
+            );
         }
+        this.logger.debug(String.format("Using driver '%s'", result.getName()));
+        return result;
     }
 }

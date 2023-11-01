@@ -81,15 +81,6 @@ public class ConnectionConfigCli implements ConnectionConfig {
     )
     private String driverPath;
 
-    @Parameter(
-        names = {
-            "-loadjars","--load-sibling-jars",
-            "schemaspy.loadjars", "schemaspy.load-sibling-jars"
-        },
-        descriptionKey = "loadsiblings"
-    )
-    private boolean loadSiblings = false;
-
     private final DatabaseTypeConfig databaseTypeConfig;
     private List<String> remainingArguments = Collections.emptyList();
 
@@ -148,11 +139,6 @@ public class ConnectionConfigCli implements ConnectionConfig {
     @Override
     public String getDriverPath() {
         return driverPath;
-    }
-
-    @Override
-    public boolean withLoadSiblings() {
-        return loadSiblings;
     }
 
     public void setRemainingArguments(List<String> remainingArguments) {

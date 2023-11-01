@@ -1,2 +1,3 @@
 build
 source/_ext/__pycache__/
+.python-version

@@ -111,9 +111,8 @@ public class DatabaseService {
     }
 
     public void gatherSchemaDetails(Database db, SchemaMeta schemaMeta, ProgressListener listener) throws SQLException {
-        LOGGER.info("Gathering schema details");
 
-        listener.startedGatheringDetails();
+        listener.startCollectingTablesViews();
 
         DatabaseMetaData meta = sqlService.getDatabaseMetaData();
 
@@ -136,10 +135,13 @@ public class DatabaseService {
         typeService.gatherTypes(db);
         sequenceService.gatherSequences(db);
 
-        listener.startedConnectingTables();
+        listener.finishedCollectingTablesViews();
+        listener.startConnectingTablesViews();
 
         connectTables(db, listener);
         updateFromXmlMetadata(db, schemaMeta);
+
+        listener.finishedConnectingTablesViews();
     }
     
     private void initCatalogs(Database db) throws SQLException {
@@ -233,7 +235,7 @@ public class DatabaseService {
                 View view = new View(db, entry.getCatalog(), entry.getSchema(), entry.getName(),
                         entry.getRemarks(), entry.getViewDefinition());
                 viewService.gatherViewsDetails(db, view);
-                listener.gatheringDetailsProgressed(view);
+                listener.tableViewCollected(view);
                 LOGGER.debug("Found details of view {}", view.getName());
             }
         }
@@ -312,11 +314,11 @@ public class DatabaseService {
         }
     }
 
-    private void connectTables(Database db, ProgressListener listener) throws SQLException {
+    private void connectTables(Database db, ProgressListener listener) {
         Instant startTables = clock.instant();
         Duration durationOneTable = null;
         for (Table table : db.getTables()) {
-            listener.connectingTablesProgressed(table);
+            listener.connectedTableView(table);
 
             tableService.connectForeignKeys(db, table, db.getLocals());
             if (Objects.isNull(durationOneTable)) {
@@ -331,7 +333,7 @@ public class DatabaseService {
         Instant startViews = clock.instant();
         Duration durationOneView = null;
         for (Table view : db.getViews()) {
-            listener.connectingTablesProgressed(view);
+            listener.connectedTableView(view);
 
             tableService.connectForeignKeys(db, view, db.getLocals());
             if (Objects.isNull(durationOneView)) {
@@ -373,7 +375,7 @@ public class DatabaseService {
                 db.getTablesMap().put(table.getName(), table);
             }
 
-            listener.gatheringDetailsProgressed(table);
+            listener.tableViewCollected(table);
 
             LOGGER.debug("Retrieved details of {}", table.getFullName());
         }

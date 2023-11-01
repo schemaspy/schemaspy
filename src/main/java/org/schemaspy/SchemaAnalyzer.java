@@ -25,9 +25,31 @@
  */
 package org.schemaspy;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.input.dbms.CatalogResolver;
@@ -37,7 +59,17 @@ import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.input.dbms.xml.SchemaMeta;
-import org.schemaspy.model.*;
+import org.schemaspy.logging.Sanitize;
+import org.schemaspy.model.Console;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.DbmsMeta;
+import org.schemaspy.model.EmptySchemaException;
+import org.schemaspy.model.ForeignKeyConstraint;
+import org.schemaspy.model.ImpliedForeignKeyConstraint;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Routine;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.Tracked;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.diagram.Renderer;
@@ -53,29 +85,31 @@ import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramFactory
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
 import org.schemaspy.output.html.mustache.diagrams.MustacheTableDiagramFactory;
 import org.schemaspy.output.html.mustache.diagrams.OrphanDiagram;
-import org.schemaspy.util.*;
+import org.schemaspy.progress.ConditionalProgress;
+import org.schemaspy.progress.IfUpdateAfter;
+import org.schemaspy.util.DataTableConfig;
+import org.schemaspy.util.DefaultPrintWriter;
+import org.schemaspy.util.ManifestUtils;
+import org.schemaspy.util.Markdown;
 import org.schemaspy.util.copy.CopyFromUrl;
 import org.schemaspy.util.naming.FileNameGenerator;
-import org.schemaspy.view.*;
+import org.schemaspy.view.HtmlAnomaliesPage;
+import org.schemaspy.view.HtmlColumnsPage;
+import org.schemaspy.view.HtmlConstraintsPage;
+import org.schemaspy.view.HtmlMainIndexPage;
+import org.schemaspy.view.HtmlMultipleSchemasIndexPage;
+import org.schemaspy.view.HtmlOrphansPage;
+import org.schemaspy.view.HtmlRelationshipsPage;
+import org.schemaspy.view.HtmlRoutinePage;
+import org.schemaspy.view.HtmlRoutinesPage;
+import org.schemaspy.view.HtmlTablePage;
+import org.schemaspy.view.MustacheCatalog;
+import org.schemaspy.view.MustacheCompiler;
+import org.schemaspy.view.MustacheSchema;
+import org.schemaspy.view.MustacheTableDiagram;
+import org.schemaspy.view.SqlAnalyzer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.invoke.MethodHandles;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author John Currier
@@ -88,9 +122,9 @@ import java.util.stream.Collectors;
  */
 public class SchemaAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final int SECONDS_IN_MS = 1000;
     private static final String DOT_HTML = ".html";
     private static final String INDEX_DOT_HTML = "index.html";
+    private static final String LOG_SCHEMAS_FORMAT = "\t'{}'";
 
     private final SqlService sqlService;
     private final DatabaseServiceFactory databaseServiceFactory;
@@ -116,17 +150,10 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze() throws SQLException, IOException {
-        ProgressListener progressListener = new Tracked();
-        // don't render console-based detail unless we're generating HTML (those probably don't have a user watching)
-        // and not already logging fine details (to keep from obfuscating those)
-        if (commandLineArguments.isHtmlEnabled()) {
-            progressListener = new Console(commandLineArguments, progressListener);
-        }
 
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
-                    databaseServiceFactory.forMultipleSchemas(commandLineArguments.getProcessingConfig()),
-                    progressListener
+                    databaseServiceFactory.forMultipleSchemas(commandLineArguments.getProcessingConfig())
             );
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
@@ -137,15 +164,13 @@ public class SchemaAnalyzer {
                     schema,
                     false,
                     outputDirectory,
-                    databaseServiceFactory.forSingleSchema(commandLineArguments.getProcessingConfig()),
-                    progressListener
+                    databaseServiceFactory.forSingleSchema(commandLineArguments.getProcessingConfig())
             );
         }
     }
 
     public Database analyzeMultipleSchemas(
-            DatabaseService databaseService,
-            ProgressListener progressListener
+            DatabaseService databaseService
     ) throws SQLException, IOException {
         List<String> schemas = commandLineArguments.getSchemas();
         Database db = null;
@@ -157,17 +182,24 @@ public class SchemaAnalyzer {
             LOGGER.info(
                     "Analyzing schemas that match regular expression '{}'. " +
                     "(use -schemaSpec on command line or in .properties to exclude other schemas)",
-                    schemaSpec);
-            schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, false);
-            if (schemas.isEmpty())
-                schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec, true);
-            if (schemas.isEmpty())
+                    new Sanitize(schemaSpec));
+            schemas = DbAnalyzer.getPopulatedSchemas(meta, schemaSpec);
+            if (schemas.isEmpty() && Objects.nonNull(commandLineArguments.getConnectionConfig().getUser())) {
                 schemas.add(commandLineArguments.getConnectionConfig().getUser());
+            }
+            if (schemas.isEmpty()) {
+                LOGGER.error("Couldn't find any schemas to analyze using schemaSpec '{}'", new Sanitize(schemaSpec));
+                return null;
+            }
         }
 
-        LOGGER.info("Analyzing schemas: {}{}",
-                System.lineSeparator(),
-                schemas.stream().map(s -> String.format("'%s'", s)).collect(Collectors.joining(System.lineSeparator())));
+        LOGGER.info("Analyzing schemas:");
+        schemas.forEach(
+            schemaName -> LOGGER.info(
+                LOG_SCHEMAS_FORMAT,
+                new Sanitize(schemaName)
+            )
+        );
 
         File outputDir = commandLineArguments.getOutputDirectory();
 
@@ -181,34 +213,33 @@ public class SchemaAnalyzer {
                 ? commandLineArguments.getConnectionConfig().getDatabaseName()
                 : schema;
 
-            LOGGER.info("Analyzing '{}'", schema);
+            LOGGER.info("Analyzing '{}'", new Sanitize(schema));
             File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
-            db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService, progressListener);
+            db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService);
             if (db == null) //if any of analysed schema returns null
                 return null;
             mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
             mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
         }
 
-        new CopyFromUrl(layoutFolder.url(), outputDir, notHtml()).copy();
+        if (commandLineArguments.isHtmlEnabled()) {
+            new CopyFromUrl(layoutFolder.url(), outputDir, notHtml()).copy();
 
-        DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
-        MustacheCompiler mustacheCompiler = new MustacheCompiler(
-            commandLineArguments.getConnectionConfig().getDatabaseName(),
-            null,
-            commandLineArguments.getHtmlConfig(),
-            true,
-            dataTableConfig
-        );
-        HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
-        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
-            htmlMultipleSchemasIndexPage.write(
-                mustacheCatalog,
-                mustacheSchemas,
-                commandLineArguments.getHtmlConfig().getDescription(),
-                getDatabaseProduct(meta),
-                writer
+            DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
+            MustacheCompiler mustacheCompiler = new MustacheCompiler(commandLineArguments.getConnectionConfig().getDatabaseName(),
+                null, commandLineArguments.getHtmlConfig(), true, dataTableConfig
             );
+            HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(
+                mustacheCompiler);
+            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
+                htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas,
+                    commandLineArguments.getHtmlConfig().getDescription(), getDatabaseProduct(meta), writer
+                );
+                LOGGER.info(
+                    "Access navigation to reports by opening {}",
+                    new File(outputDir, INDEX_DOT_HTML)
+                );
+            }
         }
         return db;
     }
@@ -232,10 +263,10 @@ public class SchemaAnalyzer {
             String schema,
             boolean isOneOfMultipleSchemas,
             File outputDir,
-            DatabaseService databaseService,
-            ProgressListener progressListener
+            DatabaseService databaseService
     ) throws SQLException, IOException {
         LOGGER.info("Starting schema analysis");
+        ProgressListener progressListener = new Console(outputDir, new Tracked());
 
         FileUtils.forceMkdir(outputDir);
 
@@ -243,6 +274,7 @@ public class SchemaAnalyzer {
 
         DatabaseMetaData databaseMetaData = sqlService.connect(commandLineArguments.getConnectionConfig());
         DbmsMeta dbmsMeta = sqlService.getDbmsMeta();
+        LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
 
         LOGGER.debug("supportsSchemasInTableDefinitions: {}", databaseMetaData.supportsSchemasInTableDefinitions());
         LOGGER.debug("supportsCatalogsInTableDefinitions: {}", databaseMetaData.supportsCatalogsInTableDefinitions());
@@ -251,16 +283,16 @@ public class SchemaAnalyzer {
         catalog = new CatalogResolver(databaseMetaData).resolveCatalog(catalog);
         schema = new SchemaResolver(databaseMetaData).resolveSchema(schema);
 
-        SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null ? null : new SchemaMeta(commandLineArguments.getSchemaMeta(), dbName, schema, isOneOfMultipleSchemas);
-        if (commandLineArguments.isHtmlEnabled()) {
-            FileUtils.forceMkdir(new File(outputDir, "tables"));
-            FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
-
-            LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
-
-            if (schemaMeta != null && schemaMeta.getFile() != null) {
-                LOGGER.info("Using additional metadata from {}", schemaMeta.getFile());
-            }
+        SchemaMeta schemaMeta = commandLineArguments.getSchemaMeta() == null
+            ? null
+            : new SchemaMeta(
+                commandLineArguments.getSchemaMeta(),
+                dbName,
+                schema,
+                isOneOfMultipleSchemas
+            );
+        if (schemaMeta != null && schemaMeta.getFile() != null) {
+            LOGGER.info("Using additional metadata from {}", schemaMeta.getFile());
         }
 
         //
@@ -284,7 +316,6 @@ public class SchemaAnalyzer {
                 throw new EmptySchemaException();
         }
 
-        long duration = progressListener.startedGraphingSummaries();
         if (commandLineArguments.isHtmlEnabled()) {
             generateHtmlDoc(
                     schema,
@@ -293,7 +324,6 @@ public class SchemaAnalyzer {
                     progressListener,
                     outputDir,
                     db,
-                    duration,
                     tables
             );
         }
@@ -314,15 +344,7 @@ public class SchemaAnalyzer {
 
         new OrderingReport(outputDir, orderedTables).write();
 
-        duration = progressListener.finishedGatheringDetails();
-        long overallDuration = progressListener.finished(tables);
-
-        if (commandLineArguments.isHtmlEnabled()) {
-            LOGGER.info("Wrote table details in {} seconds", duration / SECONDS_IN_MS);
-
-            LOGGER.info("Wrote relationship details of {} tables/views to directory '{}' in {} seconds.", tables.size(), outputDir, overallDuration / SECONDS_IN_MS);
-            LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
-        }
+        progressListener.finished(tables);
 
         return db;
     }
@@ -334,11 +356,11 @@ public class SchemaAnalyzer {
             ProgressListener progressListener,
             File outputDir,
             Database db,
-            long duration,
             Collection<Table> tables
     ) throws IOException {
-        LOGGER.info("Gathered schema details in {} seconds", duration / SECONDS_IN_MS);
-        LOGGER.info("Writing/graphing summary");
+
+        FileUtils.forceMkdir(new File(outputDir, "tables"));
+        FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
         Markdown.registryPage(tables);
 
@@ -351,9 +373,9 @@ public class SchemaAnalyzer {
         writeInfo("date", ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ")), htmlInfoFile);
         writeInfo("os", System.getProperty("os.name") + " " + System.getProperty("os.version"), htmlInfoFile);
         writeInfo("schemaspy-version", ManifestUtils.getImplementationVersion(), htmlInfoFile);
-        writeInfo("schemaspy-build", ManifestUtils.getImplementationBuild(), htmlInfoFile);
+        writeInfo("schemaspy-revision", ManifestUtils.getImplementationRevision(), htmlInfoFile);
         writeInfo("renderer", renderer.identifier(), htmlInfoFile);
-        progressListener.graphingSummaryProgressed();
+        progressListener.startCreatingSummaries();
 
         boolean hasRealConstraints = !db.getRemoteTables().isEmpty() || tables.stream().anyMatch(table -> !table.isOrphan(false));
 
@@ -382,7 +404,7 @@ public class SchemaAnalyzer {
             isOneOfMultipleSchemas
         );
 
-        DotFormatter dotProducer = new DotFormatter(runtimeDotConfig);
+        DotFormatter dotProducer = new DotFormatter(runtimeDotConfig, commandLineArguments.withOrphans());
 
         File diagramDir = new File(outputDir, "diagrams");
         diagramDir.mkdirs();
@@ -391,8 +413,16 @@ public class SchemaAnalyzer {
         SummaryDiagram summaryDiagram = new SummaryDiagram(renderer, summaryDir);
 
 
-        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory = new MustacheSummaryDiagramFactory(dotProducer, summaryDiagram, hasRealConstraints, !impliedConstraints.isEmpty() , outputDir);
-        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables, progressListener);
+        MustacheSummaryDiagramFactory mustacheSummaryDiagramFactory =
+            new MustacheSummaryDiagramFactory(
+                dotProducer,
+                summaryDiagram,
+                hasRealConstraints,
+                !impliedConstraints.isEmpty(),
+                outputDir,
+                progressListener
+            );
+        MustacheSummaryDiagramResults results = mustacheSummaryDiagramFactory.generateSummaryDiagrams(db, tables);
         results.getOutputExceptions().stream().forEachOrdered(exception ->
                 LOGGER.error("RelationShipDiagramError", exception)
         );
@@ -408,9 +438,8 @@ public class SchemaAnalyzer {
         HtmlRelationshipsPage htmlRelationshipsPage = new HtmlRelationshipsPage(mustacheCompiler, hasRealConstraints, !impliedConstraints.isEmpty());
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("relationships.html").toFile())) {
             htmlRelationshipsPage.write(results, writer);
+            progressListener.createdSummary();
         }
-
-        progressListener.graphingSummaryProgressed();
 
         HtmlOrphansPage htmlOrphansPage = new HtmlOrphansPage(
                 mustacheCompiler,
@@ -422,9 +451,8 @@ public class SchemaAnalyzer {
         );
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("orphans.html").toFile())) {
             htmlOrphansPage.write(writer);
+            progressListener.createdSummary();
         }
-
-        progressListener.graphingSummaryProgressed();
 
         HtmlMainIndexPage htmlMainIndexPage = new HtmlMainIndexPage(
             mustacheCompiler,
@@ -434,8 +462,6 @@ public class SchemaAnalyzer {
             htmlMainIndexPage.write(db, tables, impliedConstraints, writer);
         }
 
-        progressListener.graphingSummaryProgressed();
-
         List<ForeignKeyConstraint> constraints = DbAnalyzer.getForeignKeyConstraints(tables);
 
         HtmlConstraintsPage htmlConstraintsPage = new HtmlConstraintsPage(mustacheCompiler);
@@ -443,33 +469,61 @@ public class SchemaAnalyzer {
             htmlConstraintsPage.write(constraints, tables, writer);
         }
 
-        progressListener.graphingSummaryProgressed();
-
         HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("anomalies.html").toFile())) {
             htmlAnomaliesPage.write(tables, impliedConstraints, writer);
         }
-
-        progressListener.graphingSummaryProgressed();
 
         HtmlColumnsPage htmlColumnsPage = new HtmlColumnsPage(mustacheCompiler);
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("columns.html").toFile())) {
             htmlColumnsPage.write(tables, writer);
         }
 
-        progressListener.graphingSummaryProgressed();
+        progressListener.finishedCreatingSummaries();
 
         HtmlRoutinesPage htmlRoutinesPage = new HtmlRoutinesPage(mustacheCompiler);
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("routines.html").toFile())) {
             htmlRoutinesPage.write(db.getRoutines(), writer);
         }
+        new ConditionalProgress<>(
+            (increments -> LOGGER.info(
+                "Written {} routines pages...",
+                increments)
+            ),
+            (increments, duration) -> LOGGER.info(
+                "Wrote {} routines pages in {} seconds",
+                increments,
+                duration.toSeconds()
+            ),
+            new IfUpdateAfter(
+                Duration.ofSeconds(10),
+                Clock.systemDefaultZone()
+            ),
+            progress -> {
+                LOGGER.info("Writing routines pages");
+                HtmlRoutinePage htmlRoutinePage =
+                    new HtmlRoutinePage(mustacheCompiler);
+                for (Routine routine : db.getRoutines()) {
+                    try (Writer writer =
+                        new DefaultPrintWriter(
+                            outputDir
+                                .toPath()
+                                .resolve("routines")
+                                .resolve(
+                                    new FileNameGenerator(routine.getName()).value()
+                                        + DOT_HTML
+                                )
+                                .toFile()
+                        )
+                    ) {
+                        htmlRoutinePage.write(routine, writer);
+                        progress.progressed();
+                    }
+                }
+            },
+            Clock.systemDefaultZone()
+        ).execute();
 
-        HtmlRoutinePage htmlRoutinePage = new HtmlRoutinePage(mustacheCompiler);
-        for (Routine routine : db.getRoutines()) {
-            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("routines").resolve(new FileNameGenerator(routine.getName()).value() + DOT_HTML).toFile())) {
-                htmlRoutinePage.write(routine, writer);
-            }
-        }
 
         HtmlTypesPage htmlTypesPage = new HtmlTypesPage(mustacheCompiler);
         try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("types.html").toFile())) {
@@ -478,10 +532,7 @@ public class SchemaAnalyzer {
 
         // create detailed diagrams
 
-        duration = progressListener.startedGraphingDetails();
-
-        LOGGER.info("Completed summary in {} seconds", duration / SECONDS_IN_MS);
-        LOGGER.info("Writing/diagramming details");
+        progressListener.startCreatingTablePages();
         SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getIdentifierQuoteString(), db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
 
         File tablesDir = new File(diagramDir, "tables");
@@ -491,24 +542,43 @@ public class SchemaAnalyzer {
         HtmlTablePage htmlTablePage = new HtmlTablePage(mustacheCompiler, sqlAnalyzer);
         for (Table table : tables) {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table);
-            progressListener.graphingDetailsProgressed(table);
             LOGGER.debug("Writing details of {}", table.getName());
             try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("tables").resolve(new FileNameGenerator(table.getName()).value() + DOT_HTML).toFile())) {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
+                progressListener.createdTablePage(table);
             }
         }
+        progressListener.finishedCreatingTablePages();
+        LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
     }
 
     private FileFilter notHtml() {
-        IOFileFilter notHtmlFilter = FileFilterUtils.notFileFilter(FileFilterUtils.suffixFileFilter(DOT_HTML));
-        return FileFilterUtils.and(notHtmlFilter);
+        return FileFilterUtils
+            .and(
+                FileFilterUtils
+                    .notFileFilter(
+                        FileFilterUtils.suffixFileFilter(DOT_HTML)
+                    )
+            );
     }
 
     private static void writeInfo(String key, String value, Path infoFile) {
         try {
-            Files.write(infoFile, (key + "=" + value + "\n").getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+            Files.write(
+                infoFile,
+                (key + "=" + value + "\n").getBytes(StandardCharsets.UTF_8),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.APPEND,
+                StandardOpenOption.WRITE)
+            ;
         } catch (IOException e) {
-            LOGGER.error("Failed to write '{}', to '{}'", key + "=" + value, infoFile, e);
+            LOGGER.error(
+                "Failed to write '{}', to '{}={}'",
+                new Sanitize(key),
+                new Sanitize(value),
+                infoFile,
+                e
+            );
         }
     }
 
@@ -519,23 +589,47 @@ public class SchemaAnalyzer {
      * @param user   String
      * @param meta   DatabaseMetaData
      */
-    private static void dumpNoTablesMessage(String schema, String user, DatabaseMetaData meta, boolean specifiedInclusions) throws SQLException {
-        LOGGER.warn("No tables or views were found in schema '{}'.", schema);
+    private static void dumpNoTablesMessage(
+        String schema,
+        String user,
+        DatabaseMetaData meta,
+        boolean specifiedInclusions
+    ) throws SQLException {
+        LOGGER.warn(
+            "No tables or views were found in schema '{}'.",
+            new Sanitize(schema)
+        );
         List<String> schemas;
         try {
             schemas = DbAnalyzer.getSchemas(meta);
         } catch (SQLException | RuntimeException exc) {
-            LOGGER.error("The user you specified '{}' might not have rights to read the database metadata.", user, exc);
+            LOGGER.error(
+                "The user you specified '{}' might not have rights to read the database metadata.",
+                new Sanitize(user),
+                exc
+            );
             return;
         }
 
-        if (Objects.isNull(schemas)) {
-            LOGGER.error("Failed to retrieve any schemas");
-        } else if (schemas.contains(schema)) {
+        if (schemas.isEmpty()) {
+            try {
+                schemas = DbAnalyzer.getCatalogs(meta);
+            } catch (SQLException | RuntimeException exc) {
+                LOGGER.error(
+                    "The user you specified '{}' might not have rights to read the database metadata.",
+                    new Sanitize(user),
+                    exc
+                );
+                return;
+            }
+        }
+
+        if (schemas.contains(schema)) {
             LOGGER.error(
                     "The schema exists in the database, but the user you specified '{}'" +
                     "might not have rights to read its contents.",
-                    user);
+                    new Sanitize(user)
+            );
             if (specifiedInclusions) {
                 LOGGER.error(
                         "Another possibility is that the regular expression that you specified " +
@@ -543,22 +637,46 @@ public class SchemaAnalyzer {
             }
         } else {
             LOGGER.error(
-                    "The schema '{}' could not be read/found, schema is specified using the -s option." +
-                    "Make sure user '{}' has the correct privileges to read the schema." +
-                    "Also not that schema names are usually case sensitive.",
-                    schema, user);
-            LOGGER.info(
-                    "Available schemas(Some of these may be user or system schemas):{}{}",
-                    System.lineSeparator(),
-                    schemas.stream().collect(Collectors.joining(System.lineSeparator())));
+                "The schema '{}' could not be read/found, schema is specified using the -s option.",
+                new Sanitize(schema)
+            );
+            LOGGER.error(
+                "Make sure user '{}' has the correct privileges to read the schema.",
+                new Sanitize(user)
+            );
+            LOGGER.error("Also not that schema names are usually case sensitive.");
             List<String> populatedSchemas = DbAnalyzer.getPopulatedSchemas(meta);
             if (populatedSchemas.isEmpty()) {
-                LOGGER.error("Unable to determine if any of the schemas contain tables/views");
+                LOGGER.error(
+                    "Unable to determine if any of the schemas are visible to '{}'",
+                    new Sanitize(user)
+                );
             } else {
-                LOGGER.info("Schemas with tables/views visible to '{}':{}{}",
-                        user,
-                        System.lineSeparator(),
-                        populatedSchemas.stream().map(s -> String.format("'%s'", s)).collect(Collectors.joining(System.lineSeparator())));
+                LOGGER.info(
+                    "Schemas with tables/views visible to '{}':",
+                    new Sanitize(user)
+                );
+                populatedSchemas
+                    .forEach(
+                        schemaName -> LOGGER.info(
+                            LOG_SCHEMAS_FORMAT,
+                            new Sanitize(schemaName)
+                        )
+                    );
+            }
+            List<String> otherSchemas = schemas
+                .stream()
+                .filter(Predicate.not(populatedSchemas::contains))
+                .toList();
+            if (!otherSchemas.isEmpty()) {
+                LOGGER.info("Other available schemas(Some of these may be system schemas):");
+                otherSchemas
+                    .forEach(
+                        schemaName -> LOGGER.info(
+                            LOG_SCHEMAS_FORMAT,
+                            new Sanitize(schemaName)
+                        )
+                    );
             }
         }
     }

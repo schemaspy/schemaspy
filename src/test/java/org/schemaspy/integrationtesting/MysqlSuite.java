@@ -51,10 +51,10 @@ public class MysqlSuite {
     @SuppressWarnings("unchecked")
     @ClassRule
     public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
-            new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5").withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"))
+            new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle").withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"))
                     .assumeDockerIsPresent()
                     .withAssumptions(assumeDriverIsPresent())
-                    .withQueryString("?useSSL=false")
+                    .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
                     .withInitFunctions(new SQLScriptsRunner("integrationTesting/mysql/dbScripts/"))
                     .withInitUser("root", "test");
 

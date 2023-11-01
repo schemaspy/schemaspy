@@ -91,6 +91,8 @@ Html report related
     Skip generation of html report.
 [-noimplied]
     Don't look for implied relationships.
+[--no-orphans]
+    Don't include orphan tables in the relationships graph.
 [-nopages]
     Just list data as one long list instead of pages.
 [-rails]

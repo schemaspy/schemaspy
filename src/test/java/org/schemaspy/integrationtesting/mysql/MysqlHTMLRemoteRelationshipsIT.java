@@ -23,16 +23,10 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
 import org.schemaspy.testing.XmlOutputDiff;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MySQLContainer;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
@@ -47,54 +41,50 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class MysqlHTMLRemoteRelationshipsIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","html_remote_relationships");
 
-    private static URL expectedXML = MysqlHTMLRemoteRelationshipsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_remote_relationships/htmlit.htmlit.xml");
-    private static URL expectedDeletionOrder = MysqlHTMLRemoteRelationshipsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_remote_relationships/deletionOrder.txt");
-    private static URL expectedInsertionOrder = MysqlHTMLRemoteRelationshipsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_remote_relationships/insertionOrder.txt");
+    private static final URL expectedXML = MysqlHTMLRemoteRelationshipsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_remote_relationships/htmlit.htmlit.xml");
+    private static final URL expectedDeletionOrder = MysqlHTMLRemoteRelationshipsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_remote_relationships/deletionOrder.txt");
+    private static final URL expectedInsertionOrder = MysqlHTMLRemoteRelationshipsIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtml_remote_relationships/insertionOrder.txt");
 
     @SuppressWarnings("unchecked")
     @ClassRule
     public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
             new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
                     MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:5"))
+                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle"))
                         .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
-                        .withQueryString("?useSSL=false")
+                        .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
                         .withInitScript("integrationTesting/mysql/dbScripts/htmlit.sql")
                         .withInitUser("root", "test")
             );
 
-    @Autowired
-    private SchemaSpyRunner schemaSpyRunner;
-
     private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
 
     @Before
-    public synchronized void generateHTML() throws Exception {
+    public synchronized void generateHTML() {
         if (shouldRun.get()) {
             String[] args = new String[]{
                     "-t", "mysql",
                     "-db", "htmlit",
                     "-s", "htmlit",
-                    "-host", jdbcContainerRule.getContainer().getContainerIpAddress() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
+                    "-host", jdbcContainerRule.getContainer().getHost() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
                     "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-o", outputPath.toString(),
-                    "-connprops", "useSSL\\=false",
-                    "-meta", Paths.get("src","test","resources","integrationTesting","mysql","metadata","remote_relationships.xml").toString()
+                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true",
+                    "-meta", Paths.get("src","test","resources","integrationTesting","mysql","metadata","remote_relationships.xml").toString(),
+                    "--no-orphans"
             };
-            schemaSpyRunner.run(args);
+            schemaSpyRunner(args).run();
             shouldRun.set(false);
         }
     }

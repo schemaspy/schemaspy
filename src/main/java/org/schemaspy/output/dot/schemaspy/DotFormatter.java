@@ -43,9 +43,9 @@ public class DotFormatter {
 
     private final DotSummaryFormatter dotSummaryFormatter;
 
-    public DotFormatter(RuntimeDotConfig runtimeDotConfig) {
+    public DotFormatter(RuntimeDotConfig runtimeDotConfig, final boolean includeOrphans) {
         this.runtimeDotConfig = runtimeDotConfig;
-        this.dotSummaryFormatter = new DotSummaryFormatter(runtimeDotConfig);
+        this.dotSummaryFormatter = new DotSummaryFormatter(runtimeDotConfig, includeOrphans);
     }
 
     public void writeSummaryRealRelationships(Database db, Collection<Table> tables, boolean compact, PrintWriter dot) {

@@ -44,10 +44,9 @@ public class HtmlAnomaliesPageTest {
     }
 
     private static CommandLineArguments commandLineArguments = new CommandLineArgumentParser(
-        new CommandLineArguments(),
-        (option) -> null
+            "-o", "out", "-sso"
     )
-        .parse("-o", "out", "-sso");
+        .commandLineArguments();
 
     private static DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
     private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", "anomalies", commandLineArguments.getHtmlConfig(), false, dataTableConfig);

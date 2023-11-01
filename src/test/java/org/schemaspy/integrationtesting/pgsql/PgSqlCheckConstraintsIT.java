@@ -22,21 +22,10 @@ import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.integrationtesting.PgSqlSuite;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.testing.SQLScriptsRunner;
 import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.io.IOException;
@@ -46,19 +35,11 @@ import java.sql.SQLException;
 
 import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class PgSqlCheckConstraintsIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","pgsql","check_constraints");
-
-    @Autowired
-    private SqlService sqlService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     private static Database database;
 
@@ -89,22 +70,10 @@ public class PgSqlCheckConstraintsIT {
                 "-o", outputPath.toString(),
                 "-u", "test",
                 "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
+                "-host", jdbcContainerRule.getContainer().getHost(),
                 "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
         };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-            sqlService.getDbmsMeta(),
-            arguments.getConnectionConfig().getDatabaseName(),
-            arguments.getCatalog(),
-            arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
-        PgSqlCheckConstraintsIT.database = database;
+        database = database(args);
     }
 
     @Test

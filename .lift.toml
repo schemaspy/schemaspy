@@ -1,0 +1,8 @@
+jdkVersion = "17"
+tools = [ "infer", "errorprone", "findsecbugs", "bill of materials", "hadolint", "refactor-first" ]
+ignoreFiles = """
+docs/
+src/main/resources/layout
+target/
+"""
+ignoreRules = [ "PATH_TRAVERSAL_IN" ]

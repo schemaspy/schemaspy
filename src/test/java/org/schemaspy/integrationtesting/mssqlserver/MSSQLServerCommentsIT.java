@@ -18,49 +18,32 @@
  */
 package org.schemaspy.integrationtesting.mssqlserver;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
-import org.schemaspy.integrationtesting.MssqlServerSuite;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.MSSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Rafal Kasa
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
+@DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
+@Testcontainers(disabledWithoutDocker = true)
 public class MSSQLServerCommentsIT {
 
-    @Autowired
-    private SqlService sqlService;
-
-    @Mock
-    private ProgressListener progressListener;
     private static Database abc_dbo;
     private static Database abc_a;
     private static Database abc_b;
@@ -76,18 +59,12 @@ public class MSSQLServerCommentsIT {
     private static Database def_e;
     private static Database def_f;
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MSSQLContainer> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MSSQLContainer>(
-                    MssqlServerSuite.jdbcContainerRule,
-                    new JdbcContainerRule<>(() -> new MSSQLContainer(IMAGE_NAME))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_comments.sql")
-            );
+    @Container
+    public static MSSQLContainer mssqlContainer =
+            new MSSQLContainer(IMAGE_NAME)
+                    .withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_comments.sql");
 
-    @Before
+    @BeforeEach
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
         if (abc_dbo == null) {
             abc_dbo = createDatabaseRepresentation("ABC", "dbo");
@@ -137,27 +114,15 @@ public class MSSQLServerCommentsIT {
                 "-cat", "%",
                 "-o", "target/testout/integrationtesting/mssql/comments",
                 "-u", "sa",
-                "-p", jdbcContainerRule.getContainer().getPassword(),
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(1433).toString()
+                "-p", mssqlContainer.getPassword(),
+                "-host", mssqlContainer.getHost(),
+                "-port", mssqlContainer.getMappedPort(1433).toString()
         };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-            sqlService.getDbmsMeta(),
-            arguments.getConnectionConfig().getDatabaseName(),
-            arguments.getCatalog(),
-            arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
-        return database;
+        return database(args);
     }
 
     @Test
-    public void validateCatalogComments() {
+    void validateCatalogComments() {
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(abc_dbo.getCatalog().getComment()).isEqualTo("ABC comment");
         softAssertions.assertThat(abc_a.getCatalog().getComment()).isEqualTo("ABC comment");
@@ -177,7 +142,7 @@ public class MSSQLServerCommentsIT {
     }
 
     @Test
-    public void validateSchemaComments() {
+    void validateSchemaComments() {
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(abc_dbo.getSchema().getComment()).isEqualTo("ABC Schema dbo comment");
         softAssertions.assertThat(abc_a.getSchema().getComment()).isEqualTo("ABC Schema A comment");
@@ -197,7 +162,7 @@ public class MSSQLServerCommentsIT {
     }
 
     @Test
-    public void validateTableComments() {
+    void validateTableComments() {
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(abc_dbo.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema dbo ATable comment");
         softAssertions.assertThat(abc_a.getTablesMap().get("ATable").getComments()).isEqualTo("ABC Schema A ATable comment");
@@ -217,7 +182,7 @@ public class MSSQLServerCommentsIT {
     }
 
     @Test
-    public void validateColumnComments() {
+    void validateColumnComments() {
         SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(abc_dbo.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema dbo ATable Column comment");
         softAssertions.assertThat(abc_a.getTablesMap().get("ATable").getColumnsMap().get("Description").getComments()).isEqualTo("ABC Schema A ATable Column comment");

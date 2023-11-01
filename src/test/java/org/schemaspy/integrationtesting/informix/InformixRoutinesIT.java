@@ -18,66 +18,46 @@
  */
 package org.schemaspy.integrationtesting.informix;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
-import org.schemaspy.input.dbms.service.SqlService;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.schemaspy.model.Database;
-import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
-import org.schemaspy.testing.AssumeClassIsPresentRule;
 import org.schemaspy.testing.SQLScriptsRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.InformixContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.function.Supplier;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
+@DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
+@Testcontainers(disabledWithoutDocker = true)
 public class InformixRoutinesIT {
-    @Autowired
-    private SqlService sqlService;
-
-    @Mock
-    private ProgressListener progressListener;
 
     private static Database database;
 
-    public static TestRule jdbcDriverClassPresentRule = new AssumeClassIsPresentRule("com.informix.jdbc.IfxDriver");
+    @Container
+    public static InformixContainer informixContainer =
+            new InformixContainer();
 
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<InformixContainer<?>> jdbcContainerRule =
-            new JdbcContainerRule<>((Supplier<InformixContainer<?>>) InformixContainer::new)
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
-                    .withInitFunctions(new SQLScriptsRunner("integrationTesting/informix/dbScripts/informixroutines.sql", "\n\n\n"));
+    @BeforeAll
+    public static void initFunction() throws SQLException {
+        new SQLScriptsRunner(
+                "integrationTesting/informix/dbScripts/informixroutines.sql",
+                "\n\n\n"
+        ).accept(informixContainer.createConnection(""));
+    }
 
-    @ClassRule
-    public static final TestRule chain = RuleChain
-            .outerRule(jdbcContainerRule)
-            .around(jdbcDriverClassPresentRule);
-
-    @Before
+    @BeforeEach
     public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
         if (database == null) {
             createDatabaseRepresentation();
@@ -92,34 +72,22 @@ public class InformixRoutinesIT {
                 "-cat", "test",
                 "-server", "dev",
                 "-o", "target/testout/integrationtesting/informix/routines",
-                "-u", jdbcContainerRule.getContainer().getUsername(),
-                "-p", jdbcContainerRule.getContainer().getPassword(),
-                "-host", jdbcContainerRule.getContainer().getContainerIpAddress(),
-                "-port", jdbcContainerRule.getContainer().getJdbcPort().toString()
+                "-u", informixContainer.getUsername(),
+                "-p", informixContainer.getPassword(),
+                "-host", informixContainer.getHost(),
+                "-port", informixContainer.getJdbcPort().toString()
         };
-        CommandLineArguments arguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
-        sqlService.connect(arguments.getConnectionConfig());
-        Database database = new Database(
-            sqlService.getDbmsMeta(),
-            arguments.getConnectionConfig().getDatabaseName(),
-            arguments.getCatalog(),
-            arguments.getSchema()
-        );
-        new DatabaseServiceFactory(sqlService).forSingleSchema(arguments.getProcessingConfig()).gatherSchemaDetails(database, null, progressListener);
-        InformixRoutinesIT.database = database;
+        database = database(args);
     }
 
     @Test
-    public void databaseShouldBePopulatedWithTableTest() {
+    void databaseShouldBePopulatedWithTableTest() {
         Table table = getTable("test");
         assertThat(table).isNotNull();
     }
 
     @Test
-    public void databaseShouldHaveCompleteRoutineDefinition() {
+    void databaseShouldHaveCompleteRoutineDefinition() {
         String expecting = "CREATE FUNCTION gc_comb(partial1 LVARCHAR, partial2 LVARCHAR) RETURNING LVARCHAR; IF partial1 IS NULL OR partial1 = '' THEN RETURN partial2; ELIF partial2 IS NULL OR partial2 = '' THEN RETURN partial1; ELSE RETURN partial1 || ',' || partial2; END IF; END FUNCTION;";
         String actual = database.getRoutinesMap().get("gc_comb(lvarchar,lvarchar)").getDefinition().replaceAll("(\r\n|\r|\n)", " ").replaceAll("\\s\\s+", " ");
         assertThat(actual).isEqualToIgnoringCase(expecting);

@@ -21,8 +21,6 @@ package org.schemaspy.integrationtesting;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.schemaspy.SimpleRuntimeDotConfig;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArgumentParser;
@@ -36,10 +34,6 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
 import org.schemaspy.testing.H2MemoryRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -48,26 +42,22 @@ import java.sql.SQLException;
 import java.util.concurrent.atomic.LongAdder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Nils Petzaell
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@DirtiesContext
 public class SchemaMetaIT {
 
-    private static String BY_SCRIPT_COMMENT = "Set by script";
-    private static String BY_SCHEMA_META_COMMENT = "Set from SchemaMeta";
+    private static final String BY_SCRIPT_COMMENT = "Set by script";
+    private static final String BY_SCHEMA_META_COMMENT = "Set from SchemaMeta";
 
     @ClassRule
     public static H2MemoryRule h2MemoryRule = new H2MemoryRule("SchemaMetaIT").addSqlScript("src/test/resources/integrationTesting/schemaMetaIT/dbScripts/shemaMetaIT.h2.sql");
 
-    @Autowired
-    private SqlService sqlService;
+    private SqlService sqlService = new SqlService();
 
-    @Mock
-    private ProgressListener progressListener;
+    private ProgressListener progressListener = mock(ProgressListener.class);
     private CommandLineArguments commandLineArguments;
     private DbmsMeta dbmsMeta;
     private String schema;
@@ -80,12 +70,12 @@ public class SchemaMetaIT {
                 "-db", "SchemaMetaIT",
                 "-s", "SCHEMAMETAIT",
                 "-o", "target/integrationtesting/schemaMetaIT",
-                "-u", "sa"
+                "-u", "sa",
+                "--no-orphans"
         };
         commandLineArguments = new CommandLineArgumentParser(
-            new CommandLineArguments(),
-            (option) -> null
-        ).parse(args);
+                args
+        ).commandLineArguments();
         sqlService.connect(commandLineArguments.getConnectionConfig());
         dbmsMeta = sqlService.getDbmsMeta();
         schema = h2MemoryRule.getConnection().getSchema();
@@ -313,7 +303,8 @@ public class SchemaMetaIT {
                 commandLineArguments.getDotConfig(),
                 false,
                 false
-            )
+            ),
+            commandLineArguments.withOrphans()
         );
 
         StringWriter withoutSchemaMetaOutput = new StringWriter();

@@ -52,19 +52,27 @@ public class MustacheSummaryDiagramFactory {
     private final boolean hasRealConstraints;
     private final boolean hasImpliedConstraints;
     private final Path summaryDir;
+    private final ProgressListener progressListener;
 
-    public MustacheSummaryDiagramFactory(DotFormatter dotProducer, SummaryDiagram diagramFactory,boolean hasRealConstraints, boolean hasImpliedConstraints, File outputDir) {
+    public MustacheSummaryDiagramFactory(
+        DotFormatter dotProducer,
+        SummaryDiagram diagramFactory,
+        boolean hasRealConstraints,
+        boolean hasImpliedConstraints,
+        File outputDir,
+        ProgressListener progressListener
+    ) {
         this.dotProducer = dotProducer;
         this.diagramFactory = diagramFactory;
         this.hasRealConstraints = hasRealConstraints;
         this.hasImpliedConstraints = hasImpliedConstraints;
         this.summaryDir = outputDir.toPath().resolve("diagrams").resolve("summary");
+        this.progressListener = progressListener;
     }
 
     public MustacheSummaryDiagramResults generateSummaryDiagrams(
             Database database,
-            Collection<Table> tables,
-            ProgressListener progressListener
+            Collection<Table> tables
     ) throws IOException {
         if (tables.isEmpty()) {
             return new MustacheSummaryDiagramResults(Collections.emptyList(), Collections.emptyList());
@@ -82,6 +90,7 @@ public class MustacheSummaryDiagramFactory {
                 MustacheTableDiagram realCompactDiagram = new MustacheTableDiagram("Compact", results, false);
                 realCompactDiagram.setActive(true);
                 diagrams.add(realCompactDiagram);
+                progressListener.createdSummary();
             } catch (IOException ioexception) {
                 outputExceptions.add(new OutputException(FAILED_DOT + realCompactDot.toString(), ioexception));
             } catch (RenderException renderException) {
@@ -91,7 +100,6 @@ public class MustacheSummaryDiagramFactory {
             generateRealLarge(database, tables, diagrams, outputExceptions);
         }
 
-        progressListener.graphingSummaryProgressed();
         if (hasImpliedConstraints) {
             generateImpliedCompact(database, tables, diagrams, outputExceptions);
             generateImpliedLarge(database, tables, diagrams, outputExceptions);
@@ -109,6 +117,7 @@ public class MustacheSummaryDiagramFactory {
             DiagramResult results = diagramFactory.generateSummaryDiagram(realLargeDot, FILE_PREFIX + ".real.large");
             MustacheTableDiagram realLargeDiagram = new MustacheTableDiagram("Large", results, false);
             diagrams.add(realLargeDiagram);
+            progressListener.createdSummary();
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + realLargeDot.toString(), ioexception));
         } catch (RenderException renderException) {
@@ -123,6 +132,7 @@ public class MustacheSummaryDiagramFactory {
             DiagramResult results = diagramFactory.generateSummaryDiagram(impliedCompactDot, FILE_PREFIX + ".implied.compact");
             MustacheTableDiagram impliedCompactDiagram = new MustacheTableDiagram("Compact Implied", results, true);
             diagrams.add(impliedCompactDiagram);
+            progressListener.createdSummary();
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + impliedCompactDot.toString(), ioexception));
         } catch (RenderException renderException) {
@@ -137,6 +147,7 @@ public class MustacheSummaryDiagramFactory {
             DiagramResult results = diagramFactory.generateSummaryDiagram(impliedLargeDot, FILE_PREFIX + ".implied.large");
             MustacheTableDiagram impliedLargeDiagram = new MustacheTableDiagram("Large Implied", results, true);
             diagrams.add(impliedLargeDiagram);
+            progressListener.createdSummary();
         } catch (IOException ioexception) {
             outputExceptions.add(new OutputException(FAILED_DOT + impliedLargeDot.toString(), ioexception));
         } catch (RenderException renderException) {

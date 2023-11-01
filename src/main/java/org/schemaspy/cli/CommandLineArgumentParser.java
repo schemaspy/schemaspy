@@ -30,8 +30,6 @@ import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.util.DbSpecificConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,31 +50,35 @@ import java.util.stream.Collectors;
 public class CommandLineArgumentParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static final PropertiesResolver propertiesResolver = new SimplePropertiesResolver();
-
-    private final JCommander jCommander;
-
-    private final CommandLineArguments arguments;
-
     private static final String[] requiredFields = {"outputDirectory"};
 
-    public CommandLineArgumentParser(CommandLineArguments commandLineArguments, IDefaultProvider defaultProvider) {
-        this.arguments = commandLineArguments;
+    private final CommandLineArguments arguments = new CommandLineArguments();
+
+    private final String[] args;
+    private final JCommander jCommander;
+
+    public CommandLineArgumentParser(String...args) {
+        this(null, args);
+    }
+
+    public CommandLineArgumentParser(IDefaultProvider defaultProvider, String...args) {
+        this.args = args;
         jCommander = JCommander.newBuilder()
                 .acceptUnknownOptions(true)
                 .programName("java -jar \"" + Paths.get("").toAbsolutePath().relativize(new SchemaSpyJarFile().path()) + "\"")
                 .columnSize(120)
                 .defaultProvider(defaultProvider)
                 .build();
+        jCommander.addObject(new ConfigFileArgument());
         jCommander.addObject(arguments);
     }
 
-    public CommandLineArguments parse(String... localArgs) {
-        jCommander.parse(localArgs);
+    public CommandLineArguments commandLineArguments() {
+        jCommander.parse(args);
         arguments.setUnknownArgs(jCommander.getUnknownOptions());
         if (shouldValidate()) {
-            validate(arguments);
+            validate();
         }
         return arguments;
     }
@@ -85,7 +87,7 @@ public class CommandLineArgumentParser {
         List<ParameterDescription> helpParameters = jCommander.getParameters()
                 .stream()
                 .filter(ParameterDescription::isHelp)
-                .collect(Collectors.toList());
+                .toList();
         for(ParameterDescription parameterDescription: helpParameters) {
             if (parameterDescription.isAssigned()) {
                 return false;
@@ -94,8 +96,8 @@ public class CommandLineArgumentParser {
         return true;
     }
 
-    private void validate(CommandLineArguments arguments) {
-        List<String> runtimeRequiredFields = computeRequiredFields(arguments);
+    private void validate() {
+        List<String> runtimeRequiredFields = computeRequiredFields();
 
         List<String> missingFields = new ArrayList<>();
         Map<String, ParameterDescription> fieldToParameterDescription = jCommander.getParameters()
@@ -103,7 +105,10 @@ public class CommandLineArgumentParser {
                         parameterDescription -> parameterDescription.getParameterized().getName(),
                         parameterDescription -> parameterDescription ));
         for (String field : runtimeRequiredFields) {
-            ParameterDescription parameterDescription = fieldToParameterDescription.get(field);
+            ParameterDescription parameterDescription = Objects.requireNonNull(
+                    fieldToParameterDescription.get(field),
+                    String.format("%s is declared required, but there is no ParameterDescription", field)
+            );
             if (valueIsMissing(parameterDescription)) {
                 missingFields.add("[" + String.join(" | ", parameterDescription.getParameter().names()) + "]");
             }
@@ -116,7 +121,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static List<String> computeRequiredFields(CommandLineArguments arguments) {
+    private List<String> computeRequiredFields() {
         List<String> computedRequiredFields = new ArrayList<>(Arrays.asList(requiredFields));
         if (!arguments.isSingleSignOn()) {
             computedRequiredFields.add("user");
@@ -135,9 +140,7 @@ public class CommandLineArgumentParser {
 
     /**
      * Prints documentation about the usage of command line arguments to the console.
-     * <p>
      */
-    //TODO consider extracting dump generation to other class
     public void printUsage() {
         StringBuilder builder = new StringBuilder();
 
@@ -172,21 +175,35 @@ public class CommandLineArgumentParser {
         }
         builtIns.forEach((key, types) -> {
             LOGGER.info(key);
-            types.forEach(DbSpecificConfig::dumpUsage);
+            types.forEach(dbSpecificConfig -> dbSpecificConfig.dumpUsage(LOGGER));
         });
         LOGGER.info("You can use your own database types by specifying the filespec of a .properties file with -t.");
         LOGGER.info("Grab one out of {} and modify it to suit your needs.", new SchemaSpyJarFile().path());
     }
 
     public void printLicense() {
-        Resource gpl = new ClassPathResource("COPYING");
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gpl.getInputStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader bufferedReader =
+                     new BufferedReader(
+                             new InputStreamReader(
+                                     this.getClass().getResourceAsStream("/COPYING"),
+                                     StandardCharsets.UTF_8
+                             )
+                     )
+        ) {
             bufferedReader.lines().forEachOrdered(LOGGER::info);
         } catch (IOException e) {
             LOGGER.error("Failed to read COPYING (GPL)", e);
         }
-        Resource lgpl = new ClassPathResource("COPYING.LESSER");
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(lgpl.getInputStream(), StandardCharsets.UTF_8))) {
+        LOGGER.info("");
+        LOGGER.info("");
+        try (BufferedReader bufferedReader =
+                     new BufferedReader(
+                             new InputStreamReader(
+                                     this.getClass().getResourceAsStream("/COPYING.LESSER"),
+                                     StandardCharsets.UTF_8
+                             )
+                     )
+        ) {
             bufferedReader.lines().forEachOrdered(LOGGER::info);
         } catch (IOException e) {
             LOGGER.error("Failed to read COPYING.LESSER (LGPL)", e);

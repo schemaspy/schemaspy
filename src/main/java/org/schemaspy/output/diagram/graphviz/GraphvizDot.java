@@ -18,6 +18,7 @@
  */
 package org.schemaspy.output.diagram.graphviz;
 
+import org.schemaspy.logging.Sanitize;
 import org.schemaspy.output.diagram.RenderException;
 import org.schemaspy.output.diagram.Renderer;
 import org.slf4j.Logger;
@@ -276,7 +277,7 @@ public class GraphvizDot implements Renderer {
                 while ((line = processReader.readLine()) != null) {
                     // don't report port id unrecognized or unrecognized port
                     if (!line.contains("unrecognized") && !line.contains("port"))
-                        LOGGER.error("{}: {}", command, line);
+                        LOGGER.warn("{}: {}", new Sanitize(command), new Sanitize(line));
                 }
             } catch (IOException ioException) {
                 LOGGER.error("Error reading from process",ioException);

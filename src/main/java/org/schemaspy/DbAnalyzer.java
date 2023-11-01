@@ -252,19 +252,35 @@ public class DbAnalyzer {
     }
 
     /**
-     * getSchemas - returns a List of schema names (Strings) that contain tables
+     * getSchemas - returns a List of schema names (Strings) that contain tables, fallback to catalogs
      *
      * @param meta DatabaseMetaData
      */
     public static List<String> getPopulatedSchemas(DatabaseMetaData meta) throws SQLException {
-        return getPopulatedSchemas(meta, ".*", false);
+        return getPopulatedSchemas(meta, ".*");
+    }
+
+    /**
+     * getSchemas - returns a List of schema names (Strings) that contain tables, fallback to catalogs
+     *
+     * @param meta DatabaseMetaData
+     * @param schemaSpec filter for schema/catalog
+     */
+    public static List<String> getPopulatedSchemas(DatabaseMetaData meta, String schemaSpec) throws SQLException {
+        List<String> populatedSchemas = getPopulatedSchemas(meta, schemaSpec, false);
+        if (populatedSchemas.isEmpty()) {
+            return getPopulatedSchemas(meta, schemaSpec, true);
+        }
+        return populatedSchemas;
     }
 
     /**
      * getSchemas - returns a List of schema names (Strings) that contain tables and
-     * match the <code>schemaSpec</code> regular expression
+     * match the <code>schemaSpec</code> regular expression, can look in catalogs
      *
      * @param meta DatabaseMetaData
+     * @param schemaSpec filter for catalog or schema
+     * @param isCatalog look in catalogs or schemas
      */
     public static List<String> getPopulatedSchemas(DatabaseMetaData meta, String schemaSpec, boolean isCatalog) throws SQLException {
         Set<String> schemas = new TreeSet<>(); // alpha sorted
