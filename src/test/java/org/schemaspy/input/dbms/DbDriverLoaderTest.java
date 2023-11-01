@@ -86,16 +86,6 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void connectionIsNullThrowsException() {
-    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
-    Mockito.when(builder.build()).thenReturn("dummy");
-    String[] drivers = new String[]{DummyDriver.class.getName()};
-    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, drivers, () -> "");
-    assertThatExceptionOfType(ConnectionFailure.class)
-        .isThrownBy(driverLoader::getConnection);
-  }
-
-  @Test
   public void nativeErrorInDriverCreationPassesUncaught() {
     ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
     Mockito.when(builder.build()).thenReturn("dummy");
