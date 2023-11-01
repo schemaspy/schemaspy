@@ -65,7 +65,7 @@ public class PgSqlTypesIT {
         String[] args = {
             "-t", "pgsql",
             "-db", "test",
-            "-s", "public",
+            "-s", "type_tests",
             "-cat", "%",
             "-o", outputPath.toString(),
             "-u", "test",
