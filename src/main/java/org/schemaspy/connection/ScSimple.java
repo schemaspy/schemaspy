@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.driver.Driversource;
-import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 
 import java.io.IOException;
 import java.sql.Driver;
@@ -46,13 +45,9 @@ public final class ScSimple implements SqlConnection{
 
     @Override
     public java.sql.Connection connection() throws IOException, SQLException {
-        String connectionURL = urlBuilder.build();
-
+        final String connectionURL = urlBuilder.build();
         final Properties connectionProperties = this.con.properties();
-
-        java.sql.Connection connection;
-        Driver driver = driversource.driver();
-        connection = driver.connect(connectionURL, connectionProperties);
-        return connection;
+        final Driver driver = driversource.driver();
+        return driver.connect(connectionURL, connectionProperties);
     }
 }
