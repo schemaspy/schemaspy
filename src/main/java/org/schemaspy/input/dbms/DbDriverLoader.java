@@ -29,6 +29,7 @@ import org.schemaspy.connection.ScNullChecked;
 import org.schemaspy.connection.ScSimple;
 import org.schemaspy.input.dbms.classloader.ClClasspath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
+import org.schemaspy.input.dbms.driver.Driversource;
 import org.schemaspy.input.dbms.driver.DsCached;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
@@ -48,7 +49,7 @@ import java.util.*;
  * @author Nils Petzaell
  * @author Daniel Watt
  */
-public class DbDriverLoader {
+public class DbDriverLoader implements Driversource  {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ConnectionConfig connectionConfig;
@@ -102,7 +103,7 @@ public class DbDriverLoader {
             this.urlBuilder,
             new ScNullChecked(
                 this.urlBuilder,
-                new ScSimple(this.connectionConfig, this.urlBuilder, this::getDriver)
+                new ScSimple(this.connectionConfig, this.urlBuilder, this::driver)
             )
         ).connection();
     }
@@ -113,7 +114,7 @@ public class DbDriverLoader {
      *
      * @return
      */
-    protected synchronized Driver getDriver() {
+    public synchronized Driver driver() {
         String driverPath = this.driverPath.value();
 
         Class<Driver> driverClass = new DcFacade(

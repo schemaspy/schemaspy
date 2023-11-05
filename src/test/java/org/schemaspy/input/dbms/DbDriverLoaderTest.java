@@ -68,9 +68,9 @@ public class DbDriverLoaderTest {
     String[] drivers = new String[]{"org.h2.Driver"};
 
     DbDriverLoader driverLoader1 = new DbDriverLoader(parse(), builder, drivers, () -> "");
-    Driver driver1 = driverLoader1.getDriver();
+    Driver driver1 = driverLoader1.driver();
     DbDriverLoader driverLoader2 = new DbDriverLoader(parse(), builder, drivers, () -> "");
-    Driver driver2 = driverLoader2.getDriver();
+    Driver driver2 = driverLoader2.driver();
     assertThat(driver1).isSameAs(driver2);
   }
 
@@ -80,7 +80,7 @@ public class DbDriverLoaderTest {
     ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
     Mockito.when(builder.build()).thenReturn("");
     DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"dummy.DummyDriver"}, () -> driverPath);
-    Driver driver = driverLoader.getDriver();
+    Driver driver = driverLoader.driver();
     assertThat(driver).isNotNull();
     assertThat(driver.acceptsURL("dummy")).isTrue();
   }
@@ -122,7 +122,7 @@ public class DbDriverLoaderTest {
     ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
     Mockito.when(builder.build()).thenReturn("");
     DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"com.no", "org.h2.Driver"}, () -> "");
-    Driver driver = driverLoader.getDriver();
+    Driver driver = driverLoader.driver();
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("org.h2.Driver");
   }
@@ -132,7 +132,7 @@ public class DbDriverLoaderTest {
     ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
     Mockito.when(builder.build()).thenReturn("");
     DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"}, () -> "");
-    Driver driver = driverLoader.getDriver();
+    Driver driver = driverLoader.driver();
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("com.mysql.cj.jdbc.Driver");
   }
