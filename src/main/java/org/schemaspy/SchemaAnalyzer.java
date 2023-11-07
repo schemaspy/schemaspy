@@ -52,7 +52,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.connection.ScExceptionChecked;
+import org.schemaspy.connection.ScNullChecked;
+import org.schemaspy.connection.ScSimple;
 import org.schemaspy.input.dbms.CatalogResolver;
+import org.schemaspy.input.dbms.ConnectionConfig;
+import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.input.dbms.SchemaResolver;
 import org.schemaspy.input.dbms.service.DatabaseService;
@@ -175,7 +180,17 @@ public class SchemaAnalyzer {
         List<String> schemas = commandLineArguments.getSchemas();
         Database db = null;
 
-        Connection connection = new DbDriverLoader(commandLineArguments.getConnectionConfig()).getConnection();
+        final ConnectionConfig connectionConfig = commandLineArguments.getConnectionConfig();
+        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
+        final DbDriverLoader loader = new DbDriverLoader(connectionConfig);
+        final Connection connection = new ScExceptionChecked(
+            urlBuilder,
+            new ScNullChecked(
+                urlBuilder,
+                new ScSimple(connectionConfig, urlBuilder, loader)
+            )
+        ).connection();
+
         DatabaseMetaData meta = connection.getMetaData();
         if (schemas.isEmpty()) {
             String schemaSpec = commandLineArguments.getSchemaSpec();
