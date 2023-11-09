@@ -23,7 +23,11 @@
  */
 package org.schemaspy.input.dbms.service;
 
+import org.schemaspy.connection.ScExceptionChecked;
+import org.schemaspy.connection.ScNullChecked;
+import org.schemaspy.connection.ScSimple;
 import org.schemaspy.input.dbms.ConnectionConfig;
+import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
@@ -66,7 +70,16 @@ public class SqlService {
     private Set<String> allKeywords;
 
     public DatabaseMetaData connect(ConnectionConfig connectionConfig) throws IOException, SQLException {
-        return connect(new DbDriverLoader(connectionConfig).getConnection());
+        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
+        final DbDriverLoader loader = new DbDriverLoader(connectionConfig);
+        final Connection connection = new ScExceptionChecked(
+            urlBuilder,
+            new ScNullChecked(
+                urlBuilder,
+                new ScSimple(connectionConfig, urlBuilder, loader)
+            )
+        ).connection();
+        return connect(connection);
     }
 
     public DatabaseMetaData connect(Connection connection) throws SQLException {
