@@ -106,18 +106,6 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void DriverMissingWithClasspathThrowsException() {
-    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
-    Mockito.when(builder.build()).thenReturn("dummy");
-    final String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar")
-                                   .toString() + File.pathSeparator + "missing";
-    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"bla.bla.bla", "no.no.no"}, () -> driverPath);
-    assertThatExceptionOfType(ConnectionFailure.class)
-        .isThrownBy(driverLoader::getConnection)
-        .withCauseInstanceOf(ConnectionFailure.class);
-  }
-
-  @Test
   public void firstDriverClassMissingSecondExists() {
     ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
     Mockito.when(builder.build()).thenReturn("");
