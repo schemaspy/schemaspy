@@ -23,10 +23,6 @@
  */
 package org.schemaspy.input.dbms;
 
-import java.sql.Connection;
-import org.schemaspy.connection.ScExceptionChecked;
-import org.schemaspy.connection.ScNullChecked;
-import org.schemaspy.connection.ScSimple;
 import org.schemaspy.input.dbms.classloader.ClClasspath;
 import org.schemaspy.input.dbms.classpath.GetExistingUrls;
 import org.schemaspy.input.dbms.driver.Driversource;
@@ -37,7 +33,6 @@ import org.schemaspy.input.dbms.driverpath.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.sql.Driver;
 import java.util.*;
@@ -96,16 +91,6 @@ public class DbDriverLoader implements Driversource  {
         this.urlBuilder = urlBuilder;
         this.driverClass = driverClass;
         this.driverPath = driverPath;
-    }
-
-    public Connection getConnection() throws IOException {
-        return new ScExceptionChecked(
-            this.urlBuilder,
-            new ScNullChecked(
-                this.urlBuilder,
-                new ScSimple(this.connectionConfig, this.urlBuilder, this::driver)
-            )
-        ).connection();
     }
 
     /**

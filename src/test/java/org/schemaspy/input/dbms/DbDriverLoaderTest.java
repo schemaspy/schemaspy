@@ -57,7 +57,7 @@ public class DbDriverLoaderTest {
     assertThat(
         new DbDriverLoader(
             parse("-t", Paths.get("src", "test", "resources", "integrationTesting", "dbTypes", "h2memory.properties").toString(), "-u", "sa", "-db", "DbDriverLoaderTest")
-        ).getConnection()
+        ).driver()
     ).isNotNull();
   }
 
@@ -92,17 +92,7 @@ public class DbDriverLoaderTest {
     String[] drivers = new String[]{DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"};
     DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, drivers, () -> "");
     assertThatExceptionOfType(UnsatisfiedLinkError.class)
-        .isThrownBy(driverLoader::getConnection);
-  }
-
-  @Test
-  public void nativeErrorInConnectPassesUncaught() {
-    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
-    Mockito.when(builder.build()).thenReturn("dummy");
-    String[] drivers = new String[]{DummyDriverUnsatisfiedConnect.class.getName()};
-    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, drivers, () -> "");
-    assertThatExceptionOfType(UnsatisfiedLinkError.class)
-        .isThrownBy(() -> driverLoader.getConnection());
+        .isThrownBy(driverLoader::driver);
   }
 
   @Test
