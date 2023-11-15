@@ -30,10 +30,7 @@ import org.schemaspy.input.dbms.driver.DsCached;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
 import org.schemaspy.input.dbms.driverpath.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
 import java.sql.Driver;
 import java.util.*;
 
@@ -46,28 +43,15 @@ import java.util.*;
  */
 public class DbDriverLoader implements Driversource  {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final ConnectionConfig connectionConfig;
-    private final ConnectionURLBuilder urlBuilder;
     private final String[] driverClass;
     private Driverpath driverPath;
 
     public DbDriverLoader(final ConnectionConfig connectionConfig) {
-        this(connectionConfig, new ConnectionURLBuilder(connectionConfig));
+        this(connectionConfig, connectionConfig.getDatabaseTypeProperties());
     }
 
-    public DbDriverLoader(final ConnectionConfig connectionConfig, final ConnectionURLBuilder urlBuilder) {
-        this(connectionConfig, urlBuilder, connectionConfig.getDatabaseTypeProperties());
-    }
-
-    public DbDriverLoader(
-        final ConnectionConfig connectionConfig,
-        final ConnectionURLBuilder urlBuilder,
-        final Properties properties
-    ) {
+    public DbDriverLoader(final ConnectionConfig connectionConfig, final Properties properties) {
         this(
-            connectionConfig,
-            urlBuilder,
             properties.getProperty("driver").split(","),
             new DpMissingPathChecked(
                 new DpFallback(
@@ -81,14 +65,7 @@ public class DbDriverLoader implements Driversource  {
         );
     }
 
-    public DbDriverLoader(
-        final ConnectionConfig connectionConfig,
-        final ConnectionURLBuilder urlBuilder,
-        final String[] driverClass,
-        final Driverpath driverPath
-    ) {
-        this.connectionConfig = connectionConfig;
-        this.urlBuilder = urlBuilder;
+    public DbDriverLoader(final String[] driverClass, final Driverpath driverPath) {
         this.driverClass = driverClass;
         this.driverPath = driverPath;
     }

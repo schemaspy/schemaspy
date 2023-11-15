@@ -19,27 +19,16 @@
 package org.schemaspy.input.dbms;
 
 import com.beust.jcommander.JCommander;
-import org.dummy.DummyDriver;
-import org.dummy.DummyDriverUnsatisfiedConnect;
 import org.dummy.DummyDriverUnsatisfiedCtor;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
-import org.schemaspy.input.dbms.driverpath.DpMissingPathChecked;
-import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.schemaspy.testing.H2MemoryRule;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URI;
 import java.nio.file.Paths;
 import java.sql.Driver;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -63,13 +52,11 @@ public class DbDriverLoaderTest {
 
   @Test
   public void driverLoaderCachesDrivers() {
-    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
-    Mockito.when(builder.build()).thenReturn("");
     String[] drivers = new String[]{"org.h2.Driver"};
 
-    DbDriverLoader driverLoader1 = new DbDriverLoader(parse(), builder, drivers, () -> "");
+    DbDriverLoader driverLoader1 = new DbDriverLoader(drivers, () -> "");
     Driver driver1 = driverLoader1.driver();
-    DbDriverLoader driverLoader2 = new DbDriverLoader(parse(), builder, drivers, () -> "");
+    DbDriverLoader driverLoader2 = new DbDriverLoader(drivers, () -> "");
     Driver driver2 = driverLoader2.driver();
     assertThat(driver1).isSameAs(driver2);
   }
@@ -77,9 +64,7 @@ public class DbDriverLoaderTest {
   @Test
   public void driverPathWorks() throws SQLException {
     String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
-    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
-    Mockito.when(builder.build()).thenReturn("");
-    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"dummy.DummyDriver"}, () -> driverPath);
+    DbDriverLoader driverLoader = new DbDriverLoader(new String[]{"dummy.DummyDriver"}, () -> driverPath);
     Driver driver = driverLoader.driver();
     assertThat(driver).isNotNull();
     assertThat(driver.acceptsURL("dummy")).isTrue();
@@ -87,19 +72,15 @@ public class DbDriverLoaderTest {
 
   @Test
   public void nativeErrorInDriverCreationPassesUncaught() {
-    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
-    Mockito.when(builder.build()).thenReturn("dummy");
     String[] drivers = new String[]{DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"};
-    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, drivers, () -> "");
+    DbDriverLoader driverLoader = new DbDriverLoader(drivers, () -> "");
     assertThatExceptionOfType(UnsatisfiedLinkError.class)
         .isThrownBy(driverLoader::driver);
   }
 
   @Test
   public void firstDriverClassMissingSecondExists() {
-    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
-    Mockito.when(builder.build()).thenReturn("");
-    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"com.no", "org.h2.Driver"}, () -> "");
+    DbDriverLoader driverLoader = new DbDriverLoader(new String[]{"com.no", "org.h2.Driver"}, () -> "");
     Driver driver = driverLoader.driver();
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("org.h2.Driver");
@@ -107,9 +88,7 @@ public class DbDriverLoaderTest {
 
   @Test
   public void twoDriversBothExists() {
-    ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
-    Mockito.when(builder.build()).thenReturn("");
-    DbDriverLoader driverLoader = new DbDriverLoader(parse(), builder, new String[]{"com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"}, () -> "");
+    DbDriverLoader driverLoader = new DbDriverLoader(new String[]{"com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"}, () -> "");
     Driver driver = driverLoader.driver();
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("com.mysql.cj.jdbc.Driver");
