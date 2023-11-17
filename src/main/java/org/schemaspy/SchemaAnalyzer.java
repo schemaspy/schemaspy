@@ -55,6 +55,7 @@ import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.connection.ScExceptionChecked;
 import org.schemaspy.connection.ScNullChecked;
 import org.schemaspy.connection.ScSimple;
+import org.schemaspy.connection.SqlConnection;
 import org.schemaspy.input.dbms.CatalogResolver;
 import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
@@ -157,8 +158,21 @@ public class SchemaAnalyzer {
     public Database analyze() throws SQLException, IOException {
 
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
+            final ConnectionConfig connectionConfig = this.commandLineArguments.getConnectionConfig();
+            final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
+            final DbDriverLoader loader = new DbDriverLoader(connectionConfig);
+            final SqlConnection con = new ScExceptionChecked(
+                urlBuilder,
+                new ScNullChecked(
+                    urlBuilder,
+                    new ScSimple(connectionConfig, urlBuilder, loader)
+                )
+            );
             return this.analyzeMultipleSchemas(
-                    databaseServiceFactory.forMultipleSchemas(commandLineArguments.getProcessingConfig())
+                databaseServiceFactory.forMultipleSchemas(
+                    commandLineArguments.getProcessingConfig()
+                ),
+                con
             );
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
@@ -175,23 +189,13 @@ public class SchemaAnalyzer {
     }
 
     public Database analyzeMultipleSchemas(
-            DatabaseService databaseService
+            DatabaseService databaseService,
+            final SqlConnection con
     ) throws SQLException, IOException {
         List<String> schemas = commandLineArguments.getSchemas();
         Database db = null;
 
-        final ConnectionConfig connectionConfig = commandLineArguments.getConnectionConfig();
-        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
-        final DbDriverLoader loader = new DbDriverLoader(connectionConfig);
-        final Connection connection = new ScExceptionChecked(
-            urlBuilder,
-            new ScNullChecked(
-                urlBuilder,
-                new ScSimple(connectionConfig, urlBuilder, loader)
-            )
-        ).connection();
-
-        DatabaseMetaData meta = connection.getMetaData();
+        DatabaseMetaData meta = con.connection().getMetaData();
         if (schemas.isEmpty()) {
             String schemaSpec = commandLineArguments.getSchemaSpec();
             LOGGER.info(
