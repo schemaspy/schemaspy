@@ -165,9 +165,12 @@ public class TableService {
 
             while (rs.next()) {
                 ImportForeignKey foreignKey = new ImportForeignKey.Builder().fromImportKeysResultSet(rs).build();
+                String baseContainer = remoteTable.getBaseContainer();
+                String fkSchema = foreignKey.getPkTableSchema();
+                String fkCatalog = foreignKey.getPkTableCat();
 
                 // if it points back to our schema then use it
-                if (remoteTable.getBaseContainer().equals(foreignKey.getPkTableSchema()) || remoteTable.getBaseContainer().equals(foreignKey.getPkTableCat())) {
+                if ((baseContainer != null) && (((fkSchema != null) && baseContainer.equals(fkSchema)) || ((fkCatalog != null) && baseContainer.equals(fkCatalog)))) {
                     addForeignKey(db, remoteTable, foreignKey, tables);
                 }
             }
