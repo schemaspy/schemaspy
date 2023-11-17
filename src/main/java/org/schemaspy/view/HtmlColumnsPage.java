@@ -38,6 +38,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 /**
@@ -66,10 +68,24 @@ public class HtmlColumnsPage {
                 .flatMap(tableIndex -> tableIndex.getColumns().stream())
                 .collect(Collectors.toSet());
 
-        Set<MustacheTableColumn> tableColumns = tables.stream()
+        Set<MustacheTableColumn> tmpColumns = tables.stream()
                 .flatMap(table -> table.getColumns().stream())
                 .map(tableColumn -> new MustacheTableColumn(tableColumn, indexedColumns.contains(tableColumn), mustacheCompiler.getRootPath(0)))
                 .collect(Collectors.toSet());
+
+	Set<MustacheTableColumn> tableColumns = new TreeSet<MustacheTableColumn> (new Comparator<MustacheTableColumn>() {
+		@Override
+		public int compare(MustacheTableColumn o1, MustacheTableColumn o2){
+		    int result =  o1.getColumn().getTable().getName().compareTo(o2.getColumn().getTable().getName());
+
+		    if (result == 0) {
+		    result =  o1.getColumn().getName().compareTo(o2.getColumn().getName());
+		    }
+		    return result;
+		}
+	    });
+
+	tableColumns.addAll(tmpColumns);
 
         JSONArray columns = new JSONArray();
 

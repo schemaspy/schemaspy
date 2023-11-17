@@ -36,6 +36,7 @@ import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -73,7 +74,11 @@ public class HtmlMainIndexPage {
             mustacheTables.add(mustacheTable);
         }
 
-        long tablesAmount = tables.stream().filter(t -> !t.isView()).count();
+	mustacheTables.sort( (t1,t2) -> t1.getTable().getName().compareTo(t2.getTable().getName()));
+
+
+
+	long tablesAmount = tables.stream().filter(t -> !t.isView()).count();
         long viewsAmount = tables.stream().filter(Table::isView).count();
         long constraintsAmount = DbAnalyzer.getForeignKeyConstraints(tables).size();
         long routinesAmount = database.getRoutines().size();
