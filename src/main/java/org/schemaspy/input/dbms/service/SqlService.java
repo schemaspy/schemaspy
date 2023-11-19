@@ -26,6 +26,7 @@ package org.schemaspy.input.dbms.service;
 import org.schemaspy.connection.ScExceptionChecked;
 import org.schemaspy.connection.ScNullChecked;
 import org.schemaspy.connection.ScSimple;
+import org.schemaspy.connection.SqlConnection;
 import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.DbDriverLoader;
@@ -71,20 +72,24 @@ public class SqlService {
 
     public DatabaseMetaData connect(ConnectionConfig connectionConfig) throws IOException, SQLException {
         final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
-        final DbDriverLoader loader = new DbDriverLoader(connectionConfig);
-        final Connection connection = new ScExceptionChecked(
-            urlBuilder,
-            new ScNullChecked(
+        return connect(
+            new ScExceptionChecked(
                 urlBuilder,
-                new ScSimple(connectionConfig, urlBuilder, loader)
+                new ScNullChecked(
+                    urlBuilder,
+                    new ScSimple(
+                        connectionConfig,
+                        urlBuilder,
+                        new DbDriverLoader(connectionConfig)
+                    )
+                )
             )
-        ).connection();
-        return connect(connection);
+        );
     }
 
-    public DatabaseMetaData connect(Connection connection) throws SQLException {
-        this.connection = connection;
-        databaseMetaData = connection.getMetaData();
+    public DatabaseMetaData connect(SqlConnection sqlConnection) throws SQLException, IOException {
+        this.connection = sqlConnection.connection();
+        databaseMetaData = this.connection.getMetaData();
         dbmsMeta = dbmsService.fetchDbmsMeta(databaseMetaData);
         invalidIdentifierPattern = createInvalidIdentifierPattern(databaseMetaData);
         allKeywords = dbmsMeta.getAllKeywords();
