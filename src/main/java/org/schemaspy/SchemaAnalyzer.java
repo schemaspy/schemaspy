@@ -291,7 +291,20 @@ public class SchemaAnalyzer {
 
         String catalog = commandLineArguments.getCatalog();
 
-        DatabaseMetaData databaseMetaData = sqlService.connect(commandLineArguments.getConnectionConfig());
+        final ConnectionConfig connectionConfig = commandLineArguments.getConnectionConfig();
+        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
+        final SqlConnection connection = new ScExceptionChecked(
+            urlBuilder,
+            new ScNullChecked(
+                urlBuilder,
+                new ScSimple(
+                    connectionConfig,
+                    urlBuilder,
+                    new DbDriverLoader(connectionConfig)
+                )
+            )
+        );
+        DatabaseMetaData databaseMetaData = sqlService.connect(connection);
         DbmsMeta dbmsMeta = sqlService.getDbmsMeta();
         LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
 
