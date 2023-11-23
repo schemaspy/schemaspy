@@ -25,6 +25,10 @@ import org.schemaspy.SimpleRuntimeDotConfig;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.connection.ScSimple;
+import org.schemaspy.input.dbms.ConnectionConfig;
+import org.schemaspy.input.dbms.ConnectionURLBuilder;
+import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.input.dbms.xml.SchemaMeta;
@@ -76,7 +80,14 @@ public class SchemaMetaIT {
         commandLineArguments = new CommandLineArgumentParser(
                 args
         ).commandLineArguments();
-        sqlService.connect(commandLineArguments.getConnectionConfig());
+        ConnectionConfig connectionConfig = commandLineArguments.getConnectionConfig();
+        sqlService.connect(
+            new ScSimple(
+                connectionConfig,
+                new ConnectionURLBuilder(connectionConfig),
+                new DbDriverLoader(connectionConfig)
+            )
+        );
         dbmsMeta = sqlService.getDbmsMeta();
         schema = h2MemoryRule.getConnection().getSchema();
         catalog = h2MemoryRule.getConnection().getCatalog();
