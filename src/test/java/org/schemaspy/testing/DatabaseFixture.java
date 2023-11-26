@@ -2,6 +2,10 @@ package org.schemaspy.testing;
 
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.connection.ScSimple;
+import org.schemaspy.input.dbms.ConnectionConfig;
+import org.schemaspy.input.dbms.ConnectionURLBuilder;
+import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.model.Database;
@@ -29,7 +33,14 @@ public class DatabaseFixture {
         CommandLineArguments arguments = new CommandLineArgumentParser(
                 args
         ).commandLineArguments();
-        DatabaseMetaData metaData = sqlService.connect(arguments.getConnectionConfig());
+        ConnectionConfig connectionConfig = arguments.getConnectionConfig();
+        DatabaseMetaData metaData = sqlService.connect(
+            new ScSimple(
+                connectionConfig,
+                new ConnectionURLBuilder(connectionConfig),
+                new DbDriverLoader(connectionConfig)
+            )
+        );
         Database database = new Database(
                 sqlService.getDbmsMeta(),
                 arguments.getConnectionConfig().getDatabaseName(),
