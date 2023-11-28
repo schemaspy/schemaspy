@@ -70,23 +70,6 @@ public class SqlService {
     private Pattern invalidIdentifierPattern;
     private Set<String> allKeywords;
 
-    public DatabaseMetaData connect(ConnectionConfig connectionConfig) throws IOException, SQLException {
-        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
-        return connect(
-            new ScExceptionChecked(
-                urlBuilder,
-                new ScNullChecked(
-                    urlBuilder,
-                    new ScSimple(
-                        connectionConfig,
-                        urlBuilder,
-                        new DbDriverLoader(connectionConfig)
-                    )
-                )
-            )
-        );
-    }
-
     public DatabaseMetaData connect(SqlConnection sqlConnection) throws SQLException, IOException {
         this.connection = sqlConnection.connection();
         databaseMetaData = this.connection.getMetaData();
