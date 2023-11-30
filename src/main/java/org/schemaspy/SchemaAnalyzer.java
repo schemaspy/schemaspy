@@ -178,12 +178,26 @@ public class SchemaAnalyzer {
             File outputDirectory = commandLineArguments.getOutputDirectory();
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
+            final ConnectionConfig connectionConfig = commandLineArguments.getConnectionConfig();
+            final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
+            final SqlConnection connection = new ScExceptionChecked(
+                urlBuilder,
+                new ScNullChecked(
+                    urlBuilder,
+                    new ScSimple(
+                        connectionConfig,
+                        urlBuilder,
+                        new DbDriverLoader(connectionConfig)
+                    )
+                )
+            );
             return analyze(
-                    commandLineArguments.getConnectionConfig().getDatabaseName(),
-                    schema,
-                    false,
-                    outputDirectory,
-                    databaseServiceFactory.forSingleSchema(commandLineArguments.getProcessingConfig())
+                commandLineArguments.getConnectionConfig().getDatabaseName(),
+                schema,
+                false,
+                outputDirectory,
+                databaseServiceFactory.forSingleSchema(commandLineArguments.getProcessingConfig()),
+                connection
             );
         }
     }
@@ -234,7 +248,20 @@ public class SchemaAnalyzer {
 
             LOGGER.info("Analyzing '{}'", new Sanitize(schema));
             File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
-            db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService);
+            final ConnectionConfig connectionConfig = commandLineArguments.getConnectionConfig();
+            final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
+            final SqlConnection connection = new ScExceptionChecked(
+                urlBuilder,
+                new ScNullChecked(
+                    urlBuilder,
+                    new ScSimple(
+                        connectionConfig,
+                        urlBuilder,
+                        new DbDriverLoader(connectionConfig)
+                    )
+                )
+            );
+            db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService, connection);
             if (db == null) //if any of analysed schema returns null
                 return null;
             mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
@@ -278,11 +305,12 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze(
-            String dbName,
-            String schema,
-            boolean isOneOfMultipleSchemas,
-            File outputDir,
-            DatabaseService databaseService
+        String dbName,
+        String schema,
+        boolean isOneOfMultipleSchemas,
+        File outputDir,
+        DatabaseService databaseService,
+        SqlConnection connection
     ) throws SQLException, IOException {
         LOGGER.info("Starting schema analysis");
         ProgressListener progressListener = new Console(outputDir, new Tracked());
@@ -291,19 +319,6 @@ public class SchemaAnalyzer {
 
         String catalog = commandLineArguments.getCatalog();
 
-        final ConnectionConfig connectionConfig = commandLineArguments.getConnectionConfig();
-        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
-        final SqlConnection connection = new ScExceptionChecked(
-            urlBuilder,
-            new ScNullChecked(
-                urlBuilder,
-                new ScSimple(
-                    connectionConfig,
-                    urlBuilder,
-                    new DbDriverLoader(connectionConfig)
-                )
-            )
-        );
         DatabaseMetaData databaseMetaData = sqlService.connect(connection);
         DbmsMeta dbmsMeta = sqlService.getDbmsMeta();
         LOGGER.info("Connected to {} - {}", databaseMetaData.getDatabaseProductName(), databaseMetaData.getDatabaseProductVersion());
