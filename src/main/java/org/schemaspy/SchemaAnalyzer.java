@@ -156,41 +156,30 @@ public class SchemaAnalyzer {
     }
 
     public Database analyze() throws SQLException, IOException {
-
-        if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
-            final ConnectionConfig connectionConfig = this.commandLineArguments.getConnectionConfig();
-            final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
-            final DbDriverLoader loader = new DbDriverLoader(connectionConfig);
-            final SqlConnection con = new ScExceptionChecked(
+        final ConnectionConfig connectionConfig = this.commandLineArguments.getConnectionConfig();
+        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
+        final SqlConnection connection = new ScExceptionChecked(
+            urlBuilder,
+            new ScNullChecked(
                 urlBuilder,
-                new ScNullChecked(
+                new ScSimple(
+                    connectionConfig,
                     urlBuilder,
-                    new ScSimple(connectionConfig, urlBuilder, loader)
+                    new DbDriverLoader(connectionConfig)
                 )
-            );
+            )
+        );
+        if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
                 databaseServiceFactory.forMultipleSchemas(
                     commandLineArguments.getProcessingConfig()
                 ),
-                con
+                connection
             );
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
             Objects.requireNonNull(outputDirectory);
             String schema = commandLineArguments.getSchema();
-            final ConnectionConfig connectionConfig = commandLineArguments.getConnectionConfig();
-            final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
-            final SqlConnection connection = new ScExceptionChecked(
-                urlBuilder,
-                new ScNullChecked(
-                    urlBuilder,
-                    new ScSimple(
-                        connectionConfig,
-                        urlBuilder,
-                        new DbDriverLoader(connectionConfig)
-                    )
-                )
-            );
             return analyze(
                 commandLineArguments.getConnectionConfig().getDatabaseName(),
                 schema,
