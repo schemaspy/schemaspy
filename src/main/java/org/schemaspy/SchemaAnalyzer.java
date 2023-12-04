@@ -237,20 +237,7 @@ public class SchemaAnalyzer {
 
             LOGGER.info("Analyzing '{}'", new Sanitize(schema));
             File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
-            final ConnectionConfig connectionConfig = commandLineArguments.getConnectionConfig();
-            final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
-            final SqlConnection connection = new ScExceptionChecked(
-                urlBuilder,
-                new ScNullChecked(
-                    urlBuilder,
-                    new ScSimple(
-                        connectionConfig,
-                        urlBuilder,
-                        new DbDriverLoader(connectionConfig)
-                    )
-                )
-            );
-            db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService, connection);
+            db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService, con);
             if (db == null) //if any of analysed schema returns null
                 return null;
             mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
