@@ -82,7 +82,7 @@ Here is a list of where you might find drivers for common database management sy
 * `MariaDB <https://downloads.mariadb.org/connector-java/>`_
 * `Netezza <https://www.ibm.com/support/knowledgecenter/SSULQD_7.2.1/com.ibm.nz.datacon.doc/c_datacon_installing_configuring_jdbc.html>`_
 * `Oracle <https://www.oracle.com/database/technologies/appdev/jdbc-downloads.html>`_
-* `PostgreSQL <https://jdbc.postgresql.org/download.html>`_
+* `PostgreSQL <https://jdbc.postgresql.org/download/>`_
 * `Redshift <https://docs.aws.amazon.com/redshift/latest/mgmt/configuring-connections.html>`_
 * `SQLite <https://github.com/xerial/sqlite-jdbc>`_
 * `SQL Server <https://docs.microsoft.com/en-us/sql/connect/jdbc/download-microsoft-jdbc-driver-for-sql-server>`_
