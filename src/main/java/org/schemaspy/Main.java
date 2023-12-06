@@ -29,6 +29,12 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.cli.*;
+import org.schemaspy.connection.ScExceptionChecked;
+import org.schemaspy.connection.ScNullChecked;
+import org.schemaspy.connection.ScSimple;
+import org.schemaspy.input.dbms.ConnectionConfig;
+import org.schemaspy.input.dbms.ConnectionURLBuilder;
+import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
@@ -106,18 +112,30 @@ public class Main {
             LOGGER.debug("Debug enabled");
         }
         SqlService sqlService = new SqlService();
-        SchemaSpyRunner schemaSpyRunner =
-                new SchemaSpyRunner(
-                        new SchemaAnalyzer(
-                                sqlService,
-                                new DatabaseServiceFactory(sqlService),
-                                arguments,
-                                new XmlProducerUsingDOM(),
-                                new LayoutFolder(SchemaAnalyzer.class.getClassLoader())
-                        ),
-                        arguments,
-                        args
-                );
+        final ConnectionConfig connectionConfig = arguments.getConnectionConfig();
+        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
+        SchemaSpyRunner schemaSpyRunner = new SchemaSpyRunner(
+            new SchemaAnalyzer(
+                sqlService,
+                new DatabaseServiceFactory(sqlService),
+                arguments,
+                new XmlProducerUsingDOM(),
+                new LayoutFolder(SchemaAnalyzer.class.getClassLoader()),
+                new ScExceptionChecked(
+                    urlBuilder,
+                    new ScNullChecked(
+                        urlBuilder,
+                        new ScSimple(
+                            connectionConfig,
+                            urlBuilder,
+                            new DbDriverLoader(connectionConfig)
+                            )
+                        )
+                    )
+                ),
+            arguments,
+            args
+        );
         System.exit(schemaSpyRunner.run());
     }
 

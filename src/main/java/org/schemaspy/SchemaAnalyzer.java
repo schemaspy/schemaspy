@@ -34,7 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.time.Clock;
@@ -52,14 +51,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.connection.ScExceptionChecked;
-import org.schemaspy.connection.ScNullChecked;
-import org.schemaspy.connection.ScSimple;
 import org.schemaspy.connection.SqlConnection;
 import org.schemaspy.input.dbms.CatalogResolver;
-import org.schemaspy.input.dbms.ConnectionConfig;
-import org.schemaspy.input.dbms.ConnectionURLBuilder;
-import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.input.dbms.SchemaResolver;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -140,41 +133,31 @@ public class SchemaAnalyzer {
     private final OutputProducer outputProducer;
 
     private final LayoutFolder layoutFolder;
+    private final SqlConnection connection;
 
     public SchemaAnalyzer(
             final SqlService sqlService,
             final DatabaseServiceFactory databaseServiceFactory,
             final CommandLineArguments commandLineArguments,
             final OutputProducer outputProducer,
-            final LayoutFolder layoutFolder
+            final LayoutFolder layoutFolder,
+            final SqlConnection connection
     ) {
         this.sqlService = Objects.requireNonNull(sqlService);
         this.databaseServiceFactory = databaseServiceFactory;
         this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
         this.outputProducer = outputProducer;
         this.layoutFolder = layoutFolder;
+        this.connection = connection;
     }
 
     public Database analyze() throws SQLException, IOException {
-        final ConnectionConfig connectionConfig = this.commandLineArguments.getConnectionConfig();
-        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
-        final SqlConnection connection = new ScExceptionChecked(
-            urlBuilder,
-            new ScNullChecked(
-                urlBuilder,
-                new ScSimple(
-                    connectionConfig,
-                    urlBuilder,
-                    new DbDriverLoader(connectionConfig)
-                )
-            )
-        );
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
                 databaseServiceFactory.forMultipleSchemas(
                     commandLineArguments.getProcessingConfig()
                 ),
-                connection
+                this.connection
             );
         } else {
             File outputDirectory = commandLineArguments.getOutputDirectory();
@@ -186,7 +169,7 @@ public class SchemaAnalyzer {
                 false,
                 outputDirectory,
                 databaseServiceFactory.forSingleSchema(commandLineArguments.getProcessingConfig()),
-                connection
+                this.connection
             );
         }
     }
