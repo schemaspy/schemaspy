@@ -44,7 +44,7 @@ public class DbDriverLoaderTest {
   @Test
   public void testGetConnection() throws IOException {
     assertThat(
-        new DbDriverLoader(
+        new DriverFromConfig(
             parse("-t", Paths.get("src", "test", "resources", "integrationTesting", "dbTypes", "h2memory.properties").toString(), "-u", "sa", "-db", "DbDriverLoaderTest")
         ).driver()
     ).isNotNull();

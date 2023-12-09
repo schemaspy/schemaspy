@@ -29,10 +29,9 @@ import org.schemaspy.input.dbms.driver.Driversource;
 import org.schemaspy.input.dbms.driver.DsCached;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
-import org.schemaspy.input.dbms.driverpath.*;
 
 import java.sql.Driver;
-import java.util.*;
+import org.schemaspy.input.dbms.driverpath.Driverpath;
 
 /**
  * @author John Currier
@@ -41,29 +40,10 @@ import java.util.*;
  * @author Nils Petzaell
  * @author Daniel Watt
  */
-public class DbDriverLoader implements Driversource  {
+public class DbDriverLoader implements Driversource {
 
     private final String[] driverClass;
     private Driverpath driverPath;
-
-    public DbDriverLoader(final ConnectionConfig connectionConfig) {
-        this(connectionConfig, connectionConfig.getDatabaseTypeProperties());
-    }
-
-    public DbDriverLoader(final ConnectionConfig connectionConfig, final Properties properties) {
-        this(
-            properties.getProperty("driver").split(","),
-            new DpMissingPathChecked(
-                new DpFallback(
-                    new DpConnectionConfig(connectionConfig),
-                    new DpFallback(
-                        new DpProperties(properties),
-                        new DpNull()
-                    )
-                )
-            )
-        );
-    }
 
     public DbDriverLoader(final String[] driverClass, final Driverpath driverPath) {
         this.driverClass = driverClass;

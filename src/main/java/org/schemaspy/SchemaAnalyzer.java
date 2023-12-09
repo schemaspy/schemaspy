@@ -60,6 +60,7 @@ import org.schemaspy.input.dbms.CatalogResolver;
 import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.DbDriverLoader;
+import org.schemaspy.input.dbms.DriverFromConfig;
 import org.schemaspy.input.dbms.SchemaResolver;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -165,7 +166,7 @@ public class SchemaAnalyzer {
                 new ScSimple(
                     connectionConfig,
                     urlBuilder,
-                    new DbDriverLoader(connectionConfig)
+                    new DriverFromConfig(connectionConfig)
                 )
             )
         );
