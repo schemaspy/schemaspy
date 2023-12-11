@@ -6,22 +6,21 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.schemaspy.input.dbms.driverpath.Driverpath;
 
 public class GetExistingUrls implements Classpath {
 
-    private final String[] pieces;
+    private final Driverpath driverpath;
 
-    public GetExistingUrls(final String path) {
-        this(path.split(File.pathSeparator));
-    }
+    public GetExistingUrls(final Driverpath driverpath) {
 
-    public GetExistingUrls(final String[] pieces) {
-        this.pieces = pieces;
+        this.driverpath = driverpath;
     }
 
     @Override
     public Set<URI> paths() {
-        Iterable<File> files = Arrays.stream(this.pieces).map(File::new).collect(Collectors.toList());
+        final String[] pieces = this.driverpath.value().split(File.pathSeparator);
+        Iterable<File> files = Arrays.stream(pieces).map(File::new).collect(Collectors.toList());
         return consider(files);
     }
 
