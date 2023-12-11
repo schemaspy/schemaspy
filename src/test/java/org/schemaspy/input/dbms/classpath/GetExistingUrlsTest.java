@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.schemaspy.input.dbms.driverpath.Driverpath;
 
 public class GetExistingUrlsTest {
 
@@ -37,7 +38,7 @@ public class GetExistingUrlsTest {
     URI narJarWarNotIncludedURI = Paths.get("src", "test", "resources", "driverFolder", "nar.jar.war.not.included")
                                        .toUri();
 
-    String dp = Paths.get("src", "test", "resources", "driverFolder").toString();
+    Driverpath dp = () -> Paths.get("src", "test", "resources", "driverFolder").toString();
     Set<URI> uris = new GetExistingUrls(dp).paths();
 
     assertThat(uris)
@@ -49,7 +50,7 @@ public class GetExistingUrlsTest {
   public void willOnlyAddFileIfFileIsSpecified() {
     URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
 
-    String dp = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
+    Driverpath dp = () -> Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
     Set<URI> uris = new GetExistingUrls(dp).paths();
 
     assertThat(uris)
@@ -67,7 +68,7 @@ public class GetExistingUrlsTest {
 
     String dpFile = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
     String dpDir = Paths.get("src", "test", "resources", "driverFolder").toString();
-    Set<URI> uris = new GetExistingUrls(dpFile + File.pathSeparator + dpDir).paths();
+    Set<URI> uris = new GetExistingUrls(() -> dpFile + File.pathSeparator + dpDir).paths();
 
     assertThat(uris)
         .hasSize(4)

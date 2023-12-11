@@ -62,7 +62,7 @@ public class DbDriverLoader implements Driversource {
         Class<Driver> driverClass = new DcFacade(
             this.driverClass,
             new ClClasspath(
-                new GetExistingUrls(driverPath)
+                new GetExistingUrls(this.driverPath)
             )
         ).value();
 
