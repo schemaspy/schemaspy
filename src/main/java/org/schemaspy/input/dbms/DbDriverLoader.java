@@ -57,8 +57,6 @@ public class DbDriverLoader implements Driversource {
      * @return
      */
     public synchronized Driver driver() {
-        String driverPath = this.driverPath.value();
-
         Class<Driver> driverClass = new DcFacade(
             this.driverClass,
             new ClClasspath(
@@ -70,7 +68,6 @@ public class DbDriverLoader implements Driversource {
         //TODO implement PrintStream to Logger bridge.
         // setLogStream should only be called once maybe in Main
         return new DsCached(
-            driverPath,
             driverClass,
             new DsDriverClass(driverClass)
         ).driver();
