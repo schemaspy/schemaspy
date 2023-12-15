@@ -149,9 +149,9 @@ public class SchemaAnalyzer {
             final OutputProducer outputProducer,
             final LayoutFolder layoutFolder
     ) {
-        this.sqlService = Objects.requireNonNull(sqlService);
+        this.sqlService = sqlService;
         this.databaseServiceFactory = databaseServiceFactory;
-        this.commandLineArguments = Objects.requireNonNull(commandLineArguments);
+        this.commandLineArguments = commandLineArguments;
         this.outputProducer = outputProducer;
         this.layoutFolder = layoutFolder;
     }
