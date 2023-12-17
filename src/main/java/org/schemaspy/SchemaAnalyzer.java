@@ -141,35 +141,25 @@ public class SchemaAnalyzer {
     private final OutputProducer outputProducer;
 
     private final LayoutFolder layoutFolder;
+    private final SqlConnection connection;
 
     public SchemaAnalyzer(
             final SqlService sqlService,
             final DatabaseServiceFactory databaseServiceFactory,
             final CommandLineArguments commandLineArguments,
             final OutputProducer outputProducer,
-            final LayoutFolder layoutFolder
+            final LayoutFolder layoutFolder,
+            final SqlConnection connection
     ) {
         this.sqlService = sqlService;
         this.databaseServiceFactory = databaseServiceFactory;
         this.commandLineArguments = commandLineArguments;
         this.outputProducer = outputProducer;
         this.layoutFolder = layoutFolder;
+        this.connection = connection;
     }
 
     public Database analyze() throws SQLException, IOException {
-        final ConnectionConfig connectionConfig = this.commandLineArguments.getConnectionConfig();
-        final ConnectionURLBuilder urlBuilder = new ConnectionURLBuilder(connectionConfig);
-        final SqlConnection connection = new ScExceptionChecked(
-            urlBuilder,
-            new ScNullChecked(
-                urlBuilder,
-                new ScSimple(
-                    connectionConfig,
-                    urlBuilder,
-                    new DriverFromConfig(connectionConfig)
-                )
-            )
-        );
         if (commandLineArguments.isEvaluateAllEnabled() || !commandLineArguments.getSchemas().isEmpty()) {
             return this.analyzeMultipleSchemas(
                 databaseServiceFactory.forMultipleSchemas(
