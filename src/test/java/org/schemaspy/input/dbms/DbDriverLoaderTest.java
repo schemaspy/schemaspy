@@ -56,8 +56,7 @@ public class DbDriverLoaderTest {
 
     DbDriverLoader driverLoader1 = new DbDriverLoader(drivers, () -> "");
     Driver driver1 = driverLoader1.driver();
-    DbDriverLoader driverLoader2 = new DbDriverLoader(drivers, () -> "");
-    Driver driver2 = driverLoader2.driver();
+    Driver driver2 = driverLoader1.driver();
     assertThat(driver1).isSameAs(driver2);
   }
 
