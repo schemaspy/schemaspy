@@ -69,7 +69,7 @@ public class DbDriverLoader implements Driversource {
         // setLogStream should only be called once maybe in Main
         return new DsCached(
             driverClass,
-            new DsDriverClass(driverClass)
+            new DsDriverClass(() -> driverClass)
         ).driver();
     }
 }
