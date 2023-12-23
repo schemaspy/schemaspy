@@ -1,33 +1,28 @@
 package org.schemaspy.input.dbms.driver;
 
 import java.sql.Driver;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DsCached implements Driversource {
 
-    private static Map<String, Driver> driverCache = new HashMap<>();
-
-    private final Class<Driver> driverClass;
     private final Driversource origin;
+    private final List<Driver> cache;
 
-    public DsCached(
-        final Class<Driver> driverClass,
-        final Driversource origin
-    ) {
-        this.driverClass = driverClass;
+    public DsCached(final Driversource origin) {
+        this(origin, new ArrayList<>());
+    }
+
+    public DsCached(final Driversource origin, final List<Driver> cache) {
         this.origin = origin;
+        this.cache = cache;
     }
 
     @Override
     public Driver driver() {
-        Driver driver = driverCache.get(driverClass.getName());
-        if (Objects.nonNull(driver)) {
-            return driver;
+        if (this.cache.isEmpty()) {
+            this.cache.add(this.origin.driver());
         }
-        driver = this.origin.driver();
-        driverCache.put(driverClass.getName(), driver);
-        return driver;
+        return this.cache.get(0);
     }
 }

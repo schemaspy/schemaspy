@@ -42,12 +42,26 @@ import org.schemaspy.input.dbms.driverpath.Driverpath;
  */
 public class DbDriverLoader implements Driversource {
 
-    private final String[] driverClass;
-    private Driverpath driverPath;
+    private final Driversource origin;
 
     public DbDriverLoader(final String[] driverClass, final Driverpath driverPath) {
-        this.driverClass = driverClass;
-        this.driverPath = driverPath;
+        this(
+            new DsCached(
+                new DsDriverClass(
+                    new DcFacade(
+                        driverClass,
+                        new ClClasspath(
+                            new GetExistingUrls(driverPath)
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    public DbDriverLoader(final Driversource origin) {
+
+        this.origin = origin;
     }
 
     /**
@@ -57,19 +71,9 @@ public class DbDriverLoader implements Driversource {
      * @return
      */
     public synchronized Driver driver() {
-        Class<Driver> driverClass = new DcFacade(
-            this.driverClass,
-            new ClClasspath(
-                new GetExistingUrls(this.driverPath)
-            )
-        ).value();
-
         // @see DriverManager.setLogStream(PrintStream)
         //TODO implement PrintStream to Logger bridge.
         // setLogStream should only be called once maybe in Main
-        return new DsCached(
-            driverClass,
-            new DsDriverClass(() -> driverClass)
-        ).driver();
+        return this.origin.driver();
     }
 }
