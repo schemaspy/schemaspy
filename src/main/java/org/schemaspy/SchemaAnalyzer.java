@@ -91,6 +91,7 @@ import org.schemaspy.util.DefaultPrintWriter;
 import org.schemaspy.util.ManifestUtils;
 import org.schemaspy.util.Markdown;
 import org.schemaspy.util.copy.CopyFromUrl;
+import org.schemaspy.util.filefilter.NotHtml;
 import org.schemaspy.util.naming.FileNameGenerator;
 import org.schemaspy.view.HtmlAnomaliesPage;
 import org.schemaspy.view.HtmlColumnsPage;
@@ -229,7 +230,7 @@ public class SchemaAnalyzer {
         }
 
         if (commandLineArguments.isHtmlEnabled()) {
-            new CopyFromUrl(layoutFolder.url(), outputDir, notHtml()).copy();
+            new CopyFromUrl(layoutFolder.url(), outputDir, new NotHtml()).copy();
 
             DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
             MustacheCompiler mustacheCompiler = new MustacheCompiler(commandLineArguments.getConnectionConfig().getDatabaseName(),
@@ -372,7 +373,7 @@ public class SchemaAnalyzer {
 
         Markdown.registryPage(tables);
 
-        new CopyFromUrl(layoutFolder.url(), outputDir, notHtml()).copy();
+        new CopyFromUrl(layoutFolder.url(), outputDir, new NotHtml()).copy();
 
         Renderer renderer = useVizJS ? new VizJSDot() : new GraphvizDot(commandLineArguments.getGraphVizConfig());
 
@@ -553,16 +554,6 @@ public class SchemaAnalyzer {
         }
         progressListener.finishedCreatingTablePages();
         LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
-    }
-
-    private FileFilter notHtml() {
-        return FileFilterUtils
-            .and(
-                FileFilterUtils
-                    .notFileFilter(
-                        FileFilterUtils.suffixFileFilter(DOT_HTML)
-                    )
-            );
     }
 
     private static void writeInfo(String key, String value, Path infoFile) {
