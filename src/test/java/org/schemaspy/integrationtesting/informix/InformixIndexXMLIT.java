@@ -74,7 +74,8 @@ public class InformixIndexXMLIT {
                     "-p", informixContainer.getPassword(),
                     "-host", informixContainer.getHost(),
                     "-port", informixContainer.getJdbcPort().toString(),
-                    "-nohtml"
+                    "-nohtml",
+                    "--include-routine-definition"
             };
             schemaSpyRunner(args).run();
             shouldRun.set(false);
