@@ -1,50 +1,50 @@
 package org.schemaspy.cli;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CombinedDefaultProviderTest {
+class CombinedDefaultProviderTest {
 
     @Test
-    public void returnsNullIfNullIsEverything() {
+    void returnsNullIfNullIsEverything() {
         CombinedDefaultProvider combinedDefaultProvider = new CombinedDefaultProvider((optionName)-> null);
         String value = combinedDefaultProvider.getDefaultValueFor("someString");
         assertThat(value).isNull();
     }
 
     @Test
-    public void getSSOWithOutValueShouldBeTrue() {
+    void getSSOWithOutValueShouldBeTrue() {
         CombinedDefaultProvider combinedDefaultProvider = new CombinedDefaultProvider((optionName)-> "");
         assertThat(combinedDefaultProvider.getDefaultValueFor("schemaspy.sso")).isEqualTo(Boolean.TRUE.toString());
     }
 
     @Test
-    public void getDebugWithValueFalseShouldBeFalse() {
+    void getDebugWithValueFalseShouldBeFalse() {
         CombinedDefaultProvider combinedDefaultProvider = new CombinedDefaultProvider((optionName)-> "false");
         assertThat(combinedDefaultProvider.getDefaultValueFor("schemaspy.debug")).isEqualTo(Boolean.FALSE.toString());
     }
 
     @Test
-    public void getNoHTMLWithoutValueIsTrue() {
+    void getNoHTMLWithoutValueIsTrue() {
         CombinedDefaultProvider combinedDefaultProvider = new CombinedDefaultProvider((optionName)-> "");
         assertThat(combinedDefaultProvider.getDefaultValueFor("schemaspy.nohtml")).isEqualTo(Boolean.TRUE.toString());
     }
 
     @Test
-    public void getNoHTMLNotDefinedIsFalse() {
+    void getNoHTMLNotDefinedIsFalse() {
         CombinedDefaultProvider combinedDefaultProvider = new CombinedDefaultProvider((optionName)-> null);
         assertThat(combinedDefaultProvider.getDefaultValueFor("schemaspy.nohtml")).isEqualTo(Boolean.FALSE.toString());
     }
 
     @Test
-    public void definedOrderIsTheOrder() {
+    void definedOrderIsTheOrder() {
         CombinedDefaultProvider combinedDefaultProvider = new CombinedDefaultProvider((optionName)-> "first",(optionName)-> "second" );
         assertThat(combinedDefaultProvider.getDefaultValueFor("someString")).isEqualTo("first");
     }
 
     @Test
-    public void willFallbackToSecondIfFirstIsNull() {
+    void willFallbackToSecondIfFirstIsNull() {
         CombinedDefaultProvider combinedDefaultProvider = new CombinedDefaultProvider((optionName)-> null,(optionName)-> "second" );
         assertThat(combinedDefaultProvider.getDefaultValueFor("someString")).isEqualTo("second");
     }

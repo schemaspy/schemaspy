@@ -20,25 +20,26 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.ParameterException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.schemaspy.testing.Logger;
-import org.schemaspy.testing.LoggingRule;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.schemaspy.testing.logback.Logback;
+import org.schemaspy.testing.logback.LogbackExtension;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-public class CommandLineArgumentParserTest {
+class CommandLineArgumentParserTest {
 
     private static final PropertyFileDefaultProvider NO_DEFAULT_PROVIDER = null;
 
-    @Rule
-    public LoggingRule loggingRule = new LoggingRule();
+    @RegisterExtension
+    public static LogbackExtension logback = new LogbackExtension();
 
     @Test
-    public void givenNoRequiredParameterProvided_AndNoDefaultProvider_ExpectError() {
+    void givenNoRequiredParameterProvided_AndNoDefaultProvider_ExpectError() {
         CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
 
         assertThatThrownBy(parser::commandLineArguments)
@@ -47,7 +48,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void givenNoRequiredParameterAndDefaultProviderWithoutRequiredValue_ExpectError() {
+    void givenNoRequiredParameterAndDefaultProviderWithoutRequiredValue_ExpectError() {
         PropertyFileDefaultProvider defaultProvider = mock(PropertyFileDefaultProvider.class);
         given(defaultProvider.getDefaultValueFor(any())).willReturn(null);
 
@@ -62,7 +63,7 @@ public class CommandLineArgumentParserTest {
      * given all required params (o and u) -> expect all ok
      */
     @Test
-    public void givenAllRequiredParamsProvided_ExpectToSuccessfullyParseCommandLineArguments() throws Exception {
+    void givenAllRequiredParamsProvided_ExpectToSuccessfullyParseCommandLineArguments() throws Exception {
         String[] args = {
                 "-o", "aFolder",
                 "-u", "MyUser"
@@ -75,7 +76,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void givenNoRequiredParameterAndDefaultProviderWithRequiredValue_ExpectSuccess() {
+    void givenNoRequiredParameterAndDefaultProviderWithRequiredValue_ExpectSuccess() {
         PropertyFileDefaultProvider defaultProvider = mock(PropertyFileDefaultProvider.class);
         given(defaultProvider.getDefaultValueFor("schemaspy.outputDirectory")).willReturn("mydirectory");
         given(defaultProvider.getDefaultValueFor("schemaspy.user")).willReturn("myuser");
@@ -88,7 +89,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void ssoIsEnabledOnCommandLineUserIsNotRequired() {
+    void ssoIsEnabledOnCommandLineUserIsNotRequired() {
         String[] args = {
                 "-o", "aFolder",
                 "-sso"
@@ -101,7 +102,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void ssoIsEnabledInPropertiesFileUserIsNotRequired() {
+    void ssoIsEnabledInPropertiesFileUserIsNotRequired() {
         PropertyFileDefaultProvider defaultProvider = mock(PropertyFileDefaultProvider.class);
         given(defaultProvider.getDefaultValueFor("schemaspy.outputDirectory")).willReturn("mydirectory");
         given(defaultProvider.getDefaultValueFor("schemaspy.sso")).willReturn(Boolean.TRUE.toString());
@@ -114,21 +115,20 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    @Logger(CommandLineArgumentParser.class)
-    public void printUsage() {
+    @Logback(CommandLineArgumentParser.class)
+    void printUsage() {
+        logback.expect(Matchers.containsString("Options:"));
         String[] args = {
                 "-o", "aFolder",
                 "-sso"
         };
         CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER, args);
-
-        CommandLineArguments arguments = parser.commandLineArguments();
+        parser.commandLineArguments();
         parser.printUsage();
-        assertThat(loggingRule.getLog()).contains("Options:");
     }
 
     @Test
-    public void onlyHelpSetsHelpRequiredShowsHelp() {
+    void onlyHelpSetsHelpRequiredShowsHelp() {
         String[] args = {
                 "-help"
         };
@@ -138,7 +138,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void onlyDBHelpSetsDBHelpRequired() {
+    void onlyDBHelpSetsDBHelpRequired() {
         String[] args = {
                 "-dbHelp"
         };
@@ -148,7 +148,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void printLicenseFlagWorks() {
+    void printLicenseFlagWorks() {
         String[] args = {
                 "--license"
         };
@@ -158,18 +158,16 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    @Logger(CommandLineArgumentParser.class)
-    public void canPrintLicense() {
+    @Logback(CommandLineArgumentParser.class)
+    void canPrintLicense() {
+        logback.expect(Matchers.containsString("GNU GENERAL PUBLIC LICENSE"));
+        logback.expect(Matchers.containsString("GNU LESSER GENERAL PUBLIC LICENSE"));
         CommandLineArgumentParser parser = new CommandLineArgumentParser(NO_DEFAULT_PROVIDER);
         parser.printLicense();
-        String log = loggingRule.getLog();
-        assertThat(log)
-            .contains("GNU GENERAL PUBLIC LICENSE")
-            .contains("GNU LESSER GENERAL PUBLIC LICENSE");
     }
 
     @Test
-    public void skipHtmlIsFalseByDefault() {
+    void skipHtmlIsFalseByDefault() {
         String[] args = {
                 "-o", "aFolder",
                 "-sso"
@@ -181,7 +179,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void skipHtmlCanBeEnabled() {
+    void skipHtmlCanBeEnabled() {
         String[] args = {
                 "-o", "aFolder",
                 "-sso",
@@ -194,7 +192,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void degreeOfSeparationIsTwoByDefault() {
+    void degreeOfSeparationIsTwoByDefault() {
         String[] args = {
                 "-o", "aFolder",
                 "-sso"
@@ -205,7 +203,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void degreeOfSeparationCanBeSetToOne() {
+    void degreeOfSeparationCanBeSetToOne() {
         String[] args = {
                 "-o", "aFolder",
                 "-sso",
@@ -217,7 +215,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void degreeOfSeparationThreeThrowsException() {
+    void degreeOfSeparationThreeThrowsException() {
         String[] args = {
                 "-o", "aFolder",
                 "-sso",
@@ -229,7 +227,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void testDataTablesConfig() {
+    void testDataTablesConfig() {
         String[] args = ("-o output/folder/ -u db_user " +
                 "-noDbObjectPaging -columnPageLength 45 -columnLengthChange -tablePageLength 20 " +
                 "-indexLengthChange -noCheckPaging -routineLengthChange")
@@ -255,7 +253,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void dontTreatWordAsParameterName() {
+    void dontTreatWordAsParameterName() {
         String[] args = {
             "-u", "user",
             "-p", "user",
@@ -267,7 +265,7 @@ public class CommandLineArgumentParserTest {
     }
 
     @Test
-    public void unkownOptionsAreStoredInArgument() {
+    void unkownOptionsAreStoredInArgument() {
         String[] args = {
             "-o", "aFolder",
             "-sso",
