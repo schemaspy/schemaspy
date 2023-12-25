@@ -19,33 +19,33 @@
 package org.schemaspy.cli;
 
 import com.beust.jcommander.ParameterException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class DegreeOfSeparationValidatorTest {
+class DegreeOfSeparationValidatorTest {
 
     private static String NAME = "-degree";
     private static final DegreeOfSeparationValidator VALIDATOR = new DegreeOfSeparationValidator();
 
     @Test
-    public void doesNotAllowZero() {
+    void doesNotAllowZero() {
         assertThatExceptionOfType(ParameterException.class)
                 .isThrownBy(() -> VALIDATOR.validate(NAME, 0));
     }
 
     @Test
-    public void doesAllowOne() {
+    void doesAllowOne() {
         VALIDATOR.validate(NAME, 1);
     }
 
     @Test
-    public void doesAllowTwo() {
+    void doesAllowTwo() {
         VALIDATOR.validate(NAME, 2);
     }
 
     @Test
-    public void doesNotAllowThree() {
+    void doesNotAllowThree() {
         assertThatExceptionOfType(ParameterException.class)
                 .isThrownBy(() -> VALIDATOR.validate(NAME, 3));
     }

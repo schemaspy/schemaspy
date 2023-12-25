@@ -18,17 +18,17 @@
  */
 package org.schemaspy.cli;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Thomas Traude
  */
-public class ConfigFileArgumentParserTest {
+class ConfigFileArgumentParserTest {
 
     @Test
-    public void givenConfigFileArgument_ExpectToParseItsValue() {
+    void givenConfigFileArgument_ExpectToParseItsValue() {
         assertThat(
                 new ConfigFileArgumentParser("-configFile", "my.properties")
                         .configFile()
@@ -36,7 +36,7 @@ public class ConfigFileArgumentParserTest {
     }
 
     @Test
-    public void givenNoConfigFileArgument_ExpectEmptyConfigFileValue() {
+    void givenNoConfigFileArgument_ExpectEmptyConfigFileValue() {
         assertThat(
                 new ConfigFileArgumentParser()
                         .configFile()

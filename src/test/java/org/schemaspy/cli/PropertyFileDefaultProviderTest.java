@@ -18,32 +18,32 @@
  */
 package org.schemaspy.cli;
 
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Nils Petzaell
  */
-public class PropertyFileDefaultProviderTest {
+class PropertyFileDefaultProviderTest {
 
-    @ClassRule
-    public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    private static Path temporaryFolder;
 
     private static PropertyFileDefaultProvider propertyFileDefaultProvider;
 
-    @BeforeClass
-    public static void createPropertiesFile() throws IOException {
-        File propertiesFile = temporaryFolder.newFile("schemaspy.properties");
+    @BeforeAll
+    static void createPropertiesFile() throws IOException {
+        File propertiesFile = Files.createFile(temporaryFolder.resolve("schemaspy.properties")).toFile();
         try (BufferedWriter bufferedWriter = Files.newBufferedWriter(propertiesFile.toPath(), StandardCharsets.UTF_8)) {
             bufferedWriter.write("schemaspy.user=humbug");
         }
@@ -51,7 +51,7 @@ public class PropertyFileDefaultProviderTest {
     }
 
     @Test
-    public void getStringValue() {
+    void getStringValue() {
         assertThat(propertyFileDefaultProvider.getDefaultValueFor("schemaspy.user")).isEqualTo("humbug");
     }
 
