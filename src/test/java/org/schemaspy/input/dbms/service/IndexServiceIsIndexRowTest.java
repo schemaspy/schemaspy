@@ -18,7 +18,7 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Nils Petzaell
  */
-public class IndexServiceIsIndexRowTest {
+class IndexServiceIsIndexRowTest {
 
     private SqlService sqlService = mock(SqlService.class);
 
@@ -66,25 +66,25 @@ public class IndexServiceIsIndexRowTest {
     }
 
     @Test
-    public void TableStatAndOrdinalZeroIsNotIndexRow() throws InvocationTargetException, IllegalAccessException, SQLException {
+    void TableStatAndOrdinalZeroIsNotIndexRow() throws InvocationTargetException, IllegalAccessException, SQLException {
         ResultSet rs = newResultSet(DatabaseMetaData.tableIndexStatistic, 0);
         assertThat(isIndexRow(rs)).isFalse();
     }
 
     @Test
-    public void NotTableStatAndOrdinalZeroIsNotIndexRow() throws SQLException, InvocationTargetException, IllegalAccessException {
+    void NotTableStatAndOrdinalZeroIsNotIndexRow() throws SQLException, InvocationTargetException, IllegalAccessException {
         ResultSet rs = newResultSet(DatabaseMetaData.tableIndexClustered, 0);
         assertThat(isIndexRow(rs)).isFalse();
     }
 
     @Test
-    public void TableStatAndOrdinalNotZeroIsNotIndexRow() throws SQLException, InvocationTargetException, IllegalAccessException {
+    void TableStatAndOrdinalNotZeroIsNotIndexRow() throws SQLException, InvocationTargetException, IllegalAccessException {
         ResultSet rs = newResultSet(DatabaseMetaData.tableIndexStatistic, 10);
         assertThat(isIndexRow(rs)).isFalse();
     }
 
     @Test
-    public void NotTableStatsAndOrdinalNotZeroIsIndexRow() throws SQLException, InvocationTargetException, IllegalAccessException {
+    void NotTableStatsAndOrdinalNotZeroIsIndexRow() throws SQLException, InvocationTargetException, IllegalAccessException {
         ResultSet rs = newResultSet(DatabaseMetaData.tableIndexClustered,10);
         assertThat(isIndexRow(rs)).isTrue();
     }

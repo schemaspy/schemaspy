@@ -18,8 +18,7 @@
  */
 package org.schemaspy.input.dbms.xml;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -27,88 +26,86 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author Wojciech Kasa
  */
-public class TableColumnMetaTest {
+class TableColumnMetaTest {
 
     @Test
-    public void nullableShouldBeTrue() throws Exception {
+    void nullableShouldBeTrue() throws Exception {
         Element itemElement = initialiseElement();
         itemElement.setAttribute("nullable", "true");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
-
-        Assert.assertEquals(true, tableColumnMeta.isNullable());
-
+        assertThat(tableColumnMeta.isNullable()).isTrue();
     }
 
     @Test
-    public void autoUpdatedShouldBeTrue() throws Exception {
+    void autoUpdatedShouldBeTrue() throws Exception {
         Element itemElement = initialiseElement();
         itemElement.setAttribute("autoUpdated", "true");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
-
-        Assert.assertEquals(true, tableColumnMeta.isAutoUpdated());
+        assertThat(tableColumnMeta.isAutoUpdated()).isTrue();
     }
 
     @Test
-    public void primaryShouldBeTrue() throws Exception {
+    void primaryShouldBeTrue() throws Exception {
         Element itemElement = initialiseElement();
         itemElement.setAttribute("primaryKey", "true");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
-
-        Assert.assertEquals(true, tableColumnMeta.isPrimary());
+        assertThat(tableColumnMeta.isPrimary()).isTrue();
     }
 
 
     @Test
-    public void shouldDisableImpliedKeys() throws Exception {
+    void shouldDisableImpliedKeys() throws Exception {
         Element itemElement = initialiseElement();
         itemElement.setAttribute("disableImpliedKeys", "all");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
 
-        Assert.assertEquals(true, tableColumnMeta.isImpliedChildrenDisabled());
-        Assert.assertEquals(true, tableColumnMeta.isImpliedParentsDisabled());
+        assertThat(tableColumnMeta.isImpliedChildrenDisabled()).isTrue();
+        assertThat(tableColumnMeta.isImpliedParentsDisabled()).isTrue();
 
         itemElement.setAttribute("disableImpliedKeys", "to");
         tableColumnMeta = new TableColumnMeta(itemElement);
 
-        Assert.assertEquals(true, tableColumnMeta.isImpliedChildrenDisabled());
-        Assert.assertEquals(false, tableColumnMeta.isImpliedParentsDisabled());
+        assertThat(tableColumnMeta.isImpliedChildrenDisabled()).isTrue();
+        assertThat(tableColumnMeta.isImpliedParentsDisabled()).isFalse();
 
         itemElement.setAttribute("disableImpliedKeys", "from");
         tableColumnMeta = new TableColumnMeta(itemElement);
 
-        Assert.assertEquals(false, tableColumnMeta.isImpliedChildrenDisabled());
-        Assert.assertEquals(true, tableColumnMeta.isImpliedParentsDisabled());
+        assertThat(tableColumnMeta.isImpliedChildrenDisabled()).isFalse();
+        assertThat(tableColumnMeta.isImpliedParentsDisabled()).isTrue();
 
         itemElement.setAttribute("disableImpliedKeys", "other");
         tableColumnMeta = new TableColumnMeta(itemElement);
 
-        Assert.assertEquals(false, tableColumnMeta.isImpliedChildrenDisabled());
-        Assert.assertEquals(false, tableColumnMeta.isImpliedParentsDisabled());
+        assertThat(tableColumnMeta.isImpliedChildrenDisabled()).isFalse();
+        assertThat(tableColumnMeta.isImpliedParentsDisabled()).isFalse();
     }
 
     @Test
-    public void shouldDisableDiagramAssociations() throws Exception {
+    void shouldDisableDiagramAssociations() throws Exception {
         Element itemElement = initialiseElement();
         itemElement.setAttribute("disableDiagramAssociations", "all");
         TableColumnMeta tableColumnMeta = new TableColumnMeta(itemElement);
 
-        Assert.assertEquals(true, tableColumnMeta.isAllExcluded());
-        Assert.assertEquals(true, tableColumnMeta.isExcluded());
+        assertThat(tableColumnMeta.isAllExcluded()).isTrue();
+        assertThat(tableColumnMeta.isExcluded()).isTrue();
 
         itemElement.setAttribute("disableDiagramAssociations", "exceptdirect");
         tableColumnMeta = new TableColumnMeta(itemElement);
 
-        Assert.assertEquals(false, tableColumnMeta.isAllExcluded());
-        Assert.assertEquals(true, tableColumnMeta.isExcluded());
+        assertThat(tableColumnMeta.isAllExcluded()).isFalse();
+        assertThat(tableColumnMeta.isExcluded()).isTrue();
 
         itemElement.setAttribute("disableDiagramAssociations", "other");
         tableColumnMeta = new TableColumnMeta(itemElement);
 
-        Assert.assertEquals(false, tableColumnMeta.isAllExcluded());
-        Assert.assertEquals(false, tableColumnMeta.isExcluded());
+        assertThat(tableColumnMeta.isAllExcluded()).isFalse();
+        assertThat(tableColumnMeta.isExcluded()).isFalse();
     }
 
 

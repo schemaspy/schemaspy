@@ -18,47 +18,46 @@
  */
 package org.schemaspy.input.dbms.xml;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.schemaspy.testing.Logger;
-import org.schemaspy.testing.LoggingRule;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.schemaspy.testing.logback.Logback;
+import org.schemaspy.testing.logback.LogbackExtension;
 
 /**
  * @author Nils Petzaell
  */
-public class SchemaMetaTest {
+class SchemaMetaTest {
 
-    @Rule
-    public LoggingRule LOGGING = new LoggingRule();
+    @RegisterExtension
+    public static LogbackExtension logback = new LogbackExtension();
 
     @Test
-    @Logger(TableMeta.class)
-    public void deprecationWarningRemarksInTable() {
+    @Logback(TableMeta.class)
+    void deprecationWarningRemarksInTable() {
+        logback.expect(Matchers.containsString("deprecated"));
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/remarksInTable.xml", "dbname", "schemaName", false);
-        assertThat(LOGGING.getLog()).contains("deprecated");
     }
 
     @Test
-    @Logger(TableColumnMeta.class)
-    public void deprecationWarningRemarksInColumn() {
+    @Logback(TableColumnMeta.class)
+    void deprecationWarningRemarksInColumn() {
+        logback.expect(Matchers.containsString("deprecated"));
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/remarksInColumn.xml", "dbname", "schemaName", false);
-        assertThat(LOGGING.getLog()).contains("deprecated");
     }
 
     @Test
-    @Logger(TableMeta.class)
-    public void okCommentsInTable() {
+    @Logback(TableMeta.class)
+    void okCommentsInTable() {
+        logback.expect(Matchers.not(Matchers.containsString("deprecated")));
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/commentsInTable.xml", "dbname", "schemaName", false);
-        assertThat(LOGGING.getLog()).doesNotContain("deprecated");
     }
 
     @Test
-    @Logger(TableColumnMeta.class)
-    public void okCommentsInColumn() {
+    @Logback(TableColumnMeta.class)
+    void okCommentsInColumn() {
+        logback.expect(Matchers.not(Matchers.containsString("deprecated")));
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/commentsInColumn.xml", "dbname", "schemaName", false);
-        assertThat(LOGGING.getLog()).doesNotContain("deprecated");
     }
 
 }

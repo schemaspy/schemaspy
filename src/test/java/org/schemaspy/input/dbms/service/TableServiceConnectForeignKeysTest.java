@@ -18,12 +18,10 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 import org.schemaspy.model.*;
-import org.schemaspy.testing.LoggingRule;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -35,10 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TableServiceConnectForeignKeysTest {
-
-    @Rule
-    public LoggingRule loggingRule = new LoggingRule();
+class TableServiceConnectForeignKeysTest {
 
     private SqlService sqlService;
 
@@ -49,7 +44,7 @@ public class TableServiceConnectForeignKeysTest {
 
     private IndexService indexService;
 
-    private DbmsMeta dbmsMeta = mock(DbmsMeta.class);
+    private final DbmsMeta dbmsMeta = mock(DbmsMeta.class);
 
     private Database database;
 
@@ -58,7 +53,7 @@ public class TableServiceConnectForeignKeysTest {
     private TableColumn mainPrimary;
     private TableColumn mainForeign;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sqlService = mock(SqlService.class);
         columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
@@ -78,7 +73,7 @@ public class TableServiceConnectForeignKeysTest {
     }
 
     @Test
-    public void getImportedKeys() throws SQLException {
+    void getImportedKeys() throws SQLException {
         TableService tableService = new TableService(
                 sqlService,
                 false,
@@ -150,7 +145,7 @@ public class TableServiceConnectForeignKeysTest {
     }
 
     @Test
-    public void getExportedKeys() throws SQLException {
+    void getExportedKeys() throws SQLException {
         TableService tableService = new TableService(
                 sqlService,
                 true,
@@ -237,7 +232,6 @@ public class TableServiceConnectForeignKeysTest {
 
         assertThat(child.getChildren()).isEmpty();
         assertThat(child.getParents()).hasSize(1);
-
     }
 
 }

@@ -18,7 +18,7 @@
  */
 package org.schemaspy.input.dbms;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.model.InvalidConfigurationException;
 
 import java.sql.Connection;
@@ -30,10 +30,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CatalogResolverTest {
+class CatalogResolverTest {
 
     @Test
-    public void catalogIsSameIfSet() {
+    void catalogIsSameIfSet() {
         String expected = "providedCatalog";
         String provided = "providedCatalog";
 
@@ -42,7 +42,7 @@ public class CatalogResolverTest {
     }
 
     @Test
-    public void catalogIsNullFetchFromJDBC() throws SQLException {
+    void catalogIsNullFetchFromJDBC() throws SQLException {
         String expected = "jdbcProvidedCatalog";
         Connection connection = mock(Connection.class);
         when(connection.getCatalog()).thenReturn(expected);
@@ -53,12 +53,14 @@ public class CatalogResolverTest {
     }
 
     @Test
-    public void catalogIsNullFetchFromJDBCReturnsNullThenThrowsException() throws SQLException {
+    void catalogIsNullFetchFromJDBCReturnsNullThenThrowsException() throws SQLException {
         Connection connection = mock(Connection.class);
         DatabaseMetaData databaseMetaData = mock(DatabaseMetaData.class);
         when(databaseMetaData.getConnection()).thenReturn(connection);
 
-        assertThatThrownBy(() ->new CatalogResolver(databaseMetaData).resolveCatalog(null))
+        CatalogResolver catalogResolver = new CatalogResolver(databaseMetaData);
+
+        assertThatThrownBy(() -> catalogResolver.resolveCatalog(null))
                 .isInstanceOf(InvalidConfigurationException.class)
                 .hasMessageContaining("Catalog (-cat)")
                 .hasMessageContaining("-cat %");

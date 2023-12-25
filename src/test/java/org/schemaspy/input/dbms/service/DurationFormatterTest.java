@@ -18,38 +18,38 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DurationFormatterTest {
+class DurationFormatterTest {
 
     @Test
-    public void lessThenOneSecond() {
+    void lessThenOneSecond() {
         String formatted = DurationFormatter.formatMS(899);
         assertThat(formatted).isEqualTo("899 ms");
     }
 
     @Test
-    public void lessThenOneMinute() {
+    void lessThenOneMinute() {
         String formatted = DurationFormatter.formatMS(12345);
         assertThat(formatted).isEqualTo("12 s 345 ms");
     }
 
     @Test
-    public void lessThenOneHour() {
+    void lessThenOneHour() {
         String formatted = DurationFormatter.formatMS(123456);
         assertThat(formatted).isEqualTo("2 min 3 s 456 ms");
     }
 
     @Test
-    public void moreThanOneHour() {
+    void moreThanOneHour() {
         String formatted = DurationFormatter.formatMS(12345678);
         assertThat(formatted).isEqualTo("3 hr 25 min 45 s 678 ms");
     }
 
     @Test
-    public void exactlyOneMinute() {
+    void exactlyOneMinute() {
         String formatted = DurationFormatter.formatMS(60000);
         assertThat(formatted).isEqualTo("1 min");
     }
