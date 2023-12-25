@@ -1,16 +1,16 @@
 package org.schemaspy.connection;
 
-import org.junit.Test;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Properties;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 /**
  * Tests for {@link SemicolonSeparated}.
  */
-public class SemicolonSeparatedTest {
+class SemicolonSeparatedTest {
 
     /**
      * Given a connection string that separates properties by semicolons,
@@ -18,7 +18,7 @@ public class SemicolonSeparatedTest {
      * Then it should respond an object containing those properties.
      */
     @Test
-    public void parse() throws IOException {
+    void parse() throws IOException {
         final Properties result = new SemicolonSeparated(
                 "key1\\=value1;key2\\=value2"
         ).properties();
