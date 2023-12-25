@@ -18,13 +18,14 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.input.dbms.service.helper.ImportForeignKey;
 import org.schemaspy.model.*;
-import org.schemaspy.testing.Logger;
-import org.schemaspy.testing.LoggingRule;
+import org.schemaspy.testing.logback.Logback;
+import org.schemaspy.testing.logback.LogbackExtension;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -38,22 +39,22 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TableServiceAddForeignKeyTest {
+class TableServiceAddForeignKeyTest {
 
-    @Rule
-    public LoggingRule loggingRule = new LoggingRule();
+    @RegisterExtension
+    public static LogbackExtension logback = new LogbackExtension();
 
-    private SqlService sqlService = mock(SqlService.class);
+    private final SqlService sqlService = mock(SqlService.class);
 
     private static final Pattern DEFAULT_COLUMN_EXCLUSION = Pattern.compile("[^.]");
     private static final Pattern DEFAULT_TABLE_INCLUSION = Pattern.compile(".*"); // match everything
     private static final Pattern DEFAULT_TABLE_EXCLUSION = Pattern.compile(".*\\$.*");
 
-    private ColumnService columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
+    private final ColumnService columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
 
-    private IndexService indexService = new IndexService(sqlService, new Properties());
+    private final IndexService indexService = new IndexService(sqlService, new Properties());
 
-    private TableService tableService = new TableService(
+    private final TableService tableService = new TableService(
             sqlService,
             false,
             false,
@@ -64,13 +65,13 @@ public class TableServiceAddForeignKeyTest {
             indexService
     );
 
-    private DbmsMeta dbmsMeta = mock(DbmsMeta.class);
+    private final DbmsMeta dbmsMeta = mock(DbmsMeta.class);
 
     private Database database;
 
     private Table table;
 
-    @Before
+    @BeforeEach
     public void setup() {
         database = new Database(dbmsMeta, "tableServiceTest","addFK", "tst");
         table = new Table(database, database.getCatalog().getName(), database.getSchema().getName(), "mainTable", "mainTable");
@@ -78,8 +79,9 @@ public class TableServiceAddForeignKeyTest {
     }
     
     @Test
-    @Logger(value = TableService.class, level = "debug")
-    public void excludingTable() throws SQLException {
+    @Logback(value = TableService.class, level = "debug")
+    void excludingTable() throws SQLException {
+        logback.expect(Matchers.containsString("Ignoring CAT.S.excludeMePlease referenced by FK notNull"));
         ImportForeignKey foreignKey = new ImportForeignKey.Builder()
                 .withFkName("notNull")
                 .withFkColumnName(null)
@@ -100,12 +102,12 @@ public class TableServiceAddForeignKeyTest {
                 columnService,
                 indexService
         ).addForeignKey(database, null, foreignKey, new HashMap<>());
-        assertThat(loggingRule.getLog()).contains("Ignoring CAT.S.excludeMePlease referenced by FK notNull");
     }
 
     @Test
-    @Logger(TableService.class)
-    public void addsForeignKeyIfMissing() throws SQLException {
+    @Logback(TableService.class)
+    void addsForeignKeyIfMissing() throws SQLException {
+        logback.expect(Matchers.containsString("Couldn't add FK 'newFK' to table 'mainTable' - Column 'fkColumn' doesn't exist"));
         ImportForeignKey foreignKey = new ImportForeignKey.Builder()
                 .withFkName("newFK")
                 .withFkColumnName("fkColumn")
@@ -119,12 +121,12 @@ public class TableServiceAddForeignKeyTest {
         tableService.addForeignKey(database, table, foreignKey, database.getTablesMap());
         assertThat(table.getForeignKeysMap().get("newFK")).isNotNull();
         assertThat(table.getForeignKeysMap().get("newFK").getName()).isEqualTo("newFK");
-        assertThat(loggingRule.getLog()).contains("Couldn't add FK 'newFK' to table 'mainTable' - Column 'fkColumn' doesn't exist");
     }
 
     @Test
-    @Logger(TableService.class)
-    public void usesExistingForeignKeyIfExists() throws SQLException {
+    @Logback(TableService.class)
+    void usesExistingForeignKeyIfExists() throws SQLException {
+        logback.expect(Matchers.containsString("Couldn't add FK 'existingFK' to table 'mainTable' - Column 'fkColumn' doesn't exist"));
         table.getForeignKeysMap().put("existingFK", new ForeignKeyConstraint(table, "existingFK", 1,1));
         ImportForeignKey foreignKey = new ImportForeignKey.Builder()
                 .withFkName("existingFK")
@@ -139,12 +141,13 @@ public class TableServiceAddForeignKeyTest {
         tableService.addForeignKey(database, table, foreignKey, new HashMap<>());
         assertThat(table.getForeignKeysMap().get("existingFK").getUpdateRule()).isEqualTo(1);
         assertThat(table.getForeignKeysMap().get("existingFK").getDeleteRule()).isEqualTo(1);
-        assertThat(loggingRule.getLog()).contains("Couldn't add FK 'existingFK' to table 'mainTable' - Column 'fkColumn' doesn't exist");
     }
 
     @Test
-    @Logger(value = TableService.class, level = "debug")
-    public void addingRemoteTable() throws SQLException {
+    @Logback(value = TableService.class, level = "debug")
+    void addingRemoteTable() throws SQLException {
+        logback.expect(Matchers.containsString("Adding remote table other.other.parent"));
+        logback.expect(Matchers.containsString("Couldn't add FK 'withChild' to table 'mainTable' - Column 'parent' doesn't exist in table 'parent'"));
         DatabaseMetaData databaseMetaData = mock(DatabaseMetaData.class);
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.next()).thenReturn(false);
@@ -166,16 +169,12 @@ public class TableServiceAddForeignKeyTest {
                 .withDeleteRule(0)
                 .build();
         tableService.addForeignKey(database, table, foreignKey, database.getTablesMap());
-        String log = loggingRule.getLog();
-        assertThat(log)
-            .contains("Adding remote table other.other.parent")
-            .contains("Couldn't add FK 'withChild' to table 'mainTable' - Column 'parent' doesn't exist in table 'parent'");
         assertThat(database.getRemoteTablesMap().get("other.other.parent")).isNotNull();
         assertThat(table.getForeignKeysMap().get("withChild")).isNotNull();
     }
 
     @Test
-    public void addedForeignKeyAndWiring() throws SQLException {
+    void addedForeignKeyAndWiring() throws SQLException {
         TableColumn childColumn = new TableColumn(table);
         childColumn.setId(0);
         childColumn.setName("childColumn");
@@ -219,7 +218,6 @@ public class TableServiceAddForeignKeyTest {
         assertThat(table.getMaxParents()).isEqualTo(1);
         assertThat(remoteTable.getMaxChildren()).isEqualTo(1);
         assertThat(remoteTable.getMaxParents()).isZero();
-
     }
 
 }

@@ -18,39 +18,40 @@
  */
 package org.schemaspy.input.dbms.classpath;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.schemaspy.input.dbms.driverpath.Driverpath;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.schemaspy.input.dbms.driverpath.Driverpath;
 
-public class GetExistingUrlsTest {
+class GetExistingUrlsTest {
+
+  private final Path driverFolder = Paths.get("src", "test", "resources", "driverFolder");
 
   @Test
-  public void willAddDirAndContentIfDpIsADirAndNotAFile() {
-    URI driverFolder = Paths.get("src", "test", "resources", "driverFolder").toUri();
-    URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
-    URI dummyNarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.nar").toUri();
-    URI narJarWarNotIncludedURI = Paths.get("src", "test", "resources", "driverFolder", "nar.jar.war.not.included")
-                                       .toUri();
+  void willAddDirAndContentIfDpIsADirAndNotAFile() {
+    URI dummyJarURI = driverFolder.resolve("dummy.jar").toUri();
+    URI dummyNarURI = driverFolder.resolve("dummy.nar").toUri();
+    URI narJarWarNotIncludedURI = driverFolder.resolve("nar.jar.war.not.included").toUri();
 
-    Driverpath dp = () -> Paths.get("src", "test", "resources", "driverFolder").toString();
+    Driverpath dp = driverFolder::toString;
     Set<URI> uris = new GetExistingUrls(dp).paths();
 
     assertThat(uris)
         .hasSize(4)
-        .contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
+        .contains(driverFolder.toUri(), dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
   }
 
   @Test
-  public void willOnlyAddFileIfFileIsSpecified() {
-    URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
+  void willOnlyAddFileIfFileIsSpecified() {
+    URI dummyJarURI = driverFolder.resolve("dummy.jar").toUri();
 
-    Driverpath dp = () -> Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
+    Driverpath dp = () -> driverFolder.resolve("dummy.jar").toString();
     Set<URI> uris = new GetExistingUrls(dp).paths();
 
     assertThat(uris)
@@ -59,19 +60,17 @@ public class GetExistingUrlsTest {
   }
 
   @Test
-  public void willAddDirAndContentIfDpSecondArgIsADirAndNotAFile() {
-    URI driverFolder = Paths.get("src", "test", "resources", "driverFolder").toUri();
-    URI dummyJarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toUri();
-    URI dummyNarURI = Paths.get("src", "test", "resources", "driverFolder", "dummy.nar").toUri();
-    URI narJarWarNotIncludedURI = Paths.get("src", "test", "resources", "driverFolder", "nar.jar.war.not.included")
-                                       .toUri();
+  void willAddDirAndContentIfDpSecondArgIsADirAndNotAFile() {
+    URI dummyJarURI = driverFolder.resolve("dummy.jar").toUri();
+    URI dummyNarURI = driverFolder.resolve("dummy.nar").toUri();
+    URI narJarWarNotIncludedURI = driverFolder.resolve("nar.jar.war.not.included").toUri();
 
-    String dpFile = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
-    String dpDir = Paths.get("src", "test", "resources", "driverFolder").toString();
+    String dpFile = driverFolder.resolve("dummy.jar").toString();
+    String dpDir = driverFolder.toString();
     Set<URI> uris = new GetExistingUrls(() -> dpFile + File.pathSeparator + dpDir).paths();
 
     assertThat(uris)
         .hasSize(4)
-        .contains(driverFolder, dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
+        .contains(driverFolder.toUri(), dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
   }
 }

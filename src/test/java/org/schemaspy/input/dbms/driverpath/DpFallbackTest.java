@@ -1,13 +1,13 @@
 package org.schemaspy.input.dbms.driverpath;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
  * Tests for {@link DpFallback}.
  */
-public class DpFallbackTest {
+class DpFallbackTest {
 
     /**
      * Given primary that gives a response,
@@ -15,7 +15,7 @@ public class DpFallbackTest {
      * Then it should respond with the primary's response.
      */
     @Test
-    public void delegate()  {
+    void delegate()  {
         final Driverpath primary = () -> "foo";
         final Driverpath secondary = () -> "bar";
         assertThat(
@@ -32,7 +32,7 @@ public class DpFallbackTest {
      * Then it should respond with the secondary's response.
      */
     @Test
-    public void fallback()  {
+    void fallback()  {
         final Driverpath primary = () -> null;
         final Driverpath secondary = () -> "foo";
         assertThat(

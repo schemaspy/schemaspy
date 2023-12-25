@@ -1,6 +1,6 @@
 package org.schemaspy.input.dbms.driverpath;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 
@@ -12,7 +12,7 @@ import static org.mockito.ArgumentMatchers.any;
 /**
  * Tests for {@link DpMissingPathChecked}.
  */
-public class DpMissingPathCheckedTest {
+class DpMissingPathCheckedTest {
 
     /**
      * Given a driverpath with missing paths,
@@ -20,7 +20,7 @@ public class DpMissingPathCheckedTest {
      * Then it should log a warning.
      */
     @Test
-    public void warn()  {
+    void warn()  {
         final Logger logger = Mockito.mock(Logger.class);
         final String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar")
                 .toString() + File.pathSeparator + "missing";

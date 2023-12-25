@@ -18,16 +18,17 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.input.dbms.service.helper.RemoteTableIdentifier;
 import org.schemaspy.input.dbms.xml.ForeignKeyMeta;
 import org.schemaspy.input.dbms.xml.TableColumnMeta;
 import org.schemaspy.input.dbms.xml.TableMeta;
 import org.schemaspy.model.*;
-import org.schemaspy.testing.Logger;
-import org.schemaspy.testing.LoggingRule;
+import org.schemaspy.testing.logback.Logback;
+import org.schemaspy.testing.logback.LogbackExtension;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -41,21 +42,21 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TableServiceConnectTest {
+class TableServiceConnectTest {
 
-    @Rule
-    public LoggingRule loggingRule = new LoggingRule();
+    @RegisterExtension
+    public static LogbackExtension logback = new LogbackExtension();
 
-    private SqlService sqlService = mock(SqlService.class);
+    private final SqlService sqlService = mock(SqlService.class);
 
     private static final Pattern DEFAULT_COLUMN_EXCLUSION = Pattern.compile("[^.]");
-    private ColumnService columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
+    private final ColumnService columnService = new ColumnService(sqlService, DEFAULT_COLUMN_EXCLUSION, DEFAULT_COLUMN_EXCLUSION);
     private static final Pattern DEFAULT_TABLE_INCLUSION = Pattern.compile(".*"); // match everything
     private static final Pattern DEFAULT_TABLE_EXCLUSION = Pattern.compile(".*\\$.*");
 
-    private IndexService indexService = new IndexService(sqlService, new Properties());
+    private final IndexService indexService = new IndexService(sqlService, new Properties());
 
-    private TableService tableService = new TableService(
+    private final TableService tableService = new TableService(
             sqlService,
             false,
             false,
@@ -66,13 +67,13 @@ public class TableServiceConnectTest {
             indexService
     );
 
-    private DbmsMeta dbmsMeta = mock(DbmsMeta.class);
+    private final DbmsMeta dbmsMeta = mock(DbmsMeta.class);
 
     private Database database;
 
     private Table table;
 
-    @Before
+    @BeforeEach
     public void setup() {
         database = new Database(dbmsMeta, "tableServiceTest","connect", "tst");
         table = new Table(database, database.getCatalog().getName(), database.getSchema().getName(), "mainTable", "mainTable");
@@ -80,8 +81,7 @@ public class TableServiceConnectTest {
     }
 
     @Test
-    @Logger(TableService.class)
-    public void addRemote() throws SQLException {
+    void addRemote() throws SQLException {
         DatabaseMetaData databaseMetaData = mock(DatabaseMetaData.class);
         ResultSet resultSet = mock(ResultSet.class);
         when(resultSet.next()).thenReturn(false);
@@ -114,8 +114,9 @@ public class TableServiceConnectTest {
     }
 
     @Test
-    @Logger(TableService.class)
-    public void remoteExists() throws SQLException {
+    @Logback(TableService.class)
+    void remoteExists() throws SQLException {
+        logback.expect(Matchers.containsString("Assuming 'parent.parent' is a primary key due to being referenced by 'mainTable.child'"));
         ForeignKeyMeta foreignKeyMeta = mock(ForeignKeyMeta.class);
         TableColumnMeta tableColumnMeta = mock(TableColumnMeta.class);
         TableMeta tableMeta = mock(TableMeta.class);
@@ -161,8 +162,6 @@ public class TableServiceConnectTest {
         assertThat(table.getMaxParents()).isEqualTo(1);
         assertThat(logicalRemoteTable.getMaxChildren()).isEqualTo(1);
         assertThat(logicalRemoteTable.getMaxParents()).isEqualTo(0);
-
-        assertThat(loggingRule.getLog()).contains("Assuming 'parent.parent' is a primary key due to being referenced by 'mainTable.child'");
     }
 
 }

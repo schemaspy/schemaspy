@@ -18,21 +18,18 @@
  */
 package org.schemaspy.input.dbms.config;
 
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.input.dbms.exceptions.ResourceNotFoundException;
 import org.schemaspy.model.InvalidConfigurationException;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,12 +38,9 @@ import static org.mockito.Mockito.when;
  */
 public class SimplePropertiesResolverTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private static ResourceFinder resourceFinder;
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         resourceFinder = mock(ResourceFinder.class);
         when(resourceFinder.find("A0")).thenReturn(getResource("A0"));
@@ -62,21 +56,21 @@ public class SimplePropertiesResolverTest {
     }
 
     @Test
-    public void resolveSingleLevel() {
+    void resolveSingleLevel() {
         SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
-        Map expected = new HashMap<>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("level", "0");
         expected.put("branch", "A");
         expected.put("level0", "zero");
         expected.put("avalue", "This is branch A");
         Properties dbProps = resolver.getDbProperties("A0");
-        assertThat(dbProps.entrySet()).containsExactlyInAnyOrder(toArray(expected));
+        assertThat(dbProps).containsExactlyInAnyOrderEntriesOf(expected);
     }
 
     @Test
-    public void resolverWithExtends() throws IOException {
+    void resolverWithExtends() {
         SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
-        Map expected = new HashMap<>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("level", "2");
         expected.put("branch", "A");
         expected.put("level0", "zero");
@@ -84,38 +78,34 @@ public class SimplePropertiesResolverTest {
         expected.put("level2", "two");
         expected.put("avalue", "This is branch A");
         Properties dbProps = resolver.getDbProperties("A2");
-        assertThat(dbProps.entrySet()).containsExactlyInAnyOrder(toArray(expected));
+        assertThat(dbProps).containsExactlyInAnyOrderEntriesOf(expected);
     }
 
     @Test
-    public void resolverWillInclude() throws IOException {
+    void resolverWillInclude() {
         SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
-        Map expected = new HashMap<>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("level","0");
         expected.put("branch", "B");
         expected.put("level0", "zero");
         expected.put("avalue", "This is branch A");
         Properties dbProps = resolver.getDbProperties("B0");
-        assertThat(dbProps.entrySet()).containsExactlyInAnyOrder(toArray(expected));
-    }
-
-    private Map.Entry[] toArray(Map map) {
-        return (Map.Entry[])map.entrySet().toArray(new Map.Entry[map.size()]);
+        assertThat(dbProps).containsExactlyInAnyOrderEntriesOf(expected);
     }
 
     @Test
-    public void noSuchPropertiesFile() {
-        thrown.expect(InvalidConfigurationException.class);
-        thrown.expectCause(instanceOf(ResourceNotFoundException.class));
+    void noSuchPropertiesFile() {
         SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
-        resolver.getDbProperties("XX");
+        assertThatThrownBy(() -> resolver.getDbProperties("XX"))
+                .isInstanceOf(InvalidConfigurationException.class)
+                .hasCauseInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
-    public void invalidInclude() {
-        thrown.expect(InvalidConfigurationException.class);
-        thrown.expectMessage("include.1=mysql:someRefKey");
+    void invalidInclude() {
         SimplePropertiesResolver resolver = new SimplePropertiesResolver(resourceFinder);
-        resolver.getDbProperties("badInclude");
+        assertThatThrownBy(() -> resolver.getDbProperties("badInclude"))
+                .isInstanceOf(InvalidConfigurationException.class)
+                .hasMessageContaining("include.1=mysql:someRefKey");
     }
 }

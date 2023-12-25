@@ -18,7 +18,7 @@
  */
 package org.schemaspy.input.dbms;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.model.InvalidConfigurationException;
 
 import java.sql.Connection;
@@ -30,10 +30,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SchemaResolverTest {
+class SchemaResolverTest {
 
     @Test
-    public void schemaIsSameIfSet() {
+    void schemaIsSameIfSet() {
         String expected = "providedSchema";
         String provided = "providedSchema";
 
@@ -42,7 +42,7 @@ public class SchemaResolverTest {
     }
 
     @Test
-    public void schemaIsNullFetchFromJDBC() throws SQLException {
+    void schemaIsNullFetchFromJDBC() throws SQLException {
         String expected = "jdbcProvidedSchema";
         Connection connection = mock(Connection.class);
         when(connection.getSchema()).thenReturn(expected);
@@ -53,12 +53,14 @@ public class SchemaResolverTest {
     }
 
     @Test
-    public void schemaIsNullFetchFromJDBCReturnsNullThenThrowsException() throws SQLException {
+    void schemaIsNullFetchFromJDBCReturnsNullThenThrowsException() throws SQLException {
         Connection connection = mock(Connection.class);
         DatabaseMetaData databaseMetaData = mock(DatabaseMetaData.class);
         when(databaseMetaData.getConnection()).thenReturn(connection);
 
-        assertThatThrownBy(() ->new SchemaResolver(databaseMetaData).resolveSchema(null))
+        SchemaResolver schemaResolver = new SchemaResolver(databaseMetaData);
+
+        assertThatThrownBy(() -> schemaResolver.resolveSchema(null))
                 .isInstanceOf(InvalidConfigurationException.class)
                 .hasMessageContaining("Schema (-s/-schemas)")
                 .hasMessageContaining("user/owner/database");

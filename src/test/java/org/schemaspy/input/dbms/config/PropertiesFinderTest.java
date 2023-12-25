@@ -18,7 +18,9 @@
  */
 package org.schemaspy.input.dbms.config;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.schemaspy.input.dbms.exceptions.ResourceNotFoundException;
 
 import java.net.URISyntaxException;
@@ -26,50 +28,43 @@ import java.net.URL;
 import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Nils Petzaell
  */
-public class PropertiesFinderTest {
+class PropertiesFinderTest {
 
-    private PropertiesFinder propertiesFinder = new PropertiesFinder();
+    private final PropertiesFinder propertiesFinder = new PropertiesFinder();
 
-    @Test
-    public void findOnClassPathWithExtension() {
-        URL url = propertiesFinder.find("mssql.properties");
-        assertThat(url).isNotNull();
-    }
-    @Test
-    public void findOnClassPathWithNoExtension() {
-        URL url = propertiesFinder.find("mssql");
-        assertThat(url).isNotNull();
-    }
-
-    @Test
-    public void findByPathWithOutExtension() {
-        URL url = propertiesFinder.find("src/test/resources/dbtypes/C0");
-        assertThat(url).isNotNull();
+    @ParameterizedTest(name = "{index} {0} is found")
+    @CsvSource(
+            {
+                    "onClassPathWithExtension, mssql.properties",
+                    "onClassPathWithNoExtension, mssql",
+                    "byPathWithExtension, src/test/resources/dbtypes/C0.properties",
+                    "byPathWithNoExtension, src/test/resources/dbtypes/C0"
+            }
+    )
+    void find(String type, String argument) {
+        URL url = propertiesFinder.find(argument);
+        assertThat(url).isNotNull().as("Should have found %s %s", argument, type);
     }
 
     @Test
-    public void findByPathWithExtension() {
-        URL url = propertiesFinder.find("src/test/resources/dbtypes/C0.properties");
-        assertThat(url).isNotNull();
-    }
-
-    @Test(expected = ResourceNotFoundException.class)
-    public void noSuchResource() {
-        propertiesFinder.find("doesNotExist");
+    void noSuchResource() {
+        assertThatThrownBy(() -> propertiesFinder.find("doesNotExist"))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
-    public void shouldNotReturnAFolderFromClassPath() throws URISyntaxException {
+    void shouldNotReturnAFolderFromClassPath() throws URISyntaxException {
         URL url = propertiesFinder.find("folder");
         assertThat(Paths.get(url.toURI()).toFile().isDirectory()).isFalse();
     }
 
     @Test
-    public void shouldNotReturnAFolderFromPath() throws URISyntaxException {
+    void shouldNotReturnAFolderFromPath() throws URISyntaxException {
         URL url = propertiesFinder.find("src/test/resources/org/schemaspy/types/folder");
         assertThat(Paths.get(url.toURI()).toFile().isDirectory()).isFalse();
     }

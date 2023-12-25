@@ -18,18 +18,18 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
-import org.schemaspy.testing.Logger;
-import org.schemaspy.testing.LoggingRule;
+import org.schemaspy.testing.logback.Logback;
+import org.schemaspy.testing.logback.LogbackExtension;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -38,32 +38,32 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.*;
 
-public class DatabaseServiceTest {
+class DatabaseServiceTest {
 
     private static final ProgressListener progressListener = mock(ProgressListener.class);
 
-    @Rule
-    public LoggingRule loggingRule = new LoggingRule();
+    @RegisterExtension
+    public static LogbackExtension logback = new LogbackExtension();
 
     private Instant currentTime = Instant.now();
-    private Clock clock = mock(Clock.class);
+    private final Clock clock = mock(Clock.class);
 
     private static final Pattern DEFAULT_TABLE_INCLUSION = Pattern.compile(".*"); // match everything
     private static final Pattern DEFAULT_TABLE_EXCLUSION = Pattern.compile(".*\\$.*");
 
-    @Before
+    @BeforeEach
     public void setup() {
         when(clock.instant()).thenAnswer(invocation -> currentTime);
     }
 
     @Test
-    @Logger(DatabaseService.class)
-    public void databaseServicePrintsInformationWhenConnectionTablesWillTakeMoreThan30MinutesAndExportedKeysIsEnabled() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    @Logback(DatabaseService.class)
+    void databaseServicePrintsInformationWhenConnectionTablesWillTakeMoreThan30MinutesAndExportedKeysIsEnabled() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        logback.expect(Matchers.containsString("Estimated time remaining"));
         SqlService sqlService = mock(SqlService.class);
         TableService tableService = mock(TableService.class);
         doAnswer(invocation -> {
@@ -100,13 +100,12 @@ public class DatabaseServiceTest {
         connectTables.setAccessible(true);
 
         connectTables.invoke(databaseService, database, progressListener);
-
-        assertThat(loggingRule.getLog()).contains("Estimated time remaining");
     }
 
     @Test
-    @Logger(DatabaseService.class)
-    public void databaseServiceDoesNotPrintInformationWhenConnectionTablesWillTakeMoreThan30MinutesAndExportedKeysIsDisabled() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    @Logback(DatabaseService.class)
+    void databaseServiceDoesNotPrintInformationWhenConnectionTablesWillTakeMoreThan30MinutesAndExportedKeysIsDisabled() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        logback.expect(Matchers.not(Matchers.containsString("Estimated time remaining")));
         SqlService sqlService = mock(SqlService.class);
         TableService tableService = mock(TableService.class);
         doAnswer(invocation -> {
@@ -143,13 +142,12 @@ public class DatabaseServiceTest {
         connectTables.setAccessible(true);
 
         connectTables.invoke(databaseService, database, progressListener);
-
-        assertThat(loggingRule.getLog()).doesNotContain("Estimated time remaining");
     }
 
     @Test
-    @Logger(DatabaseService.class)
-    public void databaseServiceDoesNotPrintInformationWhenConnectionTablesWillTakeLessThan30Minutes() throws SQLException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    @Logback(DatabaseService.class)
+    void databaseServiceDoesNotPrintInformationWhenConnectionTablesWillTakeLessThan30Minutes() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        logback.expect(Matchers.not(Matchers.containsString("Estimated time remaining")));
         SqlService sqlService = mock(SqlService.class);
         TableService tableService = mock(TableService.class);
         doAnswer(invocation -> {
@@ -186,8 +184,6 @@ public class DatabaseServiceTest {
         connectTables.setAccessible(true);
 
         connectTables.invoke(databaseService, database, progressListener);
-
-        assertThat(loggingRule.getLog()).doesNotContain("Estimated time remaining");
     }
 
 }
