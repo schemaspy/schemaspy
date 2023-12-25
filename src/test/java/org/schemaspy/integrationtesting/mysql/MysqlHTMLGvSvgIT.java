@@ -81,7 +81,8 @@ public class MysqlHTMLGvSvgIT {
                     "-u", jdbcContainerRule.getContainer().getUsername(),
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-o", outputPath.toString(),
-                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
+                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true",
+                    "--include-routine-definition"
             };
             schemaSpyRunner(args).run();
             shouldRun.set(false);

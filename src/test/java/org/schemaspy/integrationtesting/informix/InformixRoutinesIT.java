@@ -75,7 +75,8 @@ public class InformixRoutinesIT {
                 "-u", informixContainer.getUsername(),
                 "-p", informixContainer.getPassword(),
                 "-host", informixContainer.getHost(),
-                "-port", informixContainer.getJdbcPort().toString()
+                "-port", informixContainer.getJdbcPort().toString(),
+                "--include-routine-definition"
         };
         database = database(args);
     }

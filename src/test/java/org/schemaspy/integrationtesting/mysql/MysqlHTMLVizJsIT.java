@@ -81,7 +81,8 @@ public class MysqlHTMLVizJsIT {
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-o", outputPath.toString(),
                     "-vizjs",
-                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
+                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true",
+                    "--include-routine-definition"
             };
             schemaSpyRunner(args).run();
             shouldRun.set(false);

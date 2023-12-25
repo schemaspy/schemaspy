@@ -73,7 +73,8 @@ public class MysqlMultiSchemaIT {
                     "-p", jdbcContainerRule.getContainer().getPassword(),
                     "-o", outputPath.toString(),
                     "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true",
-                    "--no-orphans"
+                    "--no-orphans",
+                    "--include-routine-definition"
             };
             schemaSpyRunner(args).run();
             shouldRun.set(false);
