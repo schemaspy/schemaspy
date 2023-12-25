@@ -1,15 +1,16 @@
 package org.schemaspy.connection;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 /**
  * Tests for {@link ScNullChecked}.
  */
-public class ScNullCheckedTest {
+class ScNullCheckedTest {
 
     /**
      * Given that the origin will produce null,
@@ -17,7 +18,7 @@ public class ScNullCheckedTest {
      * Then it should throw an exception.
      */
     @Test
-    public void ThrowExceptionOnNull() {
+    void ThrowExceptionOnNull() {
         final ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
         Mockito.when(builder.build()).thenReturn("dummy");
         final ScNullChecked sut = new ScNullChecked(builder, () -> null);

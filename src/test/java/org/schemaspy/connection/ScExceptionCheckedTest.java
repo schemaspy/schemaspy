@@ -1,15 +1,16 @@
 package org.schemaspy.connection;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 /**
  * Tests for {@link ScExceptionChecked}.
  */
-public class ScExceptionCheckedTest {
+class ScExceptionCheckedTest {
 
     /**
      * Given that the origin cannot connect,
@@ -17,7 +18,7 @@ public class ScExceptionCheckedTest {
      * Then it should throw a connection failure exception.
      */
     @Test
-    public void ThrowException() {
+    void ThrowException() {
         final ConnectionURLBuilder builder = Mockito.mock(ConnectionURLBuilder.class);
         final ScExceptionChecked sut = new ScExceptionChecked(builder, () -> {
             throw new ConnectionFailure("");
