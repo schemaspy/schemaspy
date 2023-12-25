@@ -78,6 +78,8 @@ Processing
     Include table(s) in analysis, defaults to match everything
 [-I excludeTableRegex]
     Exclude table(s) from analysis, defaults to exclude tables containing ``$``, can be overridden with ``-I ""``
+[-\-include-routine-definition]
+    Include routine definition in output
 
 Additional data
 ~~~~~~~~~~~~~~~
@@ -91,7 +93,7 @@ Html report related
     Skip generation of html report.
 [-noimplied]
     Don't look for implied relationships.
-[--no-orphans]
+[-\-no-orphans]
     Don't include orphan tables in the relationships graph.
 [-nopages]
     Just list data as one long list instead of pages.
