@@ -72,6 +72,7 @@ public class DatabaseServiceTest {
         }).when(tableService).connectForeignKeys(any(),any(),anyMap());
         ViewService viewService = mock(ViewService.class);
         RoutineService routineService = mock(RoutineService.class);
+        TypeService typeService = mock(TypeService.class);
         SequenceService sequenceService = mock(SequenceService.class);
         DatabaseService databaseService = new DatabaseService(
                 clock,
@@ -86,6 +87,7 @@ public class DatabaseServiceTest {
                 tableService,
                 viewService,
                 routineService,
+                typeService,
                 sequenceService
         );
         List<Table> tablesList = new ArrayList<>();
@@ -115,6 +117,7 @@ public class DatabaseServiceTest {
         }).when(tableService).connectForeignKeys(any(),any(),anyMap());
         ViewService viewService = mock(ViewService.class);
         RoutineService routineService = mock(RoutineService.class);
+        TypeService typeService = mock(TypeService.class);
         SequenceService sequenceService = mock(SequenceService.class);
         DatabaseService databaseService = new DatabaseService(
                 clock,
@@ -129,6 +132,7 @@ public class DatabaseServiceTest {
                 tableService,
                 viewService,
                 routineService,
+                typeService,
                 sequenceService
         );
         List<Table> tablesList = new ArrayList<>();
@@ -158,6 +162,7 @@ public class DatabaseServiceTest {
         }).when(tableService).connectForeignKeys(any(),any(),anyMap());
         ViewService viewService = mock(ViewService.class);
         RoutineService routineService = mock(RoutineService.class);
+        TypeService typeService = mock(TypeService.class);
         SequenceService sequenceService = mock(SequenceService.class);
         DatabaseService databaseService = new DatabaseService(
                 clock,
@@ -172,6 +177,7 @@ public class DatabaseServiceTest {
                 tableService,
                 viewService,
                 routineService,
+                typeService,
                 sequenceService
         );
         List<Table> tablesList = new ArrayList<>();

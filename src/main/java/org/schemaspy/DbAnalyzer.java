@@ -288,21 +288,7 @@ public class DbAnalyzer {
 
         for (String schema : (isCatalog ? getCatalogs(meta) : getSchemas(meta))) {
             if (schemaRegex.matcher(schema).matches()) {
-                ResultSet rs = null;
-                try {
-                    rs = meta.getTables(null, schema, "%", null);
-                    if (rs.next()) {
-                        LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex);
-                        schemas.add(schema);
-                    } else {
-                        LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex);
-                    }
-                } catch (SQLException sqlex) {
-                    LOGGER.debug("SQLException caught during populateSchemas", sqlex);
-                } finally {
-                    if (rs != null)
-                        rs.close();
-                }
+                schemas.add(schema);
             } else {
                 LOGGER.debug("Excluding schema {}: doesn't match '{}'", schema, schemaRegex);
             }

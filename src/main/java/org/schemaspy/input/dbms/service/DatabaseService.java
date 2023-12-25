@@ -72,6 +72,7 @@ public class DatabaseService {
     private final TableService tableService;
     private final ViewService viewService;
     private final RoutineService routineService;
+    private final TypeService typeService;
     private final SequenceService sequenceService;
 
 
@@ -90,6 +91,7 @@ public class DatabaseService {
             TableService tableService,
             ViewService viewService,
             RoutineService routineService,
+            TypeService typeService,
             SequenceService sequenceService
     ) {
         this.clock = Objects.requireNonNull(clock);
@@ -104,6 +106,7 @@ public class DatabaseService {
         this.tableService = Objects.requireNonNull(tableService);
         this.viewService = Objects.requireNonNull(viewService);
         this.routineService = Objects.requireNonNull(routineService);
+        this.typeService = Objects.requireNonNull(typeService);
         this.sequenceService = Objects.requireNonNull(sequenceService);
     }
 
@@ -129,6 +132,7 @@ public class DatabaseService {
         viewService.gatherViewColumnComments(db);
         initColumnTypes(db);
         routineService.gatherRoutines(db);
+        typeService.gatherTypes(db);
         sequenceService.gatherSequences(db);
 
         listener.finishedCollectingTablesViews();

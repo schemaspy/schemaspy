@@ -110,6 +110,7 @@ import org.schemaspy.view.HtmlRelationshipsPage;
 import org.schemaspy.view.HtmlRoutinePage;
 import org.schemaspy.view.HtmlRoutinesPage;
 import org.schemaspy.view.HtmlTablePage;
+import org.schemaspy.view.HtmlTypesPage;
 import org.schemaspy.view.MustacheCatalog;
 import org.schemaspy.view.MustacheCompiler;
 import org.schemaspy.view.MustacheSchema;
@@ -319,7 +320,7 @@ public class SchemaAnalyzer {
         Collection<Table> tables = new ArrayList<>(db.getTables());
         tables.addAll(db.getViews());
 
-        if (tables.isEmpty()) {
+        if (db.getTables().isEmpty() && db.getViews().isEmpty() && db.getSequences().isEmpty() && db.getRoutines().isEmpty() && db.getTypes().isEmpty()) {
             dumpNoTablesMessage(
                 schema,
                 commandLineArguments.getConnectionConfig().getUser(),
@@ -538,6 +539,11 @@ public class SchemaAnalyzer {
             Clock.systemDefaultZone()
         ).execute();
 
+
+        HtmlTypesPage htmlTypesPage = new HtmlTypesPage(mustacheCompiler);
+        try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("types.html").toFile())) {
+            htmlTypesPage.write(db.getTypes(), writer);
+        }
 
         // create detailed diagrams
 
