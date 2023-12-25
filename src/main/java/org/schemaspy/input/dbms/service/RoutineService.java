@@ -36,10 +36,12 @@ public class RoutineService {
 
     private final SqlService sqlService;
     private final Properties dbProperties;
+    private final boolean includeRoutineDefinition;
 
-    public RoutineService(SqlService sqlService, Properties dbProperties) {
+    public RoutineService(SqlService sqlService, Properties dbProperties, boolean includeRoutineDefinition) {
         this.sqlService = sqlService;
         this.dbProperties = dbProperties;
+        this.includeRoutineDefinition = includeRoutineDefinition;
     }
 
     public void gatherRoutines(Database database) {
@@ -51,7 +53,9 @@ public class RoutineService {
                     trim(routine.getType()),
                     trim(routine.getReturnType()),
                     trim(routine.getDefinitionLanguage()),
-                    trim(routine.getDefinition()),
+                    includeRoutineDefinition || routine.getDefinition().isBlank()
+                        ? trim(routine.getDefinition())
+                        : "Redacted, use --include-routine-definition",
                     routine.isDeterministic(),
                     trim(routine.getDataAccess()),
                     trim(routine.getSecurityType()),

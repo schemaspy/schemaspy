@@ -78,6 +78,15 @@ public class ProcessingConfigCli implements ProcessingConfig {
     )
     private int maxDbThreads = 0;
 
+    @Parameter(
+        names = {
+            "--include-routine-definition",
+            "schemaspy.includeRoutineDefinition"
+        },
+        descriptionKey = "includeroutinedefinition"
+    )
+    private boolean includeRoutineDefinition = false;
+
     private final NoRowsConfigCli noRowsConfigCli;
     private final DatabaseTypeConfig databaseTypeConfig;
 
@@ -142,5 +151,10 @@ public class ProcessingConfigCli implements ProcessingConfig {
         } else {
             return Math.min(Runtime.getRuntime().availableProcessors(), 15);
         }
+    }
+
+    @Override
+    public boolean includeRoutineDefinition() {
+        return includeRoutineDefinition;
     }
 }

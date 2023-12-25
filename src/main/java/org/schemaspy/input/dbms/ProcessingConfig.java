@@ -15,4 +15,5 @@ public interface ProcessingConfig {
     Pattern getTableInclusions();
     Pattern getTableExclusions();
     int getMaxDbThreads();
+    boolean includeRoutineDefinition();
 }
