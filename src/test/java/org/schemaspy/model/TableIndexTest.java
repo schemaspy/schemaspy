@@ -18,27 +18,27 @@
  */
 package org.schemaspy.model;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Daniel Watt
  */
-public class TableIndexTest {
+class TableIndexTest {
 
 	TableIndex tableIndex1;
 	TableIndex tableIndex2;
 
-	@Before
-	public void setup() {
+	@BeforeEach
+	void setup() {
 		tableIndex1 = new TableIndex("index1", false);
 		tableIndex2 = new TableIndex("index2", false);
 	}
 
 	@Test
-	public void primaryKeysSortBeforeNonPrimaryKeys() {
+	void primaryKeysSortBeforeNonPrimaryKeys() {
 		tableIndex1.setIsPrimaryKey(true);
 		tableIndex2.setIsPrimaryKey(false);
 
@@ -47,7 +47,7 @@ public class TableIndexTest {
 	}
 
 	@Test
-	public void stringIdComparison() {
+	void stringIdComparison() {
 		tableIndex1.setId("a");
 		tableIndex2.setId("b");
 
@@ -56,7 +56,7 @@ public class TableIndexTest {
 	}
 
 	@Test
-	public void numericIdComparison() {
+	void numericIdComparison() {
 		tableIndex1.setId(1);
 		tableIndex2.setId(3);
 
@@ -65,13 +65,13 @@ public class TableIndexTest {
 	}
 
 	@Test
-	public void nameComparison() {
+	void nameComparison() {
 		assertThat(tableIndex1.compareTo(tableIndex2)).isEqualTo(-1);
 		assertThat(tableIndex2.compareTo(tableIndex1)).isEqualTo(1);
 	}
 
 	@Test
-	public void stringIdEquality() {
+	void stringIdEquality() {
 		tableIndex1.setId("a");
 		tableIndex2.setId("a");
 
@@ -82,7 +82,7 @@ public class TableIndexTest {
 	}
 
 	@Test
-	public void numericIdEquality() {
+	void numericIdEquality() {
 		tableIndex1.setId(1);
 		tableIndex2.setId(1);
 
@@ -95,7 +95,7 @@ public class TableIndexTest {
 	}
 
 	@Test
-	public void nameEquality() {
+	void nameEquality() {
 		tableIndex1 = new TableIndex("name", false);
 		tableIndex2 = new TableIndex("name", false);
 		assertThat(tableIndex1).isEqualTo(tableIndex2);
