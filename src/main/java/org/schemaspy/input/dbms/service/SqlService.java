@@ -23,28 +23,28 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.connection.ScExceptionChecked;
-import org.schemaspy.connection.ScNullChecked;
-import org.schemaspy.connection.ScSimple;
-import org.schemaspy.connection.SqlConnection;
-import org.schemaspy.input.dbms.ConnectionConfig;
-import org.schemaspy.input.dbms.ConnectionURLBuilder;
-import org.schemaspy.input.dbms.DbDriverLoader;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.DbmsMeta;
-import org.schemaspy.model.InvalidConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.schemaspy.connection.SqlConnection;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.DbmsMeta;
+import org.schemaspy.model.InvalidConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Optional.ofNullable;
 
@@ -91,8 +91,9 @@ public class SqlService {
         String extraValidChars = databaseMetaData.getExtraNameCharacters();
         for (int i = 0; i < extraValidChars.length(); ++i) {
             char ch = extraValidChars.charAt(i);
-            if (reservedRegexChars.indexOf(ch) >= 0)
+            if (reservedRegexChars.indexOf(ch) >= 0) {
                 validChars.append("" + "\\");
+            }
             validChars.append(ch);
         }
         return Pattern.compile("[^" + validChars + "]");
@@ -173,8 +174,10 @@ public class SqlService {
         while (nextColon != -1) {
             String paramName = new StringTokenizer(sql.substring(nextColon), " ,\"')").nextToken();
             String paramValue = namedParams.get(paramName);
-            if (Objects.isNull(paramValue))
-                throw new InvalidConfigurationException("Unexpected named parameter '" + paramName + "' found in SQL '" + sql + "'");
+            if (Objects.isNull(paramValue)) {
+                throw new InvalidConfigurationException(
+                    "Unexpected named parameter '" + paramName + "' found in SQL '" + sql + "'");
+            }
             sqlParams.add(paramValue);
             sql.replace(nextColon, nextColon + paramName.length(), "?"); // replace with a ?
             nextColon = sql.indexOf(":", nextColon);
