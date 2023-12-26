@@ -22,15 +22,15 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ManifestUtilsTest {
+class ManifestUtilsTest {
 
     @Test
-    public void getImplementationVersion() {
+    void getImplementationVersion() {
         assertThat(ManifestUtils.getImplementationVersion()).isEqualTo("IDE");
     }
 
     @Test
-    public void getImplementationRevision() {
+    void getImplementationRevision() {
         assertThat(ManifestUtils.getImplementationRevision()).isEqualTo("IDE");
     }
 }

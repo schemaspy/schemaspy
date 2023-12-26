@@ -18,7 +18,10 @@
  */
 package org.schemaspy.model;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Collections;
 
@@ -27,11 +30,12 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TableTest {
+class TableTest {
 
     private static final Database database = mock(Database.class);
 
-    static {
+    @BeforeAll
+    static void setup() {
         when(database.getName()).thenReturn("DBNAME");
     }
 
@@ -53,23 +57,15 @@ public class TableTest {
         assertThat(table.getContainer()).isEqualToIgnoringCase("DBNAME");
     }
 
-    @Test
-    void hasImpliedWith0DegreesIsAlwaysFalse() {
+    @ParameterizedTest(name = "Empty database has no implied constraints at {0} degrees of separation")
+    @ValueSource(
+            ints = { 0, 1, 2}
+    )
+    void emptyAtDegree(int degree) {
         Table table = new Table(database, null, null, "table", null);
-        assertThat(table.hasImpliedConstraints(0)).isFalse();
+        assertThat(table.hasImpliedConstraints(degree)).isFalse();
     }
 
-    @Test
-    void withNoDirectImpliedHasImpliedIsFalse() {
-        Table table = new Table(database, null, null, "table", null);
-        assertThat(table.hasImpliedConstraints(1)).isFalse();
-    }
-
-    @Test
-    void withNoIndirectImpliedHasImpliedISFalse() {
-        Table table = new Table(database, null, null, "table", null);
-        assertThat(table.hasImpliedConstraints(2)).isFalse();
-    }
 
     @Test
     void withDirectImpliedHasImpliedIsTrue() {

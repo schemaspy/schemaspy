@@ -7,14 +7,14 @@ import org.schemaspy.testing.exit.AssertExitCode;
 import org.schemaspy.testing.logback.Logback;
 import org.schemaspy.testing.logback.LogbackExtension;
 
-public class MainIT {
+class MainIT {
 
     @RegisterExtension
-    public static LogbackExtension logback = new LogbackExtension();
+    static LogbackExtension logback = new LogbackExtension();
 
     @Test
     @AssertExitCode(3)
-    public void callsSystemExit() { //NOSONAR AssertionHandled by @AssertExitCode
+    void callsSystemExit() { //NOSONAR AssertionHandled by @AssertExitCode
             Main.main(
                     "-t", "mysql",
                     "-sso",
@@ -28,7 +28,7 @@ public class MainIT {
     @Test
     @AssertExitCode
     @Logback(logger = "org.schemaspy.cli.CommandLineArgumentParser")
-    public void printUsage() {
+    void printUsage() {
         logback.expect(Matchers.containsString("-u, --user, schemaspy.u, schemaspy.user"));
         Main.main("-h");
     }
@@ -36,7 +36,7 @@ public class MainIT {
     @Test
     @AssertExitCode
     @Logback(logger = "org.schemaspy.cli.CommandLineArgumentParser")
-    public void printDbHelp() {
+    void printDbHelp() {
         logback.expect(Matchers.containsString("You can use your own database types"));
         Main.main("-dbhelp");
     }
@@ -52,14 +52,15 @@ public class MainIT {
 
     @Test
     @AssertExitCode(1)
-    public void parsingError() { //NOSONAR AssertionHandled by @AssertExitCode
+    @SuppressWarnings("squid:S2699")
+    void parsingError() {
         Main.main("-t", "-t");
     }
 
     @Test
     @AssertExitCode(4)
     @Logback(logger = "org.schemaspy", pattern = "%msg%n%debugEx")
-    public void noStacktraceWhenLoggingIsOf() {
+    void noStacktraceWhenLoggingIsOf() {
         logback.expect(Matchers.not(Matchers.containsString("Caused by:")));
         Main.main("-sso", "-o", "target/somefolder", "-t", "doesnt-exist");
     }
@@ -67,7 +68,7 @@ public class MainIT {
     @Test
     @AssertExitCode(4)
     @Logback(logger = "org.schemaspy", pattern = "%msg%n%debugEx")
-    public void stacktraceWhenLoggingIsOn() {
+    void stacktraceWhenLoggingIsOn() {
         logback.expect(Matchers.containsString("Caused by:"));
         Main.main("-sso", "-o", "target/somefolder", "-t", "doesnt-exist", "-debug");
     }
