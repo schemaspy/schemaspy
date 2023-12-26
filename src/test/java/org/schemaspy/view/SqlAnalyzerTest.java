@@ -18,20 +18,20 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Test;
-import org.schemaspy.input.dbms.service.DbmsService;
-import org.schemaspy.model.Table;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.Test;
+import org.schemaspy.input.dbms.service.DbmsService;
+import org.schemaspy.model.Table;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SqlAnalyzerTest {
+class SqlAnalyzerTest {
 
     private static Table createTable(String container, String name) {
         Table table = mock(Table.class);
@@ -41,7 +41,7 @@ public class SqlAnalyzerTest {
     }
 
     @Test
-    public void willIdentifySQLServerQuotedTables() {
+    void willIdentifySQLServerQuotedTables() {
         List<Table> tables = Arrays.asList(
                 createTable("htmlit", "group"),
                 createTable("htmlit", "user"),

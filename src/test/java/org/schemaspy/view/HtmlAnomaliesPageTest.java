@@ -18,7 +18,12 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Test;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.ForeignKeyConstraint;
@@ -27,33 +32,30 @@ import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.CaseInsensitiveMap;
 import org.schemaspy.util.DataTableConfig;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class HtmlAnomaliesPageTest {
+class HtmlAnomaliesPageTest {
 
-    private static HtmlConfig htmlConfig = mock(HtmlConfig.class);
-    static {
-        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
-        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
-    }
+    private final HtmlConfig htmlConfig = mock(HtmlConfig.class);
 
-    private static CommandLineArguments commandLineArguments = new CommandLineArgumentParser(
+    private final CommandLineArguments commandLineArguments = new CommandLineArgumentParser(
             "-o", "out", "-sso"
     )
         .commandLineArguments();
 
-    private static DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
-    private static MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", "anomalies", commandLineArguments.getHtmlConfig(), false, dataTableConfig);
-    private static HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
+    private final DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
+    private final MustacheCompiler mustacheCompiler = new MustacheCompiler("anomalies", "anomalies", commandLineArguments.getHtmlConfig(), false, dataTableConfig);
+    private final HtmlAnomaliesPage htmlAnomaliesPage = new HtmlAnomaliesPage(mustacheCompiler);
 
+    @BeforeEach
+    void setup() {
+        when(htmlConfig.getTemplateDirectory()).thenReturn("layout");
+        when(htmlConfig.isPaginationEnabled()).thenReturn(true);
+    }
     @Test
-    public void impliedRelationships() {
+    void impliedRelationships() {
         StringWriter output = new StringWriter();
 
         Table parentTable = mock(Table.class);
@@ -69,7 +71,7 @@ public class HtmlAnomaliesPageTest {
         ForeignKeyConstraint implied = new ForeignKeyConstraint(parentColumn, childColumn);
 
         htmlAnomaliesPage.write(
-                Collections.EMPTY_LIST,
+                Collections.emptyList(),
                 Collections.singletonList(implied),
                 output);
         assertThat(output.toString()).contains("<td><a href='tables/childTable.html'>childTable</a>.[childColumn]</td>");
@@ -77,7 +79,7 @@ public class HtmlAnomaliesPageTest {
     }
 
     @Test
-    public void tablesWithoutIndex() {
+    void tablesWithoutIndex() {
         StringWriter output = new StringWriter();
 
         Table table = mock(Table.class);
@@ -87,13 +89,13 @@ public class HtmlAnomaliesPageTest {
 
         htmlAnomaliesPage.write(
                 Collections.singletonList(table),
-                Collections.EMPTY_LIST,
+                Collections.emptyList(),
                 output);
         assertThat(output.toString()).contains("<td><a href='tables/hasNoIndex.html'>hasNoIndex</a></td>");
     }
 
     @Test
-    public void tableWithIncrementingColumnNames() {
+    void tableWithIncrementingColumnNames() {
         StringWriter output = new StringWriter();
         Table table = mock(Table.class);
         when(table.getName()).thenReturn("denormalized");
@@ -115,13 +117,13 @@ public class HtmlAnomaliesPageTest {
 
         htmlAnomaliesPage.write(
                 Collections.singletonList(table),
-                Collections.EMPTY_LIST,
+                Collections.emptyList(),
                 output);
         assertThat(output.toString()).contains("<td><a href='tables/denormalized.html'>denormalized</a></td>");
     }
 
     @Test
-    public void tableWithSingleColumn() {
+    void tableWithSingleColumn() {
         StringWriter output = new StringWriter();
         Table table = mock(Table.class);
         when(table.getName()).thenReturn("hasOnlyOneColumn");
@@ -136,14 +138,14 @@ public class HtmlAnomaliesPageTest {
 
         htmlAnomaliesPage.write(
                 Collections.singletonList(table),
-                Collections.EMPTY_LIST,
+                Collections.emptyList(),
                 output);
         assertThat(output.toString()).contains("<td><a href='tables/hasOnlyOneColumn.html'>hasOnlyOneColumn</a></td>");
         assertThat(output.toString()).contains("<td>singleColumn</td>");
     }
 
     @Test
-    public void columnsWithDefaultValueWordNULL() {
+    void columnsWithDefaultValueWordNULL() {
         StringWriter output = new StringWriter();
         Table table = mock(Table.class);
         when(table.getName()).thenReturn("defaultNullTable");
@@ -158,7 +160,7 @@ public class HtmlAnomaliesPageTest {
 
         htmlAnomaliesPage.write(
                 Collections.singletonList(table),
-                Collections.EMPTY_LIST,
+                Collections.emptyList(),
                 output);
         assertThat(output.toString()).contains("<td><a href='tables/defaultNullTable.html'>defaultNullTable</a>.defaultNullColumn</td>");
     }
