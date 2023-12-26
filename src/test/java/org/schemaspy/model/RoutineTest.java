@@ -18,17 +18,17 @@
  */
 package org.schemaspy.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Mårten Bohlin
  */
-public class RoutineTest {
+class RoutineTest {
 
     @Test
-    public void definition() throws Exception {
+    void definition() throws Exception {
         // Given
         String procedureDefinition = "create procedure dbo.TestProcedure (@param varchar(max) AS\nselect * from dbo.TestTable";
         Routine routine = new Routine(
@@ -50,7 +50,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void nullDefinitionIsReplacedWithEmptyString() throws Exception {
+    void nullDefinitionIsReplacedWithEmptyString() throws Exception {
         // Given
         Routine routine = new Routine(
                 "testFunction",

@@ -19,14 +19,14 @@
 package org.schemaspy.model;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daniel Watt
  */
-public class SchemaTest {
+class SchemaTest {
 	@Test
-	public void compareEqualsHash() {
+	void compareEqualsHash() {
 		EqualsVerifier.forClass(Schema.class).withNonnullFields("name").withIgnoredFields("comment").verify();
 	}
 }
