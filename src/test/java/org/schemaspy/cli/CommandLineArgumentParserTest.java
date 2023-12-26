@@ -36,7 +36,7 @@ class CommandLineArgumentParserTest {
     private static final PropertyFileDefaultProvider NO_DEFAULT_PROVIDER = null;
 
     @RegisterExtension
-    public static LogbackExtension logback = new LogbackExtension();
+    static LogbackExtension logback = new LogbackExtension();
 
     @Test
     void givenNoRequiredParameterProvided_AndNoDefaultProvider_ExpectError() {
