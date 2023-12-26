@@ -18,12 +18,12 @@
  */
 package org.schemaspy.integrationtesting;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.schemaspy.model.Database;
-
 import java.io.IOException;
 import java.sql.SQLException;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.schemaspy.model.Database;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.DatabaseFixture.database;
@@ -31,36 +31,30 @@ import static org.schemaspy.testing.DatabaseFixture.database;
 /**
  * @author Nils Petzaell
  */
-public class SqliteIT {
+class SqliteIT {
 
     private static Database database;
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
-                "-t", "sqlite-xerial",
-                "-db", "src/test/resources/integrationTesting/sqlite/database/chinook.db",
-                "-s", "chinook",
-                "-cat", "chinook",
-                "-o", "target/integrationtesting/sqlite",
-                "-sso"
+            "-t", "sqlite-xerial",
+            "-db", "src/test/resources/integrationTesting/sqlite/database/chinook.db",
+            "-s", "chinook",
+            "-cat", "chinook",
+            "-o", "target/integrationtesting/sqlite",
+            "-sso"
         };
         database = database(args);
     }
 
     @Test
-    public void databaseContainsTable() {
+    void databaseContainsTable() {
         assertThat(database.getTables()).hasSize(11);
     }
 
     @Test
-    public void databaseTablePlaylistsContainsPrimaryKey() {
+    void databaseTablePlaylistsContainsPrimaryKey() {
         assertThat(database.getTablesMap().get("playlists").getPrimaryColumns()).isNotEmpty();
     }
 }
