@@ -18,19 +18,18 @@
  */
 package org.schemaspy.util;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.IsNull;
-import org.junit.Test;
-
-import static org.junit.Assert.assertThat;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thomas Traude
  */
-public class DbSpecificOptionTest {
+class DbSpecificOptionTest {
 
     @Test
-    public void valueOfOptionCanBeNull() {
+    void valueOfOptionCanBeNull() {
         DbSpecificOption dbSpecificOption = new DbSpecificOption("MyOption", "MyDescription");
-        assertThat(dbSpecificOption.getValue(), IsNull.nullValue());
+        MatcherAssert.assertThat(dbSpecificOption.getValue(), IsNull.nullValue());
     }
 }
