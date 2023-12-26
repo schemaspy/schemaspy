@@ -18,12 +18,12 @@
  */
 package org.schemaspy.integrationtesting.h2;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
-import org.schemaspy.testing.H2MemoryRule;
+import org.schemaspy.testing.H2MemoryExtension;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -36,40 +36,35 @@ import static org.schemaspy.testing.DatabaseFixture.database;
 /**
  * @author Nils Petzaell
  */
-public class H2SpacesIT {
+class H2SpacesIT {
 
-    @ClassRule
-    public static H2MemoryRule h2MemoryRule = new H2MemoryRule("h2 spaces").addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/spaces_in_schema_and_table.sql");
+    @RegisterExtension
+    static H2MemoryExtension h2 = new H2MemoryExtension("h2 spaces")
+            .addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/spaces_in_schema_and_table.sql");
 
     private static Database database;
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
         String[] args = {
-            "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
-            "-db", "h2 spaces",
-            "-s", h2MemoryRule.getConnection().getSchema(),
-            "-cat", h2MemoryRule.getConnection().getCatalog(),
-            "-o", "target/testout/integrationtesting/h2/ spaces",
-            "-u", "sa"
+                "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
+                "-db", "h2 spaces",
+                "-s", h2.getConnection().getSchema(),
+                "-cat", h2.getConnection().getCatalog(),
+                "-o", "target/testout/integrationtesting/h2/ spaces",
+                "-u", "sa"
         };
         database = database(args);
     }
 
     @Test
-    public void databaseShouldExist() {
+    void databaseShouldExist() {
         assertThat(database).isNotNull();
         assertThat(database.getName()).isEqualToIgnoringCase("h2 spaces");
     }
 
     @Test
-    public void tableWithSpacesShouldExist() {
+    void tableWithSpacesShouldExist() {
         assertThat(database.getTables()).extracting(Table::getName).contains("has space");
     }
 }
