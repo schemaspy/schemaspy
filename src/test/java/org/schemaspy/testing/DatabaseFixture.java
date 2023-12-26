@@ -5,7 +5,6 @@ import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.connection.ScSimple;
 import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
-import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.input.dbms.DriverFromConfig;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
