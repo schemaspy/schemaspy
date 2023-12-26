@@ -19,11 +19,11 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Sequence;
-import org.schemaspy.testing.H2MemoryRule;
+import org.schemaspy.testing.H2MemoryExtension;
 
 import java.util.Collection;
 
@@ -34,28 +34,29 @@ import static org.schemaspy.testing.DatabaseFixture.database;
  * @author Nils Petzaell
  * @author Thomas Traude
  */
-public class DatabaseServiceIT {
+class DatabaseServiceIT {
 
     private static final String CREATE_SCHEMA = "CREATE SCHEMA DATABASESERVICEIT AUTHORIZATION SA";
     private static final String SET_SCHEMA = "SET SCHEMA DATABASESERVICEIT";
     private static final String CREATE_TABLE = "CREATE TABLE TEST(ID INT PRIMARY KEY, NAME VARCHAR(255))";
     private static final String CREATE_SEQUENCE = "CREATE SEQUENCE SEQ_CLIENT start with 5 increment by 2";
 
-    @Rule
-    public H2MemoryRule h2MemoryRule = new H2MemoryRule("DatabaseServiceIT").addSqls(
-        CREATE_SCHEMA,
-        SET_SCHEMA,
-        CREATE_TABLE,
-        CREATE_SEQUENCE
-    );
+    @RegisterExtension
+    static H2MemoryExtension h2 = new H2MemoryExtension("DatabaseServiceIT")
+            .addSqls(
+                    CREATE_SCHEMA,
+                    SET_SCHEMA,
+                    CREATE_TABLE,
+                    CREATE_SEQUENCE
+            );
 
     @Test
-    public void gatheringSchemaDetailsTest() throws Exception {
+    void gatheringSchemaDetailsTest() throws Exception {
         String[] args = {
             "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
             "-db", "DatabaseServiceIT",
-            "-s", h2MemoryRule.getConnection().getSchema(),
-            "-cat", h2MemoryRule.getConnection().getCatalog(),
+            "-s", h2.getConnection().getSchema(),
+            "-cat", h2.getConnection().getCatalog(),
             "-o", "target/integrationtesting/databaseServiceIT",
             "-u", "sa"
         };
