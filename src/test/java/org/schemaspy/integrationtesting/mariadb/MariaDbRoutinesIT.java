@@ -18,73 +18,58 @@
  */
 package org.schemaspy.integrationtesting.mariadb;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.schemaspy.integrationtesting.MysqlSuite;
-import org.schemaspy.model.Database;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.testcontainers.containers.MySQLContainer;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.schemaspy.model.Database;
+import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
  */
-@Ignore
-public class MariaDbRoutinesIT {
+@Disabled
+@Testcontainers(disabledWithoutDocker = true)
+class MariaDbRoutinesIT {
 
     private static Database database;
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
-                    MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mariadb:10.2"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitScript("integrationTesting/mysql/dbScripts/routinesit.sql")
-                            .withInitUser("root", "test")
-            );
+    @Container
+    static MariaDBContainer container =
+        new MariaDBContainer<>("mariadb:10.2")
+            .withInitScript("integrationTesting/mariadb/dbScripts/routinesit.sql");
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
-                "-t", "mariadb",
-                "-db", "routinesit",
-                "-s", "routinesit",
-                "-cat", "%",
-                "-o", "target/testout/integrationtesting/mariadb/routines",
-                "-u", "test",
-                "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getHost(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString()
+            "-t", "mariadb",
+            "-db", "test",
+            "-s", "test",
+            "-cat", "%",
+            "-o", "target/testout/integrationtesting/mariadb/routines",
+            "-u", container.getUsername(),
+            "-p", container.getPassword(),
+            "-host", container.getHost(),
+            "-port", container.getMappedPort(3306).toString()
         };
         database = database(args);
     }
 
     @Test
-    public void databaseShouldExist() {
+    void databaseShouldExist() {
         assertThat(database).isNotNull();
-        assertThat(database.getName()).isEqualToIgnoringCase("routinesit");
+        assertThat(database.getName()).isEqualToIgnoringCase("test");
     }
 
     @Test
-    public void databaseShouldHaveRoutines() {
+    void databaseShouldHaveRoutines() {
         assertThat(database.getRoutinesMap().get("no_det").isDeterministic()).isFalse();
         assertThat(database.getRoutinesMap().get("yes_det").isDeterministic()).isTrue();
     }
