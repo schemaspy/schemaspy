@@ -18,27 +18,22 @@
  */
 package org.schemaspy.util;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.Collections;
 
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Daniel Watt
  */
-public class CaseInsensitiveMapTest {
+class CaseInsensitiveMapTest {
 
-    private CaseInsensitiveMap<String> map;
-
-    @Before
-    public void setup() {
-        this.map = new CaseInsensitiveMap<>();
-    }
+    private CaseInsensitiveMap<String> map = new CaseInsensitiveMap<>();
 
     @Test
-    public void putGetContainsKey() {
+    void putGetContainsKey() {
         assertThat(map).isEmpty();
 
         map.put("key", "value");
@@ -57,7 +52,7 @@ public class CaseInsensitiveMapTest {
     }
 
     @Test
-    public void putAll() {
+    void putAll() {
         map.putAll(Collections.singletonMap("key","value"));
         assertThat(map.get("key")).isEqualTo("value");
         assertThat(map.get("KEY")).isEqualTo("value");
@@ -68,7 +63,7 @@ public class CaseInsensitiveMapTest {
     }
 
     @Test
-    public void remove() {
+    void remove() {
         map = new CaseInsensitiveMap<>(1);
         assertThat(map).isEmpty();
         assertThat(map.remove("key")).isNull();
@@ -83,25 +78,26 @@ public class CaseInsensitiveMapTest {
         assertThat(map).isEmpty();
     }
 
-    @Test(expected = NullPointerException.class)
-    public void nullPutIsNotSupported() {
-        map.put(null, "value");
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void nullRemoveNotSupported() {
-        map.remove(null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void nullContainsKeyNotSupported() {
-        map.containsKey(null);
+    @Test
+    void nullPutIsNotSupported() {
+        assertThatThrownBy(() -> map.put(null, "value"))
+            .isInstanceOf(NullPointerException.class);
     }
 
     @Test
-    public void nullGetIsSupported() {
-        assertThat(map.get(null)).isNull();
+    void nullRemoveNotSupported() {
+        assertThatThrownBy(() -> map.remove(null))
+            .isInstanceOf(NullPointerException.class);
     }
 
+    @Test
+    void nullContainsKeyNotSupported() {
+        assertThatThrownBy(() -> map.containsKey(null))
+            .isInstanceOf(NullPointerException.class);
+    }
 
+    @Test
+    void nullGetIsSupported() {
+        assertThat(map.get(null)).isNull();
+    }
 }

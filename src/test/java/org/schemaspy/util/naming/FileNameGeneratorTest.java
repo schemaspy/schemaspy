@@ -18,51 +18,39 @@
  */
 package org.schemaspy.util.naming;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class FileNameGeneratorTest {
+class FileNameGeneratorTest {
 
     @Test
-    public void nameShorterOrEqualTo40ReturnIt() {
-        String name = "1234567890123456789012345678901234567890";
-        String fileName = new FileNameGenerator(name).value();
-        assertThat(fileName).isEqualToIgnoringCase(name);
-    }
-
-    @Test
-    public void nameLongerThan40ShortenItTo40() {
-        String name= "12345678901234567890123456789012345678901";
-        String fileName = new FileNameGenerator(name).value();
-        assertThat(fileName.length()).isLessThanOrEqualTo(40);
-    }
-
-    @Test
-    public void wontGenerateSameNameForTwoDifferentNames() {
+    void wontGenerateSameNameForTwoDifferentNames() {
         String nameOne = "98765432109876543210987654321098765432109876543210";
         String nameTwo = "12345678901234567890123456789012345678901234567890";
         assertThat(new FileNameGenerator(nameOne).value()).isNotEqualToIgnoringCase(new FileNameGenerator(nameTwo).value());
     }
 
     @Test
-    public void willReplaceIllegalCharsWithUnderscoreAndAddHashAsHex() {
-        String name = "Test\tif/name/is#fixed or not";
-        String fileName = new FileNameGenerator(name).value();
-        assertThat(fileName).isEqualToIgnoringCase("Test_if_name_is_fixed_or_not_f9e4eeb2");
-    }
-
-    @Test
-    public void wontGenerateSameForSimilar() {
+    void wontGenerateSameForSimilar() {
         String nameOne = "Test\tif/name/is#fixed or not";
         String nameTwo = "Test\tif\tname/is#fixed or not";
         assertThat(new FileNameGenerator(nameOne).value()).isNotEqualToIgnoringCase(new FileNameGenerator(nameTwo).value());
     }
 
-    @Test
-    public void withJapanese() {
-        String name = "こんにちは";
-        String fileName = new FileNameGenerator(name).value();
-        assertThat(fileName).isEqualToIgnoringCase("______bfca3f39");
+    @ParameterizedTest(name = "{0}, \"{1}\" should become {2}")
+    @CsvSource(
+        textBlock = """
+            #case,         input,                                      output
+            japanese,      こんにちは,                                   ______bfca3f39
+            illegal,       Test\tif/name/is#fixed or not,              Test_if_name_is_fixed_or_not_f9e4eeb2
+            shortAndOk,    1234567890123456789012345678901234567890,   1234567890123456789012345678901234567890
+            short40C,      12345678901234567890123456789012345678901,  1234567890123456789012345678901_6e3e05c5   
+            """
+    )
+    void generateName(String description, String input, String output) {
+        assertThat(new FileNameGenerator(input).value()).isEqualTo(output).as("Failed %s", description);
     }
 }
