@@ -1,5 +1,9 @@
 package org.schemaspy.output.html.mustache.diagrams;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.schemaspy.output.diagram.RenderException;
@@ -8,14 +12,13 @@ import org.schemaspy.output.dot.schemaspy.graph.Graph;
 import org.schemaspy.output.html.HtmlException;
 import org.schemaspy.output.html.mustache.Diagram;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class OrphanDiagramTest {
 

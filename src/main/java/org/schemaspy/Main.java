@@ -25,14 +25,23 @@
  */
 package org.schemaspy;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.beust.jcommander.ParameterException;
-import org.schemaspy.cli.*;
+import org.schemaspy.cli.Banner;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.cli.ConfigFileArgumentParser;
+import org.schemaspy.cli.DefaultProviderFactory;
+import org.schemaspy.cli.RuntimeInfo;
+import org.schemaspy.cli.SchemaSpyRunner;
 import org.schemaspy.connection.ScExceptionChecked;
 import org.schemaspy.connection.ScNullChecked;
 import org.schemaspy.connection.ScSimple;
-import org.schemaspy.connection.SqlConnection;
 import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.DriverFromConfig;
@@ -42,10 +51,6 @@ import org.schemaspy.output.xml.dom.XmlProducerUsingDOM;
 import org.schemaspy.util.ManifestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.invoke.MethodHandles;
-import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * @author John Currier
@@ -69,7 +74,7 @@ public class Main {
                 ).banner()
         );
         LOGGER.info("{}", new RuntimeInfo("SchemaSpy", ManifestUtils.getImplementationVersion()));
-        if (Stream.of(args).anyMatch(arg -> arg.equals("-debug") || arg.equals("--debug"))) {
+        if (Stream.of(args).anyMatch(arg -> "-debug".equals(arg) || "--debug".equals(arg))) {
             enableDebug();
         }
         try {

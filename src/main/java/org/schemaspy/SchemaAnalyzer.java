@@ -34,7 +34,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.time.Clock;
@@ -52,15 +51,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.connection.ScExceptionChecked;
-import org.schemaspy.connection.ScNullChecked;
-import org.schemaspy.connection.ScSimple;
 import org.schemaspy.connection.SqlConnection;
 import org.schemaspy.input.dbms.CatalogResolver;
-import org.schemaspy.input.dbms.ConnectionConfig;
-import org.schemaspy.input.dbms.ConnectionURLBuilder;
-import org.schemaspy.input.dbms.DbDriverLoader;
-import org.schemaspy.input.dbms.DriverFromConfig;
 import org.schemaspy.input.dbms.SchemaResolver;
 import org.schemaspy.input.dbms.service.DatabaseService;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
@@ -229,8 +221,9 @@ public class SchemaAnalyzer {
             LOGGER.info("Analyzing '{}'", new Sanitize(schema));
             File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
             db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService, con);
-            if (db == null) //if any of analysed schema returns null
+            if (db == null) { //if any of analysed schema returns null
                 return null;
+            }
             mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
             mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
         }
@@ -326,8 +319,9 @@ public class SchemaAnalyzer {
                 databaseMetaData,
                 !".*".equals(commandLineArguments.getProcessingConfig().getTableInclusions().toString())
             );
-            if (!isOneOfMultipleSchemas) // don't bail if we're doing the whole enchilada
+            if (!isOneOfMultipleSchemas) { // don't bail if we're doing the whole enchilada
                 throw new EmptySchemaException();
+            }
         }
 
         if (commandLineArguments.isHtmlEnabled()) {
