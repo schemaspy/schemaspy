@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link Digraph}.
  */
-public class DigraphTest {
+class DigraphTest {
 
     /**
      * When the object is asked to represent itself in DOT,

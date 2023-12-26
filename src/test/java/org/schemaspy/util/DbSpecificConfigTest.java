@@ -26,13 +26,13 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DbSpecificConfigTest {
+class DbSpecificConfigTest {
 
-    private static Properties withoutHostAndOptionalPort = new Properties();
-    private static Properties withHostAndOptionalPort = new Properties();
+    private static final Properties withoutHostAndOptionalPort = new Properties();
+    private static final Properties withHostAndOptionalPort = new Properties();
 
     @BeforeAll
-    public static void setupProperties() {
+    static void setupProperties() {
         withoutHostAndOptionalPort.setProperty("description","MySQL");
         withoutHostAndOptionalPort.setProperty("connectionSpec","jdbc:mysql://<host>/<db>?socketFactory=<socketFactory>&socket=<socket>");
         withoutHostAndOptionalPort.setProperty("host","host where database resides with optional port");
@@ -49,7 +49,7 @@ public class DbSpecificConfigTest {
     }
 
     @Test
-    public void worksWithoutHostAndOptionalPort() {
+    void worksWithoutHostAndOptionalPort() {
         DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withoutHostAndOptionalPort", withoutHostAndOptionalPort);
         assertThat(dbSpecificConfig.getOptions()).usingElementComparatorOnFields("name", "description").containsExactly(
                 new DbSpecificOption("host", "host where database resides with optional port"),
@@ -60,7 +60,7 @@ public class DbSpecificConfigTest {
     }
 
     @Test
-    public void dumpUsageWithoutHostAndOptionalPort() {
+    void dumpUsageWithoutHostAndOptionalPort() {
         RecordingLogger recordingLogger = new RecordingLogger();
         new DbSpecificConfig(
                 "withoutHostAndOptionalPort",
@@ -70,7 +70,7 @@ public class DbSpecificConfigTest {
     }
 
     @Test
-    public void worksWithHostAndOptionalPort() {
+    void worksWithHostAndOptionalPort() {
         DbSpecificConfig dbSpecificConfig = new DbSpecificConfig("withHostAndOptionalPort", withHostAndOptionalPort);
         assertThat(dbSpecificConfig.getOptions()).usingElementComparatorOnFields("name", "description").containsExactly(
                 new DbSpecificOption("hostOptionalPort", null),
@@ -79,7 +79,7 @@ public class DbSpecificConfigTest {
     }
 
     @Test
-    public void dumpUsageWithHostAndOptionalPort(){
+    void dumpUsageWithHostAndOptionalPort(){
         RecordingLogger recordingLogger = new RecordingLogger();
         new DbSpecificConfig(
                 "withHostAndOptionalPort",

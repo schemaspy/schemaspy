@@ -24,15 +24,15 @@ import org.schemaspy.testing.EnableIfClassAvailable;
 import static org.assertj.core.api.Assertions.assertThat;
 //Only run from maven
 @EnableIfClassAvailable("org.apache.maven.surefire.booter.StartupConfiguration")
-public class ManifestUtilsIT {
+class ManifestUtilsIT {
 
     @Test
-    public void getImplementationVersion() {
+    void getImplementationVersion() {
         assertThat(ManifestUtils.getImplementationVersion()).isEqualTo(System.getProperty("pomImplementationVersion"));
     }
 
     @Test
-    public void getImplementationBuild() {
+    void getImplementationBuild() {
         assertThat(ManifestUtils.getImplementationRevision()).isEqualTo(System.getProperty("pomImplementationRevision"));
     }
 }
