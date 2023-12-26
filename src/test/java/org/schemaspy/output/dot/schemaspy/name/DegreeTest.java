@@ -1,12 +1,13 @@
 package org.schemaspy.output.dot.schemaspy.name;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link Degree}.
  */
-public class DegreeTest {
+class DegreeTest {
 
     /**
      * Given two degrees of separation,
@@ -14,7 +15,7 @@ public class DegreeTest {
      * Then it should respond with two degrees.
      */
     @Test
-    public void acknowledgeImplication() {
+    void acknowledgeImplication() {
         assertThat(
             new Degree(true).value()
         ).isEqualTo("twoDegrees");
@@ -26,7 +27,7 @@ public class DegreeTest {
      * Then it should respond with one degree.
      */
     @Test
-    public void acknowledgeNonImplication() {
+    void acknowledgeNonImplication() {
         assertThat(
             new Degree(false).value()
         ).isEqualTo("oneDegree");

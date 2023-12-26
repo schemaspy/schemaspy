@@ -18,7 +18,7 @@
  */
 package org.schemaspy.output.xml.dom;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.XmlOutputDiff;
@@ -39,12 +39,12 @@ import static org.mockito.Mockito.when;
 /**
  * @author Nils Petzaell
  */
-public class XmlTableFormatterTest {
+class XmlTableFormatterTest {
 
     private static final XmlTableFormatter xmlTableFormatter = new XmlTableFormatter();
 
     @Test
-    public void withCheckConstraint() throws ParserConfigurationException, TransformerException {
+    void withCheckConstraint() throws ParserConfigurationException, TransformerException {
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><database>\n" +
                 "   <tables>\n" +
                 "      <table catalog=\"catalog\" name=\"table\" numRows=\"0\" remarks=\"table\" schema=\"schema\" type=\"TABLE\">\n" +

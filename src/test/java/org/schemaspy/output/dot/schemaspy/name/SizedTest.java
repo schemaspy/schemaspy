@@ -1,13 +1,13 @@
 package org.schemaspy.output.dot.schemaspy.name;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link Sized}.
  */
-public class SizedTest {
+class SizedTest {
 
     /**
      * Given that the graph is compact,
@@ -15,7 +15,7 @@ public class SizedTest {
      * Then it should respond with compact.
      */
     @Test
-    public void interpretCompact() {
+    void interpretCompact() {
         assertThat(
                 new Sized(true).value()
         ).isEqualTo("compact");
@@ -27,7 +27,7 @@ public class SizedTest {
      * Then the it should respond with large.
      */
     @Test
-    public void interpretLarge() {
+    void interpretLarge() {
         assertThat(
                 new Sized(false).value()
         ).isEqualTo("large");

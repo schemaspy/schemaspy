@@ -1,8 +1,9 @@
 package org.schemaspy.output.html.mustache.diagrams;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.io.TempDir;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Table;
@@ -13,7 +14,6 @@ import org.schemaspy.output.dot.schemaspy.DotFormatter;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -21,22 +21,21 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class MustacheSummaryDiagramFactoryTest {
+class MustacheSummaryDiagramFactoryTest {
 
     private static final String FILE_PREFIX = "relationships";
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    Path temporaryFolder;
 
-    private ProgressListener progressListener = mock(ProgressListener.class);
+    private final ProgressListener progressListener = mock(ProgressListener.class);
 
     @Test
-    public void noDiagrams() throws IOException {
+    void noDiagrams() throws IOException {
         DotFormatter dotProducer = mock(DotFormatter.class);
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         when(mustacheDiagramFactory.generateSummaryDiagram(any(File.class),anyString())).then(invocation -> mock(DiagramResult.class));
@@ -46,7 +45,7 @@ public class MustacheSummaryDiagramFactoryTest {
                 mustacheDiagramFactory,
                 false,
                 false,
-                temporaryFolder.newFolder("noDiagrams"),
+                temporaryFolder.resolve("noDiagrams").toFile(),
                 progressListener
             );
 
@@ -58,7 +57,7 @@ public class MustacheSummaryDiagramFactoryTest {
     }
 
     @Test
-    public void realDiagrams() throws IOException {
+    void realDiagrams() throws IOException {
         DotFormatter dotProducer = mock(DotFormatter.class);
 
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
@@ -69,7 +68,7 @@ public class MustacheSummaryDiagramFactoryTest {
                 mustacheDiagramFactory,
                 true,
                 false,
-                temporaryFolder.newFolder("noDiagrams"),
+                temporaryFolder.resolve("noDiagrams").toFile(),
                 progressListener
             );
 
@@ -86,7 +85,7 @@ public class MustacheSummaryDiagramFactoryTest {
     }
 
     @Test
-    public void realAndImpliedDiagrams() throws IOException {
+    void realAndImpliedDiagrams() throws IOException {
         DotFormatter dotProducer = mock(DotFormatter.class);
 
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
@@ -98,7 +97,7 @@ public class MustacheSummaryDiagramFactoryTest {
                 mustacheDiagramFactory,
                 true,
                 true,
-                temporaryFolder.newFolder("noDiagrams"),
+                temporaryFolder.resolve("noDiagrams").toFile(),
                 progressListener
             );
 
@@ -117,8 +116,8 @@ public class MustacheSummaryDiagramFactoryTest {
     }
 
     @Test
-    public void exceptionsAreCaught() throws IOException {
-        assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
+    @EnabledOnOs({OS.LINUX, OS.MAC})
+    void exceptionsAreCaught() throws IOException {
         SummaryDiagram mustacheDiagramFactory = mock(SummaryDiagram.class);
         doThrow(new RenderException("byDesign")).
                 when(mustacheDiagramFactory)
@@ -127,7 +126,7 @@ public class MustacheSummaryDiagramFactoryTest {
                         anyString());
 
 
-        File outputDir = temporaryFolder.newFolder("noDiagrams");
+        File outputDir = temporaryFolder.resolve("noDiagrams").toFile();
 
         Path summaryPath = outputDir.toPath().resolve("diagrams").resolve("summary");
         Files.createDirectories(summaryPath);

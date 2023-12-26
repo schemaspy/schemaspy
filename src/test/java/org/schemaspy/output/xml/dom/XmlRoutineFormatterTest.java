@@ -18,7 +18,7 @@
  */
 package org.schemaspy.output.xml.dom;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.model.Routine;
 import org.schemaspy.model.RoutineParameter;
 import org.schemaspy.testing.XmlOutputDiff;
@@ -35,12 +35,13 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class XmlRoutineFormatterTest {
+@SuppressWarnings({"java:S5976"})
+class XmlRoutineFormatterTest {
 
     private static final XmlRoutineFormatter xmlRoutineFormatter = new XmlRoutineFormatter();
 
     @Test
-    public void noCommentNoDefinitionLanguageNoDefinition() throws ParserConfigurationException, TransformerException {
+    void noCommentNoDefinitionLanguageNoDefinition() throws ParserConfigurationException, TransformerException {
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><database>\n" +
                 "   <routines>\n" +
                 "      <routine dataAccess=\"MODIFIES\" deterministic=\"true\" name=\"noCommentNoDefinitionLanguageNoDefinition\" returnType=\"int\" securityType=\"INVOKER\" type=\"FUNCTION\">\n" +
@@ -74,7 +75,7 @@ public class XmlRoutineFormatterTest {
     }
 
     @Test
-    public void noCommentNoDefinitionLanguage() throws ParserConfigurationException, TransformerException {
+    void noCommentNoDefinitionLanguage() throws ParserConfigurationException, TransformerException {
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><database>\n" +
                 "   <routines>\n" +
                 "      <routine dataAccess=\"MODIFIES\" deterministic=\"true\" name=\"noCommentNoDefinitionLanguageNoDefinition\" returnType=\"int\" securityType=\"INVOKER\" type=\"FUNCTION\">\n" +
@@ -108,7 +109,7 @@ public class XmlRoutineFormatterTest {
     }
 
     @Test
-    public void noComment() throws ParserConfigurationException, TransformerException {
+    void noComment() throws ParserConfigurationException, TransformerException {
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><database>\n" +
                 "   <routines>\n" +
                 "      <routine dataAccess=\"MODIFIES\" deterministic=\"true\" name=\"noCommentNoDefinitionLanguageNoDefinition\" returnType=\"int\" securityType=\"INVOKER\" type=\"FUNCTION\">\n" +
@@ -142,7 +143,7 @@ public class XmlRoutineFormatterTest {
     }
 
     @Test
-    public void full() throws TransformerException, ParserConfigurationException {
+    void full() throws TransformerException, ParserConfigurationException {
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><database>\n" +
                 "   <routines>\n" +
                 "      <routine dataAccess=\"MODIFIES\" deterministic=\"true\" name=\"noCommentNoDefinitionLanguageNoDefinition\" returnType=\"int\" securityType=\"INVOKER\" type=\"FUNCTION\">\n" +

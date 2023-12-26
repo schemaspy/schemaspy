@@ -18,36 +18,36 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class StyleSheetTest {
+class StyleSheetTest {
 
     private static final StyleSheet styleSheet = new StyleSheet("layout", "schemaSpy.css").load();
 
     @Test
-    public void canGetBodyBackground() {
+    void canGetBodyBackground() {
         assertThat(styleSheet.getBodyBackground()).isEqualTo("#ffffff");
     }
 
     @Test
-    public void canGetTableBackground() {
+    void canGetTableBackground() {
         assertThat(styleSheet.getTableBackground()).isEqualTo("#ffffff");
     }
 
     @Test
-    public void canGetTableHeadBackground() {
+    void canGetTableHeadBackground() {
         assertThat(styleSheet.getTableHeadBackground()).isEqualTo("#f5f5f5");
     }
 
     @Test
-    public void canGetIndexedColumnBackground() {
+    void canGetIndexedColumnBackground() {
         assertThat(styleSheet.getIndexedColumnBackground()).isEqualTo("#ffffff");
     }
 
     @Test
-    public void canGetExcludedColumnBackgroundColor() {
+    void canGetExcludedColumnBackgroundColor() {
         assertThat(styleSheet.getExcludedColumnBackgroundColor()).isEqualTo("#c0c0c0");
     }
 

@@ -1,12 +1,13 @@
 package org.schemaspy.output.dot.schemaspy.name;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link Implied}.
  */
-public class ImpliedTest {
+class ImpliedTest {
 
     /**
      * Given an implication,
@@ -14,7 +15,7 @@ public class ImpliedTest {
      * Then it should respond with implied.
      */
     @Test
-    public void acknowledgeImplication() {
+    void acknowledgeImplication() {
         assertThat(
             new Implied(true).value()
         ).isEqualTo("Implied");
@@ -26,7 +27,7 @@ public class ImpliedTest {
      * Then it should respond with nothing.
      */
     @Test
-    public void acknowledgeNonImplication() {
+    void acknowledgeNonImplication() {
         assertThat(
             new Implied(false).value()
         ).isEmpty();

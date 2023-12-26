@@ -18,10 +18,9 @@
  */
 package org.schemaspy.output.html.mustache.diagrams;
 
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.stubbing.Answer;
 import org.schemaspy.model.Table;
 import org.schemaspy.output.diagram.DiagramResult;
@@ -32,6 +31,7 @@ import org.schemaspy.view.MustacheTableDiagram;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public class MustacheTableDiagramFactoryTest {
+class MustacheTableDiagramFactoryTest {
 
     private static Table table = mock(Table.class);
 
@@ -57,11 +57,11 @@ public class MustacheTableDiagramFactoryTest {
         return Collections.emptySet();
     };
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    Path temporaryFolder;
 
-    @BeforeClass
-    public static void setupTable() {
+    @BeforeAll
+    static void setupTable() {
         when(table.getName()).thenReturn("table");
         when(table.getMaxChildren()).thenReturn(0);
         when(table.getMaxParents()).thenReturn(0);
@@ -69,8 +69,8 @@ public class MustacheTableDiagramFactoryTest {
     }
 
     @Test
-    public void onlyOneDiagram() throws IOException {
-        File outputDir = temporaryFolder.newFolder("onediagram");
+    void onlyOneDiagram() throws IOException {
+        File outputDir = temporaryFolder.resolve("onediagram").toFile();
         when(table.hasImpliedConstraints(1)).thenReturn(false);
         when(table.hasImpliedConstraints(2)).thenReturn(false);
 
@@ -95,8 +95,8 @@ public class MustacheTableDiagramFactoryTest {
     }
 
     @Test
-    public void onlyTwoDiagram() throws IOException {
-        File outputDir = temporaryFolder.newFolder("twodiagrams");
+    void onlyTwoDiagram() throws IOException {
+        File outputDir = temporaryFolder.resolve("twodiagrams").toFile();
         when(table.hasImpliedConstraints(1)).thenReturn(false);
         when(table.hasImpliedConstraints(2)).thenReturn(false);
 
@@ -123,8 +123,8 @@ public class MustacheTableDiagramFactoryTest {
     }
 
     @Test
-    public void threeDiagramsOneIsImplied() throws IOException {
-        File outputDir = temporaryFolder.newFolder("threediagrams");
+    void threeDiagramsOneIsImplied() throws IOException {
+        File outputDir = temporaryFolder.resolve("threediagrams").toFile();
         when(table.hasImpliedConstraints(1)).thenReturn(true);
         when(table.hasImpliedConstraints(2)).thenReturn(true);
 
@@ -162,8 +162,8 @@ public class MustacheTableDiagramFactoryTest {
     }
 
     @Test
-    public void fourDiagramsTwoAreImplied() throws IOException {
-        File outputDir = temporaryFolder.newFolder("fourdiagrams");
+    void fourDiagramsTwoAreImplied() throws IOException {
+        File outputDir = temporaryFolder.resolve("fourdiagrams").toFile();
         when(table.hasImpliedConstraints(1)).thenReturn(true);
         when(table.hasImpliedConstraints(2)).thenReturn(true);
 
@@ -204,8 +204,8 @@ public class MustacheTableDiagramFactoryTest {
     }
 
     @Test
-    public void twoDiagramOnly1stDegree() throws IOException {
-        File outputDir = temporaryFolder.newFolder("fourdiagrams1degree");
+    void twoDiagramOnly1stDegree() throws IOException {
+        File outputDir = temporaryFolder.resolve("fourdiagrams1degree").toFile();
         when(table.hasImpliedConstraints(1)).thenReturn(true);
         when(table.hasImpliedConstraints(2)).thenReturn(true);
 
