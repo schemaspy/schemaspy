@@ -18,11 +18,16 @@
  */
 package org.schemaspy;
 
-import org.junit.Test;
-import org.schemaspy.model.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.ForeignKeyConstraint;
+import org.schemaspy.model.LogicalTable;
+import org.schemaspy.model.RemoteTable;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -31,13 +36,13 @@ import static org.mockito.Mockito.when;
 /**
  * @author Nils Petzaell
  */
-public class InsertionOrderedTest {
+class InsertionOrderedTest {
 
     private static final String CATALOG = "catalog";
     private static final String SCHEMA = "schema";
 
     @Test
-    public void validateSorting() {
+    void validateSorting() {
         Database database = mockDatabase("database");
         Table parent = createParent(database);
 
