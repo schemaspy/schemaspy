@@ -20,10 +20,10 @@ package org.schemaspy.input.dbms;
 
 import com.beust.jcommander.JCommander;
 import org.dummy.DummyDriverUnsatisfiedCtor;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
-import org.schemaspy.testing.H2MemoryRule;
+import org.schemaspy.testing.H2MemoryExtension;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -36,13 +36,13 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 /**
  * @author Nils Petzaell
  */
-public class DbDriverLoaderTest {
+class DbDriverLoaderTest {
 
-  @Rule
-  public H2MemoryRule h2 = new H2MemoryRule("DbDriverLoaderTest");
+  @RegisterExtension
+  static H2MemoryExtension h2 = new H2MemoryExtension("DbDriverLoaderTest");
 
   @Test
-  public void testGetConnection() throws IOException {
+  void testGetConnection() throws IOException {
     assertThat(
         new DriverFromConfig(
             parse("-t", Paths.get("src", "test", "resources", "integrationTesting", "dbTypes", "h2memory.properties").toString(), "-u", "sa", "-db", "DbDriverLoaderTest")
@@ -51,7 +51,7 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void driverLoaderCachesDrivers() {
+  void driverLoaderCachesDrivers() {
     String[] drivers = new String[]{"org.h2.Driver"};
 
     DbDriverLoader driverLoader1 = new DbDriverLoader(drivers, () -> "");
@@ -61,7 +61,7 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void driverPathWorks() throws SQLException {
+  void driverPathWorks() throws SQLException {
     String driverPath = Paths.get("src", "test", "resources", "driverFolder", "dummy.jar").toString();
     DbDriverLoader driverLoader = new DbDriverLoader(new String[]{"dummy.DummyDriver"}, () -> driverPath);
     Driver driver = driverLoader.driver();
@@ -70,7 +70,7 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void nativeErrorInDriverCreationPassesUncaught() {
+  void nativeErrorInDriverCreationPassesUncaught() {
     String[] drivers = new String[]{DummyDriverUnsatisfiedCtor.class.getName(), "dummy.dummy"};
     DbDriverLoader driverLoader = new DbDriverLoader(drivers, () -> "");
     assertThatExceptionOfType(UnsatisfiedLinkError.class)
@@ -78,7 +78,7 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void firstDriverClassMissingSecondExists() {
+  void firstDriverClassMissingSecondExists() {
     DbDriverLoader driverLoader = new DbDriverLoader(new String[]{"com.no", "org.h2.Driver"}, () -> "");
     Driver driver = driverLoader.driver();
     assertThat(driver).isNotNull();
@@ -86,14 +86,14 @@ public class DbDriverLoaderTest {
   }
 
   @Test
-  public void twoDriversBothExists() {
+  void twoDriversBothExists() {
     DbDriverLoader driverLoader = new DbDriverLoader(new String[]{"com.mysql.cj.jdbc.Driver", "com.mysql.jdbc.Driver"}, () -> "");
     Driver driver = driverLoader.driver();
     assertThat(driver).isNotNull();
     assertThat(driver.getClass().getName()).isEqualTo("com.mysql.cj.jdbc.Driver");
   }
 
-  ConnectionConfig parse(String... args) {
+  private ConnectionConfig parse(String... args) {
     DatabaseTypeConfigCli databaseTypeConfigCli = new DatabaseTypeConfigCli(new SimplePropertiesResolver());
     ConnectionConfigCli connectionConfigCli = new ConnectionConfigCli(databaseTypeConfigCli);
     JCommander jCommander = JCommander.newBuilder().build();
