@@ -18,54 +18,27 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HtmlTest {
+class HtmlTest {
 
-    private static final Html htmlEncoder = new Html();
-
-    @Test
-    public void willEscapeLesserThan() {
-        String input = "<hello<";
-        String output = htmlEncoder.escape(input);
-        assertThat(output).isEqualTo("&lt;hello&lt;");
+    @ParameterizedTest
+    @CsvSource(
+            quoteCharacter = '*',
+            useHeadersInDisplayName = true,
+            textBlock = """
+                    input,                  output
+                    <hello<,                &lt;hello&lt;
+                    >hello>,                &gt;hello&gt;
+                    "hello",                &quot;hello&quot;
+                    'hello',                &apos;hello&apos;
+                    '><&"hello<<<"&&>',   &apos;&gt;&lt;&amp;&quot;hello&lt;&lt;&lt;&quot;&amp;&amp;&gt;&apos;
+                    """
+    )
+    void htmlEscape(String input, String output) {
+        assertThat(new Html().escape(input)).isEqualTo(output);
     }
-
-    @Test
-    public void willEscapeGreaterThan() {
-        String input = ">hello>";
-        String output = htmlEncoder.escape(input);
-        assertThat(output).isEqualTo("&gt;hello&gt;");
-    }
-
-    @Test
-    public void willEscapeQuotation() {
-        String input = "\"hello\"";
-        String output = htmlEncoder.escape(input);
-        assertThat(output).isEqualTo("&quot;hello&quot;");
-    }
-
-    @Test
-    public void willEscapeApostropheQuote() {
-        String input = "'hello'";
-        String output = htmlEncoder.escape(input);
-        assertThat(output).isEqualTo("&apos;hello&apos;");
-    }
-
-    @Test
-    public void willAmpersandQuote() {
-        String input = "'hello'";
-        String output = htmlEncoder.escape(input);
-        assertThat(output).isEqualTo("&apos;hello&apos;");
-    }
-
-    @Test
-    public void willEscapeEverything() {
-        String input = "'><&\"hello<<<\"&&>'";
-        String output = htmlEncoder.escape(input);
-        assertThat(output).isEqualTo("&apos;&gt;&lt;&amp;&quot;hello&lt;&lt;&lt;&quot;&amp;&amp;&gt;&apos;");
-    }
-
 }

@@ -18,7 +18,7 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -32,20 +32,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Nils Petzaell
  */
-public class ResourceFinderTest {
+class ResourceFinderTest {
 
-    private ResourceFinder resourceFinder = new ResourceFinder();
+    private final ResourceFinder resourceFinder = new ResourceFinder();
 
-    private byte[] data = "This is a test".getBytes(StandardCharsets.UTF_8);
-    private String subPath = "resourceFinderTest";
+    private final byte[] data = "This is a test".getBytes(StandardCharsets.UTF_8);
+    private final String subPath = "resourceFinderTest";
 
-    private String workDirStr = System.getProperty("user.dir");
-    private Path workDir = Paths.get(workDirStr);
-    private String homeDirStr = System.getProperty("user.home");
-    private Path homeDir = Paths.get(homeDirStr);
+    private final String workDirStr = System.getProperty("user.dir");
+    private final Path workDir = Paths.get(workDirStr);
+    private final String homeDirStr = System.getProperty("user.home");
+    private final Path homeDir = Paths.get(homeDirStr);
 
     @Test
-    public void canFindInWorkDirRoot() throws IOException {
+    void canFindInWorkDirRoot() throws IOException {
         Path p = null;
         try {
             p = Files.createTempFile(workDir, "resourceFinderWorkDir", ".test");
@@ -61,7 +61,7 @@ public class ResourceFinderTest {
     }
 
     @Test
-    public void canFindInWorkDirRootSubPath() throws IOException {
+    void canFindInWorkDirRootSubPath() throws IOException {
         Path tmpFile = null;
         Path tmpDir = null;
         try {
@@ -80,7 +80,7 @@ public class ResourceFinderTest {
     }
 
     @Test
-    public void canFindInUserHomeDirRoot() throws IOException {
+    void canFindInUserHomeDirRoot() throws IOException {
         Path p = null;
         try {
             p = Files.createTempFile(homeDir, "resourceFinderHomeDir", ".test");
@@ -96,7 +96,7 @@ public class ResourceFinderTest {
     }
 
     @Test
-    public void canFindInUserHomeDirRootSubPath() throws IOException {
+    void canFindInUserHomeDirRootSubPath() throws IOException {
         Path tmpFile = null;
         Path tmpDir = null;
         try {
@@ -115,13 +115,13 @@ public class ResourceFinderTest {
     }
 
     @Test
-    public void canFindInClasspathRoot() throws FileNotFoundException {
+    void canFindInClasspathRoot() throws FileNotFoundException {
         InputStream inputStream = resourceFinder.find("", "resourceFinder.test");
         assertThat(inputStream).hasSameContentAs(new ByteArrayInputStream(data));
     }
 
     @Test
-    public void canFindInClasspathSubPath() throws FileNotFoundException {
+    void canFindInClasspathSubPath() throws FileNotFoundException {
         InputStream inputStream = resourceFinder.find(subPath, "resourceFinder.test");
         assertThat(inputStream).hasSameContentAs(new ByteArrayInputStream(data));
     }

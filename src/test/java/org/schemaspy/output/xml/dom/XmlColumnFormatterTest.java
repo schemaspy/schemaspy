@@ -18,7 +18,7 @@
  */
 package org.schemaspy.output.xml.dom;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
@@ -32,19 +32,18 @@ import org.xmlunit.diff.Diff;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
 import java.sql.Types;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class XmlColumnFormatterTest {
+class XmlColumnFormatterTest {
 
-    private XmlColumnFormatter xmlColumnFormatter = new XmlColumnFormatter();
+    private final XmlColumnFormatter xmlColumnFormatter = new XmlColumnFormatter();
 
     @Test
-    public void appendColumn() throws ParserConfigurationException, TransformerException {
+    void appendColumn() throws ParserConfigurationException, TransformerException {
         String expected ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><table>\n" +
                 "   <column autoUpdated=\"true\" digits=\"0\" id=\"0\" name=\"main\" nullable=\"false\" remarks=\"\" size=\"10\" type=\"int\" typeCode=\"4\" defaultValue=\"1\">\n" +
                 "      <child catalog=\"catalog\" column=\"child\" implied=\"false\" onDeleteCascade=\"false\" schema=\"schema\" table=\"childTable\"/>\n" +
