@@ -18,32 +18,24 @@
  */
 package org.schemaspy.view;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.Catalog;
-import org.schemaspy.util.DataTableConfig;
-
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.model.Catalog;
+import org.schemaspy.util.DataTableConfig;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HtmlMultipleSchemasIndexPageTest {
+class HtmlMultipleSchemasIndexPageTest {
 
-    private static CommandLineArguments commandLineArguments;
-    private static DataTableConfig dataTableConfig;
-
-    @BeforeClass
-    public static void setup() {
-        commandLineArguments = parse("");
-        dataTableConfig = new DataTableConfig(commandLineArguments);
-    }
-
-    private static CommandLineArguments parse(String...args) {
+    private final CommandLineArguments commandLineArguments = parse("");
+    private final DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
+    private CommandLineArguments parse(String...args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(
                 Stream
@@ -56,7 +48,7 @@ public class HtmlMultipleSchemasIndexPageTest {
     }
 
     @Test
-    public void multiMainIndexShouldHaveDescription() {
+    void multiMainIndexShouldHaveDescription() {
         MustacheCompiler mustacheCompiler = new MustacheCompiler("withComment", null, commandLineArguments.getHtmlConfig(), false, dataTableConfig);
         HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
         StringWriter actual = new StringWriter();
@@ -65,7 +57,7 @@ public class HtmlMultipleSchemasIndexPageTest {
     }
 
     @Test
-    public void multiMainIndexShouldNOTHaveDescription() {
+    void multiMainIndexShouldNOTHaveDescription() {
         MustacheCompiler mustacheCompiler = new MustacheCompiler("noComment", null, commandLineArguments.getHtmlConfig(), false, dataTableConfig);
         HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
         StringWriter actual = new StringWriter();

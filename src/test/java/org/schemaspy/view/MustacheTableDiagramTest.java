@@ -1,16 +1,16 @@
 package org.schemaspy.view;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.schemaspy.output.diagram.DiagramResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MustacheTableDiagramTest {
+class MustacheTableDiagramTest {
 
     @Test
-    public void translateDiagramResults() {
+    void translateDiagramResults() {
         DiagramResult results = mock(DiagramResult.class);
         when(results.getFileName()).thenReturn("orphan.png");
         when(results.getMapName()).thenReturn("orphanMap");

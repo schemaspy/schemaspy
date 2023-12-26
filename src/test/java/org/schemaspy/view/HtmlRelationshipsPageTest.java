@@ -18,24 +18,24 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Test;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.html.mustache.diagrams.MustacheSummaryDiagramResults;
 import org.schemaspy.util.DataTableConfig;
 
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HtmlRelationshipsPageTest {
+class HtmlRelationshipsPageTest {
 
     @Test
-    public void willWriteErrorInformation() {
+    void willWriteErrorInformation() {
         CommandLineArguments arguments = parse("");
         DataTableConfig dataTableConfig = new DataTableConfig(arguments);
         MustacheCompiler mustacheCompiler = new MustacheCompiler("htmlTablePage_error", "htmlTablePage_error", arguments.getHtmlConfig(), false, dataTableConfig);

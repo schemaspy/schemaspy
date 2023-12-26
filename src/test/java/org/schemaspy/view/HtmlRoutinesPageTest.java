@@ -18,24 +18,24 @@
  */
 package org.schemaspy.view;
 
-import org.junit.Test;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.model.Routine;
-import org.schemaspy.util.DataTableConfig;
-
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.model.Routine;
+import org.schemaspy.util.DataTableConfig;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HtmlRoutinesPageTest {
+class HtmlRoutinesPageTest {
 
     @Test
-    public void markdownComment() {
+    void markdownComment() {
         CommandLineArguments arguments = parse("");
         DataTableConfig dataTableConfig = new DataTableConfig(arguments);
         MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", "markdownTest", arguments.getHtmlConfig(), false, dataTableConfig);
@@ -49,7 +49,7 @@ public class HtmlRoutinesPageTest {
     }
 
     @Test
-    public void rawValueToFileName() {
+    void rawValueToFileName() {
         CommandLineArguments arguments = parse("");
         DataTableConfig dataTableConfig = new DataTableConfig(arguments);
         MustacheCompiler mustacheCompiler = new MustacheCompiler("markdownTest", "markdownTest", arguments.getHtmlConfig(), false, dataTableConfig);

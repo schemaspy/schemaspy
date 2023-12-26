@@ -18,13 +18,6 @@
  */
 package org.schemaspy.view;
 
-import org.assertj.core.api.SoftAssertions;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.schemaspy.cli.CommandLineArgumentParser;
-import org.schemaspy.cli.CommandLineArguments;
-import org.schemaspy.util.DataTableConfig;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -36,22 +29,36 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.Test;
+import org.schemaspy.cli.CommandLineArgumentParser;
+import org.schemaspy.cli.CommandLineArguments;
+import org.schemaspy.util.DataTableConfig;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MustacheCompilerTest {
+class MustacheCompilerTest {
 
-    private static MustacheCompiler mustacheCompilerSingle;
-    private static MustacheCompiler mustacheCompilerMulti;
+    private final CommandLineArguments commandLineArguments = parse("-template", "mustache");
+    private final DataTableConfig dataTableConfig = new DataTableConfig(commandLineArguments);
+    private final MustacheCompiler mustacheCompilerSingle =
+        new MustacheCompiler(
+            "testingSingle",
+            "testingSingle",
+            commandLineArguments.getHtmlConfig(),
+            false,
+            dataTableConfig
+        );
+    private final MustacheCompiler mustacheCompilerMulti =
+        new MustacheCompiler(
+            "testingMulti",
+            null,
+            commandLineArguments.getHtmlConfig(),
+            true,
+            dataTableConfig
+        );
 
-    @BeforeClass
-    public static void setup() {
-        CommandLineArguments arguments = parse("-template", "mustache");
-        DataTableConfig dataTableConfig = new DataTableConfig(arguments);
-        mustacheCompilerSingle = new MustacheCompiler("testingSingle", "testingSingle", arguments.getHtmlConfig(), false, dataTableConfig);
-        mustacheCompilerMulti = new MustacheCompiler("testingMulti", null, arguments.getHtmlConfig(), true, dataTableConfig);
-    }
-
-    private static CommandLineArguments parse(String...args) {
+    private CommandLineArguments parse(String...args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(
                 Stream
@@ -63,12 +70,12 @@ public class MustacheCompilerTest {
                 .commandLineArguments();
     }
 
-    private PageData pageData = new PageData.Builder()
+    private final PageData pageData = new PageData.Builder()
             .templateName("databaseName.html")
             .getPageData();
 
     @Test
-    public void setsDatabaseName() throws IOException {
+    void setsDatabaseName() throws IOException {
         StringWriter stringWriterSingle = new StringWriter();
         StringWriter stringWriterMulti = new StringWriter();
         mustacheCompilerSingle.write(pageData, stringWriterSingle);
@@ -81,7 +88,7 @@ public class MustacheCompilerTest {
     }
 
     @Test
-    public void setsRootPath() throws IOException {
+    void setsRootPath() throws IOException {
         StringWriter stringWriterSingle = new StringWriter();
         StringWriter stringWriterMulti = new StringWriter();
         mustacheCompilerSingle.write(pageData, stringWriterSingle);
@@ -98,7 +105,7 @@ public class MustacheCompilerTest {
     }
 
     @Test
-    public void setsRootPathToHome() throws IOException {
+    void setsRootPathToHome() throws IOException {
         StringWriter stringWriterSingle = new StringWriter();
         StringWriter stringWriterMulti = new StringWriter();
         mustacheCompilerSingle.write(pageData, stringWriterSingle);
@@ -115,7 +122,7 @@ public class MustacheCompilerTest {
     }
 
     @Test
-    public void overrideLayoutTest() throws IOException {
+    void overrideLayoutTest() throws IOException {
         Path overridePath = Paths.get("target","override.html");
         CommandLineArguments arguments = parse("-template", "target");
         DataTableConfig dataTableConfig = new DataTableConfig(arguments);
