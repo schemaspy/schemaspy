@@ -19,72 +19,73 @@
 package org.schemaspy.output.diagram.graphviz;
 
 import com.beust.jcommander.JCommander;
-import org.junit.Rule;
-import org.junit.Test;
-import org.schemaspy.testing.Logger;
-import org.schemaspy.testing.LoggingRule;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.schemaspy.testing.logback.Logback;
+import org.schemaspy.testing.logback.LogbackExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assume.assumeThat;
 
 /**
  * @author Nils Petzaell
  */
-public class GraphvizDotIT {
+class GraphvizDotIT {
 
-    @Rule
-    public LoggingRule loggingRule = new LoggingRule();
+    @RegisterExtension
+    static LogbackExtension logback = new LogbackExtension();
 
     @Test
-    public void version2_26_0() {
-        assumeThat(System.getProperty("os.name"), is("Linux"));
+    @EnabledOnOs(OS.LINUX)
+    void version2_26_0() {
         GraphvizConfig graphvizConfig = parse("-gv", "src/test/resources/dotFakes/2.26.0");
         GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
         assertThat(graphvizDot.isValid()).isTrue();
     }
 
     @Test
-    public void version2_31_0() {
-        assumeThat(System.getProperty("os.name"), is("Linux"));
+    @EnabledOnOs(OS.LINUX)
+    void version2_31_0() {
         GraphvizConfig graphvizConfig = parse("-gv", "src/test/resources/dotFakes/2.31.0");
         GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
         assertThat(graphvizDot.isValid()).isFalse();
     }
 
     @Test
-    public void version2_32_0() {
-        assumeThat(System.getProperty("os.name"), is("Linux"));
+    @EnabledOnOs(OS.LINUX)
+    void version2_32_0() {
         GraphvizConfig graphvizConfig = parse("-gv", "src/test/resources/dotFakes/2.32.0");
         GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
         assertThat(graphvizDot.isValid()).isTrue();
     }
 
     @Test
-    @Logger(GraphvizDot.class)
-    public void specifyRenderer() {
-        assumeThat(System.getProperty("os.name"), is("Linux"));
+    @EnabledOnOs(OS.LINUX)
+    @Logback(GraphvizDot.class)
+    void specifyRenderer() {
+        logback.expect(Matchers.containsString("gd"));
         GraphvizConfig graphvizConfig = parse("-gv", "src/test/resources/dotFakes/2.32.0", "-renderer", ":gd");
         GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
-        assertThat(loggingRule.getLog()).contains("gd");
     }
 
     @Test
-    @Logger(GraphvizDot.class)
-    public void defaultRenderer() {
-        assumeThat(System.getProperty("os.name"), is("Linux"));
+    @EnabledOnOs(OS.LINUX)
+    @Logback(GraphvizDot.class)
+    void defaultRenderer() {
+        logback.expect(Matchers.containsString("cairo"));
         GraphvizConfig graphvizConfig = parse("-gv", "src/test/resources/dotFakes/2.32.0");
         GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
-        assertThat(loggingRule.getLog()).contains("cairo");
     }
 
     @Test
-    @Logger(GraphvizDot.class)
-    public void lowQualityRenderer() {
-        assumeThat(System.getProperty("os.name"), is("Linux"));
+    @EnabledOnOs(OS.LINUX)
+    @Logback(GraphvizDot.class)
+    void lowQualityRenderer() {
+        logback.expect(Matchers.containsString("gd"));
         GraphvizConfig graphvizConfig = parse("-gv", "src/test/resources/dotFakes/2.32.0", "-lq");
         GraphvizDot graphvizDot = new GraphvizDot(graphvizConfig);
-        assertThat(loggingRule.getLog()).contains("gd");
     }
 
     private GraphvizConfig parse(String... args) {
