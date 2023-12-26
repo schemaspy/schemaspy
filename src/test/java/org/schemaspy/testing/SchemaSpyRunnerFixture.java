@@ -6,7 +6,6 @@ import org.schemaspy.cli.*;
 import org.schemaspy.connection.ScExceptionChecked;
 import org.schemaspy.connection.ScNullChecked;
 import org.schemaspy.connection.ScSimple;
-import org.schemaspy.connection.SqlConnection;
 import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
 import org.schemaspy.input.dbms.DriverFromConfig;
