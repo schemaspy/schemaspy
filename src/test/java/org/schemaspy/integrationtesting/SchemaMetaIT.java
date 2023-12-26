@@ -18,9 +18,9 @@
  */
 package org.schemaspy.integrationtesting;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.SimpleRuntimeDotConfig;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArgumentParser;
@@ -28,7 +28,6 @@ import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.connection.ScSimple;
 import org.schemaspy.input.dbms.ConnectionConfig;
 import org.schemaspy.input.dbms.ConnectionURLBuilder;
-import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.input.dbms.DriverFromConfig;
 import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
@@ -38,7 +37,7 @@ import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.ProgressListener;
 import org.schemaspy.output.dot.schemaspy.DefaultFontConfig;
 import org.schemaspy.output.dot.schemaspy.DotFormatter;
-import org.schemaspy.testing.H2MemoryRule;
+import org.schemaspy.testing.H2MemoryExtension;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -52,24 +51,25 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Nils Petzaell
  */
-public class SchemaMetaIT {
+class SchemaMetaIT {
 
     private static final String BY_SCRIPT_COMMENT = "Set by script";
     private static final String BY_SCHEMA_META_COMMENT = "Set from SchemaMeta";
 
-    @ClassRule
-    public static H2MemoryRule h2MemoryRule = new H2MemoryRule("SchemaMetaIT").addSqlScript("src/test/resources/integrationTesting/schemaMetaIT/dbScripts/shemaMetaIT.h2.sql");
+    @RegisterExtension
+    static H2MemoryExtension h2 = new H2MemoryExtension("SchemaMetaIT")
+            .addSqlScript("src/test/resources/integrationTesting/schemaMetaIT/dbScripts/shemaMetaIT.h2.sql");
 
-    private SqlService sqlService = new SqlService();
+    private final SqlService sqlService = new SqlService();
 
-    private ProgressListener progressListener = mock(ProgressListener.class);
+    private final ProgressListener progressListener = mock(ProgressListener.class);
     private CommandLineArguments commandLineArguments;
     private DbmsMeta dbmsMeta;
     private String schema;
     private String catalog;
 
-    @Before
-    public void setup() throws IOException, SQLException {
+    @BeforeEach
+    void setup() throws IOException, SQLException {
         String[] args = {
                 "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
                 "-db", "SchemaMetaIT",
@@ -90,12 +90,12 @@ public class SchemaMetaIT {
             )
         );
         dbmsMeta = sqlService.getDbmsMeta();
-        schema = h2MemoryRule.getConnection().getSchema();
-        catalog = h2MemoryRule.getConnection().getCatalog();
+        schema = h2.getConnection().getSchema();
+        catalog = h2.getConnection().getCatalog();
     }
 
     @Test
-    public void commentsNullTableComment() throws Exception {
+    void commentsNullTableComment() throws Exception {
         Database database = new Database(
                 dbmsMeta,
                 "DatabaseServiceIT",
@@ -126,7 +126,7 @@ public class SchemaMetaIT {
     }
 
     @Test
-    public void commentsNoTableComment() throws SQLException {
+    void commentsNoTableComment() throws SQLException {
         Database database = new Database(
                 dbmsMeta,
                 "DatabaseServiceIT",
@@ -152,7 +152,7 @@ public class SchemaMetaIT {
     }
 
     @Test
-    public void commentsAreReplacedWithReplaceComments() throws Exception {
+    void commentsAreReplacedWithReplaceComments() throws Exception {
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/integrationTesting/schemaMetaIT/input/replaceComments.xml","SchemaMetaIT", schema, false);
         Database database = new Database(
                 dbmsMeta,
@@ -169,7 +169,7 @@ public class SchemaMetaIT {
     }
 
     @Test
-    public void remoteTable() throws Exception {
+    void remoteTable() throws Exception {
         Database database = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -193,7 +193,7 @@ public class SchemaMetaIT {
     }
 
     @Test
-    public void remoteTableAndRelationShip() throws Exception {
+    void remoteTableAndRelationShip() throws Exception {
         Database database = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -216,7 +216,7 @@ public class SchemaMetaIT {
     }
 
     @Test
-    public void addColumn() throws Exception {
+    void addColumn() throws Exception {
         Database database = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -239,7 +239,7 @@ public class SchemaMetaIT {
     }
 
     @Test
-    public void disableImpliedOnAgentAccountId() throws Exception {
+    void disableImpliedOnAgentAccountId() throws Exception {
         Database database = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -265,7 +265,7 @@ public class SchemaMetaIT {
     }
 
     @Test
-    public void addFKInsteadOfImplied() throws Exception {
+    void addFKInsteadOfImplied() throws Exception {
         Database database = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",
@@ -288,7 +288,7 @@ public class SchemaMetaIT {
     }
 
     @Test
-    public void disableDiagramAssociations() throws Exception {
+    void disableDiagramAssociations() throws Exception {
         Database database = new Database(
                 dbmsMeta,
                 "SchemaMetaIT",

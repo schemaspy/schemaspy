@@ -18,12 +18,12 @@
  */
 package org.schemaspy.integrationtesting.h2;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.TableColumn;
-import org.schemaspy.testing.H2MemoryRule;
+import org.schemaspy.testing.H2MemoryExtension;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -36,34 +36,29 @@ import static org.schemaspy.testing.DatabaseFixture.database;
 /**
  * @author Nils Petzaell
  */
-public class H2PrimaryKeySeqnoIT {
+class H2PrimaryKeySeqnoIT {
 
-    @ClassRule
-    public static H2MemoryRule h2MemoryRule = new H2MemoryRule("pkorder").addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/pkordering.sql");
+    @RegisterExtension
+    static H2MemoryExtension h2 = new H2MemoryExtension("pkorder")
+            .addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/pkordering.sql");
 
     private static Database database;
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
-            "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
-            "-db", "pkorder",
-            "-s", h2MemoryRule.getConnection().getSchema(),
-            "-cat", h2MemoryRule.getConnection().getCatalog(),
-            "-o", "target/testout/integrationtesting/h2/pkorder",
-            "-u", "sa"
+                "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
+                "-db", "pkorder",
+                "-s", h2.getConnection().getSchema(),
+                "-cat", h2.getConnection().getCatalog(),
+                "-o", "target/testout/integrationtesting/h2/pkorder",
+                "-u", "sa"
         };
         database = database(args);
     }
 
     @Test
-    public void primaryKeysShouldBeInCorrectOrder() {
+    void primaryKeysShouldBeInCorrectOrder() {
         List<String> pkcolumnNames = database.getTablesMap().get("TABLE1").getPrimaryColumns().stream().map(TableColumn::getName).collect(Collectors.toList());
         assertThat(pkcolumnNames).containsExactly("ZZ", "AA", "BB");
     }

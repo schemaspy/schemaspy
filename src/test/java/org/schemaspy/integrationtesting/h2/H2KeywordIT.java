@@ -18,16 +18,14 @@
  */
 package org.schemaspy.integrationtesting.h2;
 
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
-import org.schemaspy.testing.H2MemoryRule;
+import org.schemaspy.testing.H2MemoryExtension;
 
-import javax.script.ScriptException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,41 +34,36 @@ import static org.schemaspy.testing.DatabaseFixture.database;
 /**
  * @author Nils Petzaell
  */
-public class H2KeywordIT {
+class H2KeywordIT {
 
-    @ClassRule
-    public static H2MemoryRule h2MemoryRule = new H2MemoryRule("h2keyword").addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/keyword_in_table.sql");
+    @RegisterExtension
+    static H2MemoryExtension h2 = new H2MemoryExtension("h2keyword")
+            .addSqlScript("src/test/resources/integrationTesting/h2/dbScripts/keyword_in_table.sql");
 
     private static Database database;
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
-            "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
-            "-db", "h2keyword",
-            "-s", h2MemoryRule.getConnection().getSchema(),
-            "-o", "target/testout/integrationtesting/h2/keyword",
-            "-u", "sa",
-            "-cat", h2MemoryRule.getConnection().getCatalog(),
+                "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
+                "-db", "h2keyword",
+                "-s", h2.getConnection().getSchema(),
+                "-o", "target/testout/integrationtesting/h2/keyword",
+                "-u", "sa",
+                "-cat", h2.getConnection().getCatalog(),
 
         };
         database = database(args);
     }
 
     @Test
-    public void databaseShouldExist() {
+    void databaseShouldExist() {
         assertThat(database).isNotNull();
         assertThat(database.getName()).isEqualToIgnoringCase("h2keyword");
     }
 
     @Test
-    public void tableWithKeyWordShouldExist() {
+    void tableWithKeyWordShouldExist() {
         assertThat(database.getTables()).extracting(Table::getName).contains("DISTINCT");
     }
 }
