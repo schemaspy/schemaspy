@@ -18,14 +18,12 @@
  */
 package org.schemaspy.integrationtesting.mysql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.model.*;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.testcontainers.containers.MySQLContainer;
+import org.schemaspy.testing.SuiteContainerExtension;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -34,40 +32,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
  */
-public class MysqlSpacesNoDotsIT {
+class MysqlSpacesNoDotsIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","spaces_no_dots");
 
     private static Database database;
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
-                    MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
-                            .withInitScript("integrationTesting/mysql/dbScripts/spacesnodotsit.sql")
-                            .withInitUser("root", "test")
-            );
+    @RegisterExtension
+    static SuiteContainerExtension container = MysqlSuite.SUITE_CONTAINER;
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
         String[] args = {
                 "-t", "mysql",
                 "-db", "TEST 1",
@@ -75,8 +56,8 @@ public class MysqlSpacesNoDotsIT {
                 "-cat", "%",
                 "-u", "test",
                 "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getHost(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-host", container.getHost(),
+                "-port", container.getPort(3306),
                 "-o", outputPath.toString(),
                 "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
         };
@@ -84,35 +65,35 @@ public class MysqlSpacesNoDotsIT {
     }
 
     @Test
-    public void databaseShouldExist() {
+    void databaseShouldExist() {
         assertThat(database).isNotNull();
         assertThat(database.getName()).isEqualToIgnoringCase("TEST 1");
     }
 
     @Test
-    public void databaseShouldHaveTable() {
+    void databaseShouldHaveTable() {
         assertThat(database.getTables()).extracting(Table::getName).contains("TABLE 1");
     }
 
     @Test
-    public void tableShouldHavePKWithAutoIncrement() {
+    void tableShouldHavePKWithAutoIncrement() {
         assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("id");
         assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isPrimary()).isTrue();
         assertThat(database.getTablesMap().get("TABLE 1").getColumn("id").isAutoUpdated()).isTrue();
     }
 
     @Test
-    public void tableShouldHaveForeignKey() {
+    void tableShouldHaveForeignKey() {
         assertThat(database.getTablesMap().get("TABLE 1").getForeignKeys()).extracting(ForeignKeyConstraint::getName).contains("link fk");
     }
 
     @Test
-    public void tableShouldHaveUniqueKey() {
+    void tableShouldHaveUniqueKey() {
         assertThat(database.getTablesMap().get("TABLE 1").getIndexes()).extracting(TableIndex::getName).contains("name_link_unique");
     }
 
     @Test
-    public void tableShouldHaveColumnWithSpaceInIt() {
+    void tableShouldHaveColumnWithSpaceInIt() {
         assertThat(database.getTablesMap().get("TABLE 1").getColumns()).extracting(TableColumn::getName).contains("link id");
     }
 }
