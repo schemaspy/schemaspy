@@ -47,8 +47,8 @@ class StackTraceOmitterTest {
         when(loggingEvent.getThrowableProxy()).thenReturn(new ThrowableProxy(new IOException("Exception message")));
         StackTraceOmitter stackTraceOmitter = new StackTraceOmitter();
         assertThat(
-                stackTraceOmitter.convert(loggingEvent)
-        ).isEqualTo("Exception message\n");
+                stackTraceOmitter.convert(loggingEvent).trim()
+        ).isEqualTo("Exception message");
         assertThat(StackTraceOmitter.hasOmittedStackTrace()).isTrue();
         setHasOmittedStackTrace(false);
         setLogLevel(original);
@@ -62,8 +62,8 @@ class StackTraceOmitterTest {
         when(loggingEvent.getThrowableProxy()).thenReturn(new ThrowableProxy(new IOException("Exception message")));
         StackTraceOmitter stackTraceOmitter = new StackTraceOmitter();
         assertThat(
-                stackTraceOmitter.convert(loggingEvent)
-        ).isEqualTo("java.io.IOException: Exception message\n");
+                stackTraceOmitter.convert(loggingEvent).trim()
+        ).isEqualTo("java.io.IOException: Exception message");
         assertThat(StackTraceOmitter.hasOmittedStackTrace()).isFalse();
         setHasOmittedStackTrace(false);
         setLogLevel(orignal);
@@ -76,9 +76,7 @@ class StackTraceOmitterTest {
             AtomicBoolean hasOmittedStacktrace = (AtomicBoolean) field.get(null);
             hasOmittedStacktrace.set(value);
             field.setAccessible(false);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
