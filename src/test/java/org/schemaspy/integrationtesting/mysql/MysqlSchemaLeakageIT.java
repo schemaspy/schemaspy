@@ -18,14 +18,12 @@
  */
 package org.schemaspy.integrationtesting.mysql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.model.Database;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.testcontainers.containers.MySQLContainer;
+import org.schemaspy.testing.SuiteContainerExtension;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -34,37 +32,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.DatabaseFixture.database;
 
-public class MysqlSchemaLeakageIT {
+class MysqlSchemaLeakageIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","schema_leakage");
 
     private static Database database;
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
-                    MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
-                            .withInitScript("integrationTesting/mysql/dbScripts/mysql_table_view_collision.sql")
-                            .withInitUser("root", "test")
-            );
+    @RegisterExtension
+    static SuiteContainerExtension container = MysqlSuite.SUITE_CONTAINER;
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
         String[] args = {
                 "-t", "mysql",
                 "-db", "schemaleak",
@@ -72,8 +53,8 @@ public class MysqlSchemaLeakageIT {
                 "-cat", "%",
                 "-u", "testUser",
                 "-p", "password",
-                "-host", jdbcContainerRule.getContainer().getHost(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(3306).toString(),
+                "-host", container.getHost(),
+                "-port", container.getPort(3306),
                 "-o", outputPath.toString(),
                 "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
         };
@@ -81,7 +62,7 @@ public class MysqlSchemaLeakageIT {
     }
 
     @Test
-    public void shouldHaveNoViews() {
+    void shouldHaveNoViews() {
         assertThat(database.getViews()).isEmpty();
     }
 }

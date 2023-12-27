@@ -18,16 +18,14 @@
  */
 package org.schemaspy.integrationtesting.mysql;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
+import org.schemaspy.testing.SuiteContainerExtension;
 import org.schemaspy.testing.XmlOutputDiff;
-import org.testcontainers.containers.MySQLContainer;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
 
@@ -37,58 +35,46 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
 
 /**
  * @author Nils Petzaell
  */
-public class MysqlHTMLOrphanIT {
+class MysqlHTMLOrphanIT {
 
-    private static final Path outputPath = Paths.get("target","testout","integrationtesting","mysql","htmlorphanit");
+    private static final Path outputPath =
+            Paths.get("target","testout","integrationtesting","mysql","htmlorphanit");
 
-    private static final URL expectedXML = MysqlHTMLOrphanIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlorphan/htmlorphanit.htmlorphanit.xml");
-    private static final URL expectedDeletionOrder = MysqlHTMLOrphanIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlorphan/deletionOrder.txt");
-    private static final URL expectedInsertionOrder = MysqlHTMLOrphanIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlorphan/insertionOrder.txt");
+    private static final URL expectedXML =
+            MysqlHTMLOrphanIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlorphan/htmlorphanit.htmlorphanit.xml");
+    private static final URL expectedDeletionOrder =
+            MysqlHTMLOrphanIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlorphan/deletionOrder.txt");
+    private static final URL expectedInsertionOrder =
+            MysqlHTMLOrphanIT.class.getResource("/integrationTesting/mysql/expecting/mysqlhtmlorphan/insertionOrder.txt");
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<MySQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<MySQLContainer<?>>(
-                    MysqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<MySQLContainer<?>>(() -> new MySQLContainer<>("mysql:8-oracle"))
-                        .assumeDockerIsPresent().withAssumptions(assumeDriverIsPresent())
-                        .withQueryString("?useSSL=false&allowPublicKeyRetrieval=true")
-                        .withInitScript("integrationTesting/mysql/dbScripts/htmlorphanit.sql")
-                        .withInitUser("root", "test")
-            );
+    @RegisterExtension
+    static SuiteContainerExtension container = MysqlSuite.SUITE_CONTAINER;
 
-    private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
-
-    @Before
-    public synchronized void generateHTML() {
-        if (shouldRun.get()) {
-            String[] args = new String[]{
-                    "-t", "mysql",
-                    "-db", "htmlorphanit",
-                    "-s", "htmlorphanit",
-                    "-host", jdbcContainerRule.getContainer().getHost() + ":" + jdbcContainerRule.getContainer().getMappedPort(3306),
-                    "-port", String.valueOf(jdbcContainerRule.getContainer().getMappedPort(3306)),
-                    "-u", jdbcContainerRule.getContainer().getUsername(),
-                    "-p", jdbcContainerRule.getContainer().getPassword(),
-                    "-o", outputPath.toString(),
-                    "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
-            };
-            schemaSpyRunner(args).run();
-            shouldRun.set(false);
-        }
+    @BeforeAll
+    static void generateHTML() {
+        String[] args = new String[]{
+                "-t", "mysql",
+                "-db", "htmlorphanit",
+                "-s", "htmlorphanit",
+                "-host", container.getHost() + ":" + container.getPort(3306),
+                "-port", container.getPort(3306),
+                "-u", container.getUsername(),
+                "-p", container.getPassword(),
+                "-o", outputPath.toString(),
+                "-connprops", "useSSL\\=false;allowPublicKeyRetrieval\\=true"
+        };
+        schemaSpyRunner(args).run();
     }
 
     @Test
-    public void verifyXML() {
+    void verifyXML() {
         Diff d = XmlOutputDiff.diffXmlOutput(
                 Input.fromFile(outputPath.resolve("htmlorphanit.htmlorphanit.xml").toString()),
                 Input.fromURL(expectedXML)
@@ -97,17 +83,17 @@ public class MysqlHTMLOrphanIT {
     }
 
     @Test
-    public void verifyDeletionOrder() throws IOException {
+    void verifyDeletionOrder() throws IOException {
         assertThat(Files.newInputStream(outputPath.resolve("deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
     }
 
     @Test
-    public void verifyInsertionOrder() throws IOException {
+    void verifyInsertionOrder() throws IOException {
         assertThat(Files.newInputStream(outputPath.resolve("insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
     }
 
     @Test
-    public void producesSameContent() throws IOException {
+    void producesSameContent() throws IOException {
         SoftAssertions softAssertions = HtmlOutputValidator
                 .hasProducedValidOutput(
                         outputPath,
