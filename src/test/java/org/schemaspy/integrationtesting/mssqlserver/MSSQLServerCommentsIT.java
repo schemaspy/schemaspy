@@ -19,21 +19,18 @@
 package org.schemaspy.integrationtesting.mssqlserver;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.schemaspy.integrationtesting.MssqlSuite;
 import org.schemaspy.model.Database;
-import org.testcontainers.containers.MSSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.schemaspy.testing.SuiteContainerExtension;
 
-import javax.script.ScriptException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 
-import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
@@ -41,8 +38,7 @@ import static org.schemaspy.testing.DatabaseFixture.database;
  * @author Nils Petzaell
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
-@Testcontainers(disabledWithoutDocker = true)
-public class MSSQLServerCommentsIT {
+class MSSQLServerCommentsIT {
 
     private static Database abc_dbo;
     private static Database abc_a;
@@ -59,54 +55,26 @@ public class MSSQLServerCommentsIT {
     private static Database def_e;
     private static Database def_f;
 
-    @Container
-    public static MSSQLContainer mssqlContainer =
-            new MSSQLContainer(IMAGE_NAME)
-                    .withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_comments.sql");
+    @RegisterExtension
+    static SuiteContainerExtension container = MssqlSuite.SUITE_CONTAINER;
 
-    @BeforeEach
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (abc_dbo == null) {
-            abc_dbo = createDatabaseRepresentation("ABC", "dbo");
-        }
-        if (abc_a == null) {
-            abc_a = createDatabaseRepresentation("ABC", "A");
-        }
-        if (abc_b == null) {
-            abc_b = createDatabaseRepresentation("ABC", "B");
-        }
-        if (abc_c == null) {
-            abc_c = createDatabaseRepresentation("ABC", "C");
-        }
-
-        if (abc_test_dbo == null) {
-            abc_test_dbo = createDatabaseRepresentation("ABC_TEST", "dbo");
-        }
-        if (abc_test_a == null) {
-            abc_test_a = createDatabaseRepresentation("ABC_TEST", "A");
-        }
-        if (abc_test_b == null) {
-            abc_test_b = createDatabaseRepresentation("ABC_TEST", "B");
-        }
-        if (abc_test_c == null) {
-            abc_test_c = createDatabaseRepresentation("ABC_TEST", "C");
-        }
-
-        if (def_dbo == null) {
-            def_dbo = createDatabaseRepresentation("DEF", "dbo");
-        }
-        if (def_d == null) {
-            def_d = createDatabaseRepresentation("DEF", "D");
-        }
-        if (def_e == null) {
-            def_e = createDatabaseRepresentation("DEF", "E");
-        }
-        if (def_f == null) {
-            def_f = createDatabaseRepresentation("DEF", "F");
-        }
+    @BeforeAll
+    static void gatheringSchemaDetailsTest() throws SQLException, IOException {
+        abc_dbo = createDatabaseRepresentation("ABC", "dbo");
+        abc_a = createDatabaseRepresentation("ABC", "A");
+        abc_b = createDatabaseRepresentation("ABC", "B");
+        abc_c = createDatabaseRepresentation("ABC", "C");
+        abc_test_dbo = createDatabaseRepresentation("ABC_TEST", "dbo");
+        abc_test_a = createDatabaseRepresentation("ABC_TEST", "A");
+        abc_test_b = createDatabaseRepresentation("ABC_TEST", "B");
+        abc_test_c = createDatabaseRepresentation("ABC_TEST", "C");
+        def_dbo = createDatabaseRepresentation("DEF", "dbo");
+        def_d = createDatabaseRepresentation("DEF", "D");
+        def_e = createDatabaseRepresentation("DEF", "E");
+        def_f = createDatabaseRepresentation("DEF", "F");
     }
 
-    private Database createDatabaseRepresentation(String db, String schema) throws SQLException, IOException {
+    private static Database createDatabaseRepresentation(String db, String schema) throws SQLException, IOException {
         String[] args = {
                 "-t", "mssql17",
                 "-db", db,
@@ -114,9 +82,9 @@ public class MSSQLServerCommentsIT {
                 "-cat", "%",
                 "-o", "target/testout/integrationtesting/mssql/comments",
                 "-u", "sa",
-                "-p", mssqlContainer.getPassword(),
-                "-host", mssqlContainer.getHost(),
-                "-port", mssqlContainer.getMappedPort(1433).toString()
+                "-p", container.getPassword(),
+                "-host", container.getHost(),
+                "-port", container.getPort(1433)
         };
         return database(args);
     }

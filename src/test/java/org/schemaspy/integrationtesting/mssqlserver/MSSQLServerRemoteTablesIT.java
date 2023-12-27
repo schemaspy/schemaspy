@@ -18,22 +18,19 @@
  */
 package org.schemaspy.integrationtesting.mssqlserver;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.schemaspy.integrationtesting.MssqlSuite;
 import org.schemaspy.model.Database;
-import org.testcontainers.containers.MSSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.schemaspy.testing.SuiteContainerExtension;
 
-import javax.script.ScriptException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
@@ -41,32 +38,23 @@ import static org.schemaspy.testing.DatabaseFixture.database;
  * @author Nils Petzaell
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
-@Testcontainers(disabledWithoutDocker = true)
-public class MSSQLServerRemoteTablesIT {
+class MSSQLServerRemoteTablesIT {
 
     private static Database database;
 
-    @Container
-    public static MSSQLContainer mssqlContainer =
-            new MSSQLContainer(IMAGE_NAME)
-                    .withInitScript("integrationTesting/mssqlserver/dbScripts/mssql_remote_tables.sql");
+    @RegisterExtension
+    static SuiteContainerExtension container = MssqlSuite.SUITE_CONTAINER;
 
-    @BeforeEach
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            createDatabaseRepresentation();
-        }
-    }
-
-    private void createDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void gatheringSchemaDetailsTest() throws SQLException, IOException {
         String[] args = {
                 "-t", "mssql17",
                 "-db", "ACME",
                 "-o", "target/testout/integrationtesting/mssql/remote_table",
                 "-u", "schemaspy",
                 "-p", "qwerty123!",
-                "-host", mssqlContainer.getHost(),
-                "-port", mssqlContainer.getMappedPort(1433).toString()
+                "-host", container.getHost(),
+                "-port", container.getPort(1433)
         };
         database = database(args);
     }

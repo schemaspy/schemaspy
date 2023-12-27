@@ -24,7 +24,7 @@ import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import java.util.Collections;
 import java.util.Set;
 
-public class MSSQLContainer extends MSSQLServerContainer {
+public class MSSQLContainer<SELF extends MSSQLContainer<SELF>> extends MSSQLServerContainer<SELF> {
 
     public MSSQLContainer(String dockerImageName) {
         super(dockerImageName);
@@ -56,8 +56,8 @@ public class MSSQLContainer extends MSSQLServerContainer {
     }
 
     @Override
-    public MSSQLContainer withInitScript(String initScriptPath) {
+    public SELF withInitScript(String initScriptPath) {
         super.withInitScript(initScriptPath);
-        return this;
+        return self();
     }
 }

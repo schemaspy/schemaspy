@@ -20,15 +20,15 @@
 package org.schemaspy.integrationtesting.mssqlserver;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.schemaspy.integrationtesting.MssqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
+import org.schemaspy.testing.SuiteContainerExtension;
 import org.schemaspy.testing.XmlOutputDiff;
-import org.testcontainers.containers.MSSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
 
@@ -37,48 +37,41 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.schemaspy.integrationtesting.MssqlServerSuite.IMAGE_NAME;
 import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
 
 /**
  * @author Nils Petzaell
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
-@Testcontainers(disabledWithoutDocker = true)
-public class MSSQLServerHTMLIT {
+class MSSQLServerHTMLIT {
 
-    private static final URL expectedXML = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/htmlit.htmlit.xml");
-    private static final URL expectedDeletionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/deletionOrder.txt");
-    private static final URL expectedInsertionOrder = MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/insertionOrder.txt");
+    private static final URL expectedXML =
+            MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/htmlit.htmlit.xml");
+    private static final URL expectedDeletionOrder =
+            MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/deletionOrder.txt");
+    private static final URL expectedInsertionOrder =
+            MSSQLServerHTMLIT.class.getResource("/integrationTesting/mssqlserver/expecting/mssqlserverhtmlit/insertionOrder.txt");
 
-    @Container
-    public static MSSQLContainer mssqlContainer =
-            new MSSQLContainer(IMAGE_NAME)
-                    .withInitScript("integrationTesting/mssqlserver/dbScripts/htmlit.sql");
+    @RegisterExtension
+    static SuiteContainerExtension container = MssqlSuite.SUITE_CONTAINER;
 
-    private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
-
-    @BeforeEach
-    public void generateHTML() {
-        if (shouldRun.get()) {
-            String[] args = new String[]{
-                    "-t", "mssql17",
-                    "-db", "htmlit",
-                    "-s", "htmlit",
-                    "-cat", "htmlit",
-                    "-host", mssqlContainer.getHost() + ":" + mssqlContainer.getMappedPort(1433),
-                    "-port", String.valueOf(mssqlContainer.getMappedPort(1433)),
-                    "-u", mssqlContainer.getUsername(),
-                    "-p", mssqlContainer.getPassword(),
-                    "-o", "target/testout/integrationtesting/mssql/html",
-                    "--no-orphans"
-            };
-            schemaSpyRunner(args).run();
-            shouldRun.set(false);
-        }
+    @BeforeAll
+    static void generateHTML() {
+        String[] args = new String[]{
+                "-t", "mssql17",
+                "-db", "htmlit",
+                "-s", "htmlit",
+                "-cat", "htmlit",
+                "-host", container.getHost() + ":" + container.getPort(1433),
+                "-port", container.getPort(1433),
+                "-u", container.getUsername(),
+                "-p", container.getPassword(),
+                "-o", "target/testout/integrationtesting/mssql/html",
+                "--no-orphans"
+        };
+        schemaSpyRunner(args).run();
     }
 
     @Test
@@ -92,12 +85,18 @@ public class MSSQLServerHTMLIT {
 
     @Test
     void verifyDeletionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/mssql/html/deletionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedDeletionOrder.openStream());
+        assertThat(
+                Files.newInputStream(
+                        Paths.get("target/testout/integrationtesting/mssql/html/deletionOrder.txt"), StandardOpenOption.READ)
+        ).hasSameContentAs(expectedDeletionOrder.openStream());
     }
 
     @Test
     void verifyInsertionOrder() throws IOException {
-        assertThat(Files.newInputStream(Paths.get("target/testout/integrationtesting/mssql/html/insertionOrder.txt"), StandardOpenOption.READ)).hasSameContentAs(expectedInsertionOrder.openStream());
+        assertThat(
+                Files.newInputStream(
+                        Paths.get("target/testout/integrationtesting/mssql/html/insertionOrder.txt"), StandardOpenOption.READ)
+        ).hasSameContentAs(expectedInsertionOrder.openStream());
     }
 
     @Test
