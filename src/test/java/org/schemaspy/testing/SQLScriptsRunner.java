@@ -20,13 +20,6 @@
 
 package org.schemaspy.testing;
 
-import com.github.npetzall.testcontainers.junit.jdbc.exceptions.InitScriptException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testcontainers.jdbc.ext.ScriptUtils;
-import org.testcontainers.shaded.com.google.common.base.Charsets;
-import org.testcontainers.shaded.com.google.common.io.Resources;
-
 import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +37,12 @@ import java.util.function.Consumer;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.jdbc.ext.ScriptUtils;
+import org.testcontainers.shaded.com.google.common.base.Charsets;
+import org.testcontainers.shaded.com.google.common.io.Resources;
 
 public class SQLScriptsRunner implements Consumer<Connection> {
 
@@ -72,15 +71,15 @@ public class SQLScriptsRunner implements Consumer<Connection> {
                     ScriptUtils.executeSqlScript(connection, resource.getPath(), sql, false, false, ScriptUtils.DEFAULT_COMMENT_PREFIX, statementSeparator, ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER, ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER);
                 } catch (IOException | IllegalArgumentException e) {
                     LOGGER.error("Could not load classpath init script: {}", resource.getPath());
-                    throw new InitScriptException("Could not load classpath init script: " + resource.getPath(), e);
+                    throw new RuntimeException("Could not load classpath init script: " + resource.getPath(), e);
                 } catch (ScriptException e) {
                     LOGGER.error("Error while execution init script: {}", resource.getPath(), e);
-                    throw new InitScriptException("SQLException: ", e);
+                    throw new RuntimeException("SQLException: ", e);
                 }
             }
         } catch (IOException e) {
             LOGGER.error("Could not load classpath init scripts: {}", initScriptDir);
-            throw new InitScriptException("Could not load classpath init script: " + initScriptDir, e);
+            throw new RuntimeException("Could not load classpath init script: " + initScriptDir, e);
         }
     }
 

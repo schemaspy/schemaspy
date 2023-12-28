@@ -17,8 +17,7 @@
 
         <spring-boot.version>3.1.2</spring-boot.version>
         <slf4j.version>2.0.7</slf4j.version>
-        <testcontainers-java.version>1.18.3</testcontainers-java.version>
-        <testcontainers-junit.version>1.10.1.0.0</testcontainers-junit.version>
+        <testcontainers-java.version>1.19.3</testcontainers-java.version>
 
         <java.version>17</java.version>
         <skip.surefire>false</skip.surefire>
@@ -215,12 +214,6 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.69</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.npetzall.testcontainers.junit</groupId>
-            <artifactId>jdbc</artifactId>
-            <version>${testcontainers-junit.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
