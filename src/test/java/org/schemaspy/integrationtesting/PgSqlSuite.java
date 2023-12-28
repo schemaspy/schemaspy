@@ -18,33 +18,22 @@
  */
 package org.schemaspy.integrationtesting;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.ClassRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.schemaspy.integrationtesting.pgsql.PgSqlCheckConstraintsIT;
-import org.schemaspy.integrationtesting.pgsql.PgSqlMaterializedViewsIT;
-import org.schemaspy.integrationtesting.pgsql.PgSqlRelationshipErrorIT;
-import org.schemaspy.integrationtesting.pgsql.PgSqlRoutinesIT;
+import org.junit.platform.suite.api.*;
 import org.schemaspy.testing.SQLScriptsRunner;
+import org.schemaspy.testing.SuiteContainerExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
-
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        PgSqlCheckConstraintsIT.class,
-        PgSqlMaterializedViewsIT.class,
-        PgSqlRelationshipErrorIT.class,
-        PgSqlRoutinesIT.class
-})
+@Suite
+@SuiteDisplayName("pgsql 10 Test Suite")
+@SelectPackages("org.schemaspy.integrationtesting.pgsql.v10")
+@IncludeClassNamePatterns(".*IT$")
+@IncludeEngines("junit-jupiter")
 public class PgSqlSuite {
 
-    @ClassRule
-    @SuppressWarnings("unchecked")
-    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
-            new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
-                    .assumeDockerIsPresent()
-                    .withAssumptions(assumeDriverIsPresent())
+    public static final SuiteContainerExtension SUITE_CONTAINER =
+            new SuiteContainerExtension(
+                    () -> new PostgreSQLContainer<>("postgres:10.4")
+            )
                     .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/", "\n\n\n"));
+
 }

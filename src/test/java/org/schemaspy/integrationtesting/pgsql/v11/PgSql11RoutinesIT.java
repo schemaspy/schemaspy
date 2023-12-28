@@ -16,52 +16,34 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.integrationtesting.pgsql;
+package org.schemaspy.integrationtesting.pgsql.v11;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.integrationtesting.PgSql11Suite;
 import org.schemaspy.model.Database;
-import org.schemaspy.testing.SQLScriptsRunner;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.schemaspy.testing.SuiteContainerExtension;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.DatabaseFixture.database;
 
-public class PgSql11RoutinesIT {
+class PgSql11RoutinesIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","pgsql11","routines");
 
     private static Database database;
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
-                    PgSql11Suite.jdbcContainerRule,
-                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:15.3"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/dvdrental.sql", "\n\n\n"))
-            );
+    @RegisterExtension
+    static SuiteContainerExtension container = PgSql11Suite.SUITE_CONTAINER;
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "pgsql11",
                 "-db", "test",
@@ -70,30 +52,30 @@ public class PgSql11RoutinesIT {
                 "-o", outputPath.toString(),
                 "-u", "test",
                 "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getHost(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
+                "-host", container.getHost(),
+                "-port", container.getPort(5432)
         };
         database = database(args);
     }
 
     @Test
-    public void databaseShouldExist() {
+    void databaseShouldExist() {
         assertThat(database).isNotNull();
         assertThat(database.getName()).isEqualToIgnoringCase("test");
     }
 
     @Test
-    public void databaseShouldHave8Routines() {
+    void databaseShouldHave8Routines() {
         assertThat(database.getRoutines()).hasSize(10);
     }
 
     @Test
-    public void routineFilmInStockHasComment() {
+    void routineFilmInStockHasComment() {
         assertThat(database.getRoutinesMap().get("film_in_stock(p_film_id integer, p_store_id integer, out p_film_count integer)").getComment()).isEqualToIgnoringCase("Current stock");
     }
 
     @Test
-    public void routineFilmInStockHas3Parameters() {
+    void routineFilmInStockHas3Parameters() {
         assertThat(database.getRoutinesMap().get("film_in_stock(p_film_id integer, p_store_id integer, out p_film_count integer)").getParameters()).hasSize(3);
     }
 }
