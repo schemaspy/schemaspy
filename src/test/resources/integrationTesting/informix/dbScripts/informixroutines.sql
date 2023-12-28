@@ -1,8 +1,8 @@
-create database test in rootdbs;
+create database testroutine in rootdbs;
 
 
 
-database test;
+database testroutine;
 
 
 

@@ -18,15 +18,15 @@
  */
 package org.schemaspy.integrationtesting.informix;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.schemaspy.integrationtesting.InformixSuite;
 import org.schemaspy.testing.IgnoreNonPrintedInCData;
 import org.schemaspy.testing.IgnoreUsingXPath;
-import org.testcontainers.containers.InformixContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.schemaspy.testing.SuiteContainerExtension;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
@@ -37,7 +37,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
@@ -46,40 +45,32 @@ import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
  * @author Nils Petzaell
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
-@Testcontainers(disabledWithoutDocker = true)
-public class InformixIndexXMLIT {
+class InformixIndexXMLIT {
 
     private static final URL expectedXML = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/test.informix.xml");
     private static final URL expectedDeletionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/deletionOrder.txt");
     private static final URL expectedInsertionOrder = InformixIndexXMLIT.class.getResource("/integrationTesting/informix/expecting/insertionOrder.txt");
 
-    @Container
-    public static InformixContainer informixContainer =
-            new InformixContainer()
-                    .withInitScript("integrationTesting/informix/dbScripts/informix.sql");
+    @RegisterExtension
+    static SuiteContainerExtension container = InformixSuite.SUITE_CONTAINER;
 
-    private static final AtomicBoolean shouldRun = new AtomicBoolean(true);
-
-    @BeforeEach
-    public void createXML() {
-        if (shouldRun.get()) {
-            String[] args = {
-                    "-t", "informix",
-                    "-db", "test",
-                    "-s", "informix",
-                    "-cat", "test",
-                    "-server", "dev",
-                    "-o", "target/testout/integrationtesting/informix/xml",
-                    "-u", informixContainer.getUsername(),
-                    "-p", informixContainer.getPassword(),
-                    "-host", informixContainer.getHost(),
-                    "-port", informixContainer.getJdbcPort().toString(),
-                    "-nohtml",
-                    "--include-routine-definition"
-            };
-            schemaSpyRunner(args).run();
-            shouldRun.set(false);
-        }
+    @BeforeAll
+    static void createXML() {
+        String[] args = {
+                "-t", "informix",
+                "-db", "test",
+                "-s", "informix",
+                "-cat", "test",
+                "-server", "dev",
+                "-o", "target/testout/integrationtesting/informix/xml",
+                "-u", container.getUsername(),
+                "-p", container.getPassword(),
+                "-host", container.getHost(),
+                "-port", container.getPort(9088),
+                "-nohtml",
+                "--include-routine-definition"
+        };
+        schemaSpyRunner(args).run();
     }
 
     @Test
