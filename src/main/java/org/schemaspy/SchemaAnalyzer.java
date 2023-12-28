@@ -69,6 +69,7 @@ import org.schemaspy.model.ProgressListener;
 import org.schemaspy.model.Routine;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.Tracked;
+import org.schemaspy.output.InfoHtml;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
 import org.schemaspy.output.diagram.Renderer;
@@ -376,14 +377,7 @@ public class SchemaAnalyzer {
         new CopyFromUrl(layoutFolder.url(), outputDir, new NotHtml()).copy();
 
         Renderer renderer = useVizJS ? new VizJSDot() : new GraphvizDot(commandLineArguments.getGraphVizConfig());
-
-        Path htmlInfoFile = outputDir.toPath().resolve("info-html.txt");
-        Files.deleteIfExists(htmlInfoFile);
-        writeInfo("date", ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZ")), htmlInfoFile);
-        writeInfo("os", System.getProperty("os.name") + " " + System.getProperty("os.version"), htmlInfoFile);
-        writeInfo("schemaspy-version", ManifestUtils.getImplementationVersion(), htmlInfoFile);
-        writeInfo("schemaspy-revision", ManifestUtils.getImplementationRevision(), htmlInfoFile);
-        writeInfo("renderer", renderer.identifier(), htmlInfoFile);
+        new InfoHtml(outputDir, renderer).write();
         progressListener.startCreatingSummaries();
 
         boolean hasRealConstraints = !db.getRemoteTables().isEmpty() || tables.stream().anyMatch(table -> !table.isOrphan(false));
@@ -554,26 +548,6 @@ public class SchemaAnalyzer {
         }
         progressListener.finishedCreatingTablePages();
         LOGGER.info("View the results by opening {}", new File(outputDir, INDEX_DOT_HTML));
-    }
-
-    private static void writeInfo(String key, String value, Path infoFile) {
-        try {
-            Files.write(
-                infoFile,
-                (key + "=" + value + "\n").getBytes(StandardCharsets.UTF_8),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND,
-                StandardOpenOption.WRITE)
-            ;
-        } catch (IOException e) {
-            LOGGER.error(
-                "Failed to write '{}', to '{}={}'",
-                new Sanitize(key),
-                new Sanitize(value),
-                infoFile,
-                e
-            );
-        }
     }
 
     /**
