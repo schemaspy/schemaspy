@@ -1,17 +1,5 @@
 package org.schemaspy.testing;
 
-import com.github.npetzall.testcontainers.junit.jdbc.exceptions.InitScriptException;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
-import org.junit.jupiter.api.extension.ExtensionContext.Store;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.JdbcDatabaseContainer;
-import org.testcontainers.ext.ScriptUtils;
-import org.testcontainers.jdbc.ContainerLessJdbcDelegate;
-import org.testcontainers.shaded.com.google.common.io.Resources;
-
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
@@ -26,6 +14,17 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ExtensionContext.Store;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.ext.ScriptUtils;
+import org.testcontainers.jdbc.ContainerLessJdbcDelegate;
+import org.testcontainers.shaded.com.google.common.io.Resources;
 
 public class SuiteContainerExtension implements BeforeAllCallback {
 
@@ -95,10 +94,10 @@ public class SuiteContainerExtension implements BeforeAllCallback {
                 );
             } catch (IOException | IllegalArgumentException e) {
                 LOGGER.error("Could not load classpath init script: {}", initScriptPath);
-                throw new InitScriptException("Could not load classpath init script: " + initScriptPath, e);
+                throw new RuntimeException("Could not load classpath init script: " + initScriptPath, e);
             } catch (ScriptException | SQLException e) {
                 LOGGER.error("Error while execution init script: {}", initScriptPath, e);
-                throw new InitScriptException("SQLException: ", e);
+                throw new RuntimeException("SQLException: ", e);
             }
         }
 
