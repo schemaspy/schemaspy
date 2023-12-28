@@ -463,7 +463,7 @@
                         <exclude>**/PgSql*IT.java</exclude>
                         <exclude>**/Mysql*IT.java</exclude>
                         <exclude>**/MSSQLServer*IT.java</exclude>
-                        <exclude>**/PgSql*IT.java</exclude>
+                        <exclude>**/Oracle*IT.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <pomImplementationVersion>${project.version}</pomImplementationVersion>
