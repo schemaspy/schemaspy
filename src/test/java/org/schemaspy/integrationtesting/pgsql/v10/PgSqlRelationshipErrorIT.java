@@ -16,56 +16,38 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.integrationtesting.pgsql;
+package org.schemaspy.integrationtesting.pgsql.v10;
 
-import com.github.npetzall.testcontainers.junit.jdbc.JdbcContainerRule;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.integrationtesting.PgSqlSuite;
 import org.schemaspy.model.Database;
-import org.schemaspy.testing.SQLScriptsRunner;
-import org.schemaspy.testing.SuiteOrTestJdbcContainerRule;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.schemaspy.testing.SuiteContainerExtension;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static com.github.npetzall.testcontainers.junit.jdbc.JdbcAssumptions.assumeDriverIsPresent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.DatabaseFixture.database;
 
 /**
  * @author Nils Petzaell
  */
-public class PgSqlRelationshipErrorIT {
+class PgSqlRelationshipErrorIT {
 
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","pgsql","relationship_error");
 
-    @SuppressWarnings("unchecked")
-    @ClassRule
-    public static JdbcContainerRule<PostgreSQLContainer<?>> jdbcContainerRule =
-            new SuiteOrTestJdbcContainerRule<PostgreSQLContainer<?>>(
-                    PgSqlSuite.jdbcContainerRule,
-                    new JdbcContainerRule<PostgreSQLContainer<?>>(() -> new PostgreSQLContainer<>("postgres:10.4"))
-                            .assumeDockerIsPresent()
-                            .withAssumptions(assumeDriverIsPresent())
-                            .withInitFunctions(new SQLScriptsRunner("integrationTesting/pgsql/dbScripts/relationship_error.sql", "\n\n\n"))
-            );
+    @RegisterExtension
+    static SuiteContainerExtension container = PgSqlSuite.SUITE_CONTAINER;
 
     private static Database database;
 
-    @Before
-    public synchronized void createDatabaseRepresentation() throws SQLException, IOException {
-        if (database == null) {
-            doCreateDatabaseRepresentation();
-        }
-    }
-
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "pgsql",
                 "-db", "test",
@@ -74,14 +56,14 @@ public class PgSqlRelationshipErrorIT {
                 "-o", outputPath.toString(),
                 "-u", "test",
                 "-p", "test",
-                "-host", jdbcContainerRule.getContainer().getHost(),
-                "-port", jdbcContainerRule.getContainer().getMappedPort(5432).toString()
+                "-host", container.getHost(),
+                "-port", container.getPort(5432)
         };
         database = database(args);
     }
 
     @Test
-    public void onlyHasSingleRemoteTable() {
+    void onlyHasSingleRemoteTable() {
         assertThat(database.getRemoteTables()).hasSize(1);
     }
 }

@@ -460,6 +460,7 @@
                         <include>**/*Suite.java</include>
                     </includes>
                     <excludes>
+                        <exclude>**/PgSql*IT.java</exclude>
                         <exclude>**/Mysql*IT.java</exclude>
                         <exclude>**/MSSQLServer*IT.java</exclude>
                         <exclude>**/PgSql*IT.java</exclude>
