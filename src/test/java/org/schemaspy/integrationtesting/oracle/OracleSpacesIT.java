@@ -18,19 +18,17 @@
  */
 package org.schemaspy.integrationtesting.oracle;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.schemaspy.integrationtesting.OracleSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
-import org.testcontainers.containers.OracleContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.schemaspy.testing.SuiteContainerExtension;
 
-import javax.script.ScriptException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -42,37 +40,27 @@ import static org.schemaspy.testing.DatabaseFixture.database;
  * @author Nils Petzaell
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
-@Testcontainers(disabledWithoutDocker = true)
-public class OracleSpacesIT {
+class OracleSpacesIT {
 
     private static final Path outputPath = Paths.get("target","testout","integrationtesting","oracle","spaces");
 
     private static Database database;
 
-    @Container
-    public static OracleContainer oracleContainer =
-            new OracleContainer("gvenzl/oracle-xe:11-slim")
-                    .usingSid()
-                    .withInitScript("integrationTesting/oracle/dbScripts/spaces_in_table_names.sql");
+    @RegisterExtension
+    static SuiteContainerExtension container = OracleSuite.SUITE_CONTAINER;
 
-    @BeforeEach
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
-        if (database == null) {
-            createDatabaseRepresentation();
-        }
-    }
-
-    private void createDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void gatheringSchemaDetailsTest() throws SQLException, IOException {
         String[] args = {
                 "-t", "orathin",
-                "-db", oracleContainer.getSid(),
+                "-db", "xe",
                 "-s", "ORASPACEIT",
                 "-cat", "%",
                 "-o", outputPath.toString(),
                 "-u", "oraspaceit",
                 "-p", "oraspaceit123",
-                "-host", oracleContainer.getHost(),
-                "-port", oracleContainer.getOraclePort().toString()
+                "-host", container.getHost(),
+                "-port", container.getPort(1521)
         };
         database = database(args);
     }
