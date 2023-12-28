@@ -18,15 +18,15 @@
  */
 package org.schemaspy.integrationtesting.informix;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.schemaspy.integrationtesting.InformixSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
-import org.testcontainers.containers.InformixContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.schemaspy.testing.SuiteContainerExtension;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -38,35 +38,26 @@ import static org.schemaspy.testing.DatabaseFixture.database;
  * @author Nils Petzaell
  */
 @DisabledOnOs(value = OS.MAC, architectures = {"aarch64"})
-@Testcontainers(disabledWithoutDocker = true)
-public class InformixCheckConstraintIT {
+class InformixCheckConstraintIT {
 
     private static Database database;
 
-    @Container
-    public static InformixContainer informixContainer =
-            new InformixContainer()
-                    .withInitScript("integrationTesting/informix/dbScripts/informixcc.sql");
+    @RegisterExtension
+    static SuiteContainerExtension container = InformixSuite.SUITE_CONTAINER;
 
-    @BeforeEach
-    public synchronized void gatheringSchemaDetailsTest() throws SQLException, IOException {
-        if (database == null) {
-            createDatabaseRepresentation();
-        }
-    }
-
-    private void createDatabaseRepresentation() throws SQLException, IOException {
+    @BeforeAll
+    static void gatheringSchemaDetailsTest() throws SQLException, IOException {
         String[] args = {
                 "-t", "informix",
-                "-db", "test",
+                "-db", "testconstraint",
                 "-s", "informix",
-                "-cat", "test",
+                "-cat", "testconstraint",
                 "-server", "dev",
                 "-o", "target/testout/integrationtesting/informix/cc",
-                "-u", informixContainer.getUsername(),
-                "-p", informixContainer.getPassword(),
-                "-host", informixContainer.getHost(),
-                "-port", informixContainer.getJdbcPort().toString()
+                "-u", container.getUsername(),
+                "-p", container.getPassword(),
+                "-host", container.getHost(),
+                "-port", container.getPort(9088)
         };
         database = database(args);
     }

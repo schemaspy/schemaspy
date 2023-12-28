@@ -457,6 +457,7 @@
                         <exclude>**/Mysql*IT.java</exclude>
                         <exclude>**/MSSQLServer*IT.java</exclude>
                         <exclude>**/Oracle*IT.java</exclude>
+                        <exclude>**/Informix*IT.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <pomImplementationVersion>${project.version}</pomImplementationVersion>
