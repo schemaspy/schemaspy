@@ -19,7 +19,7 @@
 package org.schemaspy.util;
 
 import org.junit.jupiter.api.Test;
-import org.schemaspy.testing.EnableIfClassAvailable;
+import org.schemaspy.testing.condition.EnableIfClassAvailable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 //Only run from maven

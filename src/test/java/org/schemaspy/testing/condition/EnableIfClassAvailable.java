@@ -1,4 +1,4 @@
-package org.schemaspy.testing;
+package org.schemaspy.testing.condition;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 
