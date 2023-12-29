@@ -8,23 +8,34 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=org.schemaspy%3Aschemaspy&metric=coverage)](https://sonarcloud.io/dashboard?id=org.schemaspy%3Aschemaspy)
 [![Gitter](https://badges.gitter.im/schemaspy/schemaspy.svg)](https://gitter.im/schemaspy/schemaspy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-**SchemaSpy** is a database metadata analyzer. It helps your database administors and developers visualize, navigate and understand your data model. With an easy-to-use HTML-based report, traversing the entity-relationship diagram has never been simpler. Our product showcase is available at http://schemaspy.org/sample/index.html.
+**SchemaSpy** is a database metadata analyzer. It helps your database administrators and developers visualize, navigate and understand your data model. With an easy-to-use HTML-based report, traversing the entity-relationship diagram has never been simpler. Our product showcase is available at http://schemaspy.org/sample/index.html.
 
 [![SchemaSpy sample](http://schemaspy.org/img/example_page_epivirusurf.png)](http://schemaspy.org/samples/epivirusurf)
 
 # Installation
 
-SchemaSpy is a stand alone tool. Just download the lastest
-[JAR file](https://github.com/schemaspy/schemaspy/releases/download/v6.2.4/schemaspy-6.2.4.jar)
-or [Docker image](https://hub.docker.com/r/schemaspy/schemaspy/) and you're
-ready to go!
+SchemaSpy is a standalone application without GUI.
+Just download the latest [JAR file](https://github.com/schemaspy/schemaspy/releases/latest) or [Docker image](https://hub.docker.com/r/schemaspy/schemaspy/) and you're ready to go!
+To use SchemaSpy from Maven, please see the [Maven chapter](#maven) below.
 
 ```
+# replace '6.2.4' with latest version
 curl -L https://github.com/schemaspy/schemaspy/releases/download/v6.2.4/schemaspy-6.2.4.jar \
     --output ~/Downloads/schemaspy.jar
 ```
 
 > For unreleased bug fixes and features-in-progress, download our [snapshot JAR](https://schemaspy.org/schemaspy/download.html) or use Docker tag `snapshot`
+
+## Maven
+
+SchemaSpy releases two types of JAR files: a bare-bone JAR and a fat JAR including all dependencies.
+Both JARs are published to Maven Central.
+The fat JAR is also attached to releases on GitHub.
+The "maven central" badge at the top of this page will take you straight to the latest version on Maven Central.
+
+The Maven GAV of the two artifacts is as follows:
+- bare-bone JAR: `org.schemaspy:schemaspy:<version>`
+- fat JAR: `org.schemaspy:schemaspy:<version>:app` **← note the `app` classifier**
 
 # Quick start
 
@@ -70,7 +81,7 @@ Be sure to check out the guides provided by the community later in this README.
 
 ## On-demand database documentation
 
-The prefered way to document databases is through entity-relationship (ER) diagrams.
+The preferred way to document databases is through entity-relationship (ER) diagrams.
 However, drawing these diagrams manually is such a time-consuming and error-prone
 process that we hardly ever draw them in practice. When the diagrams *are* drawn,
 they rarely stay up-to-date. With SchemaSpy, this is no longer a problem.
@@ -208,17 +219,17 @@ The BibTeX entry for LaTeX users is:
 SchemaSpy is built using maven and we utilize the maven wrapper.  
 __Windows__ `mvnw.cmd package`    
 __Linux__ `./mvnw package`  
-The resulting application can be found in `target`  
+The resulting application can be found in `target`
 
 ### Analyzing
 You need your own SonarQube:  
 https://hub.docker.com/_/sonarqube/  
 __Windows__ `mvnw.cmd -P sonar clean verify -Dsonar.host.url=http://$(boot2docker ip):9000 -Dsonar.jdbc.url="jdbc:h2:tcp://$(boot2docker ip)/sonar"`  
-__Linux__ `./mvnw -P sonar clean verify`  
+__Linux__ `./mvnw -P sonar clean verify`
 
 Watch results at:  
 __Linux__ `http://localhost:9000`  
-__Windows__ `http://$(boot2docker ip):9000`  
+__Windows__ `http://$(boot2docker ip):9000`
 
 ## Documentation
 Built using Python  
