@@ -2,7 +2,7 @@ package org.schemaspy.integrationtesting;
 
 import org.junit.platform.suite.api.*;
 import org.schemaspy.testing.SQLScriptsRunner;
-import org.schemaspy.testing.SuiteContainerExtension;
+import org.schemaspy.testing.testcontainers.SuiteContainerExtension;
 import org.testcontainers.containers.MySQLContainer;
 
 @Suite

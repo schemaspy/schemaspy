@@ -27,8 +27,8 @@ import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.integrationtesting.MssqlSuite;
 import org.schemaspy.testing.HtmlOutputValidator;
-import org.schemaspy.testing.SuiteContainerExtension;
 import org.schemaspy.testing.XmlOutputDiff;
+import org.schemaspy.testing.testcontainers.SuiteContainerExtension;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;
 

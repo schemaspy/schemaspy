@@ -2,8 +2,8 @@ package org.schemaspy.integrationtesting;
 
 import org.junit.platform.suite.api.*;
 import org.schemaspy.testing.SQLScriptsRunner;
-import org.schemaspy.testing.SuiteContainerExtension;
-import org.testcontainers.containers.MSSQLContainer;
+import org.schemaspy.testing.testcontainers.MSSQLContainer;
+import org.schemaspy.testing.testcontainers.SuiteContainerExtension;
 
 @Suite
 @SuiteDisplayName("MSSQL Test Suite")

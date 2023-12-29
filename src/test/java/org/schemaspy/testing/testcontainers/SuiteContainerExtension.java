@@ -1,4 +1,18 @@
-package org.schemaspy.testing;
+package org.schemaspy.testing.testcontainers;
+
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExecutionCondition;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ExtensionContext.Store;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
+import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.ext.ScriptUtils;
+import org.testcontainers.jdbc.ContainerLessJdbcDelegate;
+import org.testcontainers.shaded.com.google.common.io.Resources;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -15,18 +29,7 @@ import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
-import org.junit.jupiter.api.extension.ExtensionContext.Store;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.JdbcDatabaseContainer;
-import org.testcontainers.ext.ScriptUtils;
-import org.testcontainers.jdbc.ContainerLessJdbcDelegate;
-import org.testcontainers.shaded.com.google.common.io.Resources;
-
-public class SuiteContainerExtension implements BeforeAllCallback {
+public class SuiteContainerExtension implements BeforeAllCallback, ExecutionCondition{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Namespace NAMESPACE = Namespace.create("schemaspy", "testcontainers");
@@ -145,17 +148,17 @@ public class SuiteContainerExtension implements BeforeAllCallback {
         return container.getPassword();
     }
 
-    static class ContainerStopper implements Store.CloseableResource {
+    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext) {
+        return extensionContext.getRoot().getStore(NAMESPACE).getOrComputeIfAbsent("dockerIsPresent", (v) -> isDockerAvailable() , ConditionEvaluationResult.class);
+    }
 
-        public final JdbcDatabaseContainer<?> jdbcDatabaseContainer;
-
-        public ContainerStopper(JdbcDatabaseContainer<?> jdbcDatabaseContainer) {
-            this.jdbcDatabaseContainer = jdbcDatabaseContainer;
-        }
-
-        @Override
-        public void close() throws Throwable {
-            jdbcDatabaseContainer.stop();
+    private ConditionEvaluationResult isDockerAvailable() {
+        try {
+            DockerClientFactory.instance().client();
+            return ConditionEvaluationResult.enabled("Docker is present");
+        } catch (Throwable var2) {
+            return ConditionEvaluationResult.disabled("Docker isn't present");
         }
     }
+
 }

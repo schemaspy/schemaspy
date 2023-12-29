@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.integrationtesting.MysqlSuite;
 import org.schemaspy.model.*;
-import org.schemaspy.testing.SuiteContainerExtension;
+import org.schemaspy.testing.testcontainers.SuiteContainerExtension;
 
 import javax.script.ScriptException;
 import java.io.IOException;

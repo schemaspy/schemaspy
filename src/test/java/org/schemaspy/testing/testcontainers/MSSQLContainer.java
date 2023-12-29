@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.testcontainers.containers;
+package org.schemaspy.testing.testcontainers;
 
+import org.testcontainers.containers.MSSQLServerContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 
