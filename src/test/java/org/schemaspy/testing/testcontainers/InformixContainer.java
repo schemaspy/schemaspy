@@ -16,13 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.testcontainers.containers;
+package org.schemaspy.testing.testcontainers;
 
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.lang.invoke.MethodHandles;
@@ -72,7 +74,7 @@ public class InformixContainer extends JdbcDatabaseContainer<InformixContainer> 
         try {
             getMappedPort(INFORMIX_PORT);
         } catch (IllegalArgumentException iae) {
-            updateContainerInfo(dockerClient.inspectContainerCmd(containerId).exec());
+            updateContainerInfo(dockerClient.inspectContainerCmd(getContainerId()).exec());
         }
         return getMappedPort(INFORMIX_PORT);
     }
@@ -104,9 +106,9 @@ public class InformixContainer extends JdbcDatabaseContainer<InformixContainer> 
     protected void waitUntilContainerStarted() {
         super.waitUntilContainerStarted();
         LOGGER.info("Restart container");
-        dockerClient.restartContainerCmd(containerId).exec();
+        dockerClient.restartContainerCmd(getContainerId()).exec();
         for(int i = 0; i < 10; i++) {
-            InspectContainerResponse inspectContainerResponse = dockerClient.inspectContainerCmd(containerId).exec();
+            InspectContainerResponse inspectContainerResponse = dockerClient.inspectContainerCmd(getContainerId()).exec();
             if (inspectContainerResponse.getNetworkSettings().getPorts().getBindings().containsKey(ExposedPort.tcp(9088))) {
                 updateContainerInfo(inspectContainerResponse);
                 break;

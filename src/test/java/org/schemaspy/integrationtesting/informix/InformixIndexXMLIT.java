@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.schemaspy.integrationtesting.InformixSuite;
 import org.schemaspy.testing.IgnoreNonPrintedInCData;
 import org.schemaspy.testing.IgnoreUsingXPath;
-import org.schemaspy.testing.SuiteContainerExtension;
+import org.schemaspy.testing.testcontainers.SuiteContainerExtension;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Diff;

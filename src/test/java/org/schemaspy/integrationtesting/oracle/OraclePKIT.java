@@ -27,7 +27,7 @@ import org.schemaspy.integrationtesting.OracleSuite;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableIndex;
-import org.schemaspy.testing.SuiteContainerExtension;
+import org.schemaspy.testing.testcontainers.SuiteContainerExtension;
 
 import javax.script.ScriptException;
 import java.io.IOException;
