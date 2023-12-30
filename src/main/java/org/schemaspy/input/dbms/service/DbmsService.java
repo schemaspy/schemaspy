@@ -18,6 +18,7 @@
  */
 package org.schemaspy.input.dbms.service;
 
+import org.schemaspy.input.dbms.service.helper.UniformSet;
 import org.schemaspy.model.DbmsMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,17 +26,15 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DbmsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final Set<String> sql92Keywords = formatSqlKeyWords(("ADA" +
+    private static final Set<String> sql92Keywords = new UniformSet(("ADA" +
             "| C | CATALOG_NAME | CHARACTER_SET_CATALOG | CHARACTER_SET_NAME" +
             "| CHARACTER_SET_SCHEMA | CLASS_ORIGIN | COBOL | COLLATION_CATALOG" +
             "| COLLATION_NAME | COLLATION_SCHEMA | COLUMN_NAME | COMMAND_FUNCTION | COMMITTED" +
@@ -96,7 +95,7 @@ public class DbmsService {
             "| VALUE | VALUES | VARCHAR | VARYING | VIEW" +
             "| WHEN | WHENEVER | WHERE | WITH | WORK | WRITE" +
             "| YEAR" +
-            "| ZONE").split("[| ]"));
+            "| ZONE").split("[| ]")).value();
 
     public static Set<String> getSql92Keywords() {
         return Collections.unmodifiableSet(sql92Keywords);
@@ -108,10 +107,10 @@ public class DbmsService {
         onlyLogException(() -> builder.productName(databaseMetaData.getDatabaseProductName()));
         onlyLogException(() -> builder.productVersion(databaseMetaData.getDatabaseProductVersion()));
         onlyLogException(() -> builder.sqlKeywords(getSQLKeywords(databaseMetaData)));
-        onlyLogException(() -> builder.systemFunctions(formatSqlKeyWords(databaseMetaData.getSystemFunctions().split(","))));
-        onlyLogException(() -> builder.stringFunctions(formatSqlKeyWords(databaseMetaData.getStringFunctions().split(","))));
-        onlyLogException(() -> builder.numericFunctions(formatSqlKeyWords(databaseMetaData.getNumericFunctions().split(","))));
-        onlyLogException(() -> builder.timeDateFunctions(formatSqlKeyWords(databaseMetaData.getTimeDateFunctions().split(","))));
+        onlyLogException(() -> builder.systemFunctions(new UniformSet(databaseMetaData.getSystemFunctions().split(",")).value()));
+        onlyLogException(() -> builder.stringFunctions(new UniformSet(databaseMetaData.getStringFunctions().split(",")).value()));
+        onlyLogException(() -> builder.numericFunctions(new UniformSet(databaseMetaData.getNumericFunctions().split(",")).value()));
+        onlyLogException(() -> builder.timeDateFunctions(new UniformSet(databaseMetaData.getTimeDateFunctions().split(",")).value()));
         onlyLogException(() -> builder.identifierQuoteString(databaseMetaData.getIdentifierQuoteString().trim()));
 
         return builder.getDbmsMeta();
@@ -133,16 +132,8 @@ public class DbmsService {
     private static Set<String> getSQLKeywords(DatabaseMetaData databaseMetaData) throws SQLException {
         Set<String> allSqlKeywords = new HashSet<>(sql92Keywords);
         String[] sqlKeywordsArray = databaseMetaData.getSQLKeywords().split(",");
-        Set<String> sqlKeywords = formatSqlKeyWords(sqlKeywordsArray);
+        Set<String> sqlKeywords = new UniformSet(sqlKeywordsArray).value();
         allSqlKeywords.addAll(sqlKeywords);
         return allSqlKeywords;
-    }
-
-    private static Set<String> formatSqlKeyWords(String[] sqlKeywords) {
-        return Collections.unmodifiableSet(Arrays.stream(sqlKeywords)
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(String::toUpperCase)
-                .collect(Collectors.toSet()));
     }
 }
