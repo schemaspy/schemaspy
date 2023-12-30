@@ -26,6 +26,7 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import org.schemaspy.util.DataTableConfig;
+import org.schemaspy.util.markup.MarkupProcessor;
 import org.schemaspy.util.naming.NameFromString;
 import org.schemaspy.util.naming.SanitizedFileName;
 
@@ -55,7 +56,12 @@ public class MustacheCompiler {
     private final DataTableConfig dataTableConfig;
     private final MustacheFactory mustacheFactory;
 
-    public MustacheCompiler(String databaseName, String schemaName, HtmlConfig htmlConfig, boolean multiSchema, DataTableConfig dataTableConfig) {
+    public MustacheCompiler(
+            String databaseName,
+            String schemaName, HtmlConfig htmlConfig,
+            boolean multiSchema,
+            DataTableConfig dataTableConfig
+    ) {
         this.databaseName = databaseName;
         this.schemaName = schemaName;
         this.htmlConfig = htmlConfig;
@@ -64,7 +70,7 @@ public class MustacheCompiler {
         this.mustacheFactory = new DefaultMustacheFactory(new MustacheCustomResolver(htmlConfig.getTemplateDirectory()));
     }
 
-    public void write(PageData pageData, Writer writer) throws IOException {
+    public void write(final PageData pageData, Writer writer) throws IOException {
         StringWriter result = new StringWriter();
 
         HashMap<String, Object> pageScope = new HashMap<>();
@@ -74,6 +80,7 @@ public class MustacheCompiler {
         pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());
         pageScope.put("displayNumRows", htmlConfig.isNumRowsEnabled());
         pageScope.put("dataTableConfig", dataTableConfig.getPageScopeMap());
+        pageScope.put("markup", (Function<String,String>) md -> MarkupProcessor.getInstance().toHtml(md, getRootPath(pageData.getDepth())));
         pageScope.putAll(pageData.getScope());
 
         Mustache mustachePage = mustacheFactory.compile(pageData.getTemplateName());
