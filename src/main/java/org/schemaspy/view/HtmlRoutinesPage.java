@@ -22,7 +22,6 @@
 package org.schemaspy.view;
 
 import org.schemaspy.model.Routine;
-import org.schemaspy.util.markup.MarkupProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
-import java.util.function.Function;
 
 /**
  * The page that lists all of the routines (stored procedures and functions)
@@ -56,7 +54,6 @@ public class HtmlRoutinesPage {
                 .templateName("routines.html")
                 .scriptName("routines.js")
                 .addToScope("routines", routines)
-                .addToScope("md2html", (Function<String,String>) md -> MarkupProcessor.getInstance().toHtml(md, mustacheCompiler.getRootPath(0)))
                 .getPageData();
 
         try {
