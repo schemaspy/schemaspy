@@ -36,7 +36,24 @@
                     </div>
                 </section>
                 <script>
-                    var tableData = {{{tableData}}};
+                    var tableData = [
+{{#columns}}
+    {
+        "tableName": "{{{value.column.table.name}}}",
+        "tableFileName": "{{#toFileName}}{{{value.column.table.name}}}{{/toFileName}}",
+        "tableType": "{{{value.column.table.type}}}",
+        "keyClass": "{{{value.keyClass}}}",
+        "keyTitle": "{{{value.keyTitle}}}",
+        "name": "{{{value.keyIcon}}}{{{value.column.name}}}",
+        "type": "{{{value.column.typeName}}}",
+        "length": {{{value.column.length}}},
+        "nullable": "{{{value.nullable}}}",
+        "autoUpdated": "{{{value.autoUpdated}}}",
+        "defaultValue": "{{{value.defaultValue}}}",
+        "comments": "{{{value.comments}}}"
+    }{{^last}},{{/last}}
+    {{/columns}}
+];
                     var config = {
                         pagination: {{paginationEnabled}}
                     };

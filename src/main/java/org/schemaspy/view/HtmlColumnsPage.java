@@ -22,23 +22,20 @@
  */
 package org.schemaspy.view;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.util.naming.FileNameGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Objects;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.github.mustachejava.util.DecoratedCollection;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The page that lists all of the columns in the schema,
@@ -66,33 +63,23 @@ public class HtmlColumnsPage {
                 .flatMap(tableIndex -> tableIndex.getColumns().stream())
                 .collect(Collectors.toSet());
 
-        Set<MustacheTableColumn> tableColumns = tables.stream()
-                .flatMap(table -> table.getColumns().stream())
-                .map(tableColumn -> new MustacheTableColumn(tableColumn, indexedColumns.contains(tableColumn), mustacheCompiler.getRootPath(0)))
-                .collect(Collectors.toSet());
-
-        JSONArray columns = new JSONArray();
-
-        tableColumns.forEach(mc -> {
-            columns.put(switchToLinkedHashMap(new JSONObject())
-                .put("tableName", valueOrEmptyString(mc.getColumn().getTable().getName()))
-                .put("tableFileName", valueOrEmptyString(new FileNameGenerator(mc.getColumn().getTable().getName()).value()))
-                .put("tableType", valueOrEmptyString(mc.getColumn().getTable().getType()))
-                .put("keyClass", valueOrEmptyString(mc.getKeyClass()))
-                .put("keyTitle", valueOrEmptyString(mc.getKeyTitle()))
-                .put("name", valueOrEmptyString(mc.getKeyIcon())+valueOrEmptyString(mc.getColumn().getName()))
-                .put("type", valueOrEmptyString(mc.getColumn().getTypeName()))
-                .put("length", mc.getColumn().getLength())
-                .put("nullable", valueOrEmptyString(mc.getNullable()))
-                .put("autoUpdated", valueOrEmptyString(mc.getAutoUpdated()))
-                .put("defaultValue", valueOrEmptyString(mc.getDefaultValue()))
-                .put("comments", valueOrEmptyString(mc.getComments())));
-        });
+        List<MustacheTableColumn> tableColumns = tables.stream()
+            .sorted(
+                Comparator.comparing(Table::getName)
+            ).flatMap(table ->
+                table.getColumns().stream()
+            ).map(tableColumn ->
+                new MustacheTableColumn(
+                    tableColumn,
+                    indexedColumns.contains(tableColumn),
+                    mustacheCompiler.getRootPath(0)
+                )
+            ).toList();
 
         PageData pageData = new PageData.Builder()
                 .templateName("column.html")
                 .scriptName("column.js")
-                .addToScope("tableData", columns.toString(4))
+                .addToScope("columns", new DecoratedCollection<>(tableColumns))
                 .depth(0)
                 .getPageData();
 
@@ -103,19 +90,4 @@ public class HtmlColumnsPage {
         }
     }
 
-    private static JSONObject switchToLinkedHashMap(JSONObject jsonObject) {
-        try {
-            Field map = JSONObject.class.getDeclaredField("map");
-            map.setAccessible(true);
-            map.set(jsonObject, new LinkedHashMap<>());
-            map.setAccessible(false);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            LOGGER.debug("Failed to replace hashmap with linkedhashmap in JSONObject", e);
-        }
-        return jsonObject;
-    }
-
-    private static String valueOrEmptyString(String value) {
-        return Objects.nonNull(value) ? value : "" ;
-    }
 }
