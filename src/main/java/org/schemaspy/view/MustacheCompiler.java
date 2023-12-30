@@ -83,7 +83,7 @@ public class MustacheCompiler {
         containerScope.put("content", result);
         containerScope.put("pageScript", pageData.getScriptName());
         containerScope.put("rootPath", getRootPath(pageData.getDepth()));
-        containerScope.put("rootPathtoHome", getRootPathToHome(pageData.getDepth()));
+        containerScope.put("rootPathToHome", getRootPathToHome(pageData.getDepth()));
         containerScope.putAll(pageScope);
 
         Mustache mustacheContainer = mustacheFactory.compile("container.html");
