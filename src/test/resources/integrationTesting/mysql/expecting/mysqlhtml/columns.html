@@ -111,62 +111,6 @@
                 <script>
                     var tableData = [
     {
-        "tableName": "user",
-        "tableFileName": "user",
-        "tableType": "Table",
-        "keyClass": "foreignKey",
-        "keyTitle": "Foreign Key",
-        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>groupId",
-        "type": "INT",
-        "length": 10,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": "<p>FK to groups omitted, implied relationship<\/p>"
-    },
-    {
-        "tableName": "user",
-        "tableFileName": "user",
-        "tableType": "Table",
-        "keyClass": "indexedColumn",
-        "keyTitle": "Indexed",
-        "name": "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'><\/i>email",
-        "type": "VARCHAR",
-        "length": 40,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
-        "tableName": "group",
-        "tableFileName": "group",
-        "tableType": "Table",
-        "keyClass": "indexedColumn",
-        "keyTitle": "Indexed",
-        "name": "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'><\/i>name",
-        "type": "VARCHAR",
-        "length": 16,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": ""
-    },
-    {
-        "tableName": "userAndGroup",
-        "tableFileName": "userAndGroup",
-        "tableType": "View",
-        "keyClass": "",
-        "keyTitle": "",
-        "name": "UserName",
-        "type": "VARCHAR",
-        "length": 16,
-        "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
-        "comments": "<p>UserName<\/p>"
-    },
-    {
         "tableName": "group",
         "tableFileName": "group",
         "tableType": "Table",
@@ -186,7 +130,7 @@
         "tableType": "Table",
         "keyClass": "primaryKey",
         "keyTitle": "Primary Key",
-        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>groupId",
+        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId",
         "type": "INT",
         "length": 10,
         "nullable": "",
@@ -195,18 +139,46 @@
         "comments": ""
     },
     {
+        "tableName": "group",
+        "tableFileName": "group",
+        "tableType": "Table",
+        "keyClass": "indexedColumn",
+        "keyTitle": "Indexed",
+        "name": "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>name",
+        "type": "VARCHAR",
+        "length": 16,
+        "nullable": "",
+        "autoUpdated": "",
+        "defaultValue": "null",
+        "comments": ""
+    },
+    {
         "tableName": "user",
         "tableFileName": "user",
         "tableType": "Table",
-        "keyClass": "primaryKey",
-        "keyTitle": "Primary Key",
-        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>userId",
+        "keyClass": "indexedColumn",
+        "keyTitle": "Indexed",
+        "name": "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>email",
+        "type": "VARCHAR",
+        "length": 40,
+        "nullable": "",
+        "autoUpdated": "",
+        "defaultValue": "null",
+        "comments": ""
+    },
+    {
+        "tableName": "user",
+        "tableFileName": "user",
+        "tableType": "Table",
+        "keyClass": "foreignKey",
+        "keyTitle": "Foreign Key",
+        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>groupId",
         "type": "INT",
         "length": 10,
         "nullable": "",
-        "autoUpdated": "√",
+        "autoUpdated": "",
         "defaultValue": "null",
-        "comments": ""
+        "comments": "<p>FK to groups omitted, implied relationship</p>"
     },
     {
         "tableName": "user",
@@ -220,7 +192,21 @@
         "nullable": "",
         "autoUpdated": "",
         "defaultValue": "null",
-        "comments": "<p>UserName<\/p>"
+        "comments": "<p>UserName</p>"
+    },
+    {
+        "tableName": "user",
+        "tableFileName": "user",
+        "tableType": "Table",
+        "keyClass": "primaryKey",
+        "keyTitle": "Primary Key",
+        "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>userId",
+        "type": "INT",
+        "length": 10,
+        "nullable": "",
+        "autoUpdated": "√",
+        "defaultValue": "null",
+        "comments": ""
     },
     {
         "tableName": "userAndGroup",
@@ -235,6 +221,20 @@
         "autoUpdated": "",
         "defaultValue": "null",
         "comments": ""
+    },
+    {
+        "tableName": "userAndGroup",
+        "tableFileName": "userAndGroup",
+        "tableType": "View",
+        "keyClass": "",
+        "keyTitle": "",
+        "name": "UserName",
+        "type": "VARCHAR",
+        "length": 16,
+        "nullable": "",
+        "autoUpdated": "",
+        "defaultValue": "null",
+        "comments": "<p>UserName</p>"
     }
 ];
                     var config = {
