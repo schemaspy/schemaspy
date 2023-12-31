@@ -22,12 +22,6 @@
  */
 package org.schemaspy.view;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-import org.schemaspy.util.DataTableConfig;
-import org.schemaspy.util.naming.FileNameGenerator;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -35,6 +29,13 @@ import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+import org.schemaspy.util.DataTableConfig;
+import org.schemaspy.util.naming.FileNameGenerator;
+import org.schemaspy.util.naming.NameOf;
 
 /**
  * Created by rkasa on 2016-03-22.
@@ -67,7 +68,7 @@ public class MustacheCompiler {
         StringWriter result = new StringWriter();
 
         HashMap<String, Object> pageScope = new HashMap<>();
-        pageScope.put("toFileName", (Function<String,String>) s -> new FileNameGenerator(s).value());
+        pageScope.put("toFileName", (Function<String,String>) s -> new FileNameGenerator(new NameOf(s)).value());
         pageScope.put("databaseName", databaseName);
         pageScope.put("schemaName", schemaName);
         pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());

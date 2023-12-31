@@ -18,14 +18,6 @@
  */
 package org.schemaspy.output.html.mustache.diagrams;
 
-import org.schemaspy.model.Table;
-import org.schemaspy.output.diagram.DiagramResult;
-import org.schemaspy.output.diagram.TableDiagram;
-import org.schemaspy.output.dot.schemaspy.DotFormatter;
-import org.schemaspy.util.DefaultPrintWriter;
-import org.schemaspy.util.naming.FileNameGenerator;
-import org.schemaspy.view.MustacheTableDiagram;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,6 +25,15 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
+
+import org.schemaspy.model.Table;
+import org.schemaspy.output.diagram.DiagramResult;
+import org.schemaspy.output.diagram.TableDiagram;
+import org.schemaspy.output.dot.schemaspy.DotFormatter;
+import org.schemaspy.util.DefaultPrintWriter;
+import org.schemaspy.util.naming.FileNameGenerator;
+import org.schemaspy.util.naming.NameOf;
+import org.schemaspy.view.MustacheTableDiagram;
 
 /**
  * @author Nils Petzaell
@@ -62,7 +63,7 @@ public class MustacheTableDiagramFactory {
     public List<MustacheTableDiagram> generateRealTableDiagrams(Table table) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
 
-        String fileNameBase = new FileNameGenerator(table.getName()).value();
+        String fileNameBase = new FileNameGenerator(new NameOf(table.getName())).value();
 
         File oneDegreeDotFile = new File(tableDir, fileNameBase + ".1degree.dot");
         File twoDegreesDotFile = new File(tableDir, fileNameBase + ".2degrees.dot");
@@ -102,7 +103,7 @@ public class MustacheTableDiagramFactory {
     public List<MustacheTableDiagram> generateImpliedTableDiagrams(Table table) throws IOException {
         List<MustacheTableDiagram> diagrams = new ArrayList<>();
 
-        String fileNameBase = new FileNameGenerator(table.getName()).value();
+        String fileNameBase = new FileNameGenerator(new NameOf(table.getName())).value();
 
         File oneImpliedDotFile = new File(tableDir, fileNameBase + ".implied1degrees.dot");
         File twoImpliedDotFile = new File(tableDir, fileNameBase + ".implied2degrees.dot");

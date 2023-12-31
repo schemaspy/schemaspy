@@ -22,6 +22,7 @@ import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.util.naming.FileNameGenerator;
+import org.schemaspy.util.naming.NameOf;
 
 /**
  * Created by rkasa on 2016-03-24.
@@ -42,7 +43,7 @@ public class MustacheTableColumnRelatives {
         this(constraint);
         this.column = column;
         this.table = column.getTable();
-        this.path = table.isRemote() ? ("../../" + new FileNameGenerator(table.getContainer()).value() + "/tables/") : "";
+        this.path = table.isRemote() ? ("../../" + new FileNameGenerator(new NameOf(table.getContainer())).value() + "/tables/") : "";
     }
 
     public Table getTable() {

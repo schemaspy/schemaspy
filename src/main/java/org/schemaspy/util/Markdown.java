@@ -19,6 +19,13 @@
  */
 package org.schemaspy.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.profiles.pegdown.Extensions;
@@ -26,13 +33,7 @@ import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.options.DataHolder;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.naming.FileNameGenerator;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.schemaspy.util.naming.NameOf;
 
 /**
  * Created by rkasa on 2016-04-11.
@@ -97,7 +98,7 @@ public class Markdown {
         tables.stream()
                 .filter(table -> !table.isLogical())
                 .forEach( table -> {
-                    String tablePath = "tables/" + new FileNameGenerator(table.getName()).value() + DOT_HTML;
+                    String tablePath = "tables/" + new FileNameGenerator(new NameOf(table.getName())).value() + DOT_HTML;
                     pages.put(table.getName(), tablePath);
                 });
     }

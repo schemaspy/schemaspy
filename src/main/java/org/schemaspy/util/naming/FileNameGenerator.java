@@ -20,19 +20,20 @@ package org.schemaspy.util.naming;
 
 public class FileNameGenerator implements Name {
 
-    private final String original_name;
+    private final Name origin;
 
-    public FileNameGenerator(final String original_name) {
-        this.original_name = original_name;
+    public FileNameGenerator(final Name origin) {
+        this.origin = origin;
     }
 
     @Override
     public String value() {
-        String name = original_name.replaceAll("[^a-zA-Z0-9\\-_\\.]", "_");
-        if (name.length() <= 40 && original_name.equalsIgnoreCase(name)) {
+        String originValue = origin.value();
+        String name = originValue.replaceAll("[^a-zA-Z0-9\\-_\\.]", "_");
+        if (name.length() <= 40 && originValue.equalsIgnoreCase(name)) {
             return name;
         } else {
-            String hashAsHex = Integer.toHexString(original_name.hashCode());
+            String hashAsHex = Integer.toHexString(originValue.hashCode());
             int targetLength = Math.min(39 - hashAsHex.length(), name.length());
             return name.substring(0, targetLength) + "_" + hashAsHex;
         }
