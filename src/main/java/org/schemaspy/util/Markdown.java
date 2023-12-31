@@ -21,9 +21,9 @@ package org.schemaspy.util;
 
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.profiles.pegdown.Extensions;
-import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
-import com.vladsch.flexmark.util.options.DataHolder;
+import com.vladsch.flexmark.profile.pegdown.Extensions;
+import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
+import com.vladsch.flexmark.util.data.DataHolder;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.naming.FileNameGenerator;
 
@@ -41,6 +41,22 @@ import java.util.regex.Pattern;
  * @author Daniel Watt
  */
 public class Markdown {
+    private static class FlexmarkOptionsHolder {
+        static final DataHolder options = computeOptionsValue();
+
+        private static DataHolder computeOptionsValue() {
+            String dataHolderClassName = System.getProperty("schemaspy.flexmark.options.class");
+            if (null == dataHolderClassName) {
+                return PegdownOptionsAdapter.flexmarkOptions(true,
+                           Extensions.ALL ^ Extensions.HARDWRAPS);
+            }
+            try {
+                return (DataHolder) Class.forName(dataHolderClassName).getDeclaredMethod("getOptions").invoke(null);
+            } catch (ReflectiveOperationException | SecurityException  exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+    }
 
     private static final HashMap<String, String> pages = new HashMap<>();
 
@@ -53,9 +69,7 @@ public class Markdown {
         this(
                 markdownText,
                 rootPath,
-                PegdownOptionsAdapter.flexmarkOptions(true,
-                        Extensions.ALL ^ Extensions.HARDWRAPS
-                )
+                FlexmarkOptionsHolder.options
         );
     }
 
