@@ -22,6 +22,12 @@
  */
 package org.schemaspy.view;
 
+import com.github.mustachejava.util.DecoratedCollection;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.TableColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.invoke.MethodHandles;
@@ -30,12 +36,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.github.mustachejava.util.DecoratedCollection;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The page that lists all of the columns in the schema,
@@ -71,8 +71,7 @@ public class HtmlColumnsPage {
             ).map(tableColumn ->
                 new MustacheTableColumn(
                     tableColumn,
-                    indexedColumns.contains(tableColumn),
-                    mustacheCompiler.getRootPath(0)
+                    indexedColumns.contains(tableColumn)
                 )
             ).toList();
 
