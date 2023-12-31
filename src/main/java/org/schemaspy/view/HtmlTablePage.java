@@ -27,7 +27,6 @@ package org.schemaspy.view;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.TableIndex;
-import org.schemaspy.util.markup.MarkupProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +74,7 @@ public class HtmlTablePage {
         }
 
         for (TableColumn column : table.getColumns()) {
-            tableColumns.add(new MustacheTableColumn(column, indexes.contains(column), mustacheCompiler.getRootPath(1)));
+            tableColumns.add(new MustacheTableColumn(column, indexes.contains(column)));
         }
 
         LOGGER.debug("Writing table page -> {}", table.getName());
@@ -84,7 +83,7 @@ public class HtmlTablePage {
                 .templateName("tables/table.html")
                 .scriptName("table.js")
                 .addToScope("table", table)
-                .addToScope("comments", MarkupProcessor.getInstance().toHtml(table.getComments(), mustacheCompiler.getRootPath(1)))
+                .addToScope("comments", table.getComments())
                 .addToScope("primaries", primaries)
                 .addToScope("columns", tableColumns)
                 .addToScope("indexes", indexedColumns)

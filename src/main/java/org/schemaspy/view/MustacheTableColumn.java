@@ -21,7 +21,6 @@ package org.schemaspy.view;
 
 import org.schemaspy.model.ForeignKeyConstraint;
 import org.schemaspy.model.TableColumn;
-import org.schemaspy.util.markup.MarkupProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,6 @@ public class MustacheTableColumn {
     private List<MustacheTableColumnRelatives> parents = new ArrayList<>();
     private List<MustacheTableColumnRelatives> children = new ArrayList<>();
     private boolean indexColumn;
-    private String rootPath;
 
     public MustacheTableColumn(TableColumn tableColumn) {
         this.column = tableColumn;
@@ -47,10 +45,9 @@ public class MustacheTableColumn {
         prepareRelatives(parents, true);
     }
 
-    public MustacheTableColumn(TableColumn tableColumn, boolean indexColumn, String rootPath) {
+    public MustacheTableColumn(TableColumn tableColumn, boolean indexColumn) {
         this(tableColumn);
         this.indexColumn = indexColumn;
-        this.rootPath = rootPath;
     }
 
     public TableColumn getColumn() {
@@ -64,56 +61,49 @@ public class MustacheTableColumn {
      */
 
     public String getKey() {
-        String keyType = "";
-
         if (column.isPrimary()) {
-            keyType = " class='primaryKey' title='Primary Key'";
+            return " class='primaryKey' title='Primary Key'";
         } else if (column.isForeignKey()) {
-            keyType = " class='foreignKey' title='Foreign Key'";
+            return  " class='foreignKey' title='Foreign Key'";
         } else if (indexColumn) {
-            keyType = " class='"+markAsIndexColumn()+"' title='Indexed'";
+            return " class='"+markAsIndexColumn()+"' title='Indexed'";
+        } else {
+            return "";
         }
-
-        return keyType;
     }
 
     public String getKeyTitle() {
-        String keyTitle= "";
-
         if (column.isPrimary()) {
-            keyTitle = "Primary Key";
+            return "Primary Key";
         } else if (column.isForeignKey()) {
-            keyTitle = "Foreign Key";
+            return "Foreign Key";
         } else if (indexColumn) {
-            keyTitle = "Indexed";
+            return "Indexed";
+        } else {
+            return "";
         }
-
-        return keyTitle;
     }
 
     public String getKeyClass() {
-        String keyClass= "";
-
         if (column.isPrimary()) {
-            keyClass = "primaryKey";
+            return "primaryKey";
         } else if (column.isForeignKey()) {
-            keyClass = "foreignKey";
+            return "foreignKey";
         } else if (indexColumn) {
-            keyClass = "indexedColumn";
+            return "indexedColumn";
+        } else {
+            return "";
         }
-
-        return keyClass;
     }
 
     public String getKeyIcon() {
-        String keyIcon = "";
         if (column.isPrimary() || column.isForeignKey()) {
-            keyIcon = "<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>";
+            return "<i class='icon ion-key iconkey' style='padding-left: 5px;'></i>";
         } else if (indexColumn) {
-            keyIcon = "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>";
+            return  "<i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i>";
+        } else {
+            return "";
         }
-
-        return  keyIcon;
     }
 
     public String getNullable() {
@@ -149,9 +139,7 @@ public class MustacheTableColumn {
     }
 
     public String getComments() {
-        String comments = column.getComments();
-        comments = MarkupProcessor.getInstance().toHtml(comments, rootPath);
-        return comments;
+        return column.getComments();
     }
 
     private void prepareRelatives(List<MustacheTableColumnRelatives> relatives, boolean dumpParents) {
