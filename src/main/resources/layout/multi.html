@@ -35,7 +35,7 @@
                             <span class="label label-primary pull-right"><i class="fa fa-cog fa-2x"></i></span>
                         </div><!-- /.box-header -->
                         <div class="box-body">
-                            <p> {{{catalog.comment}}} </p>
+                            <p> {{#markup}}{{{catalog.comment}}}{{/markup}}</p>
                         </div><!-- /.box-body -->
                     </div>
                     {{/catalog.comment}}
@@ -63,7 +63,7 @@
                                     {{#schemas}}
                                     <tr class="tbl even" valign="top">
                                         <td class="detail"><a href="{{#toFileName}}{{{name}}}{{/toFileName}}/index.html">{{name}}</a></td>
-                                        <td class="comment detail" style="display: table-cell;">{{{comment}}}</td>
+                                        <td class="comment detail" style="display: table-cell;">{{#markup}}{{{comment}}}{{/markup}}</td>
                                     </tr>
                                     {{/schemas}}
                                 </tbody>

@@ -177,8 +177,8 @@ public class SchemaAnalyzer {
 
         File outputDir = commandLineArguments.getOutputDirectory();
 
-        List<MustacheSchema> mustacheSchemas = new ArrayList<>();
-        MustacheCatalog mustacheCatalog = null;
+        List<Schema> collectedSchemas = new ArrayList<>();
+        Catalog collectedCatalog = null;
         for (String schema : schemas) {
             String dbName = Objects
                 .nonNull(
@@ -193,8 +193,8 @@ public class SchemaAnalyzer {
             if (db == null) { //if any of analysed schema returns null
                 return null;
             }
-            mustacheSchemas.add(new MustacheSchema(db.getSchema(), ""));
-            mustacheCatalog = new MustacheCatalog(db.getCatalog(), "");
+            collectedSchemas.add(db.getSchema());
+            collectedCatalog = db.getCatalog();
         }
 
         if (commandLineArguments.isHtmlEnabled()) {
@@ -207,7 +207,7 @@ public class SchemaAnalyzer {
             HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(
                 mustacheCompiler);
             try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve(INDEX_DOT_HTML).toFile())) {
-                htmlMultipleSchemasIndexPage.write(mustacheCatalog, mustacheSchemas,
+                htmlMultipleSchemasIndexPage.write(collectedCatalog, collectedSchemas,
                     commandLineArguments.getHtmlConfig().getDescription(), getDatabaseProduct(meta), writer
                 );
                 LOGGER.info(
