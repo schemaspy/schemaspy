@@ -22,6 +22,8 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.model.Catalog;
+import org.schemaspy.model.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +52,7 @@ public class HtmlMultipleSchemasIndexPage {
         this.mustacheCompiler = mustacheCompiler;
     }
 
-    public void write(MustacheCatalog catalog, List<MustacheSchema> schemas, String description, String productName, Writer writer) {
+    public void write(Catalog catalog, List<Schema> schemas, String description, String productName, Writer writer) {
 
         String connectTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("EEE MMM dd HH:mm z yyyy"));
 

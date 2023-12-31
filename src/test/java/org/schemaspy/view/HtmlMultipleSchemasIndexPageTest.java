@@ -18,16 +18,16 @@
  */
 package org.schemaspy.view;
 
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.schemaspy.cli.CommandLineArgumentParser;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.model.Catalog;
 import org.schemaspy.util.DataTableConfig;
+
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,7 +52,7 @@ class HtmlMultipleSchemasIndexPageTest {
         MustacheCompiler mustacheCompiler = new MustacheCompiler("withComment", null, commandLineArguments.getHtmlConfig(), false, dataTableConfig);
         HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
         StringWriter actual = new StringWriter();
-        htmlMultipleSchemasIndexPage.write(new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),"A Description", "JAVA_TEST 1.0", actual);
+        htmlMultipleSchemasIndexPage.write(new Catalog("dbo"), Collections.emptyList(),"A Description", "JAVA_TEST 1.0", actual);
         assertThat(actual.toString()).contains("<p>A Description</p>");
     }
 
@@ -61,7 +61,7 @@ class HtmlMultipleSchemasIndexPageTest {
         MustacheCompiler mustacheCompiler = new MustacheCompiler("noComment", null, commandLineArguments.getHtmlConfig(), false, dataTableConfig);
         HtmlMultipleSchemasIndexPage htmlMultipleSchemasIndexPage = new HtmlMultipleSchemasIndexPage(mustacheCompiler);
         StringWriter actual = new StringWriter();
-        htmlMultipleSchemasIndexPage.write(new MustacheCatalog(new Catalog("dbo"),""), Collections.emptyList(),null, "JAVA_TEST 1.0", actual);
+        htmlMultipleSchemasIndexPage.write(new Catalog("dbo"), Collections.emptyList(),null, "JAVA_TEST 1.0", actual);
         assertThat(actual.toString()).doesNotContain("<p>A Description</p>");
     }
 

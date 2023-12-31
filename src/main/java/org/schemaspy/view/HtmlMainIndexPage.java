@@ -90,8 +90,8 @@ public class HtmlMainIndexPage {
                 .addToScope("tables", mustacheTables)
                 .addToScope("database", database)
                 .addToScope("description", description)
-                .addToScope("schema", new MustacheSchema(database.getSchema(), ""))
-                .addToScope("catalog", new MustacheCatalog(database.getCatalog(), ""))
+                .addToScope("schema", database.getSchema())
+                .addToScope("catalog", database.getCatalog())
                 .addToScope("xmlName", getXmlName(database))
                 .depth(0)
                 .getPageData();
