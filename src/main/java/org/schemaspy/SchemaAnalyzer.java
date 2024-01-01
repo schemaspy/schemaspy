@@ -60,6 +60,7 @@ import org.schemaspy.util.DefaultPrintWriter;
 import org.schemaspy.util.Markdown;
 import org.schemaspy.util.copy.CopyFromUrl;
 import org.schemaspy.util.filefilter.NotHtml;
+import org.schemaspy.util.naming.NameFromString;
 import org.schemaspy.util.naming.SanitizedFileName;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
@@ -185,7 +186,7 @@ public class SchemaAnalyzer {
                 : schema;
 
             LOGGER.info("Analyzing '{}'", new Sanitize(schema));
-            File outputDirForSchema = new File(outputDir, new SanitizedFileName(schema).value());
+            File outputDirForSchema = new File(outputDir, new SanitizedFileName(new NameFromString(schema)).value());
             db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService, con);
             if (db == null) { //if any of analysed schema returns null
                 return null;
@@ -477,7 +478,7 @@ public class SchemaAnalyzer {
                                 .toPath()
                                 .resolve("routines")
                                 .resolve(
-                                    new SanitizedFileName(routine.getName()).value()
+                                    new SanitizedFileName(new NameFromString(routine.getName())).value()
                                         + DOT_HTML
                                 )
                                 .toFile()
@@ -505,7 +506,7 @@ public class SchemaAnalyzer {
         for (Table table : tables) {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table);
             LOGGER.debug("Writing details of {}", table.getName());
-            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("tables").resolve(new SanitizedFileName(table.getName()).value() + DOT_HTML).toFile())) {
+            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("tables").resolve(new SanitizedFileName(new NameFromString(table.getName())).value() + DOT_HTML).toFile())) {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
                 progressListener.createdTablePage(table);
             }

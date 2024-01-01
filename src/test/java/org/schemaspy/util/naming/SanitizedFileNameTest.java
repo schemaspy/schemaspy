@@ -30,14 +30,22 @@ class SanitizedFileNameTest {
     void wontGenerateSameNameForTwoDifferentNames() {
         String nameOne = "98765432109876543210987654321098765432109876543210";
         String nameTwo = "12345678901234567890123456789012345678901234567890";
-        assertThat(new SanitizedFileName(nameOne).value()).isNotEqualToIgnoringCase(new SanitizedFileName(nameTwo).value());
+        assertThat(
+                new SanitizedFileName(new NameFromString(nameOne)).value()
+        ).isNotEqualToIgnoringCase(
+                new SanitizedFileName(new NameFromString(nameTwo)).value()
+        );
     }
 
     @Test
     void wontGenerateSameForSimilar() {
         String nameOne = "Test\tif/name/is#fixed or not";
         String nameTwo = "Test\tif\tname/is#fixed or not";
-        assertThat(new SanitizedFileName(nameOne).value()).isNotEqualToIgnoringCase(new SanitizedFileName(nameTwo).value());
+        assertThat(
+                new SanitizedFileName(new NameFromString(nameOne)).value()
+        ).isNotEqualToIgnoringCase(
+                new SanitizedFileName(new NameFromString(nameTwo)).value()
+        );
     }
 
     @ParameterizedTest(name = "{0}, \"{1}\" should become \"{2}\"")
@@ -52,6 +60,10 @@ class SanitizedFileNameTest {
             """
     )
     void generateName(String description, String input, String output) {
-        assertThat(new SanitizedFileName(input).value()).isEqualTo(output).as("Failed %s", description);
+        assertThat(
+                new SanitizedFileName(new NameFromString(input)).value()
+        ).isEqualTo(
+                output
+        ).as("Failed %s", description);
     }
 }
