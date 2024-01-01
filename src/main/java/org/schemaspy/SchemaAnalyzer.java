@@ -25,30 +25,7 @@
  */
 package org.schemaspy;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.invoke.MethodHandles;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
-
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
 import org.schemaspy.connection.SqlConnection;
@@ -59,16 +36,7 @@ import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.logging.Sanitize;
-import org.schemaspy.model.Console;
-import org.schemaspy.model.Database;
-import org.schemaspy.model.DbmsMeta;
-import org.schemaspy.model.EmptySchemaException;
-import org.schemaspy.model.ForeignKeyConstraint;
-import org.schemaspy.model.ImpliedForeignKeyConstraint;
-import org.schemaspy.model.ProgressListener;
-import org.schemaspy.model.Routine;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.Tracked;
+import org.schemaspy.model.*;
 import org.schemaspy.output.InfoHtml;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
@@ -89,28 +57,24 @@ import org.schemaspy.progress.ConditionalProgress;
 import org.schemaspy.progress.IfUpdateAfter;
 import org.schemaspy.util.DataTableConfig;
 import org.schemaspy.util.DefaultPrintWriter;
-import org.schemaspy.util.ManifestUtils;
 import org.schemaspy.util.Markdown;
 import org.schemaspy.util.copy.CopyFromUrl;
 import org.schemaspy.util.filefilter.NotHtml;
-import org.schemaspy.util.naming.FileNameGenerator;
-import org.schemaspy.view.HtmlAnomaliesPage;
-import org.schemaspy.view.HtmlColumnsPage;
-import org.schemaspy.view.HtmlConstraintsPage;
-import org.schemaspy.view.HtmlMainIndexPage;
-import org.schemaspy.view.HtmlMultipleSchemasIndexPage;
-import org.schemaspy.view.HtmlOrphansPage;
-import org.schemaspy.view.HtmlRelationshipsPage;
-import org.schemaspy.view.HtmlRoutinePage;
-import org.schemaspy.view.HtmlRoutinesPage;
-import org.schemaspy.view.HtmlTablePage;
-import org.schemaspy.view.MustacheCatalog;
-import org.schemaspy.view.MustacheCompiler;
-import org.schemaspy.view.MustacheSchema;
-import org.schemaspy.view.MustacheTableDiagram;
-import org.schemaspy.view.SqlAnalyzer;
+import org.schemaspy.util.naming.SanitizedFileName;
+import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.time.Clock;
+import java.time.Duration;
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * @author John Currier
@@ -221,7 +185,7 @@ public class SchemaAnalyzer {
                 : schema;
 
             LOGGER.info("Analyzing '{}'", new Sanitize(schema));
-            File outputDirForSchema = new File(outputDir, new FileNameGenerator(schema).value());
+            File outputDirForSchema = new File(outputDir, new SanitizedFileName(schema).value());
             db = this.analyze(dbName, schema, true, outputDirForSchema, databaseService, con);
             if (db == null) { //if any of analysed schema returns null
                 return null;
@@ -513,7 +477,7 @@ public class SchemaAnalyzer {
                                 .toPath()
                                 .resolve("routines")
                                 .resolve(
-                                    new FileNameGenerator(routine.getName()).value()
+                                    new SanitizedFileName(routine.getName()).value()
                                         + DOT_HTML
                                 )
                                 .toFile()
@@ -541,7 +505,7 @@ public class SchemaAnalyzer {
         for (Table table : tables) {
             List<MustacheTableDiagram> mustacheTableDiagrams = mustacheTableDiagramFactory.generateTableDiagrams(table);
             LOGGER.debug("Writing details of {}", table.getName());
-            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("tables").resolve(new FileNameGenerator(table.getName()).value() + DOT_HTML).toFile())) {
+            try (Writer writer = new DefaultPrintWriter(outputDir.toPath().resolve("tables").resolve(new SanitizedFileName(table.getName()).value() + DOT_HTML).toFile())) {
                 htmlTablePage.write(table, mustacheTableDiagrams, writer);
                 progressListener.createdTablePage(table);
             }
