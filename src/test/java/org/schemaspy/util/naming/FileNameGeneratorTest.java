@@ -40,14 +40,15 @@ class FileNameGeneratorTest {
         assertThat(new FileNameGenerator(nameOne).value()).isNotEqualToIgnoringCase(new FileNameGenerator(nameTwo).value());
     }
 
-    @ParameterizedTest(name = "{0}, \"{1}\" should become {2}")
+    @ParameterizedTest(name = "{0}, \"{1}\" should become \"{2}\"")
     @CsvSource(
         textBlock = """
             #case,         input,                                      output
             japanese,      こんにちは,                                   ______bfca3f39
             illegal,       Test\tif/name/is#fixed or not,              Test_if_name_is_fixed_or_not_f9e4eeb2
             shortAndOk,    1234567890123456789012345678901234567890,   1234567890123456789012345678901234567890
-            short40C,      12345678901234567890123456789012345678901,  1234567890123456789012345678901_6e3e05c5   
+            short40C,      12345678901234567890123456789012345678901,  1234567890123456789012345678901_6e3e05c5
+            withDot,       file.name,                                  file.name
             """
     )
     void generateName(String description, String input, String output) {
