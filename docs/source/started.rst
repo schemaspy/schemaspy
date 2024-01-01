@@ -60,7 +60,7 @@ Commonly used parameters
 [-o outputDirectory]
     Directory to write the generated HTML/graphs to	
 [-dp pathToDrivers]
-    Looks for drivers here before looking in driverPath in [databaseType].properties.
+    Where to search for jdbc driver.
     The drivers are usually contained in .jar or .zip files and are typically provided by your database vendor.
     Supports a directory as argument, which will add directory and all content to classpath, will recurse.
     Supports multiple paths separated by OS dependent path separator
