@@ -21,12 +21,8 @@
 package org.schemaspy.util.markup;
 
 import org.schemaspy.model.Table;
-import org.schemaspy.util.naming.NameFromString;
-import org.schemaspy.util.naming.SanitizedFileName;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +35,8 @@ import java.util.regex.Pattern;
  * @author Samuel Dussault
  */
 public abstract class MarkupProcessor {
-    protected final HashMap<String, String> pages = new HashMap<>();
+
+    protected final PageRegistry pageRegistry = new PageRegistry();
 
     private static Optional<MarkupProcessor> instance = Optional.empty();
 
@@ -55,13 +52,7 @@ public abstract class MarkupProcessor {
     }
 
     public void registryPage(final Collection<Table> tables) {
-        final String DOT_HTML = ".html";
-        tables.stream()
-                .filter(table -> !table.isLogical())
-                .forEach(table -> {
-                    String tablePath = "tables/" + new SanitizedFileName(new NameFromString(table.getName())).value() + DOT_HTML;
-                    pages.put(table.getName(), tablePath);
-                });
+        pageRegistry.register(tables);
     }
 
     public String toHtml(final String markupText, final String rootPath) {
@@ -100,9 +91,9 @@ public abstract class MarkupProcessor {
                 tableName = pageLink.substring(0, anchorPosition);
             }
 
-            String pagePath = pages.get(tableName);
+            String pagePath = pageRegistry.pathForPage(tableName);
             if (pagePath != null) {
-                pagePath = String.format("%s/%s", rootPath, pages.get(tableName));
+                pagePath = String.format("%s/%s", rootPath, pagePath);
                 if (!"".equals(anchorLink)) {
                     pagePath += "#" + anchorLink;
                 }
