@@ -22,10 +22,6 @@ public class SanitizedFileName implements Name {
 
     private final Name origin;
 
-    public SanitizedFileName(final String original_name) {
-        this(new NameFromString(original_name));
-    }
-
     public SanitizedFileName(final Name name) {
         this.origin = name;
     }

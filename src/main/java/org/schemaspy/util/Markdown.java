@@ -25,6 +25,7 @@ import com.vladsch.flexmark.profiles.pegdown.Extensions;
 import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.options.DataHolder;
 import org.schemaspy.model.Table;
+import org.schemaspy.util.naming.NameFromString;
 import org.schemaspy.util.naming.SanitizedFileName;
 
 import java.util.ArrayList;
@@ -97,7 +98,7 @@ public class Markdown {
         tables.stream()
                 .filter(table -> !table.isLogical())
                 .forEach( table -> {
-                    String tablePath = "tables/" + new SanitizedFileName(table.getName()).value() + DOT_HTML;
+                    String tablePath = "tables/" + new SanitizedFileName(new NameFromString(table.getName())).value() + DOT_HTML;
                     pages.put(table.getName(), tablePath);
                 });
     }

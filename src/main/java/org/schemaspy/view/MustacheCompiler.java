@@ -26,6 +26,7 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import org.schemaspy.util.DataTableConfig;
+import org.schemaspy.util.naming.NameFromString;
 import org.schemaspy.util.naming.SanitizedFileName;
 
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class MustacheCompiler {
         StringWriter result = new StringWriter();
 
         HashMap<String, Object> pageScope = new HashMap<>();
-        pageScope.put("toFileName", (Function<String,String>) s -> new SanitizedFileName(s).value());
+        pageScope.put("toFileName", (Function<String,String>) s -> new SanitizedFileName(new NameFromString(s)).value());
         pageScope.put("databaseName", databaseName);
         pageScope.put("schemaName", schemaName);
         pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());

@@ -32,6 +32,7 @@ import org.schemaspy.output.dot.schemaspy.node.Footer;
 import org.schemaspy.output.dot.schemaspy.node.footer.Children;
 import org.schemaspy.output.dot.schemaspy.node.footer.Parents;
 import org.schemaspy.output.dot.schemaspy.node.footer.Rows;
+import org.schemaspy.util.naming.NameFromString;
 import org.schemaspy.util.naming.SanitizedFileName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,12 +79,12 @@ public class DotNode implements Node {
 
     private String createPath(boolean fromRoot) {
         if (runtimeDotConfig.useRelativeLinks()) {
-            return (table.isRemote() ? "../../../" + new SanitizedFileName(table.getContainer()).value() : "../..") + TABLES_PATH;
+            return (table.isRemote() ? "../../../" + new SanitizedFileName(new NameFromString(table.getContainer())).value() : "../..") + TABLES_PATH;
         }
         if (fromRoot) {
-            return (table.isRemote() ? ("../" + new SanitizedFileName(table.getContainer()).value() + TABLES_PATH) : "tables/");
+            return (table.isRemote() ? ("../" + new SanitizedFileName(new NameFromString(table.getContainer())).value() + TABLES_PATH) : "tables/");
         }
-        return (table.isRemote() ? ("../../" + new SanitizedFileName(table.getContainer()).value() + TABLES_PATH) : "");
+        return (table.isRemote() ? ("../../" + new SanitizedFileName(new NameFromString(table.getContainer())).value() + TABLES_PATH) : "");
 
     }
 
@@ -131,7 +132,7 @@ public class DotNode implements Node {
 
         buf.append("    </TABLE>>" + lineSeparator);
         if (!table.isRemote() || runtimeDotConfig.isOneOfMultipleSchemas()) {
-            buf.append("    URL=\"" + path + urlEncodeLink(new SanitizedFileName(tableName).value()) + ".html\"" + lineSeparator);
+            buf.append("    URL=\"" + path + urlEncodeLink(new SanitizedFileName(new NameFromString(tableName)).value()) + ".html\"" + lineSeparator);
             buf.append("    target=\"_top\"" + lineSeparator);
         }
         buf.append("    tooltip=\"" + escapeHtml(fqTableName) + "\"" + lineSeparator);
