@@ -18,15 +18,15 @@
  */
 package org.schemaspy.util.naming;
 
-public class FileNameGenerator implements Name {
+public class SanitizedFileName implements Name {
 
     private final Name origin;
 
-    public FileNameGenerator(final String original_name) {
+    public SanitizedFileName(final String original_name) {
         this(new NameFromString(original_name));
     }
 
-    public FileNameGenerator(final Name name) {
+    public SanitizedFileName(final Name name) {
         this.origin = name;
     }
 

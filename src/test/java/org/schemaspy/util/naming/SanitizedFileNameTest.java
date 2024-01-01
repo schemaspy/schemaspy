@@ -24,20 +24,20 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class FileNameGeneratorTest {
+class SanitizedFileNameTest {
 
     @Test
     void wontGenerateSameNameForTwoDifferentNames() {
         String nameOne = "98765432109876543210987654321098765432109876543210";
         String nameTwo = "12345678901234567890123456789012345678901234567890";
-        assertThat(new FileNameGenerator(nameOne).value()).isNotEqualToIgnoringCase(new FileNameGenerator(nameTwo).value());
+        assertThat(new SanitizedFileName(nameOne).value()).isNotEqualToIgnoringCase(new SanitizedFileName(nameTwo).value());
     }
 
     @Test
     void wontGenerateSameForSimilar() {
         String nameOne = "Test\tif/name/is#fixed or not";
         String nameTwo = "Test\tif\tname/is#fixed or not";
-        assertThat(new FileNameGenerator(nameOne).value()).isNotEqualToIgnoringCase(new FileNameGenerator(nameTwo).value());
+        assertThat(new SanitizedFileName(nameOne).value()).isNotEqualToIgnoringCase(new SanitizedFileName(nameTwo).value());
     }
 
     @ParameterizedTest(name = "{0}, \"{1}\" should become \"{2}\"")
@@ -52,6 +52,6 @@ class FileNameGeneratorTest {
             """
     )
     void generateName(String description, String input, String output) {
-        assertThat(new FileNameGenerator(input).value()).isEqualTo(output).as("Failed %s", description);
+        assertThat(new SanitizedFileName(input).value()).isEqualTo(output).as("Failed %s", description);
     }
 }
