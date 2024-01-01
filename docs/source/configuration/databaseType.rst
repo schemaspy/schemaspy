@@ -112,9 +112,6 @@ Default separator is ``:`` but can be changed by specifying another under the ke
 Other Properties
 ----------------
 
-driverPath=
-    path to classpath resources that will be used when trying to create the jdbc Driver in java
-    same as commandline argument ``-dp``
 dbThreads=
     number of threads that can be used to analyze the database
 schemaSpec=

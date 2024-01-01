@@ -49,7 +49,7 @@ Connecting
     In linux shells or git bash on windows the ``\`` also needs to be escaped so it should look like ``\\=``. |br|
     ConnectionProperties will always be populated with -u and -p if they exist.
 [-dp pathToDrivers]
-    Looks for drivers here before looking in driverPath in [databaseType].properties.
+    Where to search for jdbc drivers.
     The drivers are usually contained in .jar or .zip files and are typically provided by your database vendor.
     Multiple jars can be specified using os-specific path separator.
 [-loadjars]
