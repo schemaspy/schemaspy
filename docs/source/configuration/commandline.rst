@@ -52,8 +52,6 @@ Connecting
     Where to search for jdbc drivers.
     The drivers are usually contained in .jar or .zip files and are typically provided by your database vendor.
     Multiple jars can be specified using os-specific path separator.
-[-loadjars]
-    Load siblings to jar specified in -dp, only works for single jar entry in -dp
 
 Processing
 ~~~~~~~~~~
