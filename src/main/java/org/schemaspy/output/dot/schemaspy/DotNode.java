@@ -108,14 +108,14 @@ public class DotNode implements Node {
         // fully qualified table name (optionally prefixed with schema)
         String fqTableName = (table.isRemote() ? table.getContainer() + "." : "") + tableName;
         int maxTitleWidth = getTitleMaxWidth(fqTableName);
-        String colspanHeader = config.showColumnDetails ? "COLSPAN=\"4\" " : "COLSPAN=\"3\" ";
+        String columnSpanForHeaderAndFooter = config.showColumnDetails ? "COLSPAN=\"4\" " : "COLSPAN=\"3\" ";
         String tableOrView = table.isView() ? "view" : "table";
 
         buf.append("  \"" + fqTableName + "\" [" + lineSeparator);
         buf.append("   label=<" + lineSeparator);
         buf.append("    <TABLE BORDER=\"" + (config.showColumnDetails ? "2" : "0") + "\" CELLBORDER=\"1\" CELLSPACING=\"0\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getTableBackground() + "\">" + lineSeparator);
         buf.append(INDENT_6 + Html.TR_START);
-        buf.append("<TD " + colspanHeader + " BGCOLOR=\"" + runtimeDotConfig.styleSheet().getTableHeadBackground() + "\">");
+        buf.append("<TD " + columnSpanForHeaderAndFooter + " BGCOLOR=\"" + runtimeDotConfig.styleSheet().getTableHeadBackground() + "\">");
         buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\">");
         buf.append(Html.TR_START);
         buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxTitleWidth + "\" HEIGHT=\"16\"><B>" + escapeHtml(fqTableName) +"</B>" + Html.TD_END);
@@ -127,7 +127,7 @@ public class DotNode implements Node {
 
         buf.append(columnsToString());
         if (!table.isView()) {
-            buf.append(footerToString());
+            buf.append(footerToString(columnSpanForHeaderAndFooter));
         }
 
         buf.append("    </TABLE>>" + lineSeparator);
@@ -195,19 +195,12 @@ public class DotNode implements Node {
         StringBuilder buf = new StringBuilder();
         buf.append(INDENT_6 + Html.TR_START);
         buf.append("<TD PORT=\"" + escapeHtml(column.getName()) + "\" " + columnSpan);
-        if (column.isExcluded())
-            buf.append("BGCOLOR=\"" + runtimeDotConfig.styleSheet().getExcludedColumnBackgroundColor() + "\" ");
-        else if (indexColumns.contains(column))
-            buf.append("BGCOLOR=\"" + runtimeDotConfig.styleSheet().getIndexedColumnBackground() + "\" ");
+        buf.append(getColumnBackground(column.isExcluded(), indexColumns.contains(column)));
         buf.append("ALIGN=\"LEFT\">");
         buf.append("<TABLE BORDER=\"0\" CELLSPACING=\"0\" ALIGN=\"LEFT\">");
         buf.append("<TR ALIGN=\"LEFT\">");
         buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"15\" HEIGHT=\"16\">");
-        if (column.isPrimary()) {
-            buf.append("<IMG SRC=\"../../images/primaryKeys.png\"/>");
-        } else if (column.isForeignKey()) {
-            buf.append("<IMG SRC=\"../../images/foreignKeys.png\"/>");
-        }
+        buf.append(getKeyIcon(column));
         buf.append(Html.TD_END);
         buf.append("<TD ALIGN=\"LEFT\" FIXEDSIZE=\"TRUE\" WIDTH=\"" + maxWidth + "\" HEIGHT=\"16\">");
         buf.append(escapeHtml(column.getName()));
@@ -232,11 +225,30 @@ public class DotNode implements Node {
         return buf.toString();
     }
 
-    private String footerToString() {
-        String colspan = config.showColumnDetails ? "COLSPAN=\"4\" " : "COLSPAN=\"3\" ";
+    private String getColumnBackground(boolean isExcluded, boolean isIndex) {
+        if (isExcluded) {
+            return "BGCOLOR=\"" + runtimeDotConfig.styleSheet().getExcludedColumnBackgroundColor() + "\" ";
+        }
+        if (isIndex) {
+            return "BGCOLOR=\"" + runtimeDotConfig.styleSheet().getIndexedColumnBackground() + "\" ";
+        }
+        return "";
+    }
+
+    private String getKeyIcon(TableColumn column) {
+        if (column.isPrimary()) {
+            return "<IMG SRC=\"../../images/primaryKeys.png\"/>";
+        }
+        if (column.isForeignKey()) {
+            return "<IMG SRC=\"../../images/foreignKeys.png\"/>";
+        }
+        return "";
+    }
+
+    private String footerToString(final String columnSpan) {
         StringBuilder buf = new StringBuilder();
         buf.append(INDENT_6 + Html.TR_START);
-        buf.append("<TD ALIGN=\"LEFT\" CELLPADDING=\"0\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\" " + colspan + ">");
+        buf.append("<TD ALIGN=\"LEFT\" CELLPADDING=\"0\" BGCOLOR=\"" + runtimeDotConfig.styleSheet().getBodyBackground() + "\" " + columnSpan + ">");
         buf.append(
             new Footer(
                 runtimeDotConfig.styleSheet().getBodyBackground(),
