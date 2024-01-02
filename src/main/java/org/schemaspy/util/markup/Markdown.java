@@ -85,7 +85,7 @@ public class Markdown implements Markup {
     }
 
     @Override
-    public String toHtml() {
+    public String value() {
         return renderer.render(
             parser.parse(
                 new WithReferenceLinks(pageRegistry, markupText, rootPath, getLinkFormat()).value()
