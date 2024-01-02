@@ -26,4 +26,6 @@ public interface HtmlConfig {
     boolean isPaginationEnabled();
 
     boolean isNumRowsEnabled();
+
+    boolean useAsciidoc();
 }

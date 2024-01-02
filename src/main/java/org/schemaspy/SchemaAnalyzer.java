@@ -58,12 +58,12 @@ import org.schemaspy.progress.IfUpdateAfter;
 import org.schemaspy.util.DataTableConfig;
 import org.schemaspy.util.DefaultPrintWriter;
 import org.schemaspy.util.copy.CopyFromUrl;
-import org.schemaspy.util.markup.Asciidoc;
 import org.schemaspy.util.filefilter.NotHtml;
+import org.schemaspy.util.markup.Asciidoc;
 import org.schemaspy.util.markup.Markdown;
+import org.schemaspy.util.markup.MarkupProcessor;
 import org.schemaspy.util.naming.NameFromString;
 import org.schemaspy.util.naming.SanitizedFileName;
-import org.schemaspy.util.markup.MarkupProcessor;
 import org.schemaspy.view.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -339,7 +339,7 @@ public class SchemaAnalyzer {
         FileUtils.forceMkdir(new File(outputDir, "tables"));
         FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
-        if(commandLineArguments.isAsciidoc()) {
+        if(commandLineArguments.getHtmlConfig().useAsciidoc()) {
             MarkupProcessor.setInstance(new Asciidoc());
         } else {
             MarkupProcessor.setInstance(new Markdown());
