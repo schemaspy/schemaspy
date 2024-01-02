@@ -48,7 +48,7 @@ class AsciidocTest {
     @Test
     void renderLinks() {
         assertThat(
-            new Asciidoc(new PageRegistry()).parseToHtml("link:./tables/table1.html[table1]", "")
+            new Asciidoc(new PageRegistry()).toHtml("link:./tables/table1.html[table1]", "")
         ).contains("<a href=\"./tables/table1.html\">table1</a>");
     }
 }

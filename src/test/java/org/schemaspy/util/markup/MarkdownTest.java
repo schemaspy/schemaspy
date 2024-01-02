@@ -30,7 +30,7 @@ class MarkdownTest {
     @Test
     void renderLinks() {
         assertThat(
-            new Markdown(new PageRegistry()).parseToHtml("[table1](./tables/table1.html)", "")
+            new Markdown(new PageRegistry()).toHtml("[table1](./tables/table1.html)", "")
         ).contains("<a href=\"./tables/table1.html\">table1</a>");
     }
 }
