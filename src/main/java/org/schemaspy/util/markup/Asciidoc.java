@@ -35,7 +35,8 @@ public class Asciidoc extends MarkupProcessor {
         }
     }
 
-    protected String formatLink(String pageName, String pagePath) {
-        return String.format("link:%s[%s]", pagePath, pageName);
+    @Override
+    protected String getLinkFormat() {
+        return "link:%2$s[%1$s]";
     }
 }

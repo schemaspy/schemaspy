@@ -37,4 +37,11 @@ class AsciidocTest {
         String actualHtml = new Asciidoc().toHtml(sourceAsciiDoc, ".");
         assertThat(actualHtml).isEqualTo(expectedHtml);
     }
+
+    @Test
+    void formatsLinksCorrectly() {
+        assertThat(
+            new Asciidoc().getLinkFormat().formatted("table1", "./tables/table1.html")
+        ).isEqualTo("link:./tables/table1.html[table1]");
+    }
 }

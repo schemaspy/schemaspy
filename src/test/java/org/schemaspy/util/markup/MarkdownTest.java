@@ -19,4 +19,11 @@ class MarkdownTest {
         String renderedMarkdown = new Markdown().toHtml(sourceMarkdown, ".");
         assertThat(renderedMarkdown).contains("<br />");
     }
+
+    @Test
+    void formatsLinksCorrectly() {
+        assertThat(
+            new Markdown().getLinkFormat().formatted("table1", "./tables/table1.html")
+        ).isEqualTo("[table1](./tables/table1.html)");
+    }
 }
