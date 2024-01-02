@@ -21,7 +21,6 @@
 package org.schemaspy.util.markup;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import org.schemaspy.model.Table;
 
@@ -35,19 +34,6 @@ import org.schemaspy.model.Table;
 public abstract class MarkupProcessor {
 
     protected static final PageRegistry pageRegistry = new PageRegistry();
-
-    private static Optional<MarkupProcessor> instance = Optional.empty();
-
-    public static MarkupProcessor getInstance() {
-        if (!instance.isPresent()) {
-            instance = Optional.of(new Markdown());
-        }
-        return instance.get();
-    }
-
-    public static void setInstance(MarkupProcessor instance) {
-        MarkupProcessor.instance = Optional.of(instance);
-    }
 
     public static void registryPage(final Collection<Table> tables) {
         pageRegistry.register(tables);
