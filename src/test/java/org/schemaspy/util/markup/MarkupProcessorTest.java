@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-public class MarkupProcessorTest {
+class MarkupProcessorTest {
 
     private static Stream<MarkupProcessor> provideMarkupProcessors() {
         return Stream.of(new Markdown(), new Asciidoc());
@@ -20,7 +20,7 @@ public class MarkupProcessorTest {
 
     @ParameterizedTest
     @MethodSource("provideMarkupProcessors")
-    public void replaceLinksWithExistingTablesAndDefaultRootPathTest(MarkupProcessor markupProcessor) {
+    void replaceLinksWithExistingTablesAndDefaultRootPathTest(MarkupProcessor markupProcessor) {
         String sourceMarkdown = "See [table1] or [table2.column]";
         String expected = "<p>See <a href=\"./tables/table1.html\">table1</a>" +
                 " or <a href=\"./tables/table2.html#column\">table2.column</a></p>";
@@ -45,7 +45,7 @@ public class MarkupProcessorTest {
 
     @ParameterizedTest
     @MethodSource("provideMarkupProcessors")
-    public void replaceLinksWithExistingTablesAndOtherRootPathTest(MarkupProcessor markupProcessor) {
+    void replaceLinksWithExistingTablesAndOtherRootPathTest(MarkupProcessor markupProcessor) {
         String sourceMarkdown = "See [table1] or [table2.column]";
         String expected = "<p>See <a href=\"../root/tables/table1.html\">table1</a>" +
                 " or <a href=\"../root/tables/table2.html#column\">table2.column</a></p>";
@@ -70,7 +70,7 @@ public class MarkupProcessorTest {
 
     @ParameterizedTest
     @MethodSource("provideMarkupProcessors")
-    public void dontReplaceLinksWhenTableDoesntExists(MarkupProcessor markupProcessor) {
+    void dontReplaceLinksWhenTableDoesntExists(MarkupProcessor markupProcessor) {
         String sourceMarkdown = "See [table1.column]";
         String expected = "<p>See [table1.column]</p>";
 

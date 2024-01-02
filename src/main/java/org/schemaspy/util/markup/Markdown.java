@@ -69,7 +69,8 @@ public class Markdown extends MarkupProcessor {
         ).trim();
     }
 
-    protected String formatLink(String pageName, String pagePath) {
-        return String.format("[%1$s](%2$s)", pageName, pagePath);
+    @Override
+    protected String getLinkFormat() {
+        return "[%1$s](%2$s)";
     }
 }

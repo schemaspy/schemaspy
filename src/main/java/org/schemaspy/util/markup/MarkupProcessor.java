@@ -24,8 +24,6 @@ import org.schemaspy.model.Table;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Extracted from Markdown class by samdus on 2023-06-05
@@ -59,53 +57,15 @@ public abstract class MarkupProcessor {
         if (markupText == null) {
             return null;
         }
-        return parseToHtml(addReferenceLink(markupText, rootPath)).trim();
-    }
-
-    /**
-     * Adds pages reference links to the given markup text. Links in the format [page] or [page.anchor]
-     * are replaced with reference-style links, for example: [page.anchor](./pagePath#anchor) in Markdown.
-     * The page paths are obtained from the registry page registered using the {@link #registryPage} method.
-     *
-     * @param markupText The markup text to which page links will be added.
-     * @param rootPathArg The root path used for constructing the page paths (defaults to ".").
-     * @return The modified markup text with added reference links.
-     */
-    protected String addReferenceLink(final String markupText, final String rootPathArg) {
-        //TODO: Use the rootPath and add a test for it
-        String markupTextWithReferenceLink = markupText;
-        String rootPath = (rootPathArg == null || rootPathArg.isEmpty()) ? "." : rootPathArg;
-
-        Pattern p = Pattern.compile("\\[(.*?)]");
-        Matcher m = p.matcher(markupText);
-
-        while (m.find()) {
-            String pageLink = m.group(1);
-            String tableName = pageLink;
-
-            String anchorLink = "";
-            int anchorPosition = pageLink.lastIndexOf('.');
-
-            if (anchorPosition > -1) {
-                anchorLink = pageLink.substring(anchorPosition + 1).trim();
-                tableName = pageLink.substring(0, anchorPosition);
-            }
-
-            String pagePath = pageRegistry.pathForPage(tableName);
-            if (pagePath != null) {
-                pagePath = String.format("%s/%s", rootPath, pagePath);
-                if (!"".equals(anchorLink)) {
-                    pagePath += "#" + anchorLink;
-                }
-
-                markupTextWithReferenceLink = markupTextWithReferenceLink.replace(String.format("[%s]", pageLink), formatLink(pageLink, pagePath));
-            }
-        }
-
-        return markupTextWithReferenceLink;
+        return parseToHtml(new WithReferenceLinks(pageRegistry, markupText, rootPath, getLinkFormat()).value()).trim();
     }
 
     protected abstract String parseToHtml(final String markupText);
 
-    protected abstract String formatLink(final String pageName, final String pagePath);
+    /**
+     * Expecting a format following {@link java.util.Formatter} that accepts PageLink and PagePath.
+     *
+     * @return string format that accept 2 arguments. (1) PageLink, (2) PagePath
+     */
+    protected abstract String getLinkFormat();
 }
