@@ -29,13 +29,21 @@ import org.asciidoctor.Options;
 public class Asciidoc implements Markup {
 
     private final PageRegistry pageRegistry;
+    private final String markupText;
+    private final String rootPath;
 
-    public Asciidoc(final PageRegistry pageRegistry) {
+    public Asciidoc(
+        final PageRegistry pageRegistry,
+        final String markupText,
+        final String rootPath
+    ) {
         this.pageRegistry = pageRegistry;
+        this.markupText = markupText;
+        this.rootPath = rootPath;
     }
 
     @Override
-    public String toHtml(final String markupText, final String rootPath) {
+    public String toHtml() {
         try(Asciidoctor asciidoctor = Asciidoctor.Factory.create()) {
             return asciidoctor
                 .convert(

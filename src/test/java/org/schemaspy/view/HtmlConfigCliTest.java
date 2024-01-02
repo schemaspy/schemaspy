@@ -74,7 +74,7 @@ class HtmlConfigCliTest {
     void doNotUseAsciiDoc() {
         assertThat(
             parse("")
-                .markupProcessor()
+                .markupProcessor("","")
         ).isInstanceOf(Markdown.class);
     }
 
@@ -82,7 +82,7 @@ class HtmlConfigCliTest {
     void useAsciiDocArg() {
         assertThat(
             parse("-asciidoc")
-                .markupProcessor()
+                .markupProcessor("","")
         ).isInstanceOf(Asciidoc.class);
     }
 
@@ -92,7 +92,7 @@ class HtmlConfigCliTest {
             parse(
                 optionName -> optionName.equals("schemaspy.asciidoc") ? "" : null,
                 ""
-            ).markupProcessor()
+            ).markupProcessor("","")
         ).isInstanceOf(Asciidoc.class);
     }
 
