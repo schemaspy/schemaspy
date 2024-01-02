@@ -28,6 +28,12 @@ import org.asciidoctor.Options;
  */
 public class Asciidoc extends MarkupProcessor {
 
+    private final PageRegistry pageRegistry;
+
+    public Asciidoc(final PageRegistry pageRegistry) {
+        this.pageRegistry = pageRegistry;
+    }
+
     @Override
     protected String parseToHtml(final String markupText, final String rootPath) {
         try(Asciidoctor asciidoctor = Asciidoctor.Factory.create()) {
