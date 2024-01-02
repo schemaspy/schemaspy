@@ -1,12 +1,14 @@
 package org.schemaspy.view;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 import com.beust.jcommander.IDefaultProvider;
 import org.junit.jupiter.api.Test;
 import org.schemaspy.cli.CombinedDefaultProvider;
 import org.schemaspy.cli.CommandLineArgumentParser;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
+import org.schemaspy.util.markup.Asciidoc;
+import org.schemaspy.util.markup.Markdown;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,16 +74,16 @@ class HtmlConfigCliTest {
     void doNotUseAsciiDoc() {
         assertThat(
             parse("")
-                .useAsciidoc()
-        ).isFalse();
+                .markupProcessor()
+        ).isInstanceOf(Markdown.class);
     }
 
     @Test
     void useAsciiDocArg() {
         assertThat(
             parse("-asciidoc")
-                .useAsciidoc()
-        ).isTrue();
+                .markupProcessor()
+        ).isInstanceOf(Asciidoc.class);
     }
 
     @Test
@@ -90,8 +92,8 @@ class HtmlConfigCliTest {
             parse(
                 optionName -> optionName.equals("schemaspy.asciidoc") ? "" : null,
                 ""
-            ).useAsciidoc()
-        ).isTrue();
+            ).markupProcessor()
+        ).isInstanceOf(Asciidoc.class);
     }
 
     private HtmlConfig parse(String... args) {

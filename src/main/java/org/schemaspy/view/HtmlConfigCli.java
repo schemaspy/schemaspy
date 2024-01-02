@@ -4,6 +4,9 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.schemaspy.cli.NoRowsConfigCli;
 import org.schemaspy.cli.TemplateDirectoryConfigCli;
+import org.schemaspy.util.markup.Asciidoc;
+import org.schemaspy.util.markup.Markdown;
+import org.schemaspy.util.markup.MarkupProcessor;
 
 @Parameters(resourceBundle = "htmlconfigcli")
 public class HtmlConfigCli implements HtmlConfig {
@@ -67,7 +70,11 @@ public class HtmlConfigCli implements HtmlConfig {
     }
 
     @Override
-    public boolean useAsciidoc() {
-        return asciidoc;
+    public MarkupProcessor markupProcessor() {
+        if (asciidoc) {
+            return new Asciidoc();
+        } else {
+            return new Markdown();
+        }
     }
 }

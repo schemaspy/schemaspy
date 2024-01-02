@@ -22,14 +22,6 @@
  */
 package org.schemaspy.view;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-import org.schemaspy.util.DataTableConfig;
-import org.schemaspy.util.markup.MarkupProcessor;
-import org.schemaspy.util.naming.NameFromString;
-import org.schemaspy.util.naming.SanitizedFileName;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -37,6 +29,13 @@ import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+import org.schemaspy.util.DataTableConfig;
+import org.schemaspy.util.naming.NameFromString;
+import org.schemaspy.util.naming.SanitizedFileName;
 
 /**
  * Created by rkasa on 2016-03-22.
@@ -80,7 +79,7 @@ public class MustacheCompiler {
         pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());
         pageScope.put("displayNumRows", htmlConfig.isNumRowsEnabled());
         pageScope.put("dataTableConfig", dataTableConfig.getPageScopeMap());
-        pageScope.put("markup", (Function<String,String>) md -> MarkupProcessor.getInstance().toHtml(md, getRootPath(pageData.getDepth())));
+        pageScope.put("markup", (Function<String,String>) md -> htmlConfig.markupProcessor().toHtml(md, getRootPath(pageData.getDepth())));
         pageScope.putAll(pageData.getScope());
 
         Mustache mustachePage = mustacheFactory.compile(pageData.getTemplateName());
