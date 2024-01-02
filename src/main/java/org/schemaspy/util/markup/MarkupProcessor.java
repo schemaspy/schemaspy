@@ -27,15 +27,8 @@ package org.schemaspy.util.markup;
  * @author Daniel Watt
  * @author Samuel Dussault
  */
-public abstract class MarkupProcessor {
+public interface MarkupProcessor {
 
-    public String toHtml(final String markupText, final String rootPath) {
-        if (markupText == null) {
-            return null;
-        }
-        return parseToHtml(markupText, rootPath).trim();
-    }
-
-    protected abstract String parseToHtml(final String markupText, final String rootPath);
+     String toHtml(final String markupText, final String rootPath);
 
 }

@@ -32,7 +32,7 @@ import com.vladsch.flexmark.util.options.DataHolder;
  * @author Daniel Watt
  * @author Samuel Dussault
  */
-public class Markdown extends MarkupProcessor {
+public class Markdown implements MarkupProcessor {
 
     private final PageRegistry pageRegistry;
     private final Parser parser;
@@ -66,7 +66,7 @@ public class Markdown extends MarkupProcessor {
     }
 
     @Override
-    protected String parseToHtml(final String markupText, final String rootPath) {
+    public String toHtml(final String markupText, final String rootPath) {
         return renderer.render(
             parser.parse(
                 new WithReferenceLinks(pageRegistry, markupText, rootPath, getLinkFormat()).value()

@@ -26,7 +26,7 @@ import org.asciidoctor.Options;
  *
  * @author Samuel Dussault
  */
-public class Asciidoc extends MarkupProcessor {
+public class Asciidoc implements MarkupProcessor {
 
     private final PageRegistry pageRegistry;
 
@@ -35,7 +35,7 @@ public class Asciidoc extends MarkupProcessor {
     }
 
     @Override
-    protected String parseToHtml(final String markupText, final String rootPath) {
+    public String toHtml(final String markupText, final String rootPath) {
         try(Asciidoctor asciidoctor = Asciidoctor.Factory.create()) {
             return asciidoctor
                 .convert(
