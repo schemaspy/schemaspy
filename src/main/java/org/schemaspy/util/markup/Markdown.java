@@ -34,21 +34,16 @@ import com.vladsch.flexmark.util.options.DataHolder;
  */
 public class Markdown implements Markup {
 
+    public static final String LINK_FORMAT = "[%1$s](%2$s)";
     private final Parser parser;
     private final HtmlRenderer renderer;
-    private final PageRegistry pageRegistry;
-    private final String markupText;
-    private final String rootPath;
+    private final Markup origin;
 
     public Markdown(
-        final PageRegistry pageRegistry,
-        final String markupText,
-        final String rootPath
+        final Markup origin
     ) {
         this(
-            pageRegistry,
-            markupText,
-            rootPath,
+            origin,
             PegdownOptionsAdapter.flexmarkOptions(true,
                     Extensions.ALL ^ Extensions.HARDWRAPS
             )
@@ -56,30 +51,22 @@ public class Markdown implements Markup {
     }
 
     public Markdown(
-        final PageRegistry pageRegistry,
-        final String markupText,
-        final String rootPath,
+        final Markup origin,
         final DataHolder options
     ) {
         this(
-            pageRegistry,
-            markupText,
-            rootPath,
+            origin,
             Parser.builder(options).build(),
             HtmlRenderer.builder(options).build()
         );
     }
 
     public Markdown(
-        final PageRegistry pageRegistry,
-        final String markupText,
-        final String rootPath,
+        final Markup origin,
         final Parser parser,
         final HtmlRenderer renderer
     ) {
-        this.pageRegistry = pageRegistry;
-        this.markupText = markupText;
-        this.rootPath = rootPath;
+        this.origin = origin;
         this.parser = parser;
         this.renderer = renderer;
     }
@@ -88,12 +75,8 @@ public class Markdown implements Markup {
     public String value() {
         return renderer.render(
             parser.parse(
-                new WithReferenceLinks(pageRegistry, markupText, rootPath, getLinkFormat()).value()
+                origin.value()
             )
         ).trim();
-    }
-
-    protected String getLinkFormat() {
-        return "[%1$s](%2$s)";
     }
 }

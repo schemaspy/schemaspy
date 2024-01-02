@@ -10,7 +10,9 @@ import org.schemaspy.model.Table;
 import org.schemaspy.util.markup.Asciidoc;
 import org.schemaspy.util.markup.Markdown;
 import org.schemaspy.util.markup.Markup;
+import org.schemaspy.util.markup.MarkupFromString;
 import org.schemaspy.util.markup.PageRegistry;
+import org.schemaspy.util.markup.WithReferenceLinks;
 
 @Parameters(resourceBundle = "htmlconfigcli")
 public class HtmlConfigCli implements HtmlConfig {
@@ -83,9 +85,23 @@ public class HtmlConfigCli implements HtmlConfig {
     @Override
     public Markup markupProcessor(final String markupText, final String rootPath) {
         if (useAsciiDoc) {
-            return new Asciidoc(pageRegistry, markupText, rootPath);
+            return new Asciidoc(
+                new WithReferenceLinks(
+                    new MarkupFromString(markupText),
+                    pageRegistry,
+                    rootPath,
+                    Asciidoc.LINK_FORMAT
+                )
+            );
         } else {
-            return new Markdown(pageRegistry, markupText, rootPath);
+            return new Markdown(
+                new WithReferenceLinks(
+                    new MarkupFromString(markupText),
+                    pageRegistry,
+                    rootPath,
+                    Markdown.LINK_FORMAT
+                )
+            );
         }
     }
 }

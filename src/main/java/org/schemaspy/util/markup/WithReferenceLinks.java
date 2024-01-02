@@ -3,10 +3,10 @@ package org.schemaspy.util.markup;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class WithReferenceLinks {
+public class WithReferenceLinks implements Markup {
 
     private final PageRegistry pageRegistry;
-    private final String markupText;
+    private final Markup origin;
     private final String rootPath;
     private final String linkFormat;
 
@@ -16,23 +16,24 @@ public class WithReferenceLinks {
      * The page can be registered using {@link org.schemaspy.view.HtmlConfig#registryPage} method.
      *
      * @param pageRegistry The PageRegistry used to register pages
-     * @param markupText The markup text to which page links will be added.
+     * @param origin The markup text to which page links will be added.
      * @param rootPath The root path used for constructing the page paths (defaults to ".").
      * @param linkFormat The formatting string for a link in markup
      */
-    public WithReferenceLinks(PageRegistry pageRegistry, String markupText, String rootPath, String linkFormat) {
+    public WithReferenceLinks(Markup origin, PageRegistry pageRegistry, String rootPath, String linkFormat) {
+        this.origin = origin;
         this.pageRegistry = pageRegistry;
-        this.markupText = markupText;
         this.rootPath = rootPath;
         this.linkFormat = linkFormat;
     }
 
     public String value() {
-        String markupTextWithReferenceLink = markupText;
+        String originValue = origin.value();
+        String markupTextWithReferenceLink = originValue;
         String basePath = (rootPath == null || rootPath.isEmpty()) ? "." : rootPath;
 
         Pattern p = Pattern.compile("\\[(.*?)]");
-        Matcher m = p.matcher(markupText);
+        Matcher m = p.matcher(originValue);
 
         while (m.find()) {
             String pageLink = m.group(1);

@@ -34,21 +34,21 @@ class AsciidocTest {
                 "</div>\n" +
                 "</div>";
 
-        String actualHtml = new Asciidoc(new PageRegistry(), sourceAsciiDoc, ".").value();
+        String actualHtml = new Asciidoc(new MarkupFromString(sourceAsciiDoc)).value();
         assertThat(actualHtml).isEqualTo(expectedHtml);
     }
 
     @Test
     void formatsLinksCorrectly() {
         assertThat(
-            new Asciidoc(new PageRegistry(), "", "").getLinkFormat().formatted("table1", "./tables/table1.html")
+            Asciidoc.LINK_FORMAT.formatted("table1", "./tables/table1.html")
         ).isEqualTo("link:./tables/table1.html[table1]");
     }
 
     @Test
     void renderLinks() {
         assertThat(
-            new Asciidoc(new PageRegistry(), "link:./tables/table1.html[table1]", "").value()
+            new Asciidoc(new MarkupFromString("link:./tables/table1.html[table1]")).value()
         ).contains("<a href=\"./tables/table1.html\">table1</a>");
     }
 }
