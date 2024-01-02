@@ -69,7 +69,6 @@ public class Markdown extends MarkupProcessor {
         ).trim();
     }
 
-    @Override
     protected String getLinkFormat() {
         return "[%1$s](%2$s)";
     }
