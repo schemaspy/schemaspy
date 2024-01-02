@@ -61,10 +61,10 @@ public class Markdown extends MarkupProcessor {
     }
 
     @Override
-    protected String parseToHtml(final String markupText) {
+    protected String parseToHtml(final String markupText, final String rootPath) {
         return renderer.render(
             parser.parse(
-                markupText
+                new WithReferenceLinks(pageRegistry, markupText, rootPath, getLinkFormat()).value()
             )
         ).trim();
     }
