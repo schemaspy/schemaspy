@@ -28,18 +28,14 @@ import org.asciidoctor.Options;
  */
 public class Asciidoc implements Markup {
 
-    private final PageRegistry pageRegistry;
-    private final String markupText;
-    private final String rootPath;
+    public static final String LINK_FORMAT = "link:%2$s[%1$s]";
+
+    private final Markup origin;
 
     public Asciidoc(
-        final PageRegistry pageRegistry,
-        final String markupText,
-        final String rootPath
+        final Markup origin
     ) {
-        this.pageRegistry = pageRegistry;
-        this.markupText = markupText;
-        this.rootPath = rootPath;
+        this.origin = origin;
     }
 
     @Override
@@ -47,13 +43,10 @@ public class Asciidoc implements Markup {
         try(Asciidoctor asciidoctor = Asciidoctor.Factory.create()) {
             return asciidoctor
                 .convert(
-                    new WithReferenceLinks(pageRegistry, markupText, rootPath, getLinkFormat()).value(),
+                    origin.value(),
                     Options.builder().build()
                 );
         }
     }
 
-    protected String getLinkFormat() {
-        return "link:%2$s[%1$s]";
-    }
 }

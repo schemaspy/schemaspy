@@ -1,11 +1,11 @@
 package org.schemaspy.util.markup;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.schemaspy.model.Table;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +13,6 @@ class WithReferenceLinksTest {
 
     private final Table table1 = Mockito.mock(Table.class);
     private final Table table2 = Mockito.mock(Table.class);
-
     private final List<Table> tableList = List.of(table1, table2);
 
     @BeforeEach
@@ -33,8 +32,8 @@ class WithReferenceLinksTest {
 
         assertThat(
             new WithReferenceLinks(
+                new MarkupFromString(sourceMarkdown),
                 new PageRegistry().register(tableList),
-                sourceMarkdown,
                 "",
                 "[%1$s](%2$s)"
             ).value()
@@ -52,8 +51,8 @@ class WithReferenceLinksTest {
 
         assertThat(
             new WithReferenceLinks(
+                new MarkupFromString(sourceMarkdown),
                 new PageRegistry().register(tableList),
-                sourceMarkdown,
                 "../root",
                 "[%1$s](%2$s)"
             ).value()
@@ -70,8 +69,8 @@ class WithReferenceLinksTest {
 
         assertThat(
             new WithReferenceLinks(
+                new MarkupFromString(sourceMarkdown),
                 new PageRegistry().register(tableList),
-                sourceMarkdown,
                 "",
                 "[%1$s](%2$s)"
             ).value()
