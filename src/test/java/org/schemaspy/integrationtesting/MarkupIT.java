@@ -19,14 +19,14 @@
  */
 package org.schemaspy.integrationtesting;
 
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
@@ -35,7 +35,7 @@ import static org.schemaspy.testing.SchemaSpyRunnerFixture.schemaSpyRunner;
  * @author Nils Petzaell
  * @author Samuel Dussault
  */
-class MarkupProcessorIT {
+class MarkupIT {
 
     @Test
     void defaultMarkupIsMarkdown() throws IOException {

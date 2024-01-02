@@ -21,7 +21,7 @@ package org.schemaspy.view;
 import java.util.Collection;
 
 import org.schemaspy.model.Table;
-import org.schemaspy.util.markup.MarkupProcessor;
+import org.schemaspy.util.markup.Markup;
 
 public interface HtmlConfig {
     String getDescription();
@@ -34,5 +34,5 @@ public interface HtmlConfig {
 
     void registryPage(final Collection<Table> tables);
 
-    MarkupProcessor markupProcessor();
+    Markup markupProcessor();
 }

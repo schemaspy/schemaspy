@@ -27,7 +27,7 @@ package org.schemaspy.util.markup;
  * @author Daniel Watt
  * @author Samuel Dussault
  */
-public interface MarkupProcessor {
+public interface Markup {
 
      String toHtml(final String markupText, final String rootPath);
 
