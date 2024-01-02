@@ -20,10 +20,10 @@
  */
 package org.schemaspy.util.markup;
 
-import org.schemaspy.model.Table;
-
 import java.util.Collection;
 import java.util.Optional;
+
+import org.schemaspy.model.Table;
 
 /**
  * Extracted from Markdown class by samdus on 2023-06-05
@@ -57,10 +57,10 @@ public abstract class MarkupProcessor {
         if (markupText == null) {
             return null;
         }
-        return parseToHtml(new WithReferenceLinks(pageRegistry, markupText, rootPath, getLinkFormat()).value()).trim();
+        return parseToHtml(markupText, rootPath).trim();
     }
 
-    protected abstract String parseToHtml(final String markupText);
+    protected abstract String parseToHtml(final String markupText, final String rootPath);
 
     /**
      * Expecting a format following {@link java.util.Formatter} that accepts PageLink and PagePath.

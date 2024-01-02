@@ -29,9 +29,13 @@ import org.asciidoctor.Options;
 public class Asciidoc extends MarkupProcessor {
 
     @Override
-    protected String parseToHtml(String markupText) {
+    protected String parseToHtml(final String markupText, final String rootPath) {
         try(Asciidoctor asciidoctor = Asciidoctor.Factory.create()) {
-            return asciidoctor.convert(markupText, Options.builder().build());
+            return asciidoctor
+                .convert(
+                    new WithReferenceLinks(pageRegistry, markupText, rootPath, getLinkFormat()).value(),
+                    Options.builder().build()
+                );
         }
     }
 
