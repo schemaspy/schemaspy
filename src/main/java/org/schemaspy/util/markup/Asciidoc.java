@@ -26,7 +26,7 @@ import org.asciidoctor.Options;
  *
  * @author Samuel Dussault
  */
-public class Asciidoc implements MarkupProcessor {
+public class Asciidoc implements Markup {
 
     private final PageRegistry pageRegistry;
 

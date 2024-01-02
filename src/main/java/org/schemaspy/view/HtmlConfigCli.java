@@ -9,7 +9,7 @@ import org.schemaspy.cli.TemplateDirectoryConfigCli;
 import org.schemaspy.model.Table;
 import org.schemaspy.util.markup.Asciidoc;
 import org.schemaspy.util.markup.Markdown;
-import org.schemaspy.util.markup.MarkupProcessor;
+import org.schemaspy.util.markup.Markup;
 import org.schemaspy.util.markup.PageRegistry;
 
 @Parameters(resourceBundle = "htmlconfigcli")
@@ -81,7 +81,7 @@ public class HtmlConfigCli implements HtmlConfig {
     }
 
     @Override
-    public MarkupProcessor markupProcessor() {
+    public Markup markupProcessor() {
         if (useAsciiDoc) {
             return new Asciidoc(pageRegistry);
         } else {

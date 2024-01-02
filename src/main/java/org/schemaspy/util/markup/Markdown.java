@@ -32,7 +32,7 @@ import com.vladsch.flexmark.util.options.DataHolder;
  * @author Daniel Watt
  * @author Samuel Dussault
  */
-public class Markdown implements MarkupProcessor {
+public class Markdown implements Markup {
 
     private final PageRegistry pageRegistry;
     private final Parser parser;
