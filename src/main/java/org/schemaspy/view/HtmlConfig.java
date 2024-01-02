@@ -18,6 +18,8 @@
  */
 package org.schemaspy.view;
 
+import org.schemaspy.util.markup.MarkupProcessor;
+
 public interface HtmlConfig {
     String getDescription();
 
@@ -27,5 +29,5 @@ public interface HtmlConfig {
 
     boolean isNumRowsEnabled();
 
-    boolean useAsciidoc();
+    MarkupProcessor markupProcessor();
 }

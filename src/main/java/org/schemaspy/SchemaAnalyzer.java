@@ -25,6 +25,21 @@
  */
 package org.schemaspy;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.invoke.MethodHandles;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.time.Clock;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+
 import org.apache.commons.io.FileUtils;
 import org.schemaspy.analyzer.ImpliedConstraintsFinder;
 import org.schemaspy.cli.CommandLineArguments;
@@ -36,7 +51,18 @@ import org.schemaspy.input.dbms.service.DatabaseServiceFactory;
 import org.schemaspy.input.dbms.service.SqlService;
 import org.schemaspy.input.dbms.xml.SchemaMeta;
 import org.schemaspy.logging.Sanitize;
-import org.schemaspy.model.*;
+import org.schemaspy.model.Catalog;
+import org.schemaspy.model.Console;
+import org.schemaspy.model.Database;
+import org.schemaspy.model.DbmsMeta;
+import org.schemaspy.model.EmptySchemaException;
+import org.schemaspy.model.ForeignKeyConstraint;
+import org.schemaspy.model.ImpliedForeignKeyConstraint;
+import org.schemaspy.model.ProgressListener;
+import org.schemaspy.model.Routine;
+import org.schemaspy.model.Schema;
+import org.schemaspy.model.Table;
+import org.schemaspy.model.Tracked;
 import org.schemaspy.output.InfoHtml;
 import org.schemaspy.output.OutputException;
 import org.schemaspy.output.OutputProducer;
@@ -59,25 +85,24 @@ import org.schemaspy.util.DataTableConfig;
 import org.schemaspy.util.DefaultPrintWriter;
 import org.schemaspy.util.copy.CopyFromUrl;
 import org.schemaspy.util.filefilter.NotHtml;
-import org.schemaspy.util.markup.Asciidoc;
-import org.schemaspy.util.markup.Markdown;
 import org.schemaspy.util.markup.MarkupProcessor;
 import org.schemaspy.util.naming.NameFromString;
 import org.schemaspy.util.naming.SanitizedFileName;
-import org.schemaspy.view.*;
+import org.schemaspy.view.HtmlAnomaliesPage;
+import org.schemaspy.view.HtmlColumnsPage;
+import org.schemaspy.view.HtmlConstraintsPage;
+import org.schemaspy.view.HtmlMainIndexPage;
+import org.schemaspy.view.HtmlMultipleSchemasIndexPage;
+import org.schemaspy.view.HtmlOrphansPage;
+import org.schemaspy.view.HtmlRelationshipsPage;
+import org.schemaspy.view.HtmlRoutinePage;
+import org.schemaspy.view.HtmlRoutinesPage;
+import org.schemaspy.view.HtmlTablePage;
+import org.schemaspy.view.MustacheCompiler;
+import org.schemaspy.view.MustacheTableDiagram;
+import org.schemaspy.view.SqlAnalyzer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.lang.invoke.MethodHandles;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.time.Clock;
-import java.time.Duration;
-import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * @author John Currier
@@ -339,12 +364,7 @@ public class SchemaAnalyzer {
         FileUtils.forceMkdir(new File(outputDir, "tables"));
         FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
-        if(commandLineArguments.getHtmlConfig().useAsciidoc()) {
-            MarkupProcessor.setInstance(new Asciidoc());
-        } else {
-            MarkupProcessor.setInstance(new Markdown());
-        }
-        MarkupProcessor.getInstance().registryPage(tables);
+        MarkupProcessor.registryPage(tables);
 
         new CopyFromUrl(layoutFolder.url(), outputDir, new NotHtml()).copy();
 

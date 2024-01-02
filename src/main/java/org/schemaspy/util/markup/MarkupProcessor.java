@@ -34,7 +34,7 @@ import org.schemaspy.model.Table;
  */
 public abstract class MarkupProcessor {
 
-    protected final PageRegistry pageRegistry = new PageRegistry();
+    protected static final PageRegistry pageRegistry = new PageRegistry();
 
     private static Optional<MarkupProcessor> instance = Optional.empty();
 
@@ -49,7 +49,7 @@ public abstract class MarkupProcessor {
         MarkupProcessor.instance = Optional.of(instance);
     }
 
-    public void registryPage(final Collection<Table> tables) {
+    public static void registryPage(final Collection<Table> tables) {
         pageRegistry.register(tables);
     }
 
