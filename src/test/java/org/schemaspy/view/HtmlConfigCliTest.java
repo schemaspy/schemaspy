@@ -1,6 +1,8 @@
 package org.schemaspy.view;
 
+import com.beust.jcommander.IDefaultProvider;
 import org.junit.jupiter.api.Test;
+import org.schemaspy.cli.CombinedDefaultProvider;
 import org.schemaspy.cli.CommandLineArgumentParser;
 
 import java.util.Arrays;
@@ -66,14 +68,45 @@ class HtmlConfigCliTest {
         ).isTrue();
     }
 
+    @Test
+    void doNotUseAsciiDoc() {
+        assertThat(
+            parse("")
+                .useAsciidoc()
+        ).isFalse();
+    }
+
+    @Test
+    void useAsciiDocArg() {
+        assertThat(
+            parse("-asciidoc")
+                .useAsciidoc()
+        ).isTrue();
+    }
+
+    @Test
+    void useAsciiDocProperty() {
+        assertThat(
+            parse(
+                optionName -> optionName.equals("schemaspy.asciidoc") ? "" : null,
+                ""
+            ).useAsciidoc()
+        ).isTrue();
+    }
+
     private HtmlConfig parse(String... args) {
+        return parse(optionName -> null, args);
+    }
+
+    private HtmlConfig parse(IDefaultProvider iDefaultProvider, String...args) {
         String[] defaultArgs = {"-o", "out", "-sso"};
         return new CommandLineArgumentParser(
-                Stream
-                        .concat(
-                                Arrays.stream(defaultArgs),
-                                Arrays.stream(args)
-                        ).toArray(String[]::new)
+            new CombinedDefaultProvider(iDefaultProvider),
+            Stream
+                .concat(
+                    Arrays.stream(defaultArgs),
+                    Arrays.stream(args)
+                ).toArray(String[]::new)
         )
             .commandLineArguments()
             .getHtmlConfig();

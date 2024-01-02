@@ -26,6 +26,15 @@ public class HtmlConfigCli implements HtmlConfig {
     )
     private boolean noPages = false;
 
+    @Parameter(
+        names = {
+            "-asciidoc", "--asciidoc",
+            "schemaspy.asciidoc"
+        },
+        descriptionKey = "asciidoc"
+    )
+    private boolean asciidoc = false;
+
     private NoRowsConfigCli noRowsConfigCli;
     private TemplateDirectoryConfigCli templateDirectoryConfigCli;
 
@@ -55,5 +64,10 @@ public class HtmlConfigCli implements HtmlConfig {
     @Override
     public boolean isNumRowsEnabled() {
         return noRowsConfigCli.isNumRowsEnabled();
+    }
+
+    @Override
+    public boolean useAsciidoc() {
+        return asciidoc;
     }
 }
