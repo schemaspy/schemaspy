@@ -34,28 +34,33 @@ import com.vladsch.flexmark.util.options.DataHolder;
  */
 public class Markdown extends MarkupProcessor {
 
+    private final PageRegistry pageRegistry;
     private final Parser parser;
     private final HtmlRenderer renderer;
 
-    public Markdown() {
+    public Markdown(final PageRegistry pageRegistry) {
         this(
-                PegdownOptionsAdapter.flexmarkOptions(true,
-                        Extensions.ALL ^ Extensions.HARDWRAPS
-                )
+            pageRegistry,
+            PegdownOptionsAdapter.flexmarkOptions(true,
+                    Extensions.ALL ^ Extensions.HARDWRAPS
+            )
         );
     }
 
-    public Markdown(final DataHolder options) {
+    public Markdown(final PageRegistry pageRegistry, final DataHolder options) {
         this(
-                Parser.builder(options).build(),
-                HtmlRenderer.builder(options).build()
+            pageRegistry,
+            Parser.builder(options).build(),
+            HtmlRenderer.builder(options).build()
         );
     }
 
     public Markdown(
-            final Parser parser,
-            final HtmlRenderer renderer
+        final PageRegistry pageRegistry,
+        final Parser parser,
+        final HtmlRenderer renderer
     ) {
+        this.pageRegistry = pageRegistry;
         this.parser = parser;
         this.renderer = renderer;
     }

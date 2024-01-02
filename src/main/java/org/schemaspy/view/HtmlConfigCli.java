@@ -1,12 +1,16 @@
 package org.schemaspy.view;
 
+import java.util.Collection;
+
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.schemaspy.cli.NoRowsConfigCli;
 import org.schemaspy.cli.TemplateDirectoryConfigCli;
+import org.schemaspy.model.Table;
 import org.schemaspy.util.markup.Asciidoc;
 import org.schemaspy.util.markup.Markdown;
 import org.schemaspy.util.markup.MarkupProcessor;
+import org.schemaspy.util.markup.PageRegistry;
 
 @Parameters(resourceBundle = "htmlconfigcli")
 public class HtmlConfigCli implements HtmlConfig {
@@ -36,10 +40,12 @@ public class HtmlConfigCli implements HtmlConfig {
         },
         descriptionKey = "asciidoc"
     )
-    private boolean asciidoc = false;
+    private boolean useAsciiDoc = false;
 
-    private NoRowsConfigCli noRowsConfigCli;
-    private TemplateDirectoryConfigCli templateDirectoryConfigCli;
+    private final NoRowsConfigCli noRowsConfigCli;
+    private final TemplateDirectoryConfigCli templateDirectoryConfigCli;
+
+    private final PageRegistry pageRegistry = new PageRegistry();
 
     public HtmlConfigCli(
         NoRowsConfigCli noRowsConfigCli,
@@ -70,11 +76,16 @@ public class HtmlConfigCli implements HtmlConfig {
     }
 
     @Override
+    public void registryPage(final Collection<Table> tables) {
+        pageRegistry.register(tables);
+    }
+
+    @Override
     public MarkupProcessor markupProcessor() {
-        if (asciidoc) {
-            return new Asciidoc();
+        if (useAsciiDoc) {
+            return new Asciidoc(pageRegistry);
         } else {
-            return new Markdown();
+            return new Markdown(pageRegistry);
         }
     }
 }

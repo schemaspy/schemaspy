@@ -3,7 +3,6 @@ package org.schemaspy.util.markup;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 public class WithReferenceLinks {
 
     private final PageRegistry pageRegistry;
@@ -14,7 +13,7 @@ public class WithReferenceLinks {
     /**
      * Adds pages reference links to the given markup text. Links in the format [page] or [page.anchor]
      * are replaced with reference-style links, for example: [page.anchor](./pagePath#anchor) in Markdown.
-     * The page paths are obtained from the registry page registered using the {@link MarkupProcessor#registryPage} method.
+     * The page can be registered using {@link org.schemaspy.view.HtmlConfig#registryPage} method.
      *
      * @param pageRegistry The PageRegistry used to register pages
      * @param markupText The markup text to which page links will be added.

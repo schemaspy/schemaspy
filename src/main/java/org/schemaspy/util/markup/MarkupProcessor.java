@@ -20,10 +20,6 @@
  */
 package org.schemaspy.util.markup;
 
-import java.util.Collection;
-
-import org.schemaspy.model.Table;
-
 /**
  * Extracted from Markdown class by samdus on 2023-06-05
  *
@@ -32,12 +28,6 @@ import org.schemaspy.model.Table;
  * @author Samuel Dussault
  */
 public abstract class MarkupProcessor {
-
-    protected static final PageRegistry pageRegistry = new PageRegistry();
-
-    public static void registryPage(final Collection<Table> tables) {
-        pageRegistry.register(tables);
-    }
 
     public String toHtml(final String markupText, final String rootPath) {
         if (markupText == null) {

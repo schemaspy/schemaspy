@@ -85,7 +85,6 @@ import org.schemaspy.util.DataTableConfig;
 import org.schemaspy.util.DefaultPrintWriter;
 import org.schemaspy.util.copy.CopyFromUrl;
 import org.schemaspy.util.filefilter.NotHtml;
-import org.schemaspy.util.markup.MarkupProcessor;
 import org.schemaspy.util.naming.NameFromString;
 import org.schemaspy.util.naming.SanitizedFileName;
 import org.schemaspy.view.HtmlAnomaliesPage;
@@ -364,7 +363,7 @@ public class SchemaAnalyzer {
         FileUtils.forceMkdir(new File(outputDir, "tables"));
         FileUtils.forceMkdir(new File(outputDir, "diagrams/summary"));
 
-        MarkupProcessor.registryPage(tables);
+        commandLineArguments.getHtmlConfig().registryPage(tables);
 
         new CopyFromUrl(layoutFolder.url(), outputDir, new NotHtml()).copy();
 

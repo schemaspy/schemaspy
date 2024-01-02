@@ -18,6 +18,9 @@
  */
 package org.schemaspy.view;
 
+import java.util.Collection;
+
+import org.schemaspy.model.Table;
 import org.schemaspy.util.markup.MarkupProcessor;
 
 public interface HtmlConfig {
@@ -28,6 +31,8 @@ public interface HtmlConfig {
     boolean isPaginationEnabled();
 
     boolean isNumRowsEnabled();
+
+    void registryPage(final Collection<Table> tables);
 
     MarkupProcessor markupProcessor();
 }
