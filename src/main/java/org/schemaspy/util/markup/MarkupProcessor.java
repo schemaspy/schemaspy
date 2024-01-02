@@ -62,10 +62,4 @@ public abstract class MarkupProcessor {
 
     protected abstract String parseToHtml(final String markupText, final String rootPath);
 
-    /**
-     * Expecting a format following {@link java.util.Formatter} that accepts PageLink and PagePath.
-     *
-     * @return string format that accept 2 arguments. (1) PageLink, (2) PagePath
-     */
-    protected abstract String getLinkFormat();
 }

@@ -39,7 +39,6 @@ public class Asciidoc extends MarkupProcessor {
         }
     }
 
-    @Override
     protected String getLinkFormat() {
         return "link:%2$s[%1$s]";
     }
