@@ -34,22 +34,37 @@ import com.vladsch.flexmark.util.options.DataHolder;
  */
 public class Markdown implements Markup {
 
-    private final PageRegistry pageRegistry;
     private final Parser parser;
     private final HtmlRenderer renderer;
+    private final PageRegistry pageRegistry;
+    private final String markupText;
+    private final String rootPath;
 
-    public Markdown(final PageRegistry pageRegistry) {
+    public Markdown(
+        final PageRegistry pageRegistry,
+        final String markupText,
+        final String rootPath
+    ) {
         this(
             pageRegistry,
+            markupText,
+            rootPath,
             PegdownOptionsAdapter.flexmarkOptions(true,
                     Extensions.ALL ^ Extensions.HARDWRAPS
             )
         );
     }
 
-    public Markdown(final PageRegistry pageRegistry, final DataHolder options) {
+    public Markdown(
+        final PageRegistry pageRegistry,
+        final String markupText,
+        final String rootPath,
+        final DataHolder options
+    ) {
         this(
             pageRegistry,
+            markupText,
+            rootPath,
             Parser.builder(options).build(),
             HtmlRenderer.builder(options).build()
         );
@@ -57,16 +72,20 @@ public class Markdown implements Markup {
 
     public Markdown(
         final PageRegistry pageRegistry,
+        final String markupText,
+        final String rootPath,
         final Parser parser,
         final HtmlRenderer renderer
     ) {
         this.pageRegistry = pageRegistry;
+        this.markupText = markupText;
+        this.rootPath = rootPath;
         this.parser = parser;
         this.renderer = renderer;
     }
 
     @Override
-    public String toHtml(final String markupText, final String rootPath) {
+    public String toHtml() {
         return renderer.render(
             parser.parse(
                 new WithReferenceLinks(pageRegistry, markupText, rootPath, getLinkFormat()).value()

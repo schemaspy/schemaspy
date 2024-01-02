@@ -9,28 +9,28 @@ class MarkdownTest {
     @Test
     void willNotReplaceDirectNewLineToBR() {
         String sourceMarkdown = "Line\n with\n no\n hardbreak\n";
-        String renderedMarkdown = new Markdown(new PageRegistry()).toHtml(sourceMarkdown, ".");
+        String renderedMarkdown = new Markdown(new PageRegistry(), sourceMarkdown, ".").toHtml();
         assertThat(renderedMarkdown).doesNotContain("<br />");
     }
 
     @Test
     void willReplaceNewLineWhenPrecededByTwoSpacesAsBR() {
         String sourceMarkdown = "Line  \n with  \n no  \n hardbreak  \n";
-        String renderedMarkdown = new Markdown(new PageRegistry()).toHtml(sourceMarkdown, ".");
+        String renderedMarkdown = new Markdown(new PageRegistry(), sourceMarkdown, ".").toHtml();
         assertThat(renderedMarkdown).contains("<br />");
     }
 
     @Test
     void formatsLinksCorrectly() {
         assertThat(
-            new Markdown(new PageRegistry()).getLinkFormat().formatted("table1", "./tables/table1.html")
+            new Markdown(new PageRegistry(), "", "").getLinkFormat().formatted("table1", "./tables/table1.html")
         ).isEqualTo("[table1](./tables/table1.html)");
     }
 
     @Test
     void renderLinks() {
         assertThat(
-            new Markdown(new PageRegistry()).toHtml("[table1](./tables/table1.html)", "")
+            new Markdown(new PageRegistry(), "[table1](./tables/table1.html)", "").toHtml()
         ).contains("<a href=\"./tables/table1.html\">table1</a>");
     }
 }

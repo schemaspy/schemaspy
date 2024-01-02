@@ -81,11 +81,11 @@ public class HtmlConfigCli implements HtmlConfig {
     }
 
     @Override
-    public Markup markupProcessor() {
+    public Markup markupProcessor(final String markupText, final String rootPath) {
         if (useAsciiDoc) {
-            return new Asciidoc(pageRegistry);
+            return new Asciidoc(pageRegistry, markupText, rootPath);
         } else {
-            return new Markdown(pageRegistry);
+            return new Markdown(pageRegistry, markupText, rootPath);
         }
     }
 }

@@ -34,5 +34,5 @@ public interface HtmlConfig {
 
     void registryPage(final Collection<Table> tables);
 
-    Markup markupProcessor();
+    Markup markupProcessor(final String markupText, final String rootPath);
 }
