@@ -29,6 +29,6 @@ package org.schemaspy.util.markup;
  */
 public interface Markup {
 
-     String toHtml();
+     String value();
 
 }

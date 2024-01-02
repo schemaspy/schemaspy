@@ -43,7 +43,7 @@ public class Asciidoc implements Markup {
     }
 
     @Override
-    public String toHtml() {
+    public String value() {
         try(Asciidoctor asciidoctor = Asciidoctor.Factory.create()) {
             return asciidoctor
                 .convert(

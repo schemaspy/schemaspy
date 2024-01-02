@@ -34,7 +34,7 @@ class AsciidocTest {
                 "</div>\n" +
                 "</div>";
 
-        String actualHtml = new Asciidoc(new PageRegistry(), sourceAsciiDoc, ".").toHtml();
+        String actualHtml = new Asciidoc(new PageRegistry(), sourceAsciiDoc, ".").value();
         assertThat(actualHtml).isEqualTo(expectedHtml);
     }
 
@@ -48,7 +48,7 @@ class AsciidocTest {
     @Test
     void renderLinks() {
         assertThat(
-            new Asciidoc(new PageRegistry(), "link:./tables/table1.html[table1]", "").toHtml()
+            new Asciidoc(new PageRegistry(), "link:./tables/table1.html[table1]", "").value()
         ).contains("<a href=\"./tables/table1.html\">table1</a>");
     }
 }

@@ -79,7 +79,7 @@ public class MustacheCompiler {
         pageScope.put("paginationEnabled", htmlConfig.isPaginationEnabled());
         pageScope.put("displayNumRows", htmlConfig.isNumRowsEnabled());
         pageScope.put("dataTableConfig", dataTableConfig.getPageScopeMap());
-        pageScope.put("markup", (Function<String,String>) md -> htmlConfig.markupProcessor(md, getRootPath(pageData.getDepth())).toHtml());
+        pageScope.put("markup", (Function<String,String>) md -> htmlConfig.markupProcessor(md, getRootPath(pageData.getDepth())).value());
         pageScope.putAll(pageData.getScope());
 
         Mustache mustachePage = mustacheFactory.compile(pageData.getTemplateName());

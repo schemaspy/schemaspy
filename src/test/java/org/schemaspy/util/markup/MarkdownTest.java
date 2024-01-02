@@ -9,14 +9,14 @@ class MarkdownTest {
     @Test
     void willNotReplaceDirectNewLineToBR() {
         String sourceMarkdown = "Line\n with\n no\n hardbreak\n";
-        String renderedMarkdown = new Markdown(new PageRegistry(), sourceMarkdown, ".").toHtml();
+        String renderedMarkdown = new Markdown(new PageRegistry(), sourceMarkdown, ".").value();
         assertThat(renderedMarkdown).doesNotContain("<br />");
     }
 
     @Test
     void willReplaceNewLineWhenPrecededByTwoSpacesAsBR() {
         String sourceMarkdown = "Line  \n with  \n no  \n hardbreak  \n";
-        String renderedMarkdown = new Markdown(new PageRegistry(), sourceMarkdown, ".").toHtml();
+        String renderedMarkdown = new Markdown(new PageRegistry(), sourceMarkdown, ".").value();
         assertThat(renderedMarkdown).contains("<br />");
     }
 
@@ -30,7 +30,7 @@ class MarkdownTest {
     @Test
     void renderLinks() {
         assertThat(
-            new Markdown(new PageRegistry(), "[table1](./tables/table1.html)", "").toHtml()
+            new Markdown(new PageRegistry(), "[table1](./tables/table1.html)", "").value()
         ).contains("<a href=\"./tables/table1.html\">table1</a>");
     }
 }
