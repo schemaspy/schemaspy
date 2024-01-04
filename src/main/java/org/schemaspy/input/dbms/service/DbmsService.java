@@ -19,6 +19,7 @@
 package org.schemaspy.input.dbms.service;
 
 import org.schemaspy.input.dbms.service.helper.UniformSet;
+import org.schemaspy.input.dbms.service.keywords.MetadataKeywords;
 import org.schemaspy.input.dbms.service.keywords.Sql92Keywords;
 import org.schemaspy.model.DbmsMeta;
 import org.slf4j.Logger;
@@ -69,8 +70,7 @@ public class DbmsService {
 
     private static Set<String> getSQLKeywords(DatabaseMetaData databaseMetaData) throws SQLException {
         Set<String> allSqlKeywords = new HashSet<>(new Sql92Keywords().value());
-        String[] sqlKeywordsArray = databaseMetaData.getSQLKeywords().split(",");
-        Set<String> sqlKeywords = new UniformSet(sqlKeywordsArray).value();
+        Set<String> sqlKeywords = new MetadataKeywords(databaseMetaData).value();
         allSqlKeywords.addAll(sqlKeywords);
         return allSqlKeywords;
     }
