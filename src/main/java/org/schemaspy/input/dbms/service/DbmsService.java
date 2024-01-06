@@ -45,7 +45,7 @@ public class DbmsService {
 
         onlyLogException(() -> builder.productName(databaseMetaData.getDatabaseProductName()));
         onlyLogException(() -> builder.productVersion(databaseMetaData.getDatabaseProductVersion()));
-        onlyLogException(() -> builder.sqlKeywords(getSQLKeywords(databaseMetaData)));
+        builder.sqlKeywords(getSQLKeywords(databaseMetaData));
         onlyLogException(() -> builder.systemFunctions(new UniformSet(databaseMetaData.getSystemFunctions().split(",")).value()));
         onlyLogException(() -> builder.stringFunctions(new UniformSet(databaseMetaData.getStringFunctions().split(",")).value()));
         onlyLogException(() -> builder.numericFunctions(new UniformSet(databaseMetaData.getNumericFunctions().split(",")).value()));
@@ -68,7 +68,7 @@ public class DbmsService {
         }
     }
 
-    private static Set<String> getSQLKeywords(DatabaseMetaData databaseMetaData) throws SQLException {
+    private static Set<String> getSQLKeywords(DatabaseMetaData databaseMetaData) {
         Set<String> allSqlKeywords = new HashSet<>(new Sql92Keywords().value());
         Set<String> sqlKeywords = new MetadataKeywords(databaseMetaData).value();
         allSqlKeywords.addAll(sqlKeywords);
