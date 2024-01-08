@@ -19,6 +19,7 @@
 package org.schemaspy.input.dbms.service;
 
 import org.schemaspy.input.dbms.service.helper.UniformSet;
+import org.schemaspy.input.dbms.service.keywords.Combined;
 import org.schemaspy.input.dbms.service.keywords.MetadataKeywords;
 import org.schemaspy.input.dbms.service.keywords.Sql92Keywords;
 import org.schemaspy.model.DbmsMeta;
@@ -29,7 +30,6 @@ import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 public class DbmsService {
@@ -45,7 +45,12 @@ public class DbmsService {
 
         onlyLogException(() -> builder.productName(databaseMetaData.getDatabaseProductName()));
         onlyLogException(() -> builder.productVersion(databaseMetaData.getDatabaseProductVersion()));
-        builder.sqlKeywords(getSQLKeywords(databaseMetaData));
+        builder.sqlKeywords(
+            new Combined(
+                new Sql92Keywords(),
+                new MetadataKeywords(databaseMetaData)
+            ).value()
+        );
         onlyLogException(() -> builder.systemFunctions(new UniformSet(databaseMetaData.getSystemFunctions().split(",")).value()));
         onlyLogException(() -> builder.stringFunctions(new UniformSet(databaseMetaData.getStringFunctions().split(",")).value()));
         onlyLogException(() -> builder.numericFunctions(new UniformSet(databaseMetaData.getNumericFunctions().split(",")).value()));
@@ -66,12 +71,5 @@ public class DbmsService {
         } catch (SQLException sqle) {
             LOGGER.warn("Failed to fetch metadata", sqle);
         }
-    }
-
-    private static Set<String> getSQLKeywords(DatabaseMetaData databaseMetaData) {
-        Set<String> allSqlKeywords = new HashSet<>(new Sql92Keywords().value());
-        Set<String> sqlKeywords = new MetadataKeywords(databaseMetaData).value();
-        allSqlKeywords.addAll(sqlKeywords);
-        return allSqlKeywords;
     }
 }
