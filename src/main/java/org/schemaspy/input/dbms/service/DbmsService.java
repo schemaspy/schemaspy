@@ -29,16 +29,10 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Set;
 
 public class DbmsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    public static Set<String> getSql92Keywords() {
-        return Collections.unmodifiableSet(new Sql92Keywords().value());
-    }
 
     public DbmsMeta fetchDbmsMeta(DatabaseMetaData databaseMetaData) {
         DbmsMeta.Builder builder = new DbmsMeta.Builder();
