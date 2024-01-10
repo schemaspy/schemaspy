@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.schemaspy.input.dbms.service.DbmsService;
+import org.schemaspy.input.dbms.service.keywords.Sql92Keywords;
 import org.schemaspy.model.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,7 +49,12 @@ class SqlAnalyzerTest {
                 createTable("htmlit", "resources"),
                 createTable("htmlit", "group_resources")
         );
-        SqlAnalyzer sqlAnalyzer = new SqlAnalyzer("", DbmsService.getSql92Keywords(), tables, Collections.emptyList());
+        SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(
+            "",
+            new Sql92Keywords().value(),
+            tables,
+            Collections.emptyList()
+        );
 
 
         String viewDefinition = "CREATE VIEW htmlit.userAndGroup AS SELECT u.name AS UserName, g.name AS GroupName FROM [htmlit].[user] u JOIN [htmlit].[group] g ON u.groupId = g.groupId;";
