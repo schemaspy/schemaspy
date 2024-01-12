@@ -1,9 +1,10 @@
 package org.schemaspy.input.dbms;
 
-import org.schemaspy.util.DbSpecificConfig;
-
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
+
+import org.schemaspy.util.DbSpecificConfig;
 
 public interface ConnectionConfig {
 
@@ -16,6 +17,6 @@ public interface ConnectionConfig {
     String getPassword();
     String getConnectionProperties();
     DbSpecificConfig getDbSpecificConfig();
-    String getDriverPath();
+    Iterable<Path> getDriverPath();
     List<String> getRemainingArguments();
 }
