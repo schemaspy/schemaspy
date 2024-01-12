@@ -1,13 +1,11 @@
 package org.schemaspy.input.dbms;
 
-import org.schemaspy.input.dbms.driver.Driversource;
-import org.schemaspy.input.dbms.driverpath.DpConnectionConfig;
-import org.schemaspy.input.dbms.driverpath.DpFallback;
-import org.schemaspy.input.dbms.driverpath.DpMissingPathChecked;
-import org.schemaspy.input.dbms.driverpath.DpNull;
-
 import java.sql.Driver;
 import java.util.Properties;
+
+import org.schemaspy.input.dbms.driver.Driversource;
+import org.schemaspy.input.dbms.driverpath.DpFromIterable;
+import org.schemaspy.input.dbms.driverpath.DpMissingPathChecked;
 
 
 public final class DriverFromConfig implements Driversource {
@@ -24,10 +22,7 @@ public final class DriverFromConfig implements Driversource {
         return new DbDriverLoader(
             properties.getProperty("driver").split(","),
             new DpMissingPathChecked(
-                new DpFallback(
-                    new DpConnectionConfig(this.config),
-                    new DpNull()
-                )
+                new DpFromIterable(this.config.getDriverPath())
             )
         ).driver();
     }

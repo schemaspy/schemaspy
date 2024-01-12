@@ -1,10 +1,13 @@
 package org.schemaspy.input.dbms;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
+
 import com.beust.jcommander.JCommander;
 import org.junit.jupiter.api.Test;
 import org.schemaspy.util.DbSpecificConfig;
-
-import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -112,11 +115,33 @@ class ConnectionConfigCliTest {
 
     @Test
     void driverPath() {
+        Path somePath = Paths.get("somepath","to","driver");
         assertThat(
-            parse("-dp", "/somepath/to/driver")
+            parse(
+                "-dp", somePath.toString()
+            ).getDriverPath()
+        ).containsExactly(somePath);
+    }
+
+    @Test
+    void driverPathMulti() {
+        Path somePath = Paths.get("somepath","to","driver");
+        Path someOther = Paths.get("someother","path");
+        assertThat(
+          parse("-dp", somePath + File.pathSeparator + someOther)
+            .getDriverPath()
+        ).containsExactly(
+          somePath,
+          someOther
+        );
+    }
+
+    @Test
+    void noDriverPathIsEmptyIterable() {
+        assertThat(
+            parse()
                 .getDriverPath()
-        )
-            .isEqualTo("/somepath/to/driver");
+        ).isEmpty();
     }
 
     @Test
