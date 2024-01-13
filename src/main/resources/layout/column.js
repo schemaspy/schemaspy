@@ -1,9 +1,9 @@
 var filterBy = function(tableType) {
 $.fn.dataTableExt.afnFiltering.length = 0;
 $.fn.dataTable.ext.search.push(
-    function( settings, data, dataIndex ) {        
+    function( settings, data, dataIndex ) {
         var type = data[1]; // use data for the Type column
- 
+
         if ( type == tableType || tableType=='All' )
         {
             return true;
@@ -67,9 +67,9 @@ $(document).ready(function() {
         lengthChange: false,
 		paging: config.pagination,
 		pageLength: 50,
-		autoWidth: true,
-		order: [[ 2, "asc" ]],		
-		buttons: [ 
+		autoWidth: false,
+		order: [[ 2, "asc" ]],
+		buttons: [
 					{
 						text: 'All',
 						action: function ( e, dt, node, config ) {
@@ -109,7 +109,7 @@ $(document).ready(function() {
 						columns: '.toggle'
 					}
 				]
-					
+
     } );
 
     //schemaSpy.js
