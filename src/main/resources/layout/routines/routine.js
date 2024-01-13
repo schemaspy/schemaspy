@@ -13,9 +13,9 @@ $(document).ready(function() {
 		autoWidth: true,
 		buttons: [ ]
     } );
- 
+
     table.buttons().container()
-        .appendTo('#standard_table_wrapper .col-sm-6:eq(0)' );    	
+        .appendTo('#standard_table_wrapper .col-sm-6:eq(0)' );
 } );
 
 var codeElement = document.getElementById("sql-script-codemirror");

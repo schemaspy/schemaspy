@@ -20,7 +20,7 @@ $(document).ready(function() {
 		ordering: true,
 		paging: config.pagination,
 		pageLength: 50,
-		autoWidth: true,
+		autoWidth: false,
 		processing: true,
 		order: [[ 0, "asc" ]],
         buttons: [

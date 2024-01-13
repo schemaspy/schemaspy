@@ -6,7 +6,7 @@ $(document).ready(function() {
         lengthChange: false,
         ordering: false,
         paging: config.pagination,
-		autoWidth: true,
+        autoWidth: true,
 		buttons: [
 					{
 						text: 'Related columns',
