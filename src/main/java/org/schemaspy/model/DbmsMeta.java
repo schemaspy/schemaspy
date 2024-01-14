@@ -20,6 +20,7 @@ package org.schemaspy.model;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.schemaspy.input.dbms.service.keywords.Keywords;
 
 /**
  * @author Nils Petzaell
@@ -97,8 +98,8 @@ public class DbmsMeta {
             return this;
         }
 
-        public Builder sqlKeywords(Set<String> sqlKeywords) {
-            dbmsMeta.sqlKeywords = sqlKeywords;
+        public Builder sqlKeywords(final Keywords sqlKeywords) {
+            dbmsMeta.sqlKeywords = sqlKeywords.value();
             return this;
         }
 
