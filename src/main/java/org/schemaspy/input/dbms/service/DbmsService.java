@@ -43,7 +43,7 @@ public class DbmsService {
             new Combined(
                 new Sql92Keywords(),
                 new MetadataKeywords(databaseMetaData)
-            ).value()
+            )
         );
         onlyLogException(() -> builder.systemFunctions(new UniformSet(databaseMetaData.getSystemFunctions().split(",")).value()));
         onlyLogException(() -> builder.stringFunctions(new UniformSet(databaseMetaData.getStringFunctions().split(",")).value()));
