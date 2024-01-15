@@ -18,6 +18,6 @@ public class Mapped<T,R> implements Iterable<R> {
 
   @Override
   public Iterator<R> iterator() {
-    return new org.schemaspy.util.iterator.Mapped(origin.iterator(), mapFunction);
+    return new org.schemaspy.util.iterator.Mapped(this.origin.iterator(), this.mapFunction);
   }
 }

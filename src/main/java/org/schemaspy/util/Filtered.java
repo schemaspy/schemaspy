@@ -18,7 +18,7 @@ public class Filtered<T> implements Iterable<T> {
 
   @Override
   public Iterator<T> iterator() {
-    return new org.schemaspy.util.iterator.Filtered<>(origin.iterator(), predicate);
+    return new org.schemaspy.util.iterator.Filtered<>(this.origin.iterator(), this.predicate);
   }
 
 }
