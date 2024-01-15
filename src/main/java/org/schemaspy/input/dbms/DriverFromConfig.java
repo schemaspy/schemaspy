@@ -5,8 +5,6 @@ import java.util.Properties;
 
 import org.schemaspy.input.dbms.driver.Driversource;
 import org.schemaspy.input.dbms.driverpath.DpFromIterable;
-import org.schemaspy.input.dbms.driverpath.DpMissingPathChecked;
-
 
 public final class DriverFromConfig implements Driversource {
 
@@ -21,9 +19,7 @@ public final class DriverFromConfig implements Driversource {
         final Properties properties = this.config.getDatabaseTypeProperties();
         return new DbDriverLoader(
             properties.getProperty("driver").split(","),
-            new DpMissingPathChecked(
-                new DpFromIterable(this.config.getDriverPath())
-            )
+            new DpFromIterable(this.config.getDriverPath())
         ).driver();
     }
 }

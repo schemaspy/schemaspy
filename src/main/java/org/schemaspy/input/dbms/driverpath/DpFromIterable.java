@@ -3,7 +3,12 @@ package org.schemaspy.input.dbms.driverpath;
 import java.io.File;
 import java.nio.file.Path;
 
+import org.schemaspy.input.dbms.DbDriverLoader;
+import org.schemaspy.util.Filtered;
 import org.schemaspy.util.Mapped;
+import org.schemaspy.util.WhenFalse;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 /**
  * Micro type for Driver path
@@ -13,7 +18,18 @@ public final class DpFromIterable implements Driverpath {
     private final Iterable<Path> driverPath;
 
     public DpFromIterable(final Iterable<Path> driverPath) {
-        this.driverPath = driverPath;
+        this.driverPath =
+          new Filtered<>(
+            driverPath,
+            new WhenFalse<>(
+              new PathExist(),
+              new LogPath(
+                "Provided -dp(driverPath) '{}' doesn't exist",
+                LoggerFactory.getLogger(DbDriverLoader.class),
+                Level.WARN
+              )
+            )
+        );
     }
 
     @Override
