@@ -12,12 +12,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DpFromIterableTest {
 
   @Test
-  void somePaths() {
+  void somePathsAndAMissing() {
     assertThat(
       new DpFromIterable(
         List.of(
           Paths.get("src", "main"),
-          Paths.get("src", "test")
+          Paths.get("src", "test"),
+          Paths.get("src", "nobueno")
         )
       ).value()
     ).isEqualTo(
