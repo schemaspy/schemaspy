@@ -18,11 +18,11 @@ public class Mapped<T,R> implements Iterator<R> {
 
   @Override
   public boolean hasNext() {
-    return origin.hasNext();
+    return this.origin.hasNext();
   }
 
   @Override
   public R next() {
-    return mapFunction.apply(origin.next());
+    return this.mapFunction.apply(this.origin.next());
   }
 }

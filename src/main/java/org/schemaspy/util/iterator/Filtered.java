@@ -24,8 +24,8 @@ public class Filtered<T> implements Iterator<T> {
   public boolean hasNext() {
     while (this.buffer.isEmpty() && this.origin.hasNext()) {
       final T nextElement = this.origin.next();
-      if (predicate.test(nextElement)) {
-        buffer.add(nextElement);
+      if (this.predicate.test(nextElement)) {
+        this.buffer.add(nextElement);
       }
     }
     return !this.buffer.isEmpty();
@@ -34,7 +34,7 @@ public class Filtered<T> implements Iterator<T> {
   @Override
   public T next() {
     if (this.hasNext()) {
-      return buffer.removeFirst();
+      return this.buffer.removeFirst();
     } else {
       throw new NoSuchElementException();
     }
