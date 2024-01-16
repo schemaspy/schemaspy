@@ -23,14 +23,13 @@
  */
 package org.schemaspy.input.dbms;
 
+import java.sql.Driver;
+
 import org.schemaspy.input.dbms.classloader.ClClasspath;
-import org.schemaspy.input.dbms.classpath.GetExistingUrls;
 import org.schemaspy.input.dbms.driver.Driversource;
 import org.schemaspy.input.dbms.driver.DsCached;
 import org.schemaspy.input.dbms.driver.DsDriverClass;
 import org.schemaspy.input.dbms.driverclass.DcFacade;
-
-import java.sql.Driver;
 import org.schemaspy.input.dbms.driverpath.Driverpath;
 
 /**
@@ -51,7 +50,7 @@ public class DbDriverLoader implements Driversource {
                     new DcFacade(
                         driverClass,
                         new ClClasspath(
-                            new GetExistingUrls(driverPath)
+                            driverPath
                         )
                     )
                 )

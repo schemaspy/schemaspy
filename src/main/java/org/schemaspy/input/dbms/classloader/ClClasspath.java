@@ -1,23 +1,41 @@
 package org.schemaspy.input.dbms.classloader;
 
-import org.schemaspy.input.dbms.classpath.Classpath;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.List;
+import java.nio.file.Path;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.schemaspy.input.dbms.driverpath.Driverpath;
+import org.schemaspy.util.Filtered;
+import org.schemaspy.util.Mapped;
 
 /**
  * Encapsulates how to access the classloader specified by a classpath.
  */
 public final class ClClasspath implements ClassloaderSource {
 
-    private final Classpath classpath;
+    private final Iterable<URL> classpath;
 
-    public ClClasspath(final Classpath classpath) {
-        this.classpath = classpath;
+    public ClClasspath(final Driverpath driverpath) {
+        this.classpath =
+          new Filtered<>(
+            new Mapped<>(
+              new Mapped<>(
+                driverpath,
+                Path::toUri
+              ),
+              uri -> {
+                  try {
+                      return uri.toURL();
+                  } catch (MalformedURLException e) {
+                      return null;
+                  }
+              }
+              ),
+            Objects::nonNull
+          );
     }
 
     @Override
@@ -27,16 +45,11 @@ public final class ClClasspath implements ClassloaderSource {
         // thanks to Bruno Leonardo Gonalves for this implementation that he
         // used to resolve issues when running under Maven
 
-        final List<URL> urls = this.classpath.paths().stream().map(uri -> {
-            try {
-                return uri.toURL();
-            } catch (MalformedURLException e) {
-                return null;
-            }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        final URL[] urls = StreamSupport.stream(classpath.spliterator(), false)
+                             .toArray(URL[]::new);
 
         return new URLClassLoader(
-                urls.toArray(new URL[urls.size()]),
+                urls,
                 new ClDefault().classloader()
         );
     }
