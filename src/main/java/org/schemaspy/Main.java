@@ -115,7 +115,6 @@ public class Main {
 
         if (arguments.isDebug()) {
             enableDebug();
-            LOGGER.debug("Debug enabled");
         }
         SqlService sqlService = new SqlService();
         final ConnectionConfig connectionConfig = arguments.getConnectionConfig();
