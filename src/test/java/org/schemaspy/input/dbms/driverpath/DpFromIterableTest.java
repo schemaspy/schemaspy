@@ -1,13 +1,11 @@
 package org.schemaspy.input.dbms.driverpath;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -33,28 +31,23 @@ class DpFromIterableTest {
           basePath,
           Paths.get("src", "nobueno")
         )
-      ).value()
-    ).isEqualTo(
-      List.of(
-        basePath,
-        basePath.resolve("emptyDir"),
-        basePath.resolve("other"),
-        basePath.resolve("other").resolve("otherSub"),
-        basePath.resolve("other").resolve("otherSub").resolve("otherSub.properties"),
-        basePath.resolve("some.properties")
-      ).stream()
-        .map(Path::toString)
-        .collect(Collectors.joining(File.pathSeparator))
+      )
+    ).containsExactly(
+      basePath,
+      basePath.resolve("emptyDir"),
+      basePath.resolve("other"),
+      basePath.resolve("other").resolve("otherSub"),
+      basePath.resolve("other").resolve("otherSub").resolve("otherSub.properties"),
+      basePath.resolve("some.properties")
     );
   }
 
   @Test
   void noPaths() {
     assertThat(
-      new DpFromIterable(
-        () -> Collections.emptyIterator()
-      ).value()
-    ).isEqualTo("");
+      new DpFromIterable(Collections::emptyIterator
+      )
+    ).isEmpty();
   }
 
 }
