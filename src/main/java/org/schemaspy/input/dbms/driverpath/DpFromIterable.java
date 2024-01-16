@@ -1,7 +1,7 @@
 package org.schemaspy.input.dbms.driverpath;
 
-import java.io.File;
 import java.nio.file.Path;
+import java.util.Iterator;
 
 import org.schemaspy.input.dbms.DbDriverLoader;
 import org.schemaspy.util.Filtered;
@@ -37,15 +37,9 @@ public final class DpFromIterable implements Driverpath {
             )
           );
     }
+  @Override
+  public Iterator<Path> iterator() {
+    return driverPath.iterator();
+  }
 
-    @Override
-    public String value() {
-        return String.join(
-            File.pathSeparator,
-            new Mapped<>(
-                this.driverPath,
-                Path::toString
-            )
-        );
-    }
 }
