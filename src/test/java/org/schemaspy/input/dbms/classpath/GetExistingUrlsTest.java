@@ -18,14 +18,14 @@
  */
 package org.schemaspy.input.dbms.classpath;
 
-import org.junit.jupiter.api.Test;
-import org.schemaspy.input.dbms.driverpath.Driverpath;
-
-import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+import org.schemaspy.input.dbms.driverpath.Driverpath;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,42 +35,42 @@ class GetExistingUrlsTest {
 
   @Test
   void willAddDirAndContentIfDpIsADirAndNotAFile() {
-    URI dummyJarURI = driverFolder.resolve("dummy.jar").toUri();
-    URI dummyNarURI = driverFolder.resolve("dummy.nar").toUri();
-    URI narJarWarNotIncludedURI = driverFolder.resolve("nar.jar.war.not.included").toUri();
+    Path dummyJar = driverFolder.resolve("dummy.jar");
+    Path dummyNar = driverFolder.resolve("dummy.nar");
+    Path narJarWarNotIncluded = driverFolder.resolve("nar.jar.war.not.included");
 
-    Driverpath dp = driverFolder::toString;
+    Driverpath dp = () -> List.of(driverFolder).iterator();
     Set<URI> uris = new GetExistingUrls(dp).paths();
 
     assertThat(uris)
         .hasSize(4)
-        .contains(driverFolder.toUri(), dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
+        .contains(driverFolder.toUri(), dummyJar.toUri(), dummyNar.toUri(), narJarWarNotIncluded.toUri());
   }
 
   @Test
   void willOnlyAddFileIfFileIsSpecified() {
-    URI dummyJarURI = driverFolder.resolve("dummy.jar").toUri();
+    Path dummyJar = driverFolder.resolve("dummy.jar");
 
-    Driverpath dp = () -> driverFolder.resolve("dummy.jar").toString();
+    Driverpath dp = () -> List.of(dummyJar).iterator();
     Set<URI> uris = new GetExistingUrls(dp).paths();
 
     assertThat(uris)
         .hasSize(1)
-        .contains(dummyJarURI);
+        .contains(dummyJar.toUri());
   }
 
   @Test
   void willAddDirAndContentIfDpSecondArgIsADirAndNotAFile() {
-    URI dummyJarURI = driverFolder.resolve("dummy.jar").toUri();
-    URI dummyNarURI = driverFolder.resolve("dummy.nar").toUri();
-    URI narJarWarNotIncludedURI = driverFolder.resolve("nar.jar.war.not.included").toUri();
+    Path dummyJar = driverFolder.resolve("dummy.jar");
+    Path dummyNar = driverFolder.resolve("dummy.nar");
+    Path narJarWarNotIncluded = driverFolder.resolve("nar.jar.war.not.included");
 
-    String dpFile = driverFolder.resolve("dummy.jar").toString();
-    String dpDir = driverFolder.toString();
-    Set<URI> uris = new GetExistingUrls(() -> dpFile + File.pathSeparator + dpDir).paths();
+    Path dpFile = driverFolder.resolve("dummy.jar");
+    Path dpDir = driverFolder;
+    Set<URI> uris = new GetExistingUrls(() -> List.of(dpFile, dpDir).iterator()).paths();
 
     assertThat(uris)
         .hasSize(4)
-        .contains(driverFolder.toUri(), dummyJarURI, dummyNarURI, narJarWarNotIncludedURI);
+        .contains(driverFolder.toUri(), dummyJar.toUri(), dummyNar.toUri(), narJarWarNotIncluded.toUri());
   }
 }
