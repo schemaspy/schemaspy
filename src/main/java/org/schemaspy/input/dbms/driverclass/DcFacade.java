@@ -1,14 +1,15 @@
 package org.schemaspy.input.dbms.driverclass;
 
 import java.lang.invoke.MethodHandles;
-import org.schemaspy.input.dbms.classloader.ClassloaderSource;
-import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
-
 import java.sql.Driver;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+
+import org.schemaspy.input.dbms.classloader.ClSticky;
+import org.schemaspy.input.dbms.classloader.ClassloaderSource;
+import org.schemaspy.input.dbms.exceptions.ConnectionFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class DcFacade implements Driverclass {
     public DcFacade(final Logger logger, final String[] driverClasses, final ClassloaderSource loader) {
         this.logger = logger;
         this.driverClasses = driverClasses;
-        this.loader = loader;
+        this.loader = new ClSticky(loader);
     }
 
     @Override
@@ -45,7 +46,9 @@ public class DcFacade implements Driverclass {
                 )
             );
         }
-        this.logger.debug(String.format("Using driver '%s'", result.getName()));
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug(String.format("Using driver '%s'", result.getName()));
+        }
         return result;
     }
 }
