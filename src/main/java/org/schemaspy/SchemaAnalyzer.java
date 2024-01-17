@@ -522,7 +522,7 @@ public class SchemaAnalyzer {
         // create detailed diagrams
 
         progressListener.startCreatingTablePages();
-        SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getIdentifierQuoteString(), db.getDbmsMeta().getAllKeywords(), db.getTables(), db.getViews());
+        SqlAnalyzer sqlAnalyzer = new SqlAnalyzer(db.getDbmsMeta().getIdentifierQuoteString(), db.getDbmsMeta().reservedWords(), db.getTables(), db.getViews());
 
         File tablesDir = new File(diagramDir, "tables");
         tablesDir.mkdirs();

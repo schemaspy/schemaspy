@@ -70,7 +70,11 @@ public class DbmsMeta {
         return timeDateFunctions;
     }
 
-    public Set<String> getAllKeywords() {
+    /**
+     * Lists all identifiers used by the DBMS.
+     * @return The set of all keywords and built-in functions.
+     */
+    public Set<String> reservedWords() {
         Set<String> keywords = new HashSet<>();
         keywords.addAll(getSQLKeywords());
         keywords.addAll(getNumericFunctions());
