@@ -75,7 +75,7 @@ public class SqlService {
         databaseMetaData = this.connection.getMetaData();
         dbmsMeta = dbmsService.fetchDbmsMeta(databaseMetaData);
         invalidIdentifierPattern = createInvalidIdentifierPattern(databaseMetaData);
-        allKeywords = dbmsMeta.getAllKeywords();
+        allKeywords = dbmsMeta.reservedWords();
         return databaseMetaData;
     }
 
