@@ -198,7 +198,7 @@ We are proud to note that SchemaSpy assists researchers in their work.
 To cite SchemaSpy, please use:
 
 ```
-SchemaSpy Team (2023) SchemaSpy: Database documentation built easy. SchemaSpy. URL https://schemaspy.org/
+SchemaSpy Team (2024) SchemaSpy: Database documentation built easy. SchemaSpy. URL https://schemaspy.org/
 ```
 
 The BibTeX entry for LaTeX users is:
@@ -208,7 +208,7 @@ The BibTeX entry for LaTeX users is:
   title = {SchemaSpy: Database documentation built easy},
   author = {{SchemaSpy Team}},
   organization = {SchemaSpy},
-  year = {2023},
+  year = {2024},
   url = {https://schemaspy.org/}
 }
 ```
