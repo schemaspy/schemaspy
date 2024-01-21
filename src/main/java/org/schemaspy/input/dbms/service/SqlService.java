@@ -74,29 +74,9 @@ public class SqlService {
         this.connection = sqlConnection.connection();
         databaseMetaData = this.connection.getMetaData();
         dbmsMeta = dbmsService.fetchDbmsMeta(databaseMetaData);
-        invalidIdentifierPattern = createInvalidIdentifierPattern(databaseMetaData);
+        invalidIdentifierPattern = new InvalidIdentifierPattern(databaseMetaData).pattern();
         allKeywords = dbmsMeta.reservedWords();
         return databaseMetaData;
-    }
-
-
-    /**
-     * Return a <code>Pattern</code> whose matcher will return <code>true</code>
-     * when run against an identifier that contains a character that is not
-     * acceptable by the database without being quoted.
-     */
-    private static Pattern createInvalidIdentifierPattern(DatabaseMetaData databaseMetaData) throws SQLException {
-        StringBuilder validChars = new StringBuilder("a-zA-Z0-9_");
-        String reservedRegexChars = "-&^";
-        String extraValidChars = databaseMetaData.getExtraNameCharacters();
-        for (int i = 0; i < extraValidChars.length(); ++i) {
-            char ch = extraValidChars.charAt(i);
-            if (reservedRegexChars.indexOf(ch) >= 0) {
-                validChars.append("" + "\\");
-            }
-            validChars.append(ch);
-        }
-        return Pattern.compile("[^" + validChars + "]");
     }
 
     public Connection getConnection() {
@@ -157,7 +137,7 @@ public class SqlService {
         if (Objects.isNull(schema)) {
             schema = dbName; // some 'schema-less' db's treat the db name like a schema (unusual case)
         }
-        
+
         namedParams.put(":dbname", dbName);
         namedParams.put(":schema", schema);
         namedParams.put(":owner", schema); // alias for :schema
