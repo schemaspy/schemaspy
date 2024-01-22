@@ -15,7 +15,7 @@ public class MysqlSuite {
 
     public static final SuiteContainerExtension SUITE_CONTAINER
             = new SuiteContainerExtension(
-                    () -> new MySQLContainer<>("mysql:8-oracle")
+                    () -> new MySQLContainer<>("mysql:8.2-oracle")
             .withCommand("--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci")
     )
             .withInitFunctions(new SQLScriptsRunner("integrationTesting/mysql/dbScripts/"))
