@@ -40,9 +40,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.schemaspy.connection.SqlConnection;
+import org.schemaspy.input.dbms.service.name.DatabaseQuoted;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.InvalidConfigurationException;
+import org.schemaspy.util.naming.NameFromString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -232,7 +234,9 @@ public class SqlService {
     }
 
     public String quoteIdentifier(String id) {
-        String quote = dbmsMeta.getIdentifierQuoteString();
-        return quote + id + quote;
+        return new DatabaseQuoted(
+            dbmsMeta,
+            new NameFromString(id)
+        ).value();
     }
 }
