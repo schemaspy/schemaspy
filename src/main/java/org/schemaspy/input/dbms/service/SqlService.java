@@ -44,6 +44,7 @@ import org.schemaspy.input.dbms.service.name.DatabaseQuoted;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.InvalidConfigurationException;
+import org.schemaspy.util.naming.Name;
 import org.schemaspy.util.naming.NameFromString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,6 +200,8 @@ public class SqlService {
      * @return
      */
     public String getQuotedIdentifier(String id) {
+        Name result = new NameFromString(id);
+
         // look for any character that isn't valid (then matcher.find() returns true)
         Matcher matcher = invalidIdentifierPattern.matcher(id);
 
@@ -206,11 +209,14 @@ public class SqlService {
 
         if (quotesRequired) {
             // name contains something that must be quoted
-            return quoteIdentifier(id);
+            result = new DatabaseQuoted(
+                dbmsMeta,
+                result
+            );
         }
 
         // no quoting necessary
-        return id;
+        return result.value();
     }
 
     public String quoteIdentifier(String id) {
