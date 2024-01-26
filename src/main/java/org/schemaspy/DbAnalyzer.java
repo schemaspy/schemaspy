@@ -72,12 +72,43 @@ public class DbAnalyzer {
         for (Table table : tables.values()) {
             for (TableColumn column : table.getColumns()) {
                 String columnName = column.getName().toLowerCase();
-                if (!column.isForeignKey() && column.allowsImpliedParents() && columnName.endsWith("_id")) {
-                    String singular = columnName.substring(0, columnName.length() - "_id".length());
-                    String primaryTableName = Inflection.pluralize(singular);
+                if (!column.isForeignKey() && column.allowsImpliedParents() && (columnName.endsWith("_id") || columnName.endsWith("_uuid"))) {
+                    String suffix = "";
+                    if (columnName.endsWith("_id")) {
+                        suffix = "_id";
+                    } else {
+                        suffix = "_uuid";
+                    }
+                    String tableName = columnName.substring(0, columnName.length() - suffix.length());
+                    String primaryTableName = Inflection.pluralize(tableName);
                     Table primaryTable = tables.get(primaryTableName);
+
+                    /*
+                     * If the column name doesn't match a table name, it's likely that the column name has a non-default
+                     * name. This often happens when a table has multiple columns that join different rows in the same
+                     * parent table, e.g. "previous_company_id" and "current_company_id".
+                     * To still connect non-default relationships rows, remove parts of the name until the first "_"
+                     * and see if it matches a table now. If not, keep removing from the column name until the name
+                     * is empty or a table was matched. Example:
+                     * "previous_company_id" -> "company_id" => match!
+                     * "alternative_mailing_address_id" -> "mailing_address_id" -> "address_id" => match!
+                     * "3rd_party_system_id" -> "party_system_id" -> "system_id" -> no match!
+                     */
+                    if (primaryTable == null) {
+                        List<String> parts = new LinkedList<>(Arrays.asList(tableName.split("_")));
+                        while (primaryTable == null && !parts.isEmpty()) {
+                            parts.remove(0);
+                            primaryTable = tables.get(Inflection.pluralize(String.join("_", parts)));
+                        }
+                    }
+
                     if (primaryTable != null) {
-                        TableColumn primaryColumn = primaryTable.getColumn("ID");
+                        TableColumn primaryColumn = null;
+                        if (suffix == "_id") {
+                            primaryColumn = primaryTable.getColumn("ID");
+                        } else {
+                            primaryColumn = primaryTable.getColumn("UUID");
+                        }
                         if (primaryColumn != null) {
                             railsConstraints.add(new RailsForeignKeyConstraint(primaryColumn, column));
                         }
