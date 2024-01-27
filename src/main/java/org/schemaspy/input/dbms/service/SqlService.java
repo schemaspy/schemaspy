@@ -178,7 +178,7 @@ public class SqlService {
         if (forceQuotes) {
             return schemaOrCatalog + quoteIdentifier(tableName);
         } else {
-            return schemaOrCatalog + getQuotedIdentifier(tableName);
+            return schemaOrCatalog + getQuotedIdentifier(new NameFromString(tableName));
         }
     }
 
@@ -189,7 +189,7 @@ public class SqlService {
         if (forceQuotes) {
             return quoteIdentifier(schemaOrCatalog) + ".";
         } else {
-            return getQuotedIdentifier(schemaOrCatalog) + ".";
+            return getQuotedIdentifier(new NameFromString(schemaOrCatalog)) + ".";
         }
     }
 
@@ -199,23 +199,19 @@ public class SqlService {
      * @param id
      * @return
      */
-    public String getQuotedIdentifier(String id) {
-        Name result = new NameFromString(id);
+    public String getQuotedIdentifier(final Name id) {
+        final String value = id.value();
 
         // look for any character that isn't valid (then matcher.find() returns true)
-        Matcher matcher = invalidIdentifierPattern.matcher(id);
+        Matcher matcher = invalidIdentifierPattern.matcher(value);
 
-        boolean quotesRequired = matcher.find() || allKeywords.contains(id);
+        boolean quotesRequired = matcher.find() || allKeywords.contains(value);
 
-        if (quotesRequired) {
-            // name contains something that must be quoted
-            result = new DatabaseQuoted(
-                dbmsMeta,
-                result
-            );
-        }
+        // name contains something that must be quoted
+        final Name result = quotesRequired
+            ? new DatabaseQuoted(dbmsMeta, id)
+            : id;
 
-        // no quoting necessary
         return result.value();
     }
 
