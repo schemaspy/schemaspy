@@ -36,11 +36,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.schemaspy.connection.SqlConnection;
 import org.schemaspy.input.dbms.service.name.DatabaseQuoted;
+import org.schemaspy.input.dbms.service.name.Sanitized;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.InvalidConfigurationException;
@@ -71,14 +71,12 @@ public class SqlService {
     private DatabaseMetaData databaseMetaData;
     private DbmsMeta dbmsMeta;
     private Pattern invalidIdentifierPattern;
-    private Set<String> allKeywords;
 
     public DatabaseMetaData connect(SqlConnection sqlConnection) throws SQLException, IOException {
         this.connection = sqlConnection.connection();
         databaseMetaData = this.connection.getMetaData();
         dbmsMeta = dbmsService.fetchDbmsMeta(databaseMetaData);
         invalidIdentifierPattern = new InvalidIdentifierPattern(databaseMetaData).pattern();
-        allKeywords = dbmsMeta.reservedWords();
         return databaseMetaData;
     }
 
@@ -193,26 +191,8 @@ public class SqlService {
         }
     }
 
-    /**
-     * Return <code>id</code> quoted if required, otherwise return <code>id</code>
-     *
-     * @param id
-     * @return
-     */
     public String getQuotedIdentifier(final Name id) {
-        final String value = id.value();
-
-        // look for any character that isn't valid (then matcher.find() returns true)
-        Matcher matcher = invalidIdentifierPattern.matcher(value);
-
-        boolean quotesRequired = matcher.find() || allKeywords.contains(value);
-
-        // name contains something that must be quoted
-        final Name result = quotesRequired
-            ? new DatabaseQuoted(dbmsMeta, id)
-            : id;
-
-        return result.value();
+        return new Sanitized(this.invalidIdentifierPattern, this.dbmsMeta, id).value();
     }
 
     public String quoteIdentifier(String id) {
