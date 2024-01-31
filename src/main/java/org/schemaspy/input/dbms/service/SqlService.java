@@ -176,7 +176,12 @@ public class SqlService {
         if (forceQuotes) {
             return schemaOrCatalog + quoteIdentifier(tableName);
         } else {
-            return schemaOrCatalog + getQuotedIdentifier(new NameFromString(tableName));
+            return schemaOrCatalog +
+                new Sanitized(
+                    this.invalidIdentifierPattern,
+                    this.dbmsMeta,
+                    new NameFromString(tableName)
+                ).value();
         }
     }
 
@@ -187,12 +192,12 @@ public class SqlService {
         if (forceQuotes) {
             return quoteIdentifier(schemaOrCatalog) + ".";
         } else {
-            return getQuotedIdentifier(new NameFromString(schemaOrCatalog)) + ".";
+            return new Sanitized(
+                this.invalidIdentifierPattern,
+                this.dbmsMeta,
+                new NameFromString(schemaOrCatalog)
+            ).value() + ".";
         }
-    }
-
-    public String getQuotedIdentifier(final Name id) {
-        return new Sanitized(this.invalidIdentifierPattern, this.dbmsMeta, id).value();
     }
 
     public String quoteIdentifier(String id) {
