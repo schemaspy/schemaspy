@@ -189,15 +189,18 @@ public class SqlService {
         if (Objects.isNull(schemaOrCatalog)) {
             return "";
         }
+
+        final String result;
         if (forceQuotes) {
-            return quoteIdentifier(schemaOrCatalog) + ".";
+            result = quoteIdentifier(schemaOrCatalog);
         } else {
-            return new Sanitized(
+            result = new Sanitized(
                 this.invalidIdentifierPattern,
                 this.dbmsMeta,
                 new NameFromString(schemaOrCatalog)
-            ).value() + ".";
+            ).value();
         }
+        return result + ".";
     }
 
     public String quoteIdentifier(String id) {
