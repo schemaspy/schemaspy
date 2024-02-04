@@ -192,7 +192,10 @@ public class SqlService {
 
         final String result;
         if (forceQuotes) {
-            result = quoteIdentifier(schemaOrCatalog);
+            result = new DatabaseQuoted(
+                this.dbmsMeta,
+                new NameFromString(schemaOrCatalog)
+            ).value();
         } else {
             result = new Sanitized(
                 this.invalidIdentifierPattern,
