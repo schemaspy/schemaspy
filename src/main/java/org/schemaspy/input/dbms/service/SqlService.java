@@ -190,20 +190,20 @@ public class SqlService {
             return "";
         }
 
-        final String result;
+        final Name result;
         if (forceQuotes) {
             result = new DatabaseQuoted(
                 this.dbmsMeta,
                 new NameFromString(schemaOrCatalog)
-            ).value();
+            );
         } else {
             result = new Sanitized(
                 this.invalidIdentifierPattern,
                 this.dbmsMeta,
                 new NameFromString(schemaOrCatalog)
-            ).value();
+            );
         }
-        return result + ".";
+        return result.value() + ".";
     }
 
     public String quoteIdentifier(String id) {
