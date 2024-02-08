@@ -172,7 +172,8 @@ public class SqlService {
     }
 
     public String getQualifiedTableName(String catalog, String schema, String tableName, boolean forceQuotes) {
-        String schemaOrCatalog = getSchemaOrCatalog(ofNullable(schema).orElse(catalog), forceQuotes);
+        final String maybe = ofNullable(schema).orElse(catalog);
+        String schemaOrCatalog = getSchemaOrCatalog(maybe, forceQuotes);
         if (forceQuotes) {
             return schemaOrCatalog + quoteIdentifier(tableName);
         } else {
