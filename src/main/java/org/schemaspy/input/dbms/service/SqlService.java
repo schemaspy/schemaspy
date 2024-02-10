@@ -173,7 +173,9 @@ public class SqlService {
 
     public String getQualifiedTableName(String catalog, String schema, String tableName, boolean forceQuotes) {
         final String maybe = ofNullable(schema).orElse(catalog);
-        String schemaOrCatalog = getSchemaOrCatalog(maybe, forceQuotes);
+        final String schemaOrCatalog = Objects.isNull(maybe)
+            ? ""
+            : getSchemaOrCatalog(maybe, forceQuotes);
         if (forceQuotes) {
             return schemaOrCatalog + quoteIdentifier(tableName);
         } else {
@@ -187,10 +189,6 @@ public class SqlService {
     }
 
     private String getSchemaOrCatalog(String schemaOrCatalog, boolean forceQuotes) {
-        if (Objects.isNull(schemaOrCatalog)) {
-            return "";
-        }
-
         final Name result;
         if (forceQuotes) {
             result = new DatabaseQuoted(
