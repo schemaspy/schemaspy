@@ -175,7 +175,7 @@ public class SqlService {
         final String maybe = ofNullable(schema).orElse(catalog);
         final String schemaOrCatalog = Objects.isNull(maybe)
             ? ""
-            : getSchemaOrCatalog(maybe, forceQuotes);
+            : getSchemaOrCatalog(maybe, forceQuotes) + ".";
         if (forceQuotes) {
             return schemaOrCatalog + quoteIdentifier(tableName);
         } else {
@@ -202,7 +202,7 @@ public class SqlService {
                 new NameFromString(schemaOrCatalog)
             );
         }
-        return result.value() + ".";
+        return result.value();
     }
 
     public String quoteIdentifier(String id) {
