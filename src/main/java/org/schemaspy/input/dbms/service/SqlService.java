@@ -177,7 +177,7 @@ public class SqlService {
             ? ""
             : getSchemaOrCatalog(maybe, forceQuotes) + ".";
         if (forceQuotes) {
-            return schemaOrCatalog + quoteIdentifier(tableName);
+            return schemaOrCatalog + quoteIdentifier(tableName).value();
         } else {
             return schemaOrCatalog +
                 new Sanitized(
@@ -205,10 +205,10 @@ public class SqlService {
         return result.value();
     }
 
-    public String quoteIdentifier(String id) {
+    public Name quoteIdentifier(String id) {
         return new DatabaseQuoted(
             dbmsMeta,
             new NameFromString(id)
-        ).value();
+        );
     }
 }
