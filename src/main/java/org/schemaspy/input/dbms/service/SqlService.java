@@ -189,20 +189,16 @@ public class SqlService {
     }
 
     private Name getSchemaOrCatalog(String schemaOrCatalog, boolean forceQuotes) {
-        final Name result;
-        if (forceQuotes) {
-            result = new DatabaseQuoted(
+        return forceQuotes ?
+            new DatabaseQuoted(
                 this.dbmsMeta,
                 new NameFromString(schemaOrCatalog)
-            );
-        } else {
-            result = new Sanitized(
+            ) :
+            new Sanitized(
                 this.invalidIdentifierPattern,
                 this.dbmsMeta,
                 new NameFromString(schemaOrCatalog)
             );
-        }
-        return result;
     }
 
     public Name quoteIdentifier(String id) {
