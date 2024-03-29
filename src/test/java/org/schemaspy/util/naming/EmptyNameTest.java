@@ -17,4 +17,15 @@ class EmptyNameTest {
     void representName() {
         assertThat(new EmptyName().value()).isEmpty();
     }
+
+    /**
+     * When the object is asked if it equals another,
+     * Then it should discriminate based on value.
+     */
+    @Test
+    void equalName() {
+        assertThat(
+            new EmptyName().equals((Name) () -> "")
+        ).isTrue();
+    }
 }

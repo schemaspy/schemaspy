@@ -13,4 +13,13 @@ public final class EmptyName implements Name {
     public String value() {
         return "";
     }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof Name)) {
+            return false;
+        }
+        Name other = (Name) obj;
+        return other.value().equals(this.value());
+    }
 }
