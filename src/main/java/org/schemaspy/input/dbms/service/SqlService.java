@@ -176,16 +176,15 @@ public class SqlService {
         final String schemaOrCatalog = Objects.isNull(maybe)
             ? ""
             : getSchemaOrCatalog(maybe, forceQuotes).value() + ".";
-        if (forceQuotes) {
-            return schemaOrCatalog + quoteIdentifier(tableName).value();
-        } else {
-            return schemaOrCatalog +
-                new Sanitized(
-                    this.invalidIdentifierPattern,
-                    this.dbmsMeta,
-                    new NameFromString(tableName)
-                ).value();
-        }
+
+        final String table = forceQuotes ? quoteIdentifier(tableName).value()
+            : new Sanitized(
+                this.invalidIdentifierPattern,
+                this.dbmsMeta,
+                new NameFromString(tableName)
+            ).value();
+
+        return schemaOrCatalog + table;
     }
 
     private Name getSchemaOrCatalog(String schemaOrCatalog, boolean forceQuotes) {
