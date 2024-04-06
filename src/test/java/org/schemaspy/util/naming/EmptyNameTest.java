@@ -28,4 +28,16 @@ class EmptyNameTest {
             new EmptyName().equals((Name) () -> "")
         ).isTrue();
     }
+
+    /**
+     * When the object is asked for its hash code,
+     * Then it should not change its response.
+     */
+    @Test
+    void consistentHashCode() {
+        final Name sut = new EmptyName();
+        assertThat(
+            sut.hashCode()
+        ).isEqualTo(sut.hashCode());
+    }
 }

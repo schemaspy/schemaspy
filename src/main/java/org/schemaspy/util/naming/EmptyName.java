@@ -22,4 +22,9 @@ public final class EmptyName implements Name {
         Name other = (Name) obj;
         return other.value().equals(this.value());
     }
+
+    @Override
+    public int hashCode() {
+        return this.value().hashCode();
+    }
 }
