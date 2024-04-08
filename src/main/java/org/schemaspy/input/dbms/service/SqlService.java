@@ -177,14 +177,14 @@ public class SqlService {
             ? ""
             : getSchemaOrCatalog(maybe, forceQuotes).value() + ".";
 
-        final String table = forceQuotes ? quoteIdentifier(tableName).value()
+        final Name table = forceQuotes ? quoteIdentifier(tableName)
             : new Sanitized(
                 this.invalidIdentifierPattern,
                 this.dbmsMeta,
                 new NameFromString(tableName)
-            ).value();
+            );
 
-        return schemaOrCatalog + table;
+        return schemaOrCatalog + table.value();
     }
 
     private Name getSchemaOrCatalog(String schemaOrCatalog, boolean forceQuotes) {
