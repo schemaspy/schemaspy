@@ -44,8 +44,10 @@ import org.schemaspy.input.dbms.service.name.Sanitized;
 import org.schemaspy.model.Database;
 import org.schemaspy.model.DbmsMeta;
 import org.schemaspy.model.InvalidConfigurationException;
+import org.schemaspy.util.naming.EmptyName;
 import org.schemaspy.util.naming.Name;
 import org.schemaspy.util.naming.NameFromString;
+import org.schemaspy.util.naming.Qualified;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,9 +175,10 @@ public class SqlService {
 
     public String getQualifiedTableName(String catalog, String schema, String tableName, boolean forceQuotes) {
         final String maybe = ofNullable(schema).orElse(catalog);
-        final String schemaOrCatalog = Objects.isNull(maybe)
-            ? ""
-            : getSchemaOrCatalog(maybe, forceQuotes).value() + ".";
+
+        final Name schemaOrCatalog = Objects.isNull(maybe)
+            ? new EmptyName()
+            : getSchemaOrCatalog(maybe, forceQuotes);
 
         final Name table = forceQuotes ? quoteIdentifier(tableName)
             : new Sanitized(
@@ -184,7 +187,7 @@ public class SqlService {
                 new NameFromString(tableName)
             );
 
-        return schemaOrCatalog + table.value();
+        return new Qualified(table, schemaOrCatalog).value();
     }
 
     private Name getSchemaOrCatalog(String schemaOrCatalog, boolean forceQuotes) {
