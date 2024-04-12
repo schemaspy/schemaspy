@@ -178,7 +178,7 @@ public class SqlService {
 
         final Name schemaOrCatalog = Objects.isNull(maybe)
             ? new EmptyName()
-            : getSchemaOrCatalog(maybe, forceQuotes);
+            : getSchemaOrCatalog(new NameFromString(maybe), forceQuotes);
 
         final Name table = forceQuotes ? quoteIdentifier(tableName)
             : new Sanitized(
@@ -190,16 +190,19 @@ public class SqlService {
         return new Qualified(table, schemaOrCatalog).value();
     }
 
-    private Name getSchemaOrCatalog(String schemaOrCatalog, boolean forceQuotes) {
+    private Name getSchemaOrCatalog(
+        final Name schemaOrCatalog,
+        final boolean forceQuotes
+    ) {
         return forceQuotes ?
             new DatabaseQuoted(
                 this.dbmsMeta,
-                new NameFromString(schemaOrCatalog)
+                schemaOrCatalog
             ) :
             new Sanitized(
                 this.invalidIdentifierPattern,
                 this.dbmsMeta,
-                new NameFromString(schemaOrCatalog)
+                schemaOrCatalog
             );
     }
 
