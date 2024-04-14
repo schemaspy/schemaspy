@@ -286,7 +286,8 @@ public class DbAnalyzer {
         Set<String> schemas = new TreeSet<>(); // alpha sorted
         Pattern schemaRegex = Pattern.compile(schemaSpec);
 
-        for (String schema : (isCatalog ? getCatalogs(meta) : getSchemas(meta))) {
+        final List<String> candidates = isCatalog ? getCatalogs(meta) : getSchemas(meta);
+        for (String schema : candidates) {
             if (schemaRegex.matcher(schema).matches()) {
                 ResultSet rs = null;
                 try {
