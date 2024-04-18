@@ -267,9 +267,9 @@ public class DbAnalyzer {
      * @param schemaSpec filter for schema/catalog
      */
     public static List<String> getPopulatedSchemas(DatabaseMetaData meta, String schemaSpec) throws SQLException {
-        List<String> populatedSchemas = getPopulatedSchemas(meta, schemaSpec, false);
+        List<String> populatedSchemas = getPopulatedSchemas(meta, schemaSpec, getSchemas(meta));
         if (populatedSchemas.isEmpty()) {
-            return getPopulatedSchemas(meta, schemaSpec, true);
+            return getPopulatedSchemas(meta, schemaSpec, getCatalogs(meta));
         }
         return populatedSchemas;
     }
@@ -280,13 +280,16 @@ public class DbAnalyzer {
      *
      * @param meta DatabaseMetaData
      * @param schemaSpec filter for catalog or schema
-     * @param isCatalog look in catalogs or schemas
+     * @param candidates schemas to consider
      */
-    public static List<String> getPopulatedSchemas(DatabaseMetaData meta, String schemaSpec, boolean isCatalog) throws SQLException {
+    public static List<String> getPopulatedSchemas(
+        DatabaseMetaData meta,
+        String schemaSpec,
+        final List<String> candidates
+    ) throws SQLException {
         Set<String> schemas = new TreeSet<>(); // alpha sorted
         Pattern schemaRegex = Pattern.compile(schemaSpec);
 
-        final List<String> candidates = isCatalog ? getCatalogs(meta) : getSchemas(meta);
         for (String schema : candidates) {
             if (schemaRegex.matcher(schema).matches()) {
                 try (ResultSet rs = meta.getTables(null, schema, "%", null)) {
