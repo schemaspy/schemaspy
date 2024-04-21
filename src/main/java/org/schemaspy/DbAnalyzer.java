@@ -25,7 +25,9 @@
 package org.schemaspy;
 
 import org.schemaspy.model.*;
+import org.schemaspy.util.Filtered;
 import org.schemaspy.util.Inflection;
+import org.schemaspy.util.WhenFalse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -290,20 +292,24 @@ public class DbAnalyzer {
         Set<String> schemas = new TreeSet<>(); // alpha sorted
         Pattern schemaRegex = Pattern.compile(schemaSpec);
 
-        for (String schema : candidates) {
-            if (schemaRegex.matcher(schema).matches()) {
-                try (ResultSet rs = meta.getTables(null, schema, "%", null)) {
-                    if (rs.next()) {
-                        LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex);
-                        schemas.add(schema);
-                    } else {
-                        LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex);
-                    }
-                } catch (SQLException sqlex) {
-                    LOGGER.debug("SQLException caught during populateSchemas", sqlex);
+        final Iterable<String> matched = new Filtered<>(
+            candidates,
+            new WhenFalse<>(
+                schema -> schemaRegex.matcher(schema).matches(),
+                schema -> LOGGER.debug("Excluding schema {}: doesn't match '{}'", schema, schemaRegex)
+            )
+        );
+
+        for (String schema : matched) {
+            try (ResultSet rs = meta.getTables(null, schema, "%", null)) {
+                if (rs.next()) {
+                    LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex);
+                    schemas.add(schema);
+                } else {
+                    LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex);
                 }
-            } else {
-                LOGGER.debug("Excluding schema {}: doesn't match '{}'", schema, schemaRegex);
+            } catch (SQLException sqlex) {
+                LOGGER.debug("SQLException caught during populateSchemas", sqlex);
             }
         }
 
