@@ -308,12 +308,9 @@ public class DbAnalyzer {
                 } else {
                     LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex);
                 }
-            } catch (SQLException sqlex) {
-                LOGGER.debug("SQLException caught during populateSchemas", sqlex);
             }
         }
 
         return new ArrayList<>(schemas);
     }
-
 }
