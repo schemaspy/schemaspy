@@ -62,7 +62,7 @@ Processing
 [-schemas listOfSchemas]
     List of schemas to analyze, separated by ``,``
 [-all]
-    Try to analyze all schemas in database, schemas can be excluded with ``-schemSpec`` which as defaults set by databaseType
+    Try to analyze all schemas in database, schemas can be excluded with ``-schemaSpec`` which as defaults set by databaseType
 [-schemaSpec schemaRegEx]
     Schemas to analyze, default to all, might be specified by databaseType.
 [-dbthreads number]
