@@ -288,7 +288,7 @@ public class DbAnalyzer {
         DatabaseMetaData meta,
         String schemaSpec,
         final List<String> candidates
-    ) throws SQLException {
+    ) {
         Set<String> schemas = new TreeSet<>(); // alpha sorted
         Pattern schemaRegex = Pattern.compile(schemaSpec);
 
@@ -301,16 +301,25 @@ public class DbAnalyzer {
         );
 
         for (String schema : matched) {
-            try (ResultSet rs = meta.getTables(null, schema, "%", null)) {
-                if (rs.next()) {
-                    LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex);
-                    schemas.add(schema);
-                } else {
-                    LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex);
-                }
+            if (hasTables(meta, schema)) {
+                LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex);
+                schemas.add(schema);
+            } else {
+                LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex);
             }
         }
 
         return new ArrayList<>(schemas);
+    }
+
+    public static boolean hasTables(
+        final DatabaseMetaData meta,
+        final String schema
+    ) {
+        try(final ResultSet rs = meta.getTables(null, schema, "%", null)) {
+            return rs.next();
+        } catch (SQLException e) {
+            return false;
+        }
     }
 }
