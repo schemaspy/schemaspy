@@ -300,13 +300,17 @@ public class DbAnalyzer {
             )
         );
 
-        for (String schema : matched) {
-            if (hasTables(meta, schema)) {
-                LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex);
-                schemas.add(schema);
-            } else {
-                LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex);
-            }
+        final Iterable<String> populated = new Filtered<>(
+            matched,
+            new WhenFalse<>(
+                schema -> hasTables(meta, schema),
+                schema -> LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex)
+            )
+        );
+
+        for (String schema : populated) {
+            LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex);
+            schemas.add(schema);
         }
 
         return new ArrayList<>(schemas);
