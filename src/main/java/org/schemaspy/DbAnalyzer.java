@@ -289,7 +289,6 @@ public class DbAnalyzer {
         String schemaSpec,
         final List<String> candidates
     ) {
-        Set<String> schemas = new TreeSet<>(); // alpha sorted
         Pattern schemaRegex = Pattern.compile(schemaSpec);
 
         final Iterable<String> matched = new Filtered<>(
@@ -307,6 +306,8 @@ public class DbAnalyzer {
                 schema -> LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex)
             )
         );
+
+        final Set<String> schemas = new TreeSet<>(); // alpha sorted
 
         for (String schema : populated) {
             LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex);
