@@ -28,6 +28,7 @@ import org.schemaspy.model.*;
 import org.schemaspy.util.Filtered;
 import org.schemaspy.util.Inflection;
 import org.schemaspy.util.WhenFalse;
+import org.schemaspy.util.WhenIf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -301,8 +302,9 @@ public class DbAnalyzer {
 
         final Iterable<String> populated = new Filtered<>(
             matched,
-            new WhenFalse<>(
+            new WhenIf<>(
                 schema -> hasTables(meta, schema),
+                schema -> LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex),
                 schema -> LOGGER.debug("Excluding schema {}: matches \"{}\" but contains no tables", schema, schemaRegex)
             )
         );
@@ -310,7 +312,6 @@ public class DbAnalyzer {
         final Set<String> schemas = new TreeSet<>(); // alpha sorted
 
         for (String schema : populated) {
-            LOGGER.debug("Including schema {}: matches + \"{}\" and contains tables", schema, schemaRegex);
             schemas.add(schema);
         }
 
