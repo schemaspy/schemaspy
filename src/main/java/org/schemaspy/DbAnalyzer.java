@@ -24,6 +24,7 @@
  */
 package org.schemaspy;
 
+import java.util.stream.StreamSupport;
 import org.schemaspy.model.*;
 import org.schemaspy.util.Filtered;
 import org.schemaspy.util.Inflection;
@@ -309,13 +310,10 @@ public class DbAnalyzer {
             )
         );
 
-        final Set<String> schemas = new TreeSet<>(); // alpha sorted
-
-        for (String schema : populated) {
-            schemas.add(schema);
-        }
-
-        return new ArrayList<>(schemas);
+        return StreamSupport.stream(populated.spliterator(), false)
+            .distinct()
+            .sorted()
+            .toList();
     }
 
     public static boolean hasTables(
