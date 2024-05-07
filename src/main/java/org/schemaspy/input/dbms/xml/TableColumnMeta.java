@@ -69,21 +69,21 @@ public class TableColumnMeta {
 
         name = attribs.getNamedItem("name").getNodeValue();
 
-        Node node = attribs.getNamedItem("comments");
-        if (node == null) {
-            node = attribs.getNamedItem("remarks");
-            if (Objects.nonNull(node)) {
+        Node commentsNode = attribs.getNamedItem("comments");
+        if (commentsNode == null) {
+            commentsNode = attribs.getNamedItem("remarks");
+            if (Objects.nonNull(commentsNode)) {
                 LOGGER.warn("<remarks> has been deprecated");
             }
         }
-        if (node != null) {
-            tmp = node.getNodeValue().trim();
+        if (commentsNode != null) {
+            tmp = commentsNode.getNodeValue().trim();
             comments = tmp.length() == 0 ? null : tmp;
         } else {
             comments = null;
         }
 
-        node = attribs.getNamedItem("type");
+        Node node = attribs.getNamedItem("type");
         type = node == null ? "Unknown" : node.getNodeValue();
 
         node = attribs.getNamedItem("id");
@@ -94,19 +94,19 @@ public class TableColumnMeta {
 
         node = attribs.getNamedItem("digits");
         digits = node == null ? 0 : Integer.parseInt(node.getNodeValue());
-        
+
         node = attribs.getNamedItem("nullable");
         isNullable = node != null && evalBoolean(node.getNodeValue());
 
         node = attribs.getNamedItem("autoUpdated");
         isAutoUpdated = node != null && evalBoolean(node.getNodeValue());
-        
+
         node = attribs.getNamedItem("primaryKey");
         isPrimary = node != null && evalBoolean(node.getNodeValue());
-        
+
         node = attribs.getNamedItem("defaultValue");
         defaultValue = node == null ? null : node.getNodeValue();
-        
+
         node = attribs.getNamedItem("disableImpliedKeys");
         if (node != null) {
             tmp = node.getNodeValue().trim().toLowerCase();
@@ -173,23 +173,23 @@ public class TableColumnMeta {
     public String getName() {
         return name;
     }
-    
+
     public String getType() {
         return type;
     }
-    
+
     public String getId() {
         return id;
     }
-    
+
     public int getSize() {
         return size;
     }
-    
+
     public int getDigits() {
         return digits;
     }
-    
+
     public boolean isPrimary() {
         return isPrimary;
     }
@@ -197,7 +197,7 @@ public class TableColumnMeta {
     public boolean isNullable() {
         return isNullable;
     }
-    
+
     public boolean isAutoUpdated() {
         return isAutoUpdated;
     }
@@ -205,7 +205,7 @@ public class TableColumnMeta {
     public String getComments() {
         return comments;
     }
-    
+
     public String getDefaultValue() {
         return defaultValue;
     }
