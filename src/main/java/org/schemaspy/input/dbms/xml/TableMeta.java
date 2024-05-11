@@ -55,22 +55,9 @@ public class TableMeta {
         NamedNodeMap attribs = tableNode.getAttributes();
 
         name = attribs.getNamedItem("name").getNodeValue();
+        comments = new CmFacade(tableNode).value();
 
-        Node node = attribs.getNamedItem("comments");
-        if (node == null) {
-            node = attribs.getNamedItem("remarks");
-            if (Objects.nonNull(node)) {
-                LOGGER.warn("<remarks> has been deprecated");
-            }
-        }
-        if (node != null) {
-            String tmp = node.getNodeValue().trim();
-            comments = tmp.length() == 0 ? null : tmp;
-        } else {
-            comments = null;
-        }
-
-        node = attribs.getNamedItem("remoteSchema");
+        Node node = attribs.getNamedItem("remoteSchema");
         remoteSchema = node == null ? null : node.getNodeValue().trim();
 
         node = attribs.getNamedItem("remoteCatalog");
