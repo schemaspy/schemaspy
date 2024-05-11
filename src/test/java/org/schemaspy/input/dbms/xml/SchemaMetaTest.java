@@ -33,28 +33,28 @@ class SchemaMetaTest {
     public static LogbackExtension logback = new LogbackExtension();
 
     @Test
-    @Logback(TableMeta.class)
+    @Logback(CmFacade.class)
     void deprecationWarningRemarksInTable() {
         logback.expect(Matchers.containsString("deprecated"));
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/remarksInTable.xml", "dbname", "schemaName", false);
     }
 
     @Test
-    @Logback(TableColumnMeta.class)
+    @Logback(CmFacade.class)
     void deprecationWarningRemarksInColumn() {
         logback.expect(Matchers.containsString("deprecated"));
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/remarksInColumn.xml", "dbname", "schemaName", false);
     }
 
     @Test
-    @Logback(TableMeta.class)
+    @Logback(CmFacade.class)
     void okCommentsInTable() {
         logback.expect(Matchers.not(Matchers.containsString("deprecated")));
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/commentsInTable.xml", "dbname", "schemaName", false);
     }
 
     @Test
-    @Logback(TableColumnMeta.class)
+    @Logback(CmFacade.class)
     void okCommentsInColumn() {
         logback.expect(Matchers.not(Matchers.containsString("deprecated")));
         SchemaMeta schemaMeta = new SchemaMeta("src/test/resources/model/xml/commentsInColumn.xml", "dbname", "schemaName", false);

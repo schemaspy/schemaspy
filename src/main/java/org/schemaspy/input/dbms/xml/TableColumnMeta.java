@@ -68,20 +68,7 @@ public class TableColumnMeta {
         String tmp;
 
         name = attribs.getNamedItem("name").getNodeValue();
-
-        Node commentsNode = attribs.getNamedItem("comments");
-        if (commentsNode == null) {
-            commentsNode = attribs.getNamedItem("remarks");
-            if (Objects.nonNull(commentsNode)) {
-                LOGGER.warn("<remarks> has been deprecated");
-            }
-        }
-        if (commentsNode != null) {
-            tmp = commentsNode.getNodeValue().trim();
-            comments = tmp.length() == 0 ? null : tmp;
-        } else {
-            comments = null;
-        }
+        comments = new CmFacade(colNode).value();
 
         Node node = attribs.getNamedItem("type");
         type = node == null ? "Unknown" : node.getNodeValue();
