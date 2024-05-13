@@ -99,22 +99,41 @@ public class TableColumnMeta {
             tmp = node.getNodeValue().trim().toLowerCase();
             switch (tmp) {
                 case "to":
-                    isImpliedChildrenDisabled = true;
                     isImpliedParentsDisabled = false;
                     break;
                 case "from":
                     isImpliedParentsDisabled = true;
-                    isImpliedChildrenDisabled = false;
                     break;
                 case "all":
-                    isImpliedChildrenDisabled = isImpliedParentsDisabled = true;
+                    isImpliedParentsDisabled = true;
                     break;
                 default:
-                    isImpliedChildrenDisabled = isImpliedParentsDisabled = false;
+                    isImpliedParentsDisabled = false;
                     break;
             }
         } else {
-            isImpliedChildrenDisabled = isImpliedParentsDisabled = false;
+            isImpliedParentsDisabled = false;
+        }
+
+        node = attribs.getNamedItem("disableImpliedKeys");
+        if (node != null) {
+            tmp = node.getNodeValue().trim().toLowerCase();
+            switch (tmp) {
+                case "to":
+                    isImpliedChildrenDisabled = true;
+                    break;
+                case "from":
+                    isImpliedChildrenDisabled = false;
+                    break;
+                case "all":
+                    isImpliedChildrenDisabled = true;
+                    break;
+                default:
+                    isImpliedChildrenDisabled = false;
+                    break;
+            }
+        } else {
+            isImpliedChildrenDisabled = false;
         }
 
         node = attribs.getNamedItem("disableDiagramAssociations");
