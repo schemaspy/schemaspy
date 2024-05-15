@@ -98,15 +98,11 @@ public class TableColumnMeta {
         if (node != null) {
             tmp = node.getNodeValue().trim().toLowerCase();
             switch (tmp) {
-                case "to":
-                    isImpliedParentsDisabled = false;
-                    break;
+                case "all":
                 case "from":
                     isImpliedParentsDisabled = true;
                     break;
-                case "all":
-                    isImpliedParentsDisabled = true;
-                    break;
+                case "to":
                 default:
                     isImpliedParentsDisabled = false;
                     break;
@@ -119,15 +115,11 @@ public class TableColumnMeta {
         if (node != null) {
             tmp = node.getNodeValue().trim().toLowerCase();
             switch (tmp) {
+                case "all":
                 case "to":
                     isImpliedChildrenDisabled = true;
                     break;
                 case "from":
-                    isImpliedChildrenDisabled = false;
-                    break;
-                case "all":
-                    isImpliedChildrenDisabled = true;
-                    break;
                 default:
                     isImpliedChildrenDisabled = false;
                     break;
