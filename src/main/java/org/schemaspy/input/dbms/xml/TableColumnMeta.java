@@ -134,19 +134,33 @@ public class TableColumnMeta {
             switch (tmp) {
                 case "all":
                     isAllExcluded = true;
-                    isExcluded = true;
                     break;
                 case "exceptdirect":
                     isAllExcluded = false;
-                    isExcluded = true;
                     break;
                 default:
                     isAllExcluded = false;
-                    isExcluded = false;
                     break;
             }
         } else {
             isAllExcluded = false;
+        }
+
+        node = attribs.getNamedItem("disableDiagramAssociations");
+        if (node != null) {
+            tmp = node.getNodeValue().trim().toLowerCase();
+            switch (tmp) {
+                case "all":
+                    isExcluded = true;
+                    break;
+                case "exceptdirect":
+                    isExcluded = true;
+                    break;
+                default:
+                    isExcluded = false;
+                    break;
+            }
+        } else {
             isExcluded = false;
         }
 
