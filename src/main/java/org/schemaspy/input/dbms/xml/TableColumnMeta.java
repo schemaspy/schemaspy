@@ -32,7 +32,6 @@ import org.w3c.dom.NodeList;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -45,6 +44,7 @@ import java.util.Objects;
  * @author Nils Petzaell
  */
 public class TableColumnMeta {
+    private final Node colNode;
     private final String name;
     private final String type;
     private final boolean isPrimary;
@@ -58,12 +58,12 @@ public class TableColumnMeta {
     private final List<ForeignKeyMeta> foreignKeys = new ArrayList<>();
     private final boolean isExcluded;
     private final boolean isAllExcluded;
-    private final boolean isImpliedParentsDisabled;
     private final boolean isImpliedChildrenDisabled;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public TableColumnMeta(Node colNode) {
+        this.colNode = colNode;
         NamedNodeMap attribs = colNode.getAttributes();
         String tmp;
 
@@ -93,23 +93,6 @@ public class TableColumnMeta {
 
         node = attribs.getNamedItem("defaultValue");
         defaultValue = node == null ? null : node.getNodeValue();
-
-        node = attribs.getNamedItem("disableImpliedKeys");
-        if (node != null) {
-            tmp = node.getNodeValue().trim().toLowerCase();
-            switch (tmp) {
-                case "all":
-                case "from":
-                    isImpliedParentsDisabled = true;
-                    break;
-                case "to":
-                default:
-                    isImpliedParentsDisabled = false;
-                    break;
-            }
-        } else {
-            isImpliedParentsDisabled = false;
-        }
 
         node = attribs.getNamedItem("disableImpliedKeys");
         if (node != null) {
@@ -235,6 +218,25 @@ public class TableColumnMeta {
     }
 
     public boolean isImpliedParentsDisabled() {
+        final NamedNodeMap attribs = colNode.getAttributes();
+        final boolean isImpliedParentsDisabled;
+
+        Node node = attribs.getNamedItem("disableImpliedKeys");
+        if (node != null) {
+            final String tmp = node.getNodeValue().trim().toLowerCase();
+            switch (tmp) {
+                case "all":
+                case "from":
+                    isImpliedParentsDisabled = true;
+                    break;
+                case "to":
+                default:
+                    isImpliedParentsDisabled = false;
+                    break;
+            }
+        } else {
+            isImpliedParentsDisabled = false;
+        }
         return isImpliedParentsDisabled;
     }
 
