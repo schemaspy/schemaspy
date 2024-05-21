@@ -58,7 +58,6 @@ public class TableColumnMeta {
     private final List<ForeignKeyMeta> foreignKeys = new ArrayList<>();
     private final boolean isExcluded;
     private final boolean isAllExcluded;
-    private final boolean isImpliedChildrenDisabled;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -93,23 +92,6 @@ public class TableColumnMeta {
 
         node = attribs.getNamedItem("defaultValue");
         defaultValue = node == null ? null : node.getNodeValue();
-
-        node = attribs.getNamedItem("disableImpliedKeys");
-        if (node != null) {
-            tmp = node.getNodeValue().trim().toLowerCase();
-            switch (tmp) {
-                case "all":
-                case "to":
-                    isImpliedChildrenDisabled = true;
-                    break;
-                case "from":
-                default:
-                    isImpliedChildrenDisabled = false;
-                    break;
-            }
-        } else {
-            isImpliedChildrenDisabled = false;
-        }
 
         node = attribs.getNamedItem("disableDiagramAssociations");
         if (node != null) {
@@ -241,6 +223,26 @@ public class TableColumnMeta {
     }
 
     public boolean isImpliedChildrenDisabled() {
+        final NamedNodeMap attribs = this.colNode.getAttributes();
+        final boolean isImpliedChildrenDisabled;
+
+        Node node = attribs.getNamedItem("disableImpliedKeys");
+        if (node != null) {
+            final String tmp = node.getNodeValue().trim().toLowerCase();
+            switch (tmp) {
+                case "all":
+                case "to":
+                    isImpliedChildrenDisabled = true;
+                    break;
+                case "from":
+                default:
+                    isImpliedChildrenDisabled = false;
+                    break;
+            }
+        } else {
+            isImpliedChildrenDisabled = false;
+        }
+        
         return isImpliedChildrenDisabled;
     }
 }
