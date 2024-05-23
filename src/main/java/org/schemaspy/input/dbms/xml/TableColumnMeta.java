@@ -57,7 +57,6 @@ public class TableColumnMeta {
     private final boolean isAutoUpdated;
     private final List<ForeignKeyMeta> foreignKeys = new ArrayList<>();
     private final boolean isExcluded;
-    private final boolean isAllExcluded;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -92,24 +91,6 @@ public class TableColumnMeta {
 
         node = attribs.getNamedItem("defaultValue");
         defaultValue = node == null ? null : node.getNodeValue();
-
-        node = attribs.getNamedItem("disableDiagramAssociations");
-        if (node != null) {
-            tmp = node.getNodeValue().trim().toLowerCase();
-            switch (tmp) {
-                case "all":
-                    isAllExcluded = true;
-                    break;
-                case "exceptdirect":
-                    isAllExcluded = false;
-                    break;
-                default:
-                    isAllExcluded = false;
-                    break;
-            }
-        } else {
-            isAllExcluded = false;
-        }
 
         node = attribs.getNamedItem("disableDiagramAssociations");
         if (node != null) {
@@ -196,6 +177,26 @@ public class TableColumnMeta {
     }
 
     public boolean isAllExcluded() {
+        final NamedNodeMap attribs = colNode.getAttributes();
+        final boolean isAllExcluded;
+
+        Node node = attribs.getNamedItem("disableDiagramAssociations");
+        if (node != null) {
+            final String tmp = node.getNodeValue().trim().toLowerCase();
+            switch (tmp) {
+                case "all":
+                    isAllExcluded = true;
+                    break;
+                case "exceptdirect":
+                    isAllExcluded = false;
+                    break;
+                default:
+                    isAllExcluded = false;
+                    break;
+            }
+        } else {
+            isAllExcluded = false;
+        }
         return isAllExcluded;
     }
 
@@ -242,7 +243,7 @@ public class TableColumnMeta {
         } else {
             isImpliedChildrenDisabled = false;
         }
-        
+
         return isImpliedChildrenDisabled;
     }
 }
