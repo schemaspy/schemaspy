@@ -56,7 +56,6 @@ public class TableColumnMeta {
     private final String defaultValue;
     private final boolean isAutoUpdated;
     private final List<ForeignKeyMeta> foreignKeys = new ArrayList<>();
-    private final boolean isExcluded;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -91,24 +90,6 @@ public class TableColumnMeta {
 
         node = attribs.getNamedItem("defaultValue");
         defaultValue = node == null ? null : node.getNodeValue();
-
-        node = attribs.getNamedItem("disableDiagramAssociations");
-        if (node != null) {
-            tmp = node.getNodeValue().trim().toLowerCase();
-            switch (tmp) {
-                case "all":
-                    isExcluded = true;
-                    break;
-                case "exceptdirect":
-                    isExcluded = true;
-                    break;
-                default:
-                    isExcluded = false;
-                    break;
-            }
-        } else {
-            isExcluded = false;
-        }
 
 		LOGGER.debug("Found XML column metadata for {} isPrimaryKey: {} comments: {}", name, isPrimary, comments);
 
@@ -173,6 +154,26 @@ public class TableColumnMeta {
     }
 
     public boolean isExcluded() {
+        final NamedNodeMap attribs = colNode.getAttributes();
+        final boolean isExcluded;
+
+        Node node = attribs.getNamedItem("disableDiagramAssociations");
+        if (node != null) {
+            final String tmp = node.getNodeValue().trim().toLowerCase();
+            switch (tmp) {
+                case "all":
+                    isExcluded = true;
+                    break;
+                case "exceptdirect":
+                    isExcluded = true;
+                    break;
+                default:
+                    isExcluded = false;
+                    break;
+            }
+        } else {
+            isExcluded = false;
+        }
         return isExcluded;
     }
 
