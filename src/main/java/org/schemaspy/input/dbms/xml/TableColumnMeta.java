@@ -162,8 +162,6 @@ public class TableColumnMeta {
             final String tmp = node.getNodeValue().trim().toLowerCase();
             switch (tmp) {
                 case "all":
-                    isExcluded = true;
-                    break;
                 case "exceptdirect":
                     isExcluded = true;
                     break;
@@ -189,8 +187,6 @@ public class TableColumnMeta {
                     isAllExcluded = true;
                     break;
                 case "exceptdirect":
-                    isAllExcluded = false;
-                    break;
                 default:
                     isAllExcluded = false;
                     break;
