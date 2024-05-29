@@ -157,7 +157,7 @@ public class TableColumnMeta {
         final NamedNodeMap attribs = colNode.getAttributes();
         final boolean isExcluded;
 
-        Node node = attribs.getNamedItem("disableDiagramAssociations");
+        final Node node = attribs.getNamedItem("disableDiagramAssociations");
         if (node != null) {
             final String tmp = node.getNodeValue().trim().toLowerCase();
             switch (tmp) {
@@ -179,7 +179,7 @@ public class TableColumnMeta {
         final NamedNodeMap attribs = colNode.getAttributes();
         final boolean isAllExcluded;
 
-        Node node = attribs.getNamedItem("disableDiagramAssociations");
+        final Node node = attribs.getNamedItem("disableDiagramAssociations");
         if (node != null) {
             final String tmp = node.getNodeValue().trim().toLowerCase();
             switch (tmp) {
@@ -201,7 +201,7 @@ public class TableColumnMeta {
         final NamedNodeMap attribs = colNode.getAttributes();
         final boolean isImpliedParentsDisabled;
 
-        Node node = attribs.getNamedItem("disableImpliedKeys");
+        final Node node = attribs.getNamedItem("disableImpliedKeys");
         if (node != null) {
             final String tmp = node.getNodeValue().trim().toLowerCase();
             switch (tmp) {
@@ -224,7 +224,7 @@ public class TableColumnMeta {
         final NamedNodeMap attribs = this.colNode.getAttributes();
         final boolean isImpliedChildrenDisabled;
 
-        Node node = attribs.getNamedItem("disableImpliedKeys");
+        final Node node = attribs.getNamedItem("disableImpliedKeys");
         if (node != null) {
             final String tmp = node.getNodeValue().trim().toLowerCase();
             switch (tmp) {
