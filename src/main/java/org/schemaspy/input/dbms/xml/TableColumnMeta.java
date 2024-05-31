@@ -46,7 +46,6 @@ import java.util.List;
 public class TableColumnMeta {
     private final Node colNode;
     private final String name;
-    private final String type;
     private final boolean isPrimary;
     private final String id;
     private final int size;
@@ -67,10 +66,7 @@ public class TableColumnMeta {
         name = attribs.getNamedItem("name").getNodeValue();
         comments = new CmFacade(colNode).value();
 
-        Node node = attribs.getNamedItem("type");
-        type = node == null ? "Unknown" : node.getNodeValue();
-
-        node = attribs.getNamedItem("id");
+        Node node = attribs.getNamedItem("id");
         id = node == null ? null : node.getNodeValue();
 
         node = attribs.getNamedItem("size");
@@ -114,7 +110,8 @@ public class TableColumnMeta {
     }
 
     public String getType() {
-        return type;
+        final Node node = this.colNode.getAttributes().getNamedItem("type");
+        return node == null ? "Unknown" : node.getNodeValue();
     }
 
     public String getId() {
