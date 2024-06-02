@@ -47,13 +47,7 @@ public class TableColumnMeta {
     private final Node colNode;
     private final String name;
     private final boolean isPrimary;
-    private final String id;
-    private final int size;
-    private final int digits;
-    private final boolean isNullable;
     private final String comments;
-    private final String defaultValue;
-    private final boolean isAutoUpdated;
     private final List<ForeignKeyMeta> foreignKeys = new ArrayList<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -66,26 +60,8 @@ public class TableColumnMeta {
         name = attribs.getNamedItem("name").getNodeValue();
         comments = new CmFacade(colNode).value();
 
-        Node node = attribs.getNamedItem("id");
-        id = node == null ? null : node.getNodeValue();
-
-        node = attribs.getNamedItem("size");
-        size = node == null ? 0 : Integer.parseInt(node.getNodeValue());
-
-        node = attribs.getNamedItem("digits");
-        digits = node == null ? 0 : Integer.parseInt(node.getNodeValue());
-
-        node = attribs.getNamedItem("nullable");
-        isNullable = node != null && evalBoolean(node.getNodeValue());
-
-        node = attribs.getNamedItem("autoUpdated");
-        isAutoUpdated = node != null && evalBoolean(node.getNodeValue());
-
-        node = attribs.getNamedItem("primaryKey");
+        final Node node = attribs.getNamedItem("primaryKey");
         isPrimary = node != null && evalBoolean(node.getNodeValue());
-
-        node = attribs.getNamedItem("defaultValue");
-        defaultValue = node == null ? null : node.getNodeValue();
 
 		LOGGER.debug("Found XML column metadata for {} isPrimaryKey: {} comments: {}", name, isPrimary, comments);
 
@@ -115,15 +91,18 @@ public class TableColumnMeta {
     }
 
     public String getId() {
-        return id;
+        final Node node = this.colNode.getAttributes().getNamedItem("id");
+        return node == null ? null : node.getNodeValue();
     }
 
     public int getSize() {
-        return size;
+        final Node node = this.colNode.getAttributes().getNamedItem("size");
+        return node == null ? 0 : Integer.parseInt(node.getNodeValue());
     }
 
     public int getDigits() {
-        return digits;
+        final Node node = this.colNode.getAttributes().getNamedItem("digits");
+        return node == null ? 0 : Integer.parseInt(node.getNodeValue());
     }
 
     public boolean isPrimary() {
@@ -131,11 +110,13 @@ public class TableColumnMeta {
     }
 
     public boolean isNullable() {
-        return isNullable;
+        final Node node = this.colNode.getAttributes().getNamedItem("nullable");
+        return node != null && evalBoolean(node.getNodeValue());
     }
 
     public boolean isAutoUpdated() {
-        return isAutoUpdated;
+        final Node node = this.colNode.getAttributes().getNamedItem("autoUpdated");
+        return node != null && evalBoolean(node.getNodeValue());
     }
 
     public String getComments() {
@@ -143,7 +124,8 @@ public class TableColumnMeta {
     }
 
     public String getDefaultValue() {
-        return defaultValue;
+        final Node node = this.colNode.getAttributes().getNamedItem("defaultValue");
+        return node == null ? null : node.getNodeValue();
     }
 
     public List<ForeignKeyMeta> getForeignKeys() {
