@@ -55,7 +55,6 @@ public class TableColumnMeta {
     public TableColumnMeta(Node colNode) {
         this.colNode = colNode;
         NamedNodeMap attribs = colNode.getAttributes();
-        String tmp;
 
         name = attribs.getNamedItem("name").getNodeValue();
         comments = new CmFacade(colNode).value();
