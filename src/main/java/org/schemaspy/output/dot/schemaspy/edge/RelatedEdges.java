@@ -36,8 +36,9 @@ public class RelatedEdges implements Edges {
 
         for (TableColumn parentColumn : column.getParents()) {
             Table parentTable = parentColumn.getTable();
-            if (targetTable != null && parentTable != targetTable)
+            if (isNotTarget(parentTable)) {
                 continue;
+            }
             if (targetTable == null && !includeExcluded && parentColumn.isExcluded())
                 continue;
             boolean implied = column.getParentConstraint(parentColumn).isImplied();
@@ -48,8 +49,9 @@ public class RelatedEdges implements Edges {
 
         for (TableColumn childColumn : column.getChildren()) {
             Table childTable = childColumn.getTable();
-            if (targetTable != null && childTable != targetTable)
+            if (isNotTarget(childTable)) {
                 continue;
+            }
             if (targetTable == null && !includeExcluded && childColumn.isExcluded())
                 continue;
             boolean implied = column.getChildConstraint(childColumn).isImplied();
@@ -59,5 +61,9 @@ public class RelatedEdges implements Edges {
         }
 
         return relatedConnectors;
+    }
+
+    private boolean isNotTarget(final Table candidate) {
+        return this.targetTable != null && candidate != this.targetTable;
     }
 }
