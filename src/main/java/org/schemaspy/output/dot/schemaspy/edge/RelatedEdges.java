@@ -31,22 +31,11 @@ public class RelatedEdges implements Edges {
     @Override
     public Set<Edge> unique() {
         Set<Edge> relatedConnectors = new HashSet<>();
-        if (!includeExcluded && column.isExcluded())
+        if (!includeExcluded && column.isExcluded()) {
             return relatedConnectors;
-
-        for (TableColumn parentColumn : column.getParents()) {
-            Table parentTable = parentColumn.getTable();
-            if (isNotTarget(parentTable)) {
-                continue;
-            }
-            if (shouldExclude(parentColumn)) {
-                continue;
-            }
-            boolean implied = column.getParentConstraint(parentColumn).isImplied();
-            if (!implied || includeImplied) {
-                relatedConnectors.add(new Edge(parentColumn, column, implied));
-            }
         }
+
+        relatedConnectors.addAll(relatedParents());
 
         for (TableColumn childColumn : column.getChildren()) {
             Table childTable = childColumn.getTable();
@@ -62,6 +51,24 @@ public class RelatedEdges implements Edges {
             }
         }
 
+        return relatedConnectors;
+    }
+
+    private Set<Edge> relatedParents() {
+        final Set<Edge> relatedConnectors = new HashSet<>();
+        for (TableColumn parentColumn : column.getParents()) {
+            Table parentTable = parentColumn.getTable();
+            if (isNotTarget(parentTable)) {
+                continue;
+            }
+            if (shouldExclude(parentColumn)) {
+                continue;
+            }
+            boolean implied = column.getParentConstraint(parentColumn).isImplied();
+            if (!implied || includeImplied) {
+                relatedConnectors.add(new Edge(parentColumn, column, implied));
+            }
+        }
         return relatedConnectors;
     }
 
