@@ -76,16 +76,11 @@ public class DbAnalyzer {
         for (Table table : tables.values()) {
             for (TableColumn column : table.getColumns()) {
                 if (!column.isForeignKey() && column.allowsImpliedParents()) {
-                    String columnName = column.getName().toLowerCase();
-                    if (columnName.endsWith("_id")) {
-                        String singular = columnName.substring(0, columnName.length() - "_id".length());
-                        String primaryTableName = Inflection.pluralize(singular);
-                        Table primaryTable = tables.get(primaryTableName);
-                        if (primaryTable != null) {
-                            TableColumn primaryColumn = primaryTable.getColumn("ID");
-                            if (primaryColumn != null) {
-                                railsConstraints.add(new RailsForeignKeyConstraint(primaryColumn, column));
-                            }
+                    Table primaryTable = railsPrimaryTable(column, tables);
+                    if (primaryTable != null) {
+                        TableColumn primaryColumn = primaryTable.getColumn("ID");
+                        if (primaryColumn != null) {
+                            railsConstraints.add(new RailsForeignKeyConstraint(primaryColumn, column));
                         }
                     }
                 }
@@ -93,6 +88,17 @@ public class DbAnalyzer {
         }
 
         return railsConstraints;
+    }
+
+    private static Table railsPrimaryTable(final TableColumn column, final Map<String, Table> tables) {
+        Table primaryTable = null;
+        String columnName = column.getName().toLowerCase();
+        if (columnName.endsWith("_id")) {
+            String singular = columnName.substring(0, columnName.length() - "_id".length());
+            String primaryTableName = Inflection.pluralize(singular);
+            primaryTable = tables.get(primaryTableName);
+        }
+        return primaryTable;
     }
 
     /**
