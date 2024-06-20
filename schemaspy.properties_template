@@ -20,8 +20,8 @@ schemaspy.o=path/to/output
 # db scheme for which generate diagrams
 schemaspy.s=schema
 
-# Uncoment to generate diagrams for all schemas in database
+# Uncomment to generate diagrams for all schemas in database
 #schemaspy.all
 
-# Uncoment to skip creating diagrams for views
+# Uncomment to skip creating diagrams for views
 #schemaspy.noviews
