@@ -143,14 +143,7 @@ public class DbAnalyzer {
                 // and end in an incrementing number
 
                 String columnName = column.getName();
-                String numbers = null;
-                for (int i = columnName.length() - 1; i > 0; --i) {
-                    if (Character.isDigit(columnName.charAt(i))) {
-                        numbers = String.valueOf(columnName.charAt(i)) + (numbers == null ? "" : numbers);
-                    } else {
-                        break;
-                    }
-                }
+                String numbers = trailingDigits(columnName);
 
                 // attempt to detect where they had an existing column
                 // and added a "column2" type of column (we'll call this one "1")
@@ -174,6 +167,18 @@ public class DbAnalyzer {
         }
 
         return sortTablesByName(denormalizedTables);
+    }
+
+    private static String trailingDigits(final String columnName) {
+        String numbers = null;
+        for (int i = columnName.length() - 1; i > 0; --i) {
+            if (Character.isDigit(columnName.charAt(i))) {
+                numbers = String.valueOf(columnName.charAt(i)) + (numbers == null ? "" : numbers);
+            } else {
+                break;
+            }
+        }
+        return numbers;
     }
 
     public static List<Table> getTablesWithOneColumn(Collection<Table> tables) {
