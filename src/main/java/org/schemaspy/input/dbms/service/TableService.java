@@ -385,20 +385,7 @@ public class TableService {
             if (col != null) {
                 // go thru the new foreign key defs and associate them with our columns
                 for (ForeignKeyMeta fk : colMeta.getForeignKeys()) {
-                    Table parent;
-
-                    if (fk.getRemoteCatalog() != null || fk.getRemoteSchema() != null) {
-                        try {
-                            // adds if doesn't exist
-                            parent = addLogicalRemoteTable(db, RemoteTableIdentifier.from(fk), table.getContainer());
-                            addColumnIfMissing(parent, fk.getColumnName());
-                        } catch (SQLException exc) {
-                            parent = null;
-                            LOGGER.debug("Failed to addRemoteTable '{}.{}.{}'", fk.getRemoteCatalog(), fk.getRemoteSchema(), fk.getTableName(), exc);
-                        }
-                    } else {
-                        parent = tables.get(fk.getTableName());
-                    }
+                    Table parent = parentOf(fk, db, table, tables);
 
                     if (parent != null) {
                         TableColumn parentColumn = parent.getColumn(fk.getColumnName());
@@ -436,6 +423,28 @@ public class TableService {
                 LOGGER.warn("Undefined column '{}.{}' in XML metadata", table.getName(), colMeta.getName());
             }
         }
+    }
+
+    private Table parentOf(
+        final ForeignKeyMeta fk,
+        final Database db,
+        final Table table,
+        final Map<String, Table> tables
+    ) {
+        Table parent;
+        if (fk.getRemoteCatalog() != null || fk.getRemoteSchema() != null) {
+            try {
+                // adds if doesn't exist
+                parent = addLogicalRemoteTable(db, RemoteTableIdentifier.from(fk), table.getContainer());
+                addColumnIfMissing(parent, fk.getColumnName());
+            } catch (SQLException exc) {
+                parent = null;
+                LOGGER.debug("Failed to addRemoteTable '{}.{}.{}'", fk.getRemoteCatalog(), fk.getRemoteSchema(), fk.getTableName(), exc);
+            }
+        } else {
+            parent = tables.get(fk.getTableName());
+        }
+        return parent;
     }
 
     private void addColumnIfMissing(Table parent, String columnName) {
