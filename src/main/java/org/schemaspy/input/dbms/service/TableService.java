@@ -386,35 +386,8 @@ public class TableService {
                 // go thru the new foreign key defs and associate them with our columns
                 for (ForeignKeyMeta fk : colMeta.getForeignKeys()) {
                     Table parent = parentOf(fk, db, table, tables);
-
                     if (parent != null) {
-                        TableColumn parentColumn = parent.getColumn(fk.getColumnName());
-
-                        if (parentColumn == null) {
-                            LOGGER.warn("Undefined column '{}.{}' referenced by '{}.{}' in XML metadata", parent.getName(), fk.getColumnName(), col.getTable(), col);
-                        } else {
-                            /**
-                             * Merely instantiating a foreign key constraint ties it
-                             * into its parent and child columns (& therefore their tables)
-                             */
-                            /* TODO: This sort of code suggest that too much is happening in the constructor.
-                             * Should either be a factory or constructed by a method of the holding object.
-                             * Or operations preformed in the constructor should be exposed.
-                             */
-                            @SuppressWarnings("unused")
-                            ForeignKeyConstraint unused = new ForeignKeyConstraint(parentColumn, col) {
-                                @Override
-                                public String getName() {
-                                    return "Defined in XML";
-                                }
-                            };
-
-                            // they forgot to say it was a primary key
-                            if (!parentColumn.isPrimary()) {
-                                LOGGER.warn("Assuming '{}.{}' is a primary key due to being referenced by '{}.{}'", parentColumn.getTable(), parentColumn, col.getTable(), col);
-                                parent.setPrimaryColumn(parentColumn);
-                            }
-                        }
+                        glueToParent(parent, fk, col);
                     } else {
                         LOGGER.warn("Undefined table '{}' referenced by '{}.{}' in XML metadata", fk.getTableName(), table.getName(), col.getName());
                     }
@@ -445,6 +418,40 @@ public class TableService {
             parent = tables.get(fk.getTableName());
         }
         return parent;
+    }
+
+    private void glueToParent(
+        final Table parent,
+        final ForeignKeyMeta fk,
+        final TableColumn col
+    ) {
+        TableColumn parentColumn = parent.getColumn(fk.getColumnName());
+
+        if (parentColumn == null) {
+            LOGGER.warn("Undefined column '{}.{}' referenced by '{}.{}' in XML metadata", parent.getName(), fk.getColumnName(), col.getTable(), col);
+        } else {
+            /**
+             * Merely instantiating a foreign key constraint ties it
+             * into its parent and child columns (& therefore their tables)
+             */
+            /* TODO: This sort of code suggest that too much is happening in the constructor.
+             * Should either be a factory or constructed by a method of the holding object.
+             * Or operations preformed in the constructor should be exposed.
+             */
+            @SuppressWarnings("unused")
+            ForeignKeyConstraint unused = new ForeignKeyConstraint(parentColumn, col) {
+                @Override
+                public String getName() {
+                    return "Defined in XML";
+                }
+            };
+
+            // they forgot to say it was a primary key
+            if (!parentColumn.isPrimary()) {
+                LOGGER.warn("Assuming '{}.{}' is a primary key due to being referenced by '{}.{}'", parentColumn.getTable(), parentColumn, col.getTable(), col);
+                parent.setPrimaryColumn(parentColumn);
+            }
+        }
     }
 
     private void addColumnIfMissing(Table parent, String columnName) {
