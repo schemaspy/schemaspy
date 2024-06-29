@@ -180,15 +180,9 @@ public class DotTableFormatter implements Relationships {
         nodes.put(table, new DotNode(table, false, new DotNodeConfig(true, true), runtimeDotConfig));
 
         edges.addAll(allCousinEdges);
-        
-        for (Edge edge : edges) {
-            if (edge.isImplied()) {
-                DotNode node = nodes.get(edge.getParentTable());
-                if (node != null) {
-                    node.setShowImplied(true);
-                }
-            }
-        }
+
+        implyParents(edges, nodes);
+
         for (Edge edge : edges) {
             if (edge.isImplied()) {
                 DotNode node = nodes.get(edge.getChildTable());
@@ -315,5 +309,19 @@ public class DotTableFormatter implements Relationships {
     private Set<Table> cousinsOf(Table relatedTable) {
         Factory cousinsFactory = getFactory(relatedTable, false);
         return immediateRelatives(relatedTable, cousinsFactory, includeImplied);
+    }
+
+    private void implyParents(
+        final Set<Edge> edges,
+        final Map<Table, DotNode> nodes
+    ) {
+        for (Edge edge : edges) {
+            if (edge.isImplied()) {
+                DotNode node = nodes.get(edge.getParentTable());
+                if (node != null) {
+                    node.setShowImplied(true);
+                }
+            }
+        }
     }
 }
