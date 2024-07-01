@@ -182,15 +182,7 @@ public class DotTableFormatter implements Relationships {
         edges.addAll(allCousinEdges);
 
         implyParents(edges, nodes);
-
-        for (Edge edge : edges) {
-            if (edge.isImplied()) {
-                DotNode node = nodes.get(edge.getChildTable());
-                if (node != null) {
-                    node.setShowImplied(true);
-                }
-            }
-        }
+        implyChildren(edges, nodes);
 
         List<Element> elements = new LinkedList<>();
         elements.addAll(edges);
@@ -318,6 +310,20 @@ public class DotTableFormatter implements Relationships {
         for (Edge edge : edges) {
             if (edge.isImplied()) {
                 DotNode node = nodes.get(edge.getParentTable());
+                if (node != null) {
+                    node.setShowImplied(true);
+                }
+            }
+        }
+    }
+
+    private void implyChildren(
+        final Set<Edge> edges,
+        final Map<Table, DotNode> nodes
+    ) {
+        for (Edge edge : edges) {
+            if (edge.isImplied()) {
+                DotNode node = nodes.get(edge.getChildTable());
                 if (node != null) {
                     node.setShowImplied(true);
                 }
