@@ -158,7 +158,7 @@ public class DotTableFormatter implements Relationships {
 
             for (Table participantB : participants) {
                 for (Edge edge : new PairEdges(participantA, participantB, false, includeImplied).unique()) {
-                    if (twoDegreesOfSeparation && (allCousins.contains(participantA) || allCousins.contains(participantB))) {
+                    if (isCousinEdge(allCousins, participantA, participantB)) {
                         allCousinEdges.add(edge);
                     } else {
                         edges.add(edge);
@@ -301,6 +301,14 @@ public class DotTableFormatter implements Relationships {
     private Set<Table> cousinsOf(Table relatedTable) {
         Factory cousinsFactory = getFactory(relatedTable, false);
         return immediateRelatives(relatedTable, cousinsFactory, includeImplied);
+    }
+
+    private boolean isCousinEdge(
+        final Set<Table> allCousins,
+        final Table participantA,
+        final Table participantB
+    ) {
+        return twoDegreesOfSeparation && (allCousins.contains(participantA) || allCousins.contains(participantB));
     }
 
     private void implyParents(
