@@ -29,6 +29,7 @@ import org.schemaspy.model.*;
 import org.schemaspy.util.Filtered;
 import org.schemaspy.util.WhenFalse;
 import org.schemaspy.util.WhenIf;
+import org.schemaspy.util.naming.Name;
 import org.schemaspy.util.rails.NmPrimaryTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +77,8 @@ public class DbAnalyzer {
         for (Table table : tables.values()) {
             for (TableColumn column : table.getColumns()) {
                 if (!column.isForeignKey() && column.allowsImpliedParents()) {
-                    TableColumn primaryColumn = railsPrimaryColumn(column, tables);
+                    final Name primaryTable = new NmPrimaryTable(column.getName());
+                    TableColumn primaryColumn = railsPrimaryColumn(primaryTable, tables);
                     if (primaryColumn != null) {
                         railsConstraints.add(new RailsForeignKeyConstraint(primaryColumn, column));
                     }
@@ -87,18 +89,17 @@ public class DbAnalyzer {
         return railsConstraints;
     }
 
-    private static TableColumn railsPrimaryColumn(final TableColumn column, final Map<String, Table> tables) {
-        final Table primaryTable = railsPrimaryTable(column, tables);
+    private static TableColumn railsPrimaryColumn(final Name name, final Map<String, Table> tables) {
+        final Table primaryTable = railsPrimaryTable(name, tables);
         if (primaryTable != null) {
             return primaryTable.getColumn("ID");
         }
         return null;
     }
 
-    private static Table railsPrimaryTable(final TableColumn column, final Map<String, Table> tables) {
+    private static Table railsPrimaryTable(final Name name, final Map<String, Table> tables) {
         Table primaryTable = null;
-        String columnName = column.getName();
-        String primaryTableName = new NmPrimaryTable(columnName).value();
+        String primaryTableName = name.value();
         if (!primaryTableName.isEmpty()) {
             primaryTable = tables.get(primaryTableName);
         }
