@@ -170,10 +170,12 @@ public class DotTableFormatter implements Relationships {
         // now directly connect the loose ends to the title of the
         // 2nd degree of separation tables
         for (Edge edge : allCousinEdges) {
-            if (allCousins.contains(edge.getParentTable()) && !relatedTables.contains(edge.getParentTable()))
+            if (this.isCousinTable(edge.getParentTable(), allCousins, relatedTables)) {
                 edge.connectToParentTitle();
-            if (allCousins.contains(edge.getChildTable()) && !relatedTables.contains(edge.getChildTable()))
+            }
+            if (this.isCousinTable(edge.getChildTable(), allCousins, relatedTables)) {
                 edge.connectToChildTitle();
+            }
         }
 
         // include the table itself
@@ -311,7 +313,14 @@ public class DotTableFormatter implements Relationships {
         return twoDegreesOfSeparation && (allCousins.contains(participantA) || allCousins.contains(participantB));
     }
 
-    private void implyParents(
+    private boolean isCousinTable(
+        final Table candidate,
+        final Set<Table> allCousins,
+        final Set<Table> relatedTables){
+        return allCousins.contains(candidate) && !relatedTables.contains(candidate);
+    }
+
+        private void implyParents(
         final Set<Edge> edges,
         final Map<Table, DotNode> nodes
     ) {
