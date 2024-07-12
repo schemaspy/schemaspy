@@ -98,12 +98,8 @@ public class DbAnalyzer {
     }
 
     private static Table railsPrimaryTable(final Name name, final Map<String, Table> tables) {
-        Table primaryTable = null;
-        String primaryTableName = name.value();
-        if (!primaryTableName.isEmpty()) {
-            primaryTable = tables.get(primaryTableName);
-        }
-        return primaryTable;
+        final String primaryTableName = name.value();
+        return !primaryTableName.isEmpty() ? tables.get(primaryTableName) : null;
     }
 
     /**
