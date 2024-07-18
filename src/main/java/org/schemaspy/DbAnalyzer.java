@@ -77,8 +77,10 @@ public class DbAnalyzer {
         for (Table table : tables.values()) {
             for (TableColumn column : table.getColumns()) {
                 if (!column.isForeignKey() && column.allowsImpliedParents()) {
-                    final Name primaryTable = new NmPrimaryTable(column.getName());
-                    TableColumn primaryColumn = railsPrimaryColumn(primaryTable, tables);
+                    TableColumn primaryColumn = new PrimaryTableColumn(
+                        new TablesMap(tables),
+                        new NmPrimaryTable(column.getName())
+                    ).column();
                     if (primaryColumn != null) {
                         railsConstraints.add(new RailsForeignKeyConstraint(primaryColumn, column));
                     }
@@ -87,14 +89,6 @@ public class DbAnalyzer {
         }
 
         return railsConstraints;
-    }
-
-    private static TableColumn railsPrimaryColumn(final Name name, final Map<String, Table> tables) {
-        final Table primaryTable = new TablesMap(tables).table(name);
-        if (primaryTable != null) {
-            return primaryTable.getColumn("ID");
-        }
-        return null;
     }
 
     /**
