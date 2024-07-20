@@ -140,6 +140,7 @@ For creating tutorials and guides for the community:
 * :fr: [Documenter une base de données avec SchemaSpy](https://dataforeveryone.medium.com/documenter-une-base-de-donn%C3%A9es-avec-schemaspy-e0f56a6fcfb3) by Data 4 Everyone!
 * :jp: [SchemaSpyでデータベースのドキュメントを生成してみた](https://dev.classmethod.jp/articles/schemaspy-doc/) By 坂井裕介
 * :jp: [SchemaSpyでER図を生成する](https://zenn.dev/onozaty/articles/schema-spy-er) By @onozaty
+* :portugal: :arrow_forward: [SchemaSpy - fácil de usar e já salvou meu emprego!](https://www.youtube.com/watch?v=vLsmYseBIh0) By Dev Multitask
 * :portugal: [Documentando bancos com Schemaspy](https://www.linkedin.com/pulse/documentando-bancos-com-schemaspy-krisnamourt-silva/) By Krisnamourt Silva
 * :thailand: [แนะนำ SchemaSpy เครื่องมือทำเอกสาร Database](https://knowlats.dev/how-to-use-schemaspy/) by @icegotcha
 * :open_book: [Java Power Tools](https://www.goodreads.com/en/book/show/2631468) by John Ferguson Smart
