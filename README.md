@@ -128,6 +128,7 @@ For perpetuating SchemaSpy ever since:
 * [Jesper Olsson](https://github.com/jesperolsson-se)
 
 For creating tutorials and guides for the community:
+* :cn: [SQLite 可视化SQLite数据库Schemaspy](https://geek-docs.com/sqlite/sqlite-questions/370_sqlite_visualize_sqlite_database_schemaspy.html) by Geek Tutorial
 * :czech_republic: [Automatické vytvoření dokumentace k databázi s využitím nástroje SchemaSpy ](https://www.root.cz/clanky/automaticke-vytvoreni-dokumentace-k-databazi-s-vyuzitim-nastroje-schemaspy/) by Pavel Tišnovský
 * :de: [Datenbank-Analyse mit SchemaSpy](https://www.jentsch.io/datenbank-analyse-mit-schemaspy/) by Michael Jentsch
 * :de: [Quick Tipp: Eine Datenbank Struktur verstehen mit Hilfe von schemaspy](https://www.exensio.de/news-medien/newsreader-blog/quick-tipp-eine-datenbank-struktur-verstehen-mit-hilfe-von-schemaspy) by von Irving Tschepke
