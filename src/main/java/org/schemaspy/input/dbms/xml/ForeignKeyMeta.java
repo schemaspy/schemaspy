@@ -45,12 +45,14 @@ public class ForeignKeyMeta {
     public ForeignKeyMeta(Node foreignKeyNode) {
         NamedNodeMap attribs = foreignKeyNode.getAttributes();
         Node node = attribs.getNamedItem("table");
-        if (node == null)
+        if (node == null) {
             throw new IllegalStateException("XML foreignKey definition requires 'table' attribute");
+        }
         tableName = node.getNodeValue();
         node = attribs.getNamedItem("column");
-        if (node == null)
+        if (node == null) {
             throw new IllegalStateException("XML foreignKey definition requires 'column' attribute");
+        }
         columnName = node.getNodeValue();
         node = attribs.getNamedItem("remoteSchema");
         remoteSchema = node == null ? null : node.getNodeValue();

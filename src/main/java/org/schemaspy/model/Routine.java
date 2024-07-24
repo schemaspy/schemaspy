@@ -155,12 +155,15 @@ public class Routine implements Comparable<Routine> {
      */
     public int compareTo(Routine other) {
         int rc = getName().compareTo(other.getName());
-        if (rc == 0)
+        if (rc == 0) {
             rc = getType().compareTo(other.getType());
-        if (rc == 0)
+        }
+        if (rc == 0) {
             rc = String.valueOf(getReturnType()).compareTo(String.valueOf(other.getReturnType()));
-        if (rc == 0)
+        }
+        if (rc == 0) {
             rc = getDefinition().compareTo(other.getDefinition());
+        }
         return rc;
     }
 

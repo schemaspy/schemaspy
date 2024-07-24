@@ -65,21 +65,25 @@ public class GraphvizVersion implements Comparable<GraphvizVersion> {
             Integer thisSegment = segments.get(i);
             Integer otherSegment = other.segments.get(i);
             int result = thisSegment.compareTo(otherSegment);
-            if (result != 0)
+            if (result != 0) {
                 return result;
+            }
         }
 
-        if (segments.size() == other.segments.size())
+        if (segments.size() == other.segments.size()) {
             return 0;
-        if (segments.size() > other.segments.size())
+        }
+        if (segments.size() > other.segments.size()) {
             return 1;
+        }
         return -1;
     }
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof GraphvizVersion)
-            return compareTo((GraphvizVersion)other) == 0;
+        if (other instanceof GraphvizVersion) {
+            return compareTo((GraphvizVersion) other) == 0;
+        }
         return false;
     }
 

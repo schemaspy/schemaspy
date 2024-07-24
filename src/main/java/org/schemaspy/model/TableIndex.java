@@ -66,10 +66,12 @@ public class TableIndex implements Comparable<TableIndex> {
      * @return
      */
     public String getType() {
-        if (isPrimaryKey())
+        if (isPrimaryKey()) {
             return "Primary key";
-        if (isUnique())
+        }
+        if (isUnique()) {
             return "Must be unique";
+        }
         return "Performance";
     }
 
@@ -113,12 +115,14 @@ public class TableIndex implements Comparable<TableIndex> {
         Iterator<TableColumn> columnsIter = columns.iterator();
         while (columnsIter.hasNext()) {
             TableColumn column = columnsIter.next();
-            if (this.isAscending(column))
+            if (this.isAscending(column)) {
                 buf.append("<span title='Ascending'>Asc</span>");
-            else
+            } else {
                 buf.append("<span title='Descending'>Desc</span>");
-            if (columnsIter.hasNext())
+            }
+            if (columnsIter.hasNext()) {
                 buf.append("/");
+            }
         }
 
         return buf.toString();
@@ -142,17 +146,21 @@ public class TableIndex implements Comparable<TableIndex> {
      */
     @Override
 	public int compareTo(TableIndex other) {
-        if (isPrimaryKey() && !other.isPrimaryKey())
+        if (isPrimaryKey() && !other.isPrimaryKey()) {
             return -1;
-        if (!isPrimaryKey() && other.isPrimaryKey())
+        }
+        if (!isPrimaryKey() && other.isPrimaryKey()) {
             return 1;
+        }
 
         Object thisId = getId();
         Object otherId = other.getId();
-        if (thisId == null || otherId == null)
+        if (thisId == null || otherId == null) {
             return getName().compareToIgnoreCase(other.getName());
-        if (thisId instanceof Number)
-            return ((Number)thisId).intValue() - ((Number)otherId).intValue();
+        }
+        if (thisId instanceof Number) {
+            return ((Number) thisId).intValue() - ((Number) otherId).intValue();
+        }
         return thisId.toString().compareToIgnoreCase(otherId.toString());
     }
 

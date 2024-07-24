@@ -302,20 +302,22 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      * @return
      */
     public int compareTo(ForeignKeyConstraint other) {
-        if (other == this)
+        if (other == this) {
             return 0;
+        }
 
         int rc = getName().compareToIgnoreCase(other.getName());
         if (rc == 0) {
             // should only get here if we're dealing with cross-schema references (rare)
             String ours = getChildColumns().get(0).getTable().getContainer();
             String theirs = other.getChildColumns().get(0).getTable().getContainer();
-            if (ours != null && theirs != null)
+            if (ours != null && theirs != null) {
                 rc = ours.compareToIgnoreCase(theirs);
-            else if (ours == null)
+            } else if (ours == null) {
                 rc = -1;
-            else
+            } else {
                 rc = 1;
+            }
         }
 
         return rc;
@@ -329,8 +331,9 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      * @return
      */
     public static String toString(List<TableColumn> columns) {
-        if (columns.size() == 1)
+        if (columns.size() == 1) {
             return columns.iterator().next().toString();
+        }
         return columns.toString();
     }
 

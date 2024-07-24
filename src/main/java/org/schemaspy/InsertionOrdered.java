@@ -204,10 +204,12 @@ public class InsertionOrdered {
                 // have to keep track of and use the 'max' versions because
                 // by the time we get here we'll (probably?) have no parents or children
                 int rc = table2.getMaxChildren() - table1.getMaxChildren();
-                if (rc == 0)
+                if (rc == 0) {
                     rc = table1.getMaxParents() - table2.getMaxParents();
-                if (rc == 0)
+                }
+                if (rc == 0) {
                     rc = table1.compareTo(table2);
+                }
                 return rc;
             }
         }
@@ -234,8 +236,9 @@ public class InsertionOrdered {
                 // target the tables with the biggest delta and therefore the most impact
                 // on reducing the smaller of the two
                 int rc = Math.abs(t2.getNumChildren() - t2.getNumParents()) - Math.abs(t1.getNumChildren() - t1.getNumParents());
-                if (rc == 0)
+                if (rc == 0) {
                     rc = t1.compareTo(t2);
+                }
                 return rc;
             }).ifPresent(Table::removeAForeignKeyConstraint); // this one has the largest delta
     }

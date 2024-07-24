@@ -272,8 +272,9 @@ public class Table implements Comparable<Table> {
         // therefore isolate it to MySQL), but it's a bit too complex to do cleanly.
         if (cmts != null) {
             int crapIndex = cmts.indexOf("; InnoDB free: ");
-            if (crapIndex == -1)
+            if (crapIndex == -1) {
                 crapIndex = cmts.startsWith("InnoDB free: ") ? 0 : -1;
+            }
             if (crapIndex != -1) {
                 cmts = cmts.substring(0, crapIndex).trim();
                 cmts = cmts.length() == 0 ? null : cmts;
@@ -509,8 +510,9 @@ public class Table implements Comparable<Table> {
 
         for (TableColumn column : columns.values()) {
             for (TableColumn childColumn : column.getChildren()) {
-                if (!column.getChildConstraint(childColumn).isImplied())
+                if (!column.getChildConstraint(childColumn).isImplied()) {
                     ++numChildren;
+                }
             }
         }
 
@@ -542,8 +544,9 @@ public class Table implements Comparable<Table> {
 
         for (TableColumn column : columns.values()) {
             for (TableColumn parentColumn : column.getParents()) {
-                if (!column.getParentConstraint(parentColumn).isImplied())
+                if (!column.getParentConstraint(parentColumn).isImplied()) {
                     ++numParents;
+                }
             }
         }
 
@@ -572,12 +575,14 @@ public class Table implements Comparable<Table> {
 
         for (TableColumn column : sortedColumns) {
             ForeignKeyConstraint constraint;
-            if (numParents <= numChildren)
+            if (numParents <= numChildren) {
                 constraint = column.removeAParentFKConstraint();
-            else
+            } else {
                 constraint = column.removeAChildFKConstraint();
-            if (constraint != null)
+            }
+            if (constraint != null) {
                 return constraint;
+            }
         }
 
         return null;
@@ -684,17 +689,20 @@ public class Table implements Comparable<Table> {
      * @return boolean
      */
     public boolean isOrphan(boolean withImpliedRelationships) {
-        if (withImpliedRelationships)
+        if (withImpliedRelationships) {
             return getMaxParents() == 0 && getMaxChildren() == 0;
+        }
 
         for (TableColumn column : columns.values()) {
             for (TableColumn parentColumn : column.getParents()) {
-                if (!column.getParentConstraint(parentColumn).isImplied())
+                if (!column.getParentConstraint(parentColumn).isImplied()) {
                     return false;
+                }
             }
             for (TableColumn childColumn : column.getChildren()) {
-                if (!column.getChildConstraint(childColumn).isImplied())
+                if (!column.getChildConstraint(childColumn).isImplied()) {
                     return false;
+                }
             }
         }
         return true;
@@ -711,8 +719,9 @@ public class Table implements Comparable<Table> {
      *
      */
     public int compareTo(Table other) {
-        if (other == this)  // fast way out
+        if (other == this) {  // fast way out
             return 0;
+        }
 
         return getFullName().compareToIgnoreCase(other.getFullName());
     }
@@ -749,10 +758,12 @@ public class Table implements Comparable<Table> {
             Object id1 = column1.getId();
             Object id2 = column2.getId();
 
-            if (id1 == null || id2 == null)
+            if (id1 == null || id2 == null) {
                 return column1.getName().compareToIgnoreCase(column2.getName());
-            if (id1 instanceof Number && id2 instanceof Number)
+            }
+            if (id1 instanceof Number && id2 instanceof Number) {
                 return ((Number) id1).intValue() - ((Number) id2).intValue();
+            }
             return id1.toString().compareToIgnoreCase(id2.toString());
         }
     }

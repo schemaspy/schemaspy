@@ -12,8 +12,9 @@ public final class DatabasetypeValidator {
 
     public boolean isValid(String type) {
         // some databases (MySQL) return more than we wanted
-        if (!validTypes.contains(type.toUpperCase()))
+        if (!validTypes.contains(type.toUpperCase())) {
             return false;
+        }
         return true;
     }
 }

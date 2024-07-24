@@ -174,8 +174,9 @@ public class TableService {
         } catch (SQLException sqlExc) {
             if (!remoteTable.isLogical()) {
                 // if explicitly asking for these details then propagate the exception
-                if (multiSchemas)
+                if (multiSchemas) {
                     throw sqlExc;
+                }
 
                 // otherwise just report the fact that we tried & couldn't
                 LOGGER.warn("Couldn't resolve foreign keys for remote table '{}'", remoteTable.getFullName(), sqlExc);
@@ -262,8 +263,9 @@ public class TableService {
      * @return int
      */
     protected long fetchNumRows(Database db, Table table) {
-        if (table.isView() || table.isRemote())
+        if (table.isView() || table.isRemote()) {
             return -1;
+        }
 
         SQLException originalFailure = null;
 
@@ -289,8 +291,9 @@ public class TableService {
                 return fetchNumRows(db, table, "count(1)", false);
             } catch (SQLException try3Exception) {
                 if (!table.isLogical()) {
-                    if (originalFailure != null)
+                    if (originalFailure != null) {
                         LOGGER.warn("Failed to fetch number of rows for '{}' using custom query: '{}'", table.getFullName(), sql, originalFailure);
+                    }
                     LOGGER.warn("Failed to fetch number of rows for '{}' using built-in query with 'count(*)'", table.getFullName(), try2Exception);
                     LOGGER.warn("Failed to fetch number of rows for '{}' using built-in query with 'count(1)'", table.getFullName(), try3Exception);
                 }
@@ -330,8 +333,9 @@ public class TableService {
             }
             return -1;
         } catch (SQLException exc) {
-            if (forceQuotes) // we tried with and w/o quotes...fail this attempt
+            if (forceQuotes) {// we tried with and w/o quotes...fail this attempt
                 throw exc;
+            }
 
             return fetchNumRows(db, table, clause, true);
         }
@@ -355,9 +359,9 @@ public class TableService {
         if (remoteTable == null) {
             LOGGER.debug("Creating remote table {}", fullName);
 
-            if (logical)
+            if (logical) {
                 remoteTable = new LogicalRemoteTable(db, remoteTableIdentifier, baseContainer);
-            else {
+            } else {
                 remoteTable = new RemoteTable(db, remoteTableIdentifier, baseContainer);
                 columnService.gatherColumns(remoteTable);
             }
@@ -472,8 +476,9 @@ public class TableService {
                 while (rs.next()) {
                     String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
-                    if (table != null)
+                    if (table != null) {
                         table.setId(rs.getObject("table_id"));
+                    }
                 }
             } catch (SQLException sqlException) {
                 LOGGER.warn("Failed to fetch table ids using SQL '{}'", sql, sqlException);
@@ -496,8 +501,9 @@ public class TableService {
                 while (rs.next()) {
                     String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
-                    if (table != null)
+                    if (table != null) {
                         table.setComments(rs.getString("comments"));
+                    }
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
@@ -523,8 +529,9 @@ public class TableService {
                     Table table = db.getLocals().get(tableName);
                     if (table != null) {
                         TableColumn column = table.getColumn(rs.getString(COLUMN_NAME));
-                        if (column != null)
+                        if (column != null) {
                             column.setComments(rs.getString(COMMENTS));
+                        }
                     }
                 }
             } catch (SQLException sqlException) {

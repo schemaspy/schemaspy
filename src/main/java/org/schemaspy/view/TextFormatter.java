@@ -42,8 +42,9 @@ public class TextFormatter {
 
     public void write(Collection<Table> tables, boolean includeViews, PrintWriter out) {
         for (Table table : tables) {
-            if (!table.isView() || includeViews)
+            if (!table.isView() || includeViews) {
                 out.println(table.getName());
+            }
         }
     }
 }

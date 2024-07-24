@@ -91,8 +91,9 @@ public class XmlProducerUsingDOM implements XmlProducer {
         Element rootNode = document.createElement("database");
         document.appendChild(rootNode);
         DOMUtil.appendAttribute(rootNode, "name", database.getName());
-        if (Objects.nonNull(database.getSchema()))
+        if (Objects.nonNull(database.getSchema())) {
             DOMUtil.appendAttribute(rootNode, "schema", database.getSchema().getName());
+        }
         DOMUtil.appendAttribute(rootNode, "type", database.getDatabaseProduct());
 
         xmlSequenceFormatter.appendSequences(rootNode, database.getSequences());
@@ -108,8 +109,9 @@ public class XmlProducerUsingDOM implements XmlProducer {
         String[] unusables = xmlName.split("[:@]");
         xmlName = unusables[unusables.length - 1];
 
-        if (Objects.nonNull(database.getSchema()))
+        if (Objects.nonNull(database.getSchema())) {
             xmlName += '.' + database.getSchema().getName();
+        }
 
         document.getDocumentElement().normalize();
         Path xmlFile = outputDir.toPath().resolve(xmlName + ".xml");

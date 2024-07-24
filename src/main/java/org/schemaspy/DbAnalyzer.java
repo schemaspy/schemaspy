@@ -115,8 +115,9 @@ public class DbAnalyzer {
         List<Table> withoutIndexes = new ArrayList<>();
 
         for (Table table : tables) {
-            if (table.getIndexes().isEmpty() && !table.isView() && !table.isLogical())
+            if (table.getIndexes().isEmpty() && !table.isView() && !table.isLogical()) {
                 withoutIndexes.add(table);
+            }
         }
 
         return sortTablesByName(withoutIndexes);
@@ -175,8 +176,9 @@ public class DbAnalyzer {
         List<Table> singleColumnTables = new ArrayList<>();
 
         for (Table table : tables) {
-            if (table.getColumns().size() == 1)
+            if (table.getColumns().size() == 1) {
                 singleColumnTables.add(table);
+            }
         }
 
         return sortTablesByName(singleColumnTables);
@@ -191,8 +193,9 @@ public class DbAnalyzer {
     public static List<TableColumn> sortColumnsByTable(List<TableColumn> columns) {
         columns.sort((column1, column2) -> {
             int rc = column1.getTable().compareTo(column2.getTable());
-            if (rc == 0)
+            if (rc == 0) {
                 rc = column1.getName().compareToIgnoreCase(column2.getName());
+            }
             return rc;
         });
 

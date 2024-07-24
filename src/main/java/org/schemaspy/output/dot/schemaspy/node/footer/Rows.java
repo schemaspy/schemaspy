@@ -23,8 +23,9 @@ public class Rows implements Element {
     if (enabled && count >= 0) {
       builder.append(NumberFormat.getInstance().format(count));
       builder.append(" row");
-      if (count != 1)
+      if (count != 1) {
         builder.append('s');
+      }
     } else {
       builder.append("  ");
     }

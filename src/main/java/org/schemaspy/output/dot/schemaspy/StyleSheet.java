@@ -110,16 +110,17 @@ public class StyleSheet {
     }
 
     private void bindAttribute(String id, Map<String, String> attribs) {
-        if (".diagram".equals(id))
+        if (".diagram".equals(id)) {
             bodyBackgroundColor = attribs.get(BACKGROUND);
-        else if ("th.diagram".equals(id))
+        } else if ("th.diagram".equals(id)) {
             tableHeadBackgroundColor = attribs.get(BACKGROUND_COLOR);
-        else if ("td.diagram".equals(id))
+        } else if ("td.diagram".equals(id)) {
             tableBackgroundColor = attribs.get(BACKGROUND_COLOR);
-        else if (".diagram .indexedcolumn".equals(id))
+        } else if (".diagram .indexedcolumn".equals(id)) {
             indexedColumnBackgroundColor = attribs.get(BACKGROUND);
-        else if (".excludedcolumn".equals(id))
+        } else if (".excludedcolumn".equals(id)) {
             excludedColumnBackgroundColor = attribs.get(BACKGROUND);
+        }
     }
 
     private static String getContent(Reader reader) throws IOException {
@@ -162,37 +163,42 @@ public class StyleSheet {
     }
 
     public String getBodyBackground() {
-        if (bodyBackgroundColor == null)
+        if (bodyBackgroundColor == null) {
             throw new MissingCssPropertyException(".diagram", BACKGROUND);
+        }
 
         return bodyBackgroundColor;
     }
 
     public String getTableBackground() {
-        if (tableBackgroundColor == null)
+        if (tableBackgroundColor == null) {
             throw new MissingCssPropertyException("td", BACKGROUND_COLOR);
+        }
 
         return tableBackgroundColor;
     }
 
     public String getTableHeadBackground() {
-        if (tableHeadBackgroundColor == null)
+        if (tableHeadBackgroundColor == null) {
             throw new MissingCssPropertyException("th", BACKGROUND_COLOR);
+        }
 
         return tableHeadBackgroundColor;
     }
 
     public String getIndexedColumnBackground() {
-        if (indexedColumnBackgroundColor == null)
+        if (indexedColumnBackgroundColor == null) {
             throw new MissingCssPropertyException(".diagram .indexedColumn", BACKGROUND);
+        }
 
         return indexedColumnBackgroundColor;
     }
 
 
     public String getExcludedColumnBackgroundColor() {
-        if (excludedColumnBackgroundColor == null)
+        if (excludedColumnBackgroundColor == null) {
             throw new MissingCssPropertyException(".excludedColumn", BACKGROUND);
+        }
 
         return excludedColumnBackgroundColor;
     }

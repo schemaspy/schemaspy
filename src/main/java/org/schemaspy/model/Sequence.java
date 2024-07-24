@@ -45,10 +45,12 @@ public class Sequence implements Comparable<Sequence> {
     @Override
     public int compareTo(Sequence other) {
         int rc = getName().compareTo(other.getName());
-        if (rc == 0)
+        if (rc == 0) {
             rc = getStartValue().compareTo(other.getStartValue());
-        if (rc == 0)
+        }
+        if (rc == 0) {
             rc = getIncrement().compareTo(other.getIncrement());
+        }
         return rc;
     }
 }

@@ -47,8 +47,9 @@ public class StackTraceOmitter extends ThrowableProxyConverter { //NOSONAR
 
     @Override
     public String convert(ILoggingEvent event) {
-        if (SCHEMA_SPY_LOGGER.isDebugEnabled())
+        if (SCHEMA_SPY_LOGGER.isDebugEnabled()) {
             return super.convert(event);
+        }
         if (Objects.nonNull(event.getThrowableProxy())) {
             omittedStackTrace.set(true);
             return event.getThrowableProxy().getMessage() + CoreConstants.LINE_SEPARATOR;

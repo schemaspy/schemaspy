@@ -114,9 +114,10 @@ public class DatabaseService {
         DatabaseMetaData meta = sqlService.getDatabaseMetaData();
 
         initTables(db, listener, meta);
-        if (viewsEnabled)
+        if (viewsEnabled) {
             initViews(db, listener, meta);
-        
+        }
+
         initCatalogs(db);
         initSchemas(db);
 
@@ -139,7 +140,7 @@ public class DatabaseService {
 
         listener.finishedConnectingTablesViews();
     }
-    
+
     private void initCatalogs(Database db) throws SQLException {
 
             String sql = dbProperties.getProperty("selectCatalogsSql");
@@ -250,8 +251,9 @@ public class DatabaseService {
         List<String> types = new ArrayList<>();
         for (String type : value.split(",")) {
             type = type.trim();
-            if (type.length() > 0)
+            if (type.length() > 0) {
                 types.add(type);
+            }
         }
 
         return types.toArray(new String[types.size()]);
@@ -439,8 +441,9 @@ public class DatabaseService {
 
                 synchronized (threads) {
                     Iterator<Thread> iter = threads.iterator();
-                    if (!iter.hasNext())
+                    if (!iter.hasNext()) {
                         break;
+                    }
 
                     thread = iter.next();
                 }
@@ -498,8 +501,9 @@ public class DatabaseService {
         String name = rs.getString(clazz + "_name");
         String cat = getOptionalString(rs, clazz + "_catalog");
         String sch = getOptionalString(rs, clazz + "_schema");
-        if (cat == null && sch == null)
+        if (cat == null && sch == null) {
             sch = schemaName;
+        }
         String remarks = getOptionalString(rs, clazz + "_comment");
         String viewDefinition = forTables ? null : getOptionalString(rs, "view_definition");
         String rows = forTables ? getOptionalString(rs, "table_rows") : null;
@@ -521,8 +525,9 @@ public class DatabaseService {
                 basics.add(new BasicTableMeta(cat, schem, name, type, remarks, null, -1));
             }
         } catch (SQLException exc) {
-            if (forTables)
+            if (forTables) {
                 throw exc;
+            }
             LOGGER.warn("Ignoring view '{}' due to exception", lastTableName, exc);
         }
     }
@@ -603,8 +608,9 @@ public class DatabaseService {
                     Table table = db.getLocals().get(tableName);
                     if (table != null) {
                         TableIndex index = table.getIndex(rs.getString("index_name"));
-                        if (index != null)
+                        if (index != null) {
                             index.setId(rs.getObject("index_id"));
+                        }
                     }
                 }
             } catch (SQLException sqlException) {
