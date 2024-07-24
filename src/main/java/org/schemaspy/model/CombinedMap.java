@@ -45,8 +45,9 @@ class CombinedMap implements Map<String, Table> {
     @Override
     public Table get(Object name) {
         Table table = map1.get(name);
-        if (table == null)
+        if (table == null) {
             table = map2.get(name);
+        }
         return table;
     }
 

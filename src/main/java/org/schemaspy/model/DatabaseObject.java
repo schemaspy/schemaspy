@@ -84,19 +84,21 @@ public class DatabaseObject implements Comparable<DatabaseObject>{
     public String toString() {
         return name;
     }
-    
+
 	@Override
 	public int compareTo(DatabaseObject column2) {
         int rc = this.getFullName().compareToIgnoreCase(column2.getFullName());
         if (rc == 0) {
-            if (this.getType() != null && column2.getType() != null)
-            	// type is exact while typeName can be adorned with additional stuff (e.g. MSSQL appends " identity" for auto-inc keys)
-            	rc = this.getType().compareTo(column2.getType());
-            else
+            if (this.getType() != null && column2.getType() != null) {
+                // type is exact while typeName can be adorned with additional stuff (e.g. MSSQL appends " identity" for auto-inc keys)
+                rc = this.getType().compareTo(column2.getType());
+            } else {
                 rc = this.getTypeName().compareToIgnoreCase(column2.getTypeName());
+            }
         }
-        if (rc == 0)
+        if (rc == 0) {
             rc = this.getLength() - column2.getLength();
+        }
         return rc;
 	}
 

@@ -62,7 +62,8 @@ public class View extends Table {
     }
 
     public void setViewDefinition(String viewDefinition) {
-        if (viewDefinition != null && viewDefinition.trim().length() > 0)
+        if (viewDefinition != null && viewDefinition.trim().length() > 0) {
             this.viewDefinition = viewDefinition;
+        }
     }
 }

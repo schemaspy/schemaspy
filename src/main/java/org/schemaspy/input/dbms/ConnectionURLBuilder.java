@@ -83,8 +83,9 @@ public class ConnectionURLBuilder {
             if ("hostOptionalPort".equals(option.getName())) {
                 param = getHostOptionalPort();
             }
-            if (param == null)
+            if (param == null) {
                 throw new MissingParameterException(option.getName(), option.getDescription());
+            }
         } else {
             args.remove(paramIndex);
             param = args.get(paramIndex);

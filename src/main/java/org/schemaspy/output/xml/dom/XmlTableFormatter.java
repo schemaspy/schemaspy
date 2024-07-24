@@ -71,13 +71,15 @@ public class XmlTableFormatter {
         Document document = tablesNode.getOwnerDocument();
         Element tableNode = document.createElement(TABLE);
         tablesNode.appendChild(tableNode);
-        if (table.getId() != null)
+        if (table.getId() != null) {
             DOMUtil.appendAttribute(tableNode, "id", String.valueOf(table.getId()));
+        }
         DOMUtil.appendAttribute(tableNode, CATALOG, table.getCatalog());
         DOMUtil.appendAttribute(tableNode, SCHEMA, table.getSchema());
         DOMUtil.appendAttribute(tableNode, "name", table.getName());
-        if (table.getNumRows() >= 0)
+        if (table.getNumRows() >= 0) {
             DOMUtil.appendAttribute(tableNode, "numRows", String.valueOf(table.getNumRows()));
+        }
         DOMUtil.appendAttribute(tableNode, "type", table.isView() ? "VIEW" : "TABLE");
         DOMUtil.appendAttribute(tableNode, "remarks", table.getComments() == null ? "" : table.getComments());
         xmlColumnFormatter.appendColumns(tableNode, table);

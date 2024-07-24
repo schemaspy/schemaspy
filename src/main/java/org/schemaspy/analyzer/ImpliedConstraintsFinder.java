@@ -78,8 +78,9 @@ public class ImpliedConstraintsFinder {
 
     private Comparator<TableColumn> byTable = (column1, column2) -> {
         int rc = column1.getTable().compareTo(column2.getTable());
-        if (rc == 0)
+        if (rc == 0) {
             rc = column1.getName().compareToIgnoreCase(column2.getName());
+        }
         return rc;
     };
 

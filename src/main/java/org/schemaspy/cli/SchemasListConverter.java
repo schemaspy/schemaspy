@@ -11,8 +11,9 @@ public class SchemasListConverter implements IStringConverter<Set<String>> {
     public Set<String> convert(String value) {
         Set<String> schemas = new HashSet<>();
         for (String name : value.split(",")) {
-            if (name.length() > 0)
+            if (name.length() > 0) {
                 schemas.add(name);
+            }
         }
         return schemas;
     }

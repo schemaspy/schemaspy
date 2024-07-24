@@ -73,8 +73,9 @@ public class TableColumnMeta {
     }
 
     private boolean evalBoolean(String exp) {
-        if (exp == null)
+        if (exp == null) {
             return false;
+        }
 
         String returnExp = exp.trim().toLowerCase();
         return "true".equals(returnExp) || "yes".equals(returnExp) || "1".equals(returnExp);

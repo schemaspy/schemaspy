@@ -56,8 +56,9 @@ public class ColumnService {
     private void initColumns(Table table) throws SQLException {
         synchronized (Table.class) {
             try (ResultSet rs = sqlService.getDatabaseMetaData().getColumns(table.getCatalog(), table.getSchema(), table.getName(), "%")) {
-                while (rs.next())
+                while (rs.next()) {
                     addColumn(table, rs);
+                }
             } catch (SQLException exc) {
                 if (!table.isLogical()) {
                     throw new ColumnInitializationFailure(table, exc);
@@ -73,8 +74,9 @@ public class ColumnService {
     private void addColumn(Table table, ResultSet rs) throws SQLException {
         String columnName = rs.getString("COLUMN_NAME");
 
-        if (columnName == null)
+        if (columnName == null) {
             return;
+        }
 
         if (table.getColumn(columnName) == null) {
             TableColumn column = initColumn(table, rs);
@@ -95,10 +97,11 @@ public class ColumnService {
 
         column.setDecimalDigits(rs.getInt("DECIMAL_DIGITS"));
         Number bufLength = (Number)rs.getObject("BUFFER_LENGTH");
-        if (bufLength != null && bufLength.shortValue() > 0)
+        if (bufLength != null && bufLength.shortValue() > 0) {
             column.setLength(bufLength.shortValue());
-        else
+        } else {
             column.setLength(rs.getInt("COLUMN_SIZE"));
+        }
 
         StringBuilder buf = new StringBuilder();
         buf.append(column.getLength());

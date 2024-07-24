@@ -142,7 +142,7 @@ public class TableColumn {
     public void setType(Integer type) {
     	this.type = type;
     }
-    
+
     /**
      * Type of the column.
      * See {@link DatabaseMetaData#getColumns(String, String, String, String)}'s <code>TYPE_NAME</code>.
@@ -458,8 +458,9 @@ public class TableColumn {
      * Disassociate all children from this column
      */
     public void unlinkChildren() {
-        for (TableColumn child : children.keySet())
+        for (TableColumn child : children.keySet()) {
             child.removeParent(this);
+        }
         children.clear();
     }
 
@@ -499,8 +500,9 @@ public class TableColumn {
      */
     public void update(TableColumnMeta colMeta) {
         String newComments = colMeta.getComments();
-        if (newComments != null)
+        if (newComments != null) {
             setComments(newComments);
+        }
 
         if (!isPrimary() && colMeta.isPrimary()) {
             table.setPrimaryColumn(this);
@@ -531,8 +533,9 @@ public class TableColumn {
     private class ColumnComparator implements Comparator<TableColumn> {
         public int compare(TableColumn column1, TableColumn column2) {
             int rc = column1.getTable().compareTo(column2.getTable());
-            if (rc == 0)
+            if (rc == 0) {
                 rc = column1.getName().compareToIgnoreCase(column2.getName());
+            }
             return rc;
         }
     }

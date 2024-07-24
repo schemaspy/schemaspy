@@ -126,10 +126,11 @@ public class Edge implements Comparable<Edge>, Element {
         if (fullErNotation) {
             // PK end of connector
             edge.append("[arrowhead=");
-            if (childColumn.isNullable())
+            if (childColumn.isNullable()) {
                 edge.append("odottee"); // zero or one parents
-            else
+            } else {
                 edge.append("teetee");  // one parent
+            }
             edge.append(" dir=both");
         } else {
             // PK end of connector
@@ -139,13 +140,15 @@ public class Edge implements Comparable<Edge>, Element {
 
         // FK end of connector
         edge.append(" arrowtail=");
-        if (childColumn.isUnique())
+        if (childColumn.isUnique()) {
             edge.append("teeodot"); // zero or one children
-        else
+        } else {
             edge.append("crowodot");// zero or more children
+        }
 
-        if (implied)
+        if (implied) {
             edge.append(" style=dashed");
+        }
         edge.append("];");
 
         return edge.toString();
@@ -153,21 +156,26 @@ public class Edge implements Comparable<Edge>, Element {
 
     public int compareTo(Edge other) {
         int rc = childTable.compareTo(other.childTable);
-        if (rc == 0)
+        if (rc == 0) {
             rc = childColumn.getName().compareToIgnoreCase(other.childColumn.getName());
-        if (rc == 0)
+        }
+        if (rc == 0) {
             rc = parentTable.compareTo(other.parentTable);
-        if (rc == 0)
+        }
+        if (rc == 0) {
             rc = parentColumn.getName().compareToIgnoreCase(other.parentColumn.getName());
-        if (rc == 0 && implied != other.implied)
+        }
+        if (rc == 0 && implied != other.implied) {
             rc = implied ? 1 : -1;
+        }
         return rc;
     }
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof Edge))
+        if (!(other instanceof Edge)) {
             return false;
+        }
         return compareTo((Edge)other) == 0;
     }
 

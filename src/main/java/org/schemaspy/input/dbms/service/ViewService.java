@@ -140,12 +140,14 @@ public class ViewService {
 
                 while (rs.next()) {
                     String viewName = rs.getString(VIEW_NAME);
-                    if (viewName == null)
+                    if (viewName == null) {
                         viewName = rs.getString(TABLE_NAME);
+                    }
                     Table view = db.getViewsMap().get(viewName);
 
-                    if (view != null)
+                    if (view != null) {
                         view.setComments(rs.getString(COMMENTS));
+                    }
                 }
             } catch (SQLException sqlException) {
                 // don't die just because this failed
@@ -166,14 +168,16 @@ public class ViewService {
 
                 while (rs.next()) {
                     String viewName = rs.getString(VIEW_NAME);
-                    if (viewName == null)
+                    if (viewName == null) {
                         viewName = rs.getString(TABLE_NAME);
+                    }
                     Table view = db.getViewsMap().get(viewName);
 
                     if (view != null) {
                         TableColumn column = view.getColumn(rs.getString(COLUMN_NAME));
-                        if (column != null)
+                        if (column != null) {
                             column.setComments(rs.getString(COMMENTS));
+                        }
                     }
                 }
             } catch (SQLException sqlException) {

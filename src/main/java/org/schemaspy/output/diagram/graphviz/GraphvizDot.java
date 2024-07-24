@@ -229,10 +229,12 @@ public class GraphvizDot implements Renderer {
                 }
             }
             int rc = process.waitFor();
-            if (rc != 0)
+            if (rc != 0) {
                 throw new RenderException("'" + commandLine + "' failed with return code " + rc);
-            if (!diagramFile.exists())
+            }
+            if (!diagramFile.exists()) {
                 throw new RenderException("'" + commandLine + "' failed to create output file");
+            }
 
             // dot generates post-HTML 4.0.1 output...convert trailing />'s to >'s
             return mapBuffer.toString().replace("/>", ">");
@@ -253,8 +255,9 @@ public class GraphvizDot implements Renderer {
         StringBuilder displayable = new StringBuilder();
         for (int i = 0; i < command.length; ++i) {
             displayable.append(command[i]);
-            if (i + 1 < command.length)
+            if (i + 1 < command.length) {
                 displayable.append(' ');
+            }
         }
         return displayable.toString();
     }
@@ -276,8 +279,9 @@ public class GraphvizDot implements Renderer {
                 String line;
                 while ((line = processReader.readLine()) != null) {
                     // don't report port id unrecognized or unrecognized port
-                    if (!line.contains("unrecognized") && !line.contains("port"))
+                    if (!line.contains("unrecognized") && !line.contains("port")) {
                         LOGGER.warn("{}: {}", new Sanitize(command), new Sanitize(line));
+                    }
                 }
             } catch (IOException ioException) {
                 LOGGER.error("Error reading from process",ioException);
