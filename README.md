@@ -144,6 +144,7 @@ For creating tutorials and guides for the community:
 * :portugal: :arrow_forward: [SchemaSpy - fácil de usar e já salvou meu emprego!](https://www.youtube.com/watch?v=vLsmYseBIh0) By Dev Multitask
 * :portugal: [Documentando bancos com Schemaspy](https://www.linkedin.com/pulse/documentando-bancos-com-schemaspy-krisnamourt-silva/) By Krisnamourt Silva
 * :thailand: [แนะนำ SchemaSpy เครื่องมือทำเอกสาร Database](https://knowlats.dev/how-to-use-schemaspy/) by @icegotcha
+* :vietnam: [Hướng dẫn sử dụng SchemaSpy](https://viblo.asia/p/huong-dan-su-dung-schemaspy-ymwGXV23R4p1) by Pham Xuan Dung
 * :open_book: [Java Power Tools](https://www.goodreads.com/en/book/show/2631468) by John Ferguson Smart
 * :open_book: [Monolith to Microservices: Sustaining Productivity While Detangling the System](https://www.goodreads.com/en/book/show/44144499) by Sam Newman
 * [Documenting your database with SchemaSpy](https://robintegg.com/2019/01/29/documenting-your-database-with-schemaspy.html) by Robin Tegg
