@@ -70,4 +70,73 @@ class RoutineTest {
         assertThat(definition).isEqualTo("");
     }
 
+    /**
+     * Given two routines with different names,
+     * When one of the routines is asked to compare itself to the other,
+     * Then it should respond that they differ.
+     */
+    @Test
+    void compareNames() {
+        assertThat(
+            new Routine("foo", "", "", "", "", false, "", "", "").compareTo(
+                new Routine("bar", "", "", "", "", false, "", "", "")
+            )
+        ).isNotEqualTo(0);
+    }
+
+    /**
+     * Given two routines with different types,
+     * When one of the routines is asked to compare itself to the other,
+     * Then it should respond that they differ.
+     */
+    @Test
+    void compareTypes() {
+        assertThat(
+            new Routine("", "foo", "", "", "", false, "", "", "").compareTo(
+                new Routine("", "bar", "", "", "", false, "", "", "")
+            )
+        ).isNotEqualTo(0);
+    }
+
+    /**
+     * Given two routines with different return types,
+     * When one of the routines is asked to compare itself to the other,
+     * Then it should respond that they differ.
+     */
+    @Test
+    void compareReturnTypes() {
+        assertThat(
+            new Routine("", "", "foo", "", "", false, "", "", "").compareTo(
+                new Routine("", "", "bar", "", "", false, "", "", "")
+            )
+        ).isNotEqualTo(0);
+    }
+
+    /**
+     * Given two routines with different definitions,
+     * When one of the routines is asked to compare itself to the other,
+     * Then it should respond that they differ.
+     */
+    @Test
+    void compareDefinitions() {
+        assertThat(
+            new Routine("", "", "", "", "foo", false, "", "", "").compareTo(
+                new Routine("", "", "", "", "bar", false, "", "", "")
+            )
+        ).isNotEqualTo(0);
+    }
+
+    /**
+     * Given two routines with similar properties,
+     * When one of the routines is asked to compare itself to the other,
+     * Then it should respond that they differ.
+     */
+    @Test
+    void compareEquality() {
+        assertThat(
+            new Routine("", "", "", "", "", false, "", "", "").compareTo(
+                new Routine("", "", "", "", "", false, "", "", "")
+            )
+        ).isEqualTo(0);
+    }
 }
