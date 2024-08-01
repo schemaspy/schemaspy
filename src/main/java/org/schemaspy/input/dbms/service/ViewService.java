@@ -23,6 +23,7 @@
 package org.schemaspy.input.dbms.service;
 
 import org.schemaspy.model.Database;
+import org.schemaspy.model.ResultSetView;
 import org.schemaspy.model.Table;
 import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.View;
@@ -139,11 +140,7 @@ public class ViewService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String viewName = rs.getString(VIEW_NAME);
-                    if (viewName == null) {
-                        viewName = rs.getString(TABLE_NAME);
-                    }
-                    Table view = db.getViewsMap().get(viewName);
+                    Table view = new ResultSetView(db.getViewsMap(), rs).view();
 
                     if (view != null) {
                         view.setComments(rs.getString(COMMENTS));
@@ -167,11 +164,7 @@ public class ViewService {
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String viewName = rs.getString(VIEW_NAME);
-                    if (viewName == null) {
-                        viewName = rs.getString(TABLE_NAME);
-                    }
-                    Table view = db.getViewsMap().get(viewName);
+                    Table view = new ResultSetView(db.getViewsMap(), rs).view();
 
                     if (view != null) {
                         TableColumn column = view.getColumn(rs.getString(COLUMN_NAME));
