@@ -22,11 +22,7 @@
  */
 package org.schemaspy.input.dbms.service;
 
-import org.schemaspy.model.Database;
-import org.schemaspy.model.ResultSetView;
-import org.schemaspy.model.Table;
-import org.schemaspy.model.TableColumn;
-import org.schemaspy.model.View;
+import org.schemaspy.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,12 +161,9 @@ public class ViewService {
 
                 while (rs.next()) {
                     Table view = new ResultSetView(db.getViewsMap(), rs).view();
-
-                    if (view != null) {
-                        TableColumn column = view.getColumn(rs.getString(COLUMN_NAME));
-                        if (column != null) {
-                            column.setComments(rs.getString(COMMENTS));
-                        }
+                    TableColumn column = new ResultSetTableColumn(view, rs).column();
+                    if (column != null) {
+                        column.setComments(rs.getString(COMMENTS));
                     }
                 }
             } catch (SQLException sqlException) {
