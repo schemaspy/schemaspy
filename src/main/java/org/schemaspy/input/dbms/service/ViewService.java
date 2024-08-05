@@ -22,6 +22,7 @@
  */
 package org.schemaspy.input.dbms.service;
 
+import java.util.Map;
 import org.schemaspy.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,20 +132,25 @@ public class ViewService {
     public void gatherViewComments(Database db) {
         String sql = dbProperties.getProperty("selectViewCommentsSql");
         if (sql != null) {
-
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    Table view = new ResultSetView(db.getViewsMap(), rs).view();
-
-                    if (view != null) {
-                        view.setComments(rs.getString(COMMENTS));
-                    }
-                }
+            try {
+                setViewComments(sqlService.prepareStatement(sql, db, null), db.getViewsMap());
             } catch (SQLException sqlException) {
                 // don't die just because this failed
                 LOGGER.warn("Failed to retrieve view comments using SQL '{}'", sql, sqlException);
+            }
+        }
+    }
+
+    public void setViewComments(
+        final PreparedStatement stmt,
+        final Map<String, View> viewsMap
+    ) throws SQLException {
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            Table view = new ResultSetView(viewsMap, rs).view();
+
+            if (view != null) {
+                view.setComments(rs.getString(COMMENTS));
             }
         }
     }
