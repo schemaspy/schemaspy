@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.schemaspy.model.TableColumn;
 import org.schemaspy.model.View;
 
 /**
@@ -39,5 +40,30 @@ class ViewServiceTest {
         ).setViewComments(stmt, viewsMap);
 
         verify(view).setComments(anyString());
+    }
+
+    @Test
+    void setViewColumnComments() throws SQLException {
+        final ResultSet results = mock(ResultSet.class);
+        when(results.next()).thenReturn(true, false);
+        final String key = "key";
+        when(results.getString(anyString())).thenReturn(key);
+
+        final PreparedStatement stmt = mock(PreparedStatement.class);
+        when(stmt.executeQuery()).thenReturn(results);
+
+        final TableColumn column = mock(TableColumn.class);
+        final View view = mock(View.class);
+        when(view.getColumn(anyString())).thenReturn(column);
+        final Map<String, View> viewsMap = mock(Map.class);
+        when(viewsMap.get(key)).thenReturn(view);
+
+        new ViewService(
+            mock(SqlService.class),
+            mock(Properties.class),
+            mock(ColumnService.class)
+        ).setViewColumnComments(stmt, viewsMap);
+
+        verify(column).setComments(anyString());
     }
 }
