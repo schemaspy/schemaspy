@@ -162,19 +162,25 @@ public class ViewService {
         String sql = dbProperties.getProperty("selectViewColumnCommentsSql");
         if (sql != null) {
 
-            try (PreparedStatement stmt = sqlService.prepareStatement(sql, db, null);
-                 ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-                    Table view = new ResultSetView(db.getViewsMap(), rs).view();
-                    TableColumn column = new ResultSetTableColumn(view, rs).column();
-                    if (column != null) {
-                        column.setComments(rs.getString(COMMENTS));
-                    }
-                }
+            try {
+                setViewColumnComments(sqlService.prepareStatement(sql, db, null), db.getViewsMap());
             } catch (SQLException sqlException) {
                 // don't die just because this failed
                 LOGGER.warn("Failed to retrieve view column comments using SQL '{}'", sql, sqlException);
+            }
+        }
+    }
+
+    public void setViewColumnComments(
+        final PreparedStatement stmt,
+        final Map<String, View> viewsMap
+    ) throws SQLException {
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            Table view = new ResultSetView(viewsMap, rs).view();
+            TableColumn column = new ResultSetTableColumn(view, rs).column();
+            if (column != null) {
+                column.setComments(rs.getString(COMMENTS));
             }
         }
     }
