@@ -22,12 +22,12 @@ public class OrderingReport {
 
     public void write() throws IOException {
         try (PrintWriter out = new DefaultPrintWriter(new File(outputDir, "insertionOrder.txt"))) {
-            TextFormatter.getInstance().write(tables, false, out);
+            new TextFormatter(tables, false, out).write();
         }
 
         Collections.reverse(tables);
         try (PrintWriter out = new DefaultPrintWriter(new File(outputDir, "deletionOrder.txt"))){
-            TextFormatter.getInstance().write(tables, false, out);
+            new TextFormatter(tables, false, out).write();
         }
     }
 }

@@ -27,23 +27,26 @@ import java.util.Collection;
 /**
  * @author John Currier
  */
-public class TextFormatter {
-    private static TextFormatter instance = new TextFormatter();
+public final class TextFormatter {
 
-    /**
-     * Singleton - prevent creation
-     */
-    private TextFormatter() {
+    private final Collection<Table> tables;
+    private final boolean includeViews;
+    private final PrintWriter out;
+
+    public TextFormatter(
+        final Collection<Table> tables,
+        final boolean includeViews,
+        final PrintWriter out
+    ) {
+        this.tables = tables;
+        this.includeViews = includeViews;
+        this.out = out;
     }
 
-    public static TextFormatter getInstance() {
-        return instance;
-    }
-
-    public void write(Collection<Table> tables, boolean includeViews, PrintWriter out) {
-        for (Table table : tables) {
-            if (!table.isView() || includeViews) {
-                out.println(table.getName());
+    public void write() {
+        for (final Table table : this.tables) {
+            if (!table.isView() || this.includeViews) {
+                this.out.println(table.getName());
             }
         }
     }
