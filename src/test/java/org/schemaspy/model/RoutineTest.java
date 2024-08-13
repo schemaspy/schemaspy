@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RoutineTest {
 
     @Test
-    void definition() throws Exception {
+    void definition() {
         // Given
         String procedureDefinition = "create procedure dbo.TestProcedure (@param varchar(max) AS\nselect * from dbo.TestTable";
         Routine routine = new Routine(
@@ -50,7 +50,7 @@ class RoutineTest {
     }
 
     @Test
-    void nullDefinitionIsReplacedWithEmptyString() throws Exception {
+    void nullDefinitionIsReplacedWithEmptyString() {
         // Given
         Routine routine = new Routine(
                 "testFunction",

@@ -115,7 +115,7 @@ class TableServiceConnectTest {
 
     @Test
     @Logback(TableService.class)
-    void remoteExists() throws SQLException {
+    void remoteExists() {
         logback.expect(Matchers.containsString("Assuming 'parent.parent' is a primary key due to being referenced by 'mainTable.child'"));
         ForeignKeyMeta foreignKeyMeta = mock(ForeignKeyMeta.class);
         TableColumnMeta tableColumnMeta = mock(TableColumnMeta.class);

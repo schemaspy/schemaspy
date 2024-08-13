@@ -115,13 +115,13 @@ class ResourceFinderTest {
     }
 
     @Test
-    void canFindInClasspathRoot() throws FileNotFoundException {
+    void canFindInClasspathRoot() {
         InputStream inputStream = resourceFinder.find("", "resourceFinder.test");
         assertThat(inputStream).hasSameContentAs(new ByteArrayInputStream(data));
     }
 
     @Test
-    void canFindInClasspathSubPath() throws FileNotFoundException {
+    void canFindInClasspathSubPath() {
         InputStream inputStream = resourceFinder.find(subPath, "resourceFinder.test");
         assertThat(inputStream).hasSameContentAs(new ByteArrayInputStream(data));
     }

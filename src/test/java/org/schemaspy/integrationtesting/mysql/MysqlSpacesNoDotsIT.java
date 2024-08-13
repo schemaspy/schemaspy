@@ -48,7 +48,7 @@ class MysqlSpacesNoDotsIT {
     static SuiteContainerExtension container = MysqlSuite.SUITE_CONTAINER;
 
     @BeforeAll
-    static void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
+    static void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "mysql",
                 "-db", "TEST 1",

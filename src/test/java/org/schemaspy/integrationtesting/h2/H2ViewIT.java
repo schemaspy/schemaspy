@@ -55,10 +55,6 @@ class H2ViewIT {
         database = database(args);
     }
 
-    private void doCreateDatabaseRepresentation() throws SQLException, IOException {
-
-    }
-
     @Test
     void databaseShouldExist() {
         assertThat(database).isNotNull();

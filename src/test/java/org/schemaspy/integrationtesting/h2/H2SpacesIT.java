@@ -45,7 +45,7 @@ class H2SpacesIT {
     private static Database database;
 
     @BeforeAll
-    static void createDatabaseRepresentation() throws SQLException, IOException, ScriptException, URISyntaxException {
+    static void createDatabaseRepresentation() throws SQLException, IOException {
         String[] args = {
                 "-t", "src/test/resources/integrationTesting/dbTypes/h2memory",
                 "-db", "h2 spaces",
