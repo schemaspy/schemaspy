@@ -63,7 +63,7 @@ class CommandLineArgumentParserTest {
      * given all required params (o and u) -> expect all ok
      */
     @Test
-    void givenAllRequiredParamsProvided_ExpectToSuccessfullyParseCommandLineArguments() throws Exception {
+    void givenAllRequiredParamsProvided_ExpectToSuccessfullyParseCommandLineArguments() {
         String[] args = {
                 "-o", "aFolder",
                 "-u", "MyUser"

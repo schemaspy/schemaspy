@@ -45,7 +45,7 @@ class DbDriverLoaderTest {
   static H2MemoryExtension h2 = new H2MemoryExtension("DbDriverLoaderTest");
 
   @Test
-  void testGetConnection() throws IOException {
+  void testGetConnection() {
     assertThat(
         new DriverFromConfig(
             parse("-t", Paths.get("src", "test", "resources", "integrationTesting", "dbTypes", "h2memory.properties").toString(), "-u", "sa", "-db", "DbDriverLoaderTest")

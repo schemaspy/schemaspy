@@ -54,7 +54,7 @@ class MysqlHTMLVizJsIT {
     static SuiteContainerExtension container = MysqlSuite.SUITE_CONTAINER;
 
     @BeforeAll
-    static void generateHTML() throws Exception {
+    static void generateHTML() {
         String[] args = new String[]{
                 "-t", "mysql",
                 "-db", "htmlit",

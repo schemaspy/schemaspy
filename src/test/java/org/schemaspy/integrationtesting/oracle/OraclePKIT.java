@@ -53,7 +53,7 @@ class OraclePKIT {
     static SuiteContainerExtension container = OracleSuite.SUITE_CONTAINER;
 
     @BeforeAll
-    static void gatheringSchemaDetailsTest() throws SQLException, IOException, ScriptException, URISyntaxException {
+    static void gatheringSchemaDetailsTest() throws SQLException, IOException {
         String[] args = {
                 "-t", "orathin",
                 "-db", "xe",

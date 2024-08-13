@@ -40,7 +40,7 @@ class ImpliedConstraintsFinderTest {
     private Database database  = mock(Database.class);
 
     @Test
-    void testGetImpliedConstraints() throws Exception {
+    void testGetImpliedConstraints() {
         Table album = createAlbumTable();
         Table track = createTrackTable();
         Table artist = createArtistTable();
@@ -63,7 +63,7 @@ class ImpliedConstraintsFinderTest {
     }
 
     @Test
-    void testGetImpliedConstraintsWithObscureTableAndColumnNames() throws Exception {
+    void testGetImpliedConstraintsWithObscureTableAndColumnNames() {
         // Given
         Table parent = createTableWithObscureNamesParent();
         Table child = createTableWithObscureNamesChild1();
