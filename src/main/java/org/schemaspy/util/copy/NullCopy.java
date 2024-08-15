@@ -5,5 +5,7 @@ package org.schemaspy.util.copy;
  */
 public final class NullCopy implements Copy {
     @Override
-    public void copy() { }
+    public void copy() {
+        // No-op.
+    }
 }

@@ -5,8 +5,6 @@ package org.schemaspy.input.dbms.classloader;
  */
 public class ClDefault implements ClassloaderSource {
 
-    public ClDefault() { }
-
     @Override
     public ClassLoader classloader() {
         return getClass().getClassLoader();

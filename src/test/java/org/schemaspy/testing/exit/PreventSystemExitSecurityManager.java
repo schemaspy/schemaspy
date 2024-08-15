@@ -8,12 +8,12 @@ public class PreventSystemExitSecurityManager extends SecurityManager {
 
     @Override
     public void checkPermission(Permission perm) {
-
+        // Mock object. Do nothing.
     }
 
     @Override
     public void checkPermission(Permission perm, Object context) {
-
+        // Mock object. Do nothing.
     }
 
     @Override
