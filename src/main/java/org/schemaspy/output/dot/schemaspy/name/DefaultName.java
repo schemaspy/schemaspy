@@ -7,8 +7,6 @@ import org.schemaspy.util.naming.Name;
  */
 public final class DefaultName implements Name {
 
-    public DefaultName() { }
-
     @Override
     public String value() {
         return "RelationshipsDiagram";

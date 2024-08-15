@@ -46,7 +46,9 @@ public class Tracked implements ProgressListener {
     }
 
     @Override
-    public void tableViewCollected(Table table) { }
+    public void tableViewCollected(Table table) {
+        // Empty since we don't measure this.
+    }
 
     /**
      * Assumes <code>startCollectingTablesViews</code> has already been called.
@@ -62,7 +64,9 @@ public class Tracked implements ProgressListener {
     }
 
     @Override
-    public void connectedTableView(Table table) { }
+    public void connectedTableView(Table table) {
+        // Empty since we don't measure this.
+    }
 
     /**
      * Assumes <code>startConnectingTablesViews</code> has already been called.
@@ -78,7 +82,9 @@ public class Tracked implements ProgressListener {
     }
 
     @Override
-    public void createdSummary() { }
+    public void createdSummary() {
+        // Empty since we don't measure this.
+    }
 
     /**
      * Assumes <code>startCreatingSummaries</code> has already been called.
@@ -94,7 +100,9 @@ public class Tracked implements ProgressListener {
     }
 
     @Override
-    public void createdTablePage(Table table) { }
+    public void createdTablePage(Table table) {
+        // Empty since we don't measure this.
+    }
 
     /**
      * Assumes <code>startedGraphingDetails</code> has already been called.
