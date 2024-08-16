@@ -46,7 +46,7 @@ Supply or override database type
 --------------------------------
 
 #. Create a new file in same directory as the schemaspy-jar, let's call it myDbType.properties
-#. Start by extending the database type you want to supply or override sql statements for as an example we will extends postgresSQL::
+#. Start by extending the database type you want to supply or override sql statements for as an example we will extends PostgreSQL::
 
     extends=pgsql
 
