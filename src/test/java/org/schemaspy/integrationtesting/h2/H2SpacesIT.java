@@ -25,9 +25,7 @@ import org.schemaspy.model.Database;
 import org.schemaspy.model.Table;
 import org.schemaspy.testing.H2MemoryExtension;
 
-import javax.script.ScriptException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;

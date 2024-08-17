@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-import org.schemaspy.input.dbms.service.DbmsService;
 import org.schemaspy.input.dbms.service.keywords.Sql92Keywords;
 import org.schemaspy.model.Table;
 

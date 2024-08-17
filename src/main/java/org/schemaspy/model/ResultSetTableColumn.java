@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.schemaspy.input.dbms.service.ColumnLabel.COLUMN_NAME;
-import static org.schemaspy.input.dbms.service.ColumnLabel.COMMENTS;
 
 public final class ResultSetTableColumn {
 

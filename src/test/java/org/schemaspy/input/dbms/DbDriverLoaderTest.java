@@ -18,7 +18,6 @@
  */
 package org.schemaspy.input.dbms;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Driver;

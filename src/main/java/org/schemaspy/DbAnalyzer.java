@@ -29,7 +29,6 @@ import org.schemaspy.model.*;
 import org.schemaspy.util.Filtered;
 import org.schemaspy.util.WhenFalse;
 import org.schemaspy.util.WhenIf;
-import org.schemaspy.util.naming.Name;
 import org.schemaspy.util.rails.NmPrimaryTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
