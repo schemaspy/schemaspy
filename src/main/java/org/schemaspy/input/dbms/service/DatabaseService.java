@@ -556,10 +556,16 @@ public class DatabaseService {
                     String tableName = rs.getString(TABLE_NAME);
                     Table table = db.getLocals().get(tableName);
                     if (table != null) {
+                        String constraintText = rs.getString("text");
+                        String constraintName = rs.getString("constraint_name");
+                        if (constraintText == null) {
+                            LOGGER.warn("Constraint text came back null for {} using SQL '{}'", constraintName, sql);
+                            constraintText = "";
+                        }
                         if (append) {
-                            table.getCheckConstraints().merge(rs.getString("constraint_name"), rs.getString("text"), (oldValue, newValue) -> oldValue + newValue);
+                            table.getCheckConstraints().merge(constraintName, constraintText, (oldValue, newValue) -> oldValue + newValue);
                         } else {
-                            table.getCheckConstraints().put(rs.getString("constraint_name"), rs.getString("text"));
+                            table.getCheckConstraints().put(constraintName, constraintText);
                         }
                     }
                 }
