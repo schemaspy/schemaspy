@@ -1,4 +1,4 @@
-ARG APPLICATION_JRE_VERSION="17.0.9_9"
+ARG SCHEMASPY_JRE_VERSION="17.0.9_9"
 
 FROM alpine:latest AS drivers
 
@@ -28,12 +28,12 @@ RUN \
     "https://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/${JTDS_VERSION}/jtds-${JTDS_VERSION}.jar"
 
 
-FROM eclipse-temurin:${APPLICATION_JRE_VERSION}-jre-jammy
+FROM eclipse-temurin:${SCHEMASPY_JRE_VERSION}-jre-jammy
 
-ARG APPLICATION_USER=schemaspy
-ARG APPLICATION_USER_ID=999
-ARG APPLICATION_GROUP=${APPLICATION_USER}
-ARG APPLICATION_GROUP_ID=${APPLICATION_USER_ID}
+ARG SCHEMASPY_USER=schemaspy
+ARG SCHEMASPY_USER_ID=999
+ARG SCHEMASPY_GROUP=${SCHEMASPY_USER}
+ARG SCHEMASPY_GROUP_ID=${SCHEMASPY_USER_ID}
 
 ENV SCHEMASPY_DRIVERS=/drivers
 ENV SCHEMASPY_OUTPUT=/output
@@ -42,22 +42,22 @@ RUN \
   set -eux \
 # Dedicated user and group
 ; addgroup \
-    --gid "${APPLICATION_GROUP_ID}" \
+    --gid "${SCHEMASPY_GROUP_ID}" \
     --system \
-    "${APPLICATION_GROUP}" \
+    "${SCHEMASPY_GROUP}" \
 ; adduser \
-    --uid "${APPLICATION_USER_ID}" \
-    --gid "${APPLICATION_GROUP_ID}" \
+    --uid "${SCHEMASPY_USER_ID}" \
+    --gid "${SCHEMASPY_GROUP_ID}" \
     --system \
     --no-create-home \
     --disabled-password \
     --home "$SCHEMASPY_OUTPUT" \
     --shell /bin/sh \
-    "${APPLICATION_USER}" \
+    "${SCHEMASPY_USER}" \
 # Extra directories
 ; mkdir /usr/local/lib/schemaspy/ \
 ; mkdir "$SCHEMASPY_OUTPUT" \
-; chown -R "${APPLICATION_USER}":"${APPLICATION_GROUP}" "$SCHEMASPY_OUTPUT" \
+; chown -R "${SCHEMASPY_USER}":"${SCHEMASPY_GROUP}" "$SCHEMASPY_OUTPUT" \
 # Extra packages
 ; export DEBIAN_FRONTEND=noninteractive \
 ; apt-get update \
@@ -74,6 +74,6 @@ ADD docker-entrypoint.sh /usr/local/bin/schemaspy
 
 WORKDIR /
 VOLUME ${SCHEMASPY_OUTPUT}
-USER ${APPLICATION_USER}
+USER ${SCHEMASPY_USER}
 
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/schemaspy"]
