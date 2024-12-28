@@ -28,10 +28,10 @@ RUN \
     "https://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/${JTDS_VERSION}/jtds-${JTDS_VERSION}.jar"
 
 
-FROM eclipse-temurin:${APPLICATION_JRE_VERSION}-jre-alpine
+FROM eclipse-temurin:${APPLICATION_JRE_VERSION}-jre-jammy
 
 ARG APPLICATION_USER=schemaspy
-ARG APPLICATION_USER_ID=1000
+ARG APPLICATION_USER_ID=999
 ARG APPLICATION_GROUP=${APPLICATION_USER}
 ARG APPLICATION_GROUP_ID=${APPLICATION_USER_ID}
 
@@ -40,18 +40,33 @@ ENV SCHEMASPY_OUTPUT=/output
 
 RUN \
   set -eux \
-# extra packages
-; apk add --update --no-cache \
-    graphviz \
-    font-opensans \
-    tini \
-# dedicated user and group
-; addgroup -g "${APPLICATION_GROUP_ID}" -S "${APPLICATION_GROUP}" \
-; adduser -u "${APPLICATION_USER_ID}" -S -D -G "${APPLICATION_GROUP}" -H -h "$SCHEMASPY_OUTPUT" -s /bin/sh "${APPLICATION_USER}" \
-# extra directories
+# Dedicated user and group
+; addgroup \
+    --gid "${APPLICATION_GROUP_ID}" \
+    --system \
+    "${APPLICATION_GROUP}" \
+; adduser \
+    --uid "${APPLICATION_USER_ID}" \
+    --gid "${APPLICATION_GROUP_ID}" \
+    --system \
+    --no-create-home \
+    --disabled-password \
+    --home "$SCHEMASPY_OUTPUT" \
+    --shell /bin/sh \
+    "${APPLICATION_USER}" \
+# Extra directories
 ; mkdir /usr/local/lib/schemaspy/ \
 ; mkdir "$SCHEMASPY_OUTPUT" \
-; chown -R "${APPLICATION_USER}":"${APPLICATION_GROUP}" "$SCHEMASPY_OUTPUT"
+; chown -R "${APPLICATION_USER}":"${APPLICATION_GROUP}" "$SCHEMASPY_OUTPUT" \
+# Extra packages
+; export DEBIAN_FRONTEND=noninteractive \
+; apt-get update \
+; apt-get install --no-install-recommends --no-install-suggests -y \
+    graphviz \
+    fonts-open-sans \
+    tini \
+; apt-get clean \
+; rm -rf /var/lib/apt/lists/*
 
 COPY --from=drivers /drivers_inc /drivers_inc
 ADD target/schema*-app.jar /usr/local/lib/schemaspy/schemaspy-app.jar
@@ -61,4 +76,4 @@ WORKDIR /
 VOLUME ${SCHEMASPY_OUTPUT}
 USER ${APPLICATION_USER}
 
-ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/schemaspy"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/schemaspy"]
