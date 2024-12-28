@@ -1,4 +1,4 @@
-FROM curlimages/curl:8.2.1 AS drivers
+FROM alpine:latest AS drivers
 
 ARG MYSQL_VERSION=8.0.28
 ENV MYSQL_VERSION="${MYSQL_VERSION}"
@@ -15,14 +15,16 @@ ENV JTDS_VERSION="${JTDS_VERSION}"
 RUN mkdir -p /tmp/drivers_inc
 WORKDIR /tmp/drivers_inc
 
-RUN curl -L "https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/${MYSQL_VERSION}/mysql-connector-java-${MYSQL_VERSION}.jar" \
-          -o "mysql-connector-java-${MYSQL_VERSION}.jar" && \
-    curl -L "https://search.maven.org/remotecontent?filepath=org/mariadb/jdbc/mariadb-java-client/${MARIADB_VERSION}/mariadb-java-client-${MARIADB_VERSION}.jar" \
-          -o "mariadb-java-client-${MARIADB_VERSION}.jar" && \
-    curl -L "https://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/${POSTGRESQL_VERSION}/postgresql-${POSTGRESQL_VERSION}.jar" \
-          -o "postgresql-${POSTGRESQL_VERSION}.jar" && \
-    curl -L "https://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/${JTDS_VERSION}/jtds-${JTDS_VERSION}.jar" \
-          -o "jtds-${JTDS_VERSION}.jar"
+RUN \
+  set -eux \
+; wget -qO "mysql-connector-java-${MYSQL_VERSION}.jar" \
+    "https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/${MYSQL_VERSION}/mysql-connector-java-${MYSQL_VERSION}.jar" \
+; wget -qO "mariadb-java-client-${MARIADB_VERSION}.jar" \
+    "https://search.maven.org/remotecontent?filepath=org/mariadb/jdbc/mariadb-java-client/${MARIADB_VERSION}/mariadb-java-client-${MARIADB_VERSION}.jar" \
+; wget -qO "postgresql-${POSTGRESQL_VERSION}.jar" \
+    "https://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/${POSTGRESQL_VERSION}/postgresql-${POSTGRESQL_VERSION}.jar" \
+; wget -qO "jtds-${JTDS_VERSION}.jar" \
+    "https://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/${JTDS_VERSION}/jtds-${JTDS_VERSION}.jar"
 
 FROM eclipse-temurin:17.0.9_9-jre-jammy AS base
 
