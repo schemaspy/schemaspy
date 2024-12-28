@@ -12,11 +12,10 @@ ENV POSTGRESQL_VERSION="${POSTGRESQL_VERSION}"
 ARG JTDS_VERSION=1.3.1
 ENV JTDS_VERSION="${JTDS_VERSION}"
 
-RUN mkdir -p /tmp/drivers_inc
-WORKDIR /tmp/drivers_inc
-
 RUN \
   set -eux \
+; mkdir -p /tmp/drivers_inc \
+; cd /tmp/drivers_inc \
 ; wget -qO "mysql-connector-java-${MYSQL_VERSION}.jar" \
     "https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/${MYSQL_VERSION}/mysql-connector-java-${MYSQL_VERSION}.jar" \
 ; wget -qO "mariadb-java-client-${MARIADB_VERSION}.jar" \
