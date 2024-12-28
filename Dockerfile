@@ -27,29 +27,35 @@ RUN \
 ; wget -qO "jtds-${JTDS_VERSION}.jar" \
     "https://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/${JTDS_VERSION}/jtds-${JTDS_VERSION}.jar"
 
-FROM eclipse-temurin:${APPLICATION_JRE_VERSION}-jre-jammy AS base
 
-ADD docker/open-sans.tar.gz /usr/share/fonts
+FROM eclipse-temurin:${APPLICATION_JRE_VERSION}-jre-alpine
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && \
-    apt-get install -y graphviz -o APT::Install-Suggests=0 -o APT::Install-Recommends=0 && \
-    apt-get clean && \
-    useradd -ms /bin/bash java && \
-    mkdir /output && \
-    chown -R java /output
-
-USER java
-
-FROM base
-COPY --from=drivers /drivers_inc /drivers_inc
-ADD target/schema*-app.jar /usr/local/lib/schemaspy/schemaspy-app.jar
-ADD docker/schemaspy.sh /usr/local/bin/schemaspy
-
-WORKDIR /
+ARG APPLICATION_USER=schemaspy
+ARG APPLICATION_USER_ID=1000
+ARG APPLICATION_GROUP=${APPLICATION_USER}
+ARG APPLICATION_GROUP_ID=${APPLICATION_USER_ID}
 
 ENV SCHEMASPY_DRIVERS=/drivers
 ENV SCHEMASPY_OUTPUT=/output
+
+RUN \
+  set -eux \
+# extra packages
+; apk add --update --no-cache graphviz \
+# dedicated user and group
+; addgroup -g "${APPLICATION_GROUP_ID}" -S "${APPLICATION_GROUP}" \
+; adduser -u "${APPLICATION_USER_ID}" -S -D -G "${APPLICATION_GROUP}" -H -h "$SCHEMASPY_OUTPUT" -s /bin/sh "${APPLICATION_USER}" \
+# extra directories
+; mkdir /usr/local/lib/schemaspy/ \
+; mkdir "$SCHEMASPY_OUTPUT" \
+; chown -R "${APPLICATION_USER}":"${APPLICATION_GROUP}" "$SCHEMASPY_OUTPUT"
+
+COPY --from=drivers /drivers_inc /drivers_inc
+ADD target/schema*-app.jar /usr/local/lib/schemaspy/schemaspy-app.jar
+ADD docker/schemaspy.sh /usr/local/bin/schemaspy
+ADD docker/open-sans.tar.gz /usr/share/fonts
+
+WORKDIR /
+USER ${APPLICATION_USER}
 
 ENTRYPOINT ["/usr/local/bin/schemaspy"]
