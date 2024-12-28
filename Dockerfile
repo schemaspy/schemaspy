@@ -41,7 +41,7 @@ ENV SCHEMASPY_OUTPUT=/output
 RUN \
   set -eux \
 # extra packages
-; apk add --update --no-cache graphviz \
+; apk add --update --no-cache graphviz font-opensans \
 # dedicated user and group
 ; addgroup -g "${APPLICATION_GROUP_ID}" -S "${APPLICATION_GROUP}" \
 ; adduser -u "${APPLICATION_USER_ID}" -S -D -G "${APPLICATION_GROUP}" -H -h "$SCHEMASPY_OUTPUT" -s /bin/sh "${APPLICATION_USER}" \
@@ -53,7 +53,6 @@ RUN \
 COPY --from=drivers /drivers_inc /drivers_inc
 ADD target/schema*-app.jar /usr/local/lib/schemaspy/schemaspy-app.jar
 ADD docker/schemaspy.sh /usr/local/bin/schemaspy
-ADD docker/open-sans.tar.gz /usr/share/fonts
 
 WORKDIR /
 USER ${APPLICATION_USER}
