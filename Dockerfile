@@ -58,6 +58,7 @@ ADD target/schema*-app.jar /usr/local/lib/schemaspy/schemaspy-app.jar
 ADD docker-entrypoint.sh /usr/local/bin/schemaspy
 
 WORKDIR /
+VOLUME ${SCHEMASPY_OUTPUT}
 USER ${APPLICATION_USER}
 
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/schemaspy"]
