@@ -41,7 +41,10 @@ ENV SCHEMASPY_OUTPUT=/output
 RUN \
   set -eux \
 # extra packages
-; apk add --update --no-cache graphviz font-opensans \
+; apk add --update --no-cache \
+    graphviz \
+    font-opensans \
+    tini \
 # dedicated user and group
 ; addgroup -g "${APPLICATION_GROUP_ID}" -S "${APPLICATION_GROUP}" \
 ; adduser -u "${APPLICATION_USER_ID}" -S -D -G "${APPLICATION_GROUP}" -H -h "$SCHEMASPY_OUTPUT" -s /bin/sh "${APPLICATION_USER}" \
@@ -57,4 +60,4 @@ ADD docker-entrypoint.sh /usr/local/bin/schemaspy
 WORKDIR /
 USER ${APPLICATION_USER}
 
-ENTRYPOINT ["/usr/local/bin/schemaspy"]
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/schemaspy"]
