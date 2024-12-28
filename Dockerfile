@@ -14,8 +14,8 @@ ENV JTDS_VERSION="${JTDS_VERSION}"
 
 RUN \
   set -eux \
-; mkdir -p /tmp/drivers_inc \
-; cd /tmp/drivers_inc \
+; mkdir -p /drivers_inc \
+; cd /drivers_inc \
 ; wget -qO "mysql-connector-java-${MYSQL_VERSION}.jar" \
     "https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/${MYSQL_VERSION}/mysql-connector-java-${MYSQL_VERSION}.jar" \
 ; wget -qO "mariadb-java-client-${MARIADB_VERSION}.jar" \
@@ -41,7 +41,7 @@ RUN apt-get update && \
 USER java
 
 FROM base
-COPY --from=drivers /tmp/drivers_inc /drivers_inc
+COPY --from=drivers /drivers_inc /drivers_inc
 ADD target/schema*-app.jar /usr/local/lib/schemaspy/schemaspy-app.jar
 ADD docker/schemaspy.sh /usr/local/bin/schemaspy
 
