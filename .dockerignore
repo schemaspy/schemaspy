@@ -1,4 +1,4 @@
 *
-!docker/schemaspy.sh
+!docker-entrypoint.sh
 !target/schema*.jar
 !target/checkout/target/schema*.jar

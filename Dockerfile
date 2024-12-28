@@ -52,7 +52,7 @@ RUN \
 
 COPY --from=drivers /drivers_inc /drivers_inc
 ADD target/schema*-app.jar /usr/local/lib/schemaspy/schemaspy-app.jar
-ADD docker/schemaspy.sh /usr/local/bin/schemaspy
+ADD docker-entrypoint.sh /usr/local/bin/schemaspy
 
 WORKDIR /
 USER ${APPLICATION_USER}
