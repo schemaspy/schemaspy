@@ -1,3 +1,5 @@
+ARG APPLICATION_JRE_VERSION="17.0.9_9"
+
 FROM alpine:latest AS drivers
 
 ARG MYSQL_VERSION=8.0.28
@@ -25,7 +27,7 @@ RUN \
 ; wget -qO "jtds-${JTDS_VERSION}.jar" \
     "https://search.maven.org/remotecontent?filepath=net/sourceforge/jtds/jtds/${JTDS_VERSION}/jtds-${JTDS_VERSION}.jar"
 
-FROM eclipse-temurin:17.0.9_9-jre-jammy AS base
+FROM eclipse-temurin:${APPLICATION_JRE_VERSION}-jre-jammy AS base
 
 ADD docker/open-sans.tar.gz /usr/share/fonts
 
