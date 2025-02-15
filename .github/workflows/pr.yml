@@ -35,7 +35,7 @@ jobs:
           verify
           -Dscm.revision=$GITHUB_SHA
       - name: Upload test output
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: testout
