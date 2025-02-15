@@ -6,21 +6,21 @@ variable "REGISTRY" {
   default = "docker.io/schemaspy"
 }
 
-variable "GITHUB_REF_NAME" {
-  default = "$GITHUB_REF_NAME"
-}
+#variable "GITHUB_REF_NAME" {
+#  default = "$GITHUB_REF_NAME"
+#}
 
-variable "GIT_BRANCH" {
-  default = "${GITHUB_REF_NAME}"
-}
+#variable "GIT_BRANCH" {
+#  default = "${GITHUB_REF_NAME}"
+#}
 
-variable "GITHUB_SHA" {
-  default = "$GITHUB_SHA"
-}
+#variable "GITHUB_SHA" {
+#  default = "$GITHUB_SHA"
+#}
 
-variable "GIT_REVISION" {
-  default = "${GITHUB_SHA}"
-}
+#variable "GIT_REVISION" {
+#  default = "${GITHUB_SHA}"
+#}
 
 group "default" {
   targets = [
@@ -49,10 +49,10 @@ target "schemaspy" {
     drivers = "target:drivers"
     base = "target:base"
   }
-  labels = {
-    "GIT_BRANCH" = "${GIT_BRANCH}"
-    "GIT_REVISION" = "${GIT_REVISION}"
-  }
+#  labels = {
+#    "GIT_BRANCH" = "${GIT_BRANCH}"
+#    "GIT_REVISION" = "${GIT_REVISION}"
+#  }
   platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7"]
   cache-to = ["type=gha,mode=min,scope=dkr-schemaspy"]
 }
