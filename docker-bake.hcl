@@ -77,7 +77,7 @@ target "release" {
   inherits = ["schemaspy"]
   context = "./target/checkout"
   tags = [
-    "${REGISTRY}/schemaspy:${VERSION}"
+    "${REGISTRY}/schemaspy:${VERSION}",
     "${REGISTRY}/schemaspy:latest"
   ]
 }
