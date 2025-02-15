@@ -14,7 +14,7 @@ public class MssqlSuite {
 
     public static final SuiteContainerExtension SUITE_CONTAINER =
             new SuiteContainerExtension(
-                    () -> new MSSQLContainer<>("mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-16.04")
+                    () -> new MSSQLContainer<>("mcr.microsoft.com/mssql/server:2019-CU30-ubuntu-20.04")
             )
                     .withInitFunctions(new SQLScriptsRunner("integrationTesting/mssqlserver/dbScripts/"))
                     .withInitUser("sa", "A_Str0ng_Required_Password");
