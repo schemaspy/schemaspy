@@ -52,6 +52,7 @@ jobs:
       - name: Docker Buildx Bake(Temurin-snapshot)
         uses: docker/bake-action@v6
         with:
+          source: .
           files: docker-bake.hcl
           push: false
           targets: pr
