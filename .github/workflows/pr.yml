@@ -58,8 +58,8 @@ jobs:
           files: docker-bake.hcl
           push: false
           targets: pr
-          set: |
-            *.cache-to=
+#          set: |
+#            *.cache-to=
       - name: "Test Image: Print help"
         run: |
           docker run --rm schemaspy/schemaspy:pr --help
