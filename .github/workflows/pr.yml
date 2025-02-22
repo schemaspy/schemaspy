@@ -50,7 +50,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          version: v0.20.1
+          version: v0.19.3
       - name: Docker Buildx Bake(Temurin-snapshot)
         uses: docker/bake-action@v6
         with:
@@ -58,8 +58,8 @@ jobs:
           files: docker-bake.hcl
           push: false
           targets: pr
-#          set: |
-#            *.cache-to=
+          set: |
+            *.cache-to=
       - name: "Test Image: Print help"
         run: |
           docker run --rm schemaspy/schemaspy:pr --help
