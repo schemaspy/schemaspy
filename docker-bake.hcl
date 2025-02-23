@@ -29,49 +29,22 @@ group "default" {
 }
 
 target "drivers" {
-  cache-from = [
-    {
-      type="gha",
-      scope="dkr-drivers"
-    }
-  ]
+  cache-from = ["type=gha,scope=dkr-drivers"]
   target = "drivers"
   output = ["type=cacheonly"]
-  cache-to = [ 
-    { 
-      type="gha",
-      mode="min",
-      scope="dkr-drivers"
-    }
-  ]
+  cache-to = ["type=gha,mode=min,scope=dkr-drivers"]
 }
 
 target "base" {
-  cache-from = [
-    {
-      type="gha",
-      scope="dkr-base"
-    }
-  ]
+  cache-from = ["type=gha,scope=dkr-base"]
   target = "base"
   output = ["type=cacheonly"]
   platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7"]
-  cache-to = [
-    {
-      type="gha",
-      mode="min",
-      scope="dkr-base"
-    }
-  ]
+  cache-to = ["type=gha,mode=min,scope=dkr-base"]
 }
 
 target "schemaspy" {
-  cache-from = [
-    {
-      type="gha",
-      scope="dkr-schemaspy"
-    }
-  ]
+  cache-from = ["type=gha,scope=dkr-schemaspy"]
   contexts = {
     drivers = "target:drivers"
     base = "target:base"
@@ -81,13 +54,7 @@ target "schemaspy" {
     "GIT_REVISION" = "${GIT_REVISION}"
   }
   platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7"]
-  cache-to = [
-    {
-      type="gha",
-      mode="min",
-      scope="dkr-schemaspy"
-    }
-  ]
+  cache-to = ["type=gha,mode=min,scope=dkr-schemaspy"]
 }
 
 target "pr" {
