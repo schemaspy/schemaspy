@@ -46,7 +46,7 @@ target "base" {
 target "schemaspy" {
   cache-from = ["type=gha,scope=dkr-schemaspy"]
   contexts = {
-    drivers = "target:drivers",
+    drivers = "target:drivers"
     base = "target:base"
   }
   labels = {
@@ -60,7 +60,7 @@ target "schemaspy" {
 target "pr" {
   inherits = ["schemaspy"]
     tags = [
-      "${REGISTRY}/schemaspy:pr",
+      "${REGISTRY}/schemaspy:pr"
     ]
     platforms = ["linux/amd64"]
     output = ["type=docker"]
@@ -69,7 +69,7 @@ target "pr" {
 target "snapshot" {
   inherits = ["schemaspy"]
   tags = [
-    "${REGISTRY}/schemaspy:snapshot",
+    "${REGISTRY}/schemaspy:snapshot"
   ]
 }
 
@@ -78,6 +78,6 @@ target "release" {
   context = "./target/checkout"
   tags = [
     "${REGISTRY}/schemaspy:${VERSION}",
-    "${REGISTRY}/schemaspy:latest",
+    "${REGISTRY}/schemaspy:latest"
   ]
 }

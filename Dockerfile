@@ -23,7 +23,9 @@ ADD docker/open-sans.tar.gz /usr/share/fonts
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
+RUN rm /var/lib/dpkg/info/libc-bin.* && \
+    apt-get clean && \
+    apt-get update && \
     apt-get install -y graphviz -o APT::Install-Suggests=0 -o APT::Install-Recommends=0 && \
     apt-get clean && \
     useradd -ms /bin/bash java && \

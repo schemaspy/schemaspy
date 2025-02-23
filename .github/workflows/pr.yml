@@ -35,7 +35,7 @@ jobs:
           verify
           -Dscm.revision=$GITHUB_SHA
       - name: Upload test output
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: testout
@@ -49,9 +49,12 @@ jobs:
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Docker Buildx Bake(Temurin-snapshot)
-        uses: docker/bake-action@v4
         with:
+          version: v0.19.3
+      - name: Docker Buildx Bake(Temurin-snapshot)
+        uses: docker/bake-action@v6
+        with:
+          source: .
           files: docker-bake.hcl
           push: false
           targets: pr
