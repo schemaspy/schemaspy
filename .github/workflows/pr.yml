@@ -59,7 +59,7 @@ jobs:
           push: false
           targets: pr
           set: |
-            *.cache-to=""
+            *.cache-to=
       - name: "Test Image: Print help"
         run: |
           docker run --rm schemaspy/schemaspy:pr --help
