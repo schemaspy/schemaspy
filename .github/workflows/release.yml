@@ -141,4 +141,4 @@ jobs:
           push: true
           targets: release
         env:
-          VERSION: ${{ github.event.inputs.release_version }}"
+          VERSION: ${{ github.event.inputs.release_version }}
