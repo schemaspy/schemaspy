@@ -103,23 +103,19 @@ jobs:
           asset_path: ./target/checkout/target/schemaspy-${{ github.event.inputs.release_version }}-app.jar.asc
           asset_name: schemaspy-app.jar.asc
           asset_content_type: text/plain
-      - name: Upload Release Asset Checksum md5
+      - name: Create Checksums
+        run: |-
+          pushd target/checkout/target
+          sha512sum schemaspy-${{ github.event.inputs.release_version }}-app.jar > schemaspy-${{ github.event.inputs.release_version }}-app.jar.sha512
+          popd
+      - name: Upload Release Asset Checksum sha512
         if: success()
-        id: upload-release-asset-md5
+        id: upload-release-asset-sha512
         uses: npetzall/upload-release-asset@384b047305ab6dc8050e8b2c83772af692cd80cd
         with:
           release_id: ${{ steps.drafting.outputs.draft-id }}
-          asset_path: ./target/checkout/target/schemaspy-${{ github.event.inputs.release_version }}-app.jar.md5
-          asset_name: schemaspy-app.jar.md5
-          asset_content_type: text/plain
-      - name: Upload Release Asset Checksum sha1
-        if: success()
-        id: upload-release-asset-sha1
-        uses: npetzall/upload-release-asset@384b047305ab6dc8050e8b2c83772af692cd80cd
-        with:
-          release_id: ${{ steps.drafting.outputs.draft-id }}
-          asset_path: ./target/checkout/target/schemaspy-${{ github.event.inputs.release_version }}-app.jar.sha1
-          asset_name: schemaspy-app.jar.sha1
+          asset_path: ./target/checkout/target/schemaspy-${{ github.event.inputs.release_version }}-app.jar.sha512
+          asset_name: schemaspy-app.jar.sha512
           asset_content_type: text/plain
       - name: Login to Docker Hub
         uses: docker/login-action@v2
