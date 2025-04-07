@@ -31,8 +31,11 @@ OSX
 
 Graphviz
 ~~~~~~~~~
-There have been lots of issue with graphviz and OSX |br|
-So install using brew ``brew install graphviz --with-librsvg --with-pango`` |br|
+There have been lots of issue with graphviz and OSX. |br|
+
+Installing graphviz should include librsvg and pango by default when running ``brew install graphviz``.|br|
+
+For older versions of OSX/brew you may need to run ``brew install graphviz --with-librsvg --with-pango`` |br|
 Depending on OSX version |br|
 *Older than High Sierra*, add ``-renderer :quartz`` to the commandline |br|
 *High Sierra or newer*, add ``-renderer :cairo`` to the commandline |br|
