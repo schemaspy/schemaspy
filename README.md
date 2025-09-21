@@ -147,10 +147,12 @@ For creating tutorials and guides for the community:
 * :vietnam: [Hướng dẫn sử dụng SchemaSpy](https://viblo.asia/p/huong-dan-su-dung-schemaspy-ymwGXV23R4p1) by Pham Xuan Dung
 * :open_book: [Java Power Tools](https://www.goodreads.com/en/book/show/2631468) by John Ferguson Smart
 * :open_book: [Monolith to Microservices: Sustaining Productivity While Detangling the System](https://www.goodreads.com/en/book/show/44144499) by Sam Newman
+* :arrow_forward: [SchemaSpy Data Dictionary Tool for Research Datasets](https://www.youtube.com/watch?v=lxH5y187mCA) by Eisenberg Family Depression Center
 * [Documenting your database with SchemaSpy](https://robintegg.com/2019/01/29/documenting-your-database-with-schemaspy.html) by Robin Tegg
 * [Documenting your relational database using SchemaSpy](https://tech.asimio.net/2020/11/27/Documenting-your-relational-database-using-SchemaSpy.html) by Orlando L Otero
 * [How to Create ERD(Entity Relationship Diagram)](https://www.cybrosys.com/blog/how-to-create-erd-entity-relationship-diagram) by Cybrosys technologies
 * [How to Document a Database With SchemaSpy](https://levelup.gitconnected.com/database-documentation-with-schemaspy-e9071eecd45a) by Data 4 Everyone!
+* [How to use SchemaSpy to document research datasets](https://teamdynamix.umich.edu/TDClient/210/DepressionCenter/KB/ArticleDet?ID=11889) by @gabrielmongefranco
 * [How to use SchemaSpy to document your database](https://medium.com/@gustavo.ponce.ch/how-to-use-schemaspy-to-document-your-database-4046fdecfe83) by Gustavo Ponce
 * [How to visualize a PostgreSQL schema as SVG with SchemaSpy](https://dev.to/mostalive/how-to-visualize-a-postgresql-schema-as-svg-with-schemaspy-516g) by Willem van den Ende
 * [Installing SchemaSpy to document you database](http://www.goring.org/resources/schemaspy_tutorial.html) by @SimonGoring
