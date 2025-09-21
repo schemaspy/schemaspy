@@ -127,7 +127,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          version: v0.19.3
+          version: v0.28.0
       - name: Set GIT_BRANCH, GIT_REVISION
         run: |
           echo "GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> "$GITHUB_ENV"
