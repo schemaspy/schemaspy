@@ -1,6 +1,6 @@
 FROM curlimages/curl:8.2.1 AS drivers
 
-ENV MYSQL_VERSION=8.0.28
+ENV MYSQL_VERSION=8.4.0
 ENV MARIADB_VERSION=1.1.10
 ENV POSTGRESQL_VERSION=42.7.2
 ENV JTDS_VERSION=1.3.1
@@ -8,8 +8,8 @@ ENV JTDS_VERSION=1.3.1
 RUN mkdir -p /tmp/drivers_inc
 WORKDIR /tmp/drivers_inc
 
-RUN curl -L "https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/${MYSQL_VERSION}/mysql-connector-java-${MYSQL_VERSION}.jar" \
-          -o "mysql-connector-java-${MYSQL_VERSION}.jar" && \
+RUN curl -L "https://search.maven.org/remotecontent?filepath=com/mysql/mysql-connector-j/${MYSQL_VERSION}/mysql-connector-j-${MYSQL_VERSION}.jar" \
+          -o "mysql-connector-j-${MYSQL_VERSION}.jar" && \
     curl -L "https://search.maven.org/remotecontent?filepath=org/mariadb/jdbc/mariadb-java-client/${MARIADB_VERSION}/mariadb-java-client-${MARIADB_VERSION}.jar" \
           -o "mariadb-java-client-${MARIADB_VERSION}.jar" && \
     curl -L "https://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/${POSTGRESQL_VERSION}/postgresql-${POSTGRESQL_VERSION}.jar" \
