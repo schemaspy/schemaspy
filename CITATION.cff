@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - name: "SchemaSpy Team"
+    email: "team@schemaspy.org"
+    website: "https://schemaspy.org"
+title: "SchemaSpy: Database documentation built easy"
+version: 7.0.2
+date-released: 2025-09-20
+url: "https://github.com/schemaspy/schemaspy"
