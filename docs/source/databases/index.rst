@@ -7,3 +7,4 @@ Databases
 *********
 
 .. include:: mssql.rst.inc
+.. include:: spanner.rst.inc
