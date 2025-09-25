@@ -145,8 +145,12 @@ For creating tutorials and guides for the community:
 * :portugal: [Documentando bancos com Schemaspy](https://www.linkedin.com/pulse/documentando-bancos-com-schemaspy-krisnamourt-silva/) By Krisnamourt Silva
 * :thailand: [แนะนำ SchemaSpy เครื่องมือทำเอกสาร Database](https://knowlats.dev/how-to-use-schemaspy/) by @icegotcha
 * :vietnam: [Hướng dẫn sử dụng SchemaSpy](https://viblo.asia/p/huong-dan-su-dung-schemaspy-ymwGXV23R4p1) by Pham Xuan Dung
+* :open_book: [Building Microservices: Designing Fine-Grained Systems](https://www.goodreads.com/book/show/22512931-building-microservices) by Sam Newman
+* :open_book: [Continuous Integration, Delivery, and Deployment](https://www.goodreads.com/book/show/36610470-continuous-integration-delivery-and-deployment) by Sander Rossel
 * :open_book: [Java Power Tools](https://www.goodreads.com/en/book/show/2631468) by John Ferguson Smart
-* :open_book: [Monolith to Microservices: Sustaining Productivity While Detangling the System](https://www.goodreads.com/en/book/show/44144499) by Sam Newman
+* :open_book: [Learning PostgreSQL](https://www.goodreads.com/book/show/28189424-learning-postgresql) by Salahaldin Juba et al.
+* :open_book: [Monolith to Microservices: Evolutionary Patterns to Transform Your Monolith](https://www.goodreads.com/book/show/44144499-monolith-to-microservices) by Sam Newman
+* :open_book: [The Productive Programmer](https://www.goodreads.com/book/show/3411606-the-productive-programmer-theory-in-practice) by Neal Ford
 * :arrow_forward: [SchemaSpy Data Dictionary Tool for Research Datasets](https://www.youtube.com/watch?v=lxH5y187mCA) by Eisenberg Family Depression Center
 * [Documenting your database with SchemaSpy](https://robintegg.com/2019/01/29/documenting-your-database-with-schemaspy.html) by Robin Tegg
 * [Documenting your relational database using SchemaSpy](https://tech.asimio.net/2020/11/27/Documenting-your-relational-database-using-SchemaSpy.html) by Orlando L Otero
