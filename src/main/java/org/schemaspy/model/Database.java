@@ -28,6 +28,7 @@ import org.schemaspy.util.CaseInsensitiveMap;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -47,7 +48,6 @@ public class Database {
     private final Map<String, Table> tables = new CaseInsensitiveMap<>();
     private final Map<String, View> views = new CaseInsensitiveMap<>();
     private final Map<String, Table> remoteTables = new CaseInsensitiveMap<>(); // key: schema.tableName
-    private final Map<String, Table> locals = new CombinedMap(tables, views);
     private final Map<String, Routine> routines = new CaseInsensitiveMap<>();
     private final ZonedDateTime connectTime = ZonedDateTime.now();
     private final Map<String, Sequence> sequences = new CaseInsensitiveMap<>();
@@ -94,8 +94,14 @@ public class Database {
         return tables;
     }
 
+    /**
+     * A read-only map that combines Tables and Views.
+     */
     public Map<String, Table> getLocals() {
-        return locals;
+        Map<String, Table> result = new CaseInsensitiveMap<>();
+        result.putAll(tables);
+        result.putAll(views);
+        return Collections.unmodifiableMap(result);
     }
 
     public Collection<View> getViews() {
