@@ -333,6 +333,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-spanner-jdbc</artifactId>
+            <version>2.18.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
             <version>2.10.0</version>
@@ -523,6 +529,7 @@
                         <exclude>**/Oracle*IT.java</exclude>
                         <exclude>**/Informix*IT.java</exclude>
                         <exclude>**/BigQuery*IT.java</exclude>
+                        <exclude>**/Spanner*IT.java</exclude>
                     </excludes>
                     <systemPropertyVariables>
                         <pomImplementationVersion>${project.version}</pomImplementationVersion>
