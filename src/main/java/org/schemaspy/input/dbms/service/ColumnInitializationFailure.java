@@ -29,7 +29,14 @@ public class ColumnInitializationFailure extends SQLException {
     private static final long serialVersionUID = 1L;
 
     public ColumnInitializationFailure(Table table, SQLException failure) {
-        super("Failed to collect column details for " + (table.isView() ? "view" : "table") + " '" + table.getName() + "' in schema '" + table.getContainer() + "'");
+        super(
+            String.format(
+                "Failed to collect column details for %s '%s' in '%s'",
+                table.getType(),
+                table.getName(),
+                table.getContainer()
+            )
+        );
         initCause(failure);
     }
 }
