@@ -145,12 +145,18 @@ For creating tutorials and guides for the community:
 * :portugal: [Documentando bancos com Schemaspy](https://www.linkedin.com/pulse/documentando-bancos-com-schemaspy-krisnamourt-silva/) By Krisnamourt Silva
 * :thailand: [แนะนำ SchemaSpy เครื่องมือทำเอกสาร Database](https://knowlats.dev/how-to-use-schemaspy/) by @icegotcha
 * :vietnam: [Hướng dẫn sử dụng SchemaSpy](https://viblo.asia/p/huong-dan-su-dung-schemaspy-ymwGXV23R4p1) by Pham Xuan Dung
+* :open_book: [Building Microservices: Designing Fine-Grained Systems](https://www.goodreads.com/book/show/22512931-building-microservices) by Sam Newman
+* :open_book: [Continuous Integration, Delivery, and Deployment](https://www.goodreads.com/book/show/36610470-continuous-integration-delivery-and-deployment) by Sander Rossel
 * :open_book: [Java Power Tools](https://www.goodreads.com/en/book/show/2631468) by John Ferguson Smart
-* :open_book: [Monolith to Microservices: Sustaining Productivity While Detangling the System](https://www.goodreads.com/en/book/show/44144499) by Sam Newman
+* :open_book: [Learning PostgreSQL](https://www.goodreads.com/book/show/28189424-learning-postgresql) by Salahaldin Juba et al.
+* :open_book: [Monolith to Microservices: Evolutionary Patterns to Transform Your Monolith](https://www.goodreads.com/book/show/44144499-monolith-to-microservices) by Sam Newman
+* :open_book: [The Productive Programmer](https://www.goodreads.com/book/show/3411606-the-productive-programmer-theory-in-practice) by Neal Ford
+* :arrow_forward: [SchemaSpy Data Dictionary Tool for Research Datasets](https://www.youtube.com/watch?v=lxH5y187mCA) by Eisenberg Family Depression Center
 * [Documenting your database with SchemaSpy](https://robintegg.com/2019/01/29/documenting-your-database-with-schemaspy.html) by Robin Tegg
 * [Documenting your relational database using SchemaSpy](https://tech.asimio.net/2020/11/27/Documenting-your-relational-database-using-SchemaSpy.html) by Orlando L Otero
 * [How to Create ERD(Entity Relationship Diagram)](https://www.cybrosys.com/blog/how-to-create-erd-entity-relationship-diagram) by Cybrosys technologies
 * [How to Document a Database With SchemaSpy](https://levelup.gitconnected.com/database-documentation-with-schemaspy-e9071eecd45a) by Data 4 Everyone!
+* [How to use SchemaSpy to document research datasets](https://teamdynamix.umich.edu/TDClient/210/DepressionCenter/KB/ArticleDet?ID=11889) by @gabrielmongefranco
 * [How to use SchemaSpy to document your database](https://medium.com/@gustavo.ponce.ch/how-to-use-schemaspy-to-document-your-database-4046fdecfe83) by Gustavo Ponce
 * [How to visualize a PostgreSQL schema as SVG with SchemaSpy](https://dev.to/mostalive/how-to-visualize-a-postgresql-schema-as-svg-with-schemaspy-516g) by Willem van den Ende
 * [Installing SchemaSpy to document you database](http://www.goring.org/resources/schemaspy_tutorial.html) by @SimonGoring
@@ -198,25 +204,6 @@ We are proud to note that SchemaSpy assists researchers in their work.
 * [Using a combination of measurement tools to extract metrics from open source projects](http://hdl.handle.net/1885/51159) by Normi S Awang Abu Bakar and Clive Boughton
 * [Using Tableau Dashboards as Visualization Tool for MIMIC-III Data](https://dx.doi.org/10.3205/21gmds044) by Karl Gottfried et al.
 * [Zebrafish information network, the knowledgebase for Danio rerio research](https://doi.org/10.1093/genetics/iyac016) by Yvonne M Bradford et al.
-
-To cite SchemaSpy, please use:
-
-```
-SchemaSpy Team (2024) SchemaSpy: Database documentation built easy. SchemaSpy. URL https://schemaspy.org/
-```
-
-The BibTeX entry for LaTeX users is:
-
-```
-@Manual{schemaspy,
-  title = {SchemaSpy: Database documentation built easy},
-  author = {{SchemaSpy Team}},
-  organization = {SchemaSpy},
-  year = {2024},
-  url = {https://schemaspy.org/}
-}
-```
-
 
 # Build Instructions
 ## Application

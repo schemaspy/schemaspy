@@ -65,9 +65,9 @@ Commonly used parameters
     Supports a directory as argument, which will add directory and all content to classpath, will recurse.
     Supports multiple paths separated by OS dependent path separator
 [-hq] or [-lq]
-    Generate higher or lower-quality diagrams. Various installations of Graphviz (depending on OS and/or version) will default to generat /ing 
+    Generate higher or lower-quality diagrams. Various installations of Graphviz (depending on OS and/or version) will default to generating
     either higher or lower quality images. That is, some might not have the "lower quality" libraries and others might not have the "higher quality" libraries.
-    Higher quality output takes longer to generate and results in significantly larger image files (which take longer to download / display),
+    Higher quality output takes longer to generate and results in significantly larger image files (which take longer to download/display),
     but the resultant Entity Relationship diagrams generally look better.
 [-imageformat outputImageFormat]
     The format of the image that gets generated. Supported formats are svg and png. Defaults to png. 
