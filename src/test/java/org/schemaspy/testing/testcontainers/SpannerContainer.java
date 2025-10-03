@@ -18,11 +18,14 @@
  */
 package org.schemaspy.testing.testcontainers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
+import java.lang.invoke.MethodHandles;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -36,6 +39,7 @@ import java.util.Properties;
  */
 public class SpannerContainer extends JdbcDatabaseContainer<SpannerContainer> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String DRIVER_CLASS_NAME = "com.google.cloud.spanner.jdbc.JdbcDriver";
     private static final int SPANNER_PORT = 9010; // Default port for Spanner emulator gRPC
     private static final int SPANNER_HTTP_PORT = 9020; // HTTP port for REST API
@@ -85,10 +89,12 @@ public class SpannerContainer extends JdbcDatabaseContainer<SpannerContainer> {
         if (emulator != null && emulator.isRunning()) {
             String host = emulator.getHost();
             Integer port = emulator.getMappedPort(SPANNER_PORT);
-            // JDBC URL format for emulator with autoConfigEmulator=true
+            // JDBC URL format for emulator with dynamic host/port
+            // The autoConfigEmulator=true tells the driver to use the host/port from the URL
+            // We must include the actual host:port in the URL for the emulator to work
             return String.format(
-                    "jdbc:cloudspanner:/projects/%s/instances/%s/databases/%s?autoConfigEmulator=true;emulatorHost=%s:%d",
-                    projectId, instanceId, databaseId, host, port
+                    "jdbc:cloudspanner://%s:%d/projects/%s/instances/%s/databases/%s?autoConfigEmulator=true;lenient=true",
+                    host, port, projectId, instanceId, databaseId
             );
         }
         return "";
@@ -126,6 +132,13 @@ public class SpannerContainer extends JdbcDatabaseContainer<SpannerContainer> {
     public void start() {
         if (emulator != null) {
             emulator.start();
+            // Set the SPANNER_EMULATOR_HOST system property immediately after starting
+            // This is required for the JDBC driver to find the emulator
+            if (emulator.isRunning()) {
+                String emulatorHost = emulator.getHost() + ":" + emulator.getMappedPort(SPANNER_PORT);
+                System.setProperty("SPANNER_EMULATOR_HOST", emulatorHost);
+                LOGGER.info("Set SPANNER_EMULATOR_HOST to: {}", emulatorHost);
+            }
         }
     }
 
@@ -208,11 +221,14 @@ public class SpannerContainer extends JdbcDatabaseContainer<SpannerContainer> {
         Properties info = new Properties();
         info.put("user", getUsername());
         info.put("password", getPassword());
-        // For Spanner emulator, authentication is handled via the JDBC URL
+        // The Spanner JDBC driver reads SPANNER_EMULATOR_HOST from System properties
+        // which is set in the start() method
         String url = getJdbcUrl();
         if (queryString != null && !queryString.isEmpty()) {
             url += queryString;
         }
+        LOGGER.info("Connecting to Spanner emulator with URL: {}", url);
+        LOGGER.info("SPANNER_EMULATOR_HOST system property: {}", System.getProperty("SPANNER_EMULATOR_HOST"));
         return DriverManager.getConnection(url, info);
     }
 
