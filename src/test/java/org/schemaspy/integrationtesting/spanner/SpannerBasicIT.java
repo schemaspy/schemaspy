@@ -60,16 +60,17 @@ class SpannerBasicIT {
 
     @BeforeAll
     static void createDatabaseRepresentation() throws SQLException, IOException {
+        // Tables are automatically initialized by SQLScriptsRunner during suite setup
+        // Note: SPANNER_EMULATOR_HOST is set automatically by SpannerContainer.start()
         String[] args = {
-                "-t", "spanner",
+                "-t", "spanner-emulator",
                 "-db", "test-database",
                 "-s", "", // Spanner uses empty or database name as schema
-                "-cat", "test-project",
-                "-host", container.getHost(),
-                "-port", container.getPort(9010), // Spanner emulator gRPC port
+                "-port", container.getPort(9010),
                 "-o", outputPath.toString(),
-                "-u", "test",
-                "-connprops", "instance\\;test-instance;autoConfigEmulator\\;true"
+                "-u", "test", // Required by SchemaSpy but not used by Spanner emulator
+                "-project", "test-project",
+                "-instance", "test-instance"
         };
         database = database(args);
     }
