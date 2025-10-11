@@ -148,6 +148,10 @@ public class SuiteContainerExtension implements BeforeAllCallback, ExecutionCond
         return container.getPassword();
     }
 
+    public JdbcDatabaseContainer<?> getContainer() {
+        return container;
+    }
+
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext extensionContext) {
         return extensionContext.getRoot().getStore(NAMESPACE).getOrComputeIfAbsent("dockerIsPresent", (v) -> isDockerAvailable() , ConditionEvaluationResult.class);
     }
