@@ -20,7 +20,7 @@ package org.schemaspy.input.dbms.config;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.schemaspy.input.dbms.exceptions.ResourceNotFoundException;
+import org.schemaspy.util.ResourceNotFoundException;
 import org.schemaspy.model.InvalidConfigurationException;
 
 import java.net.URL;
