@@ -19,7 +19,7 @@
  */
 package org.schemaspy.input.dbms.config;
 
-import org.schemaspy.input.dbms.exceptions.ResourceNotFoundException;
+import org.schemaspy.util.ResourceNotFoundException;
 import org.schemaspy.input.dbms.exceptions.RuntimeIOException;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.slf4j.Logger;

@@ -18,6 +18,7 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
+import org.schemaspy.util.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

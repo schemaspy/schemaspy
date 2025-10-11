@@ -22,6 +22,7 @@
  */
 package org.schemaspy.output.dot.schemaspy;
 
+import org.schemaspy.util.ResourceNotFoundException;
 import org.schemaspy.model.InvalidConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
