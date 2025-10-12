@@ -1,4 +1,4 @@
-package org.schemaspy.input.dbms.exceptions;
+package org.schemaspy.util;
 
 import org.junit.jupiter.api.Test;
 
