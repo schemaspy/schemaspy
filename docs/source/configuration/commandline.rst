@@ -101,7 +101,7 @@ Html report related
     Path to custom mustache template/css directory, needs to contain full set of templates.
     Bundled templates can be found in jar '/layout' and can be extracted with jar tool or any zip capable tool.
 [-maxdet number]
-    Limit for when tables should be shown with details.
+    Threshold for details in diagrams, increase if you still want details, checked against sum of tables and views.
 [-css fileName]
     Use a custom stylesheet. Bundled stylesheet can be extracted from jar(using zip capable tool), path '/layout/schemaSpy.css'
 [-desc description]
