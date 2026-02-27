@@ -6,14 +6,17 @@ import java.util.jar.JarFile;
 
 public final class JarFileRootPath {
 
-    private final JarFile jar;
+    private String name;
 
     public JarFileRootPath(JarFile jar) {
-        this.jar = jar;
+        this(jar.getName());
+    }
+
+    public JarFileRootPath(String name) {
+        this.name = name;
     }
 
     public Path toPath() {
-        String name = jar.getName();
         int separator = name.indexOf("!/");
         if (separator > 0) {
             name = name.substring(0, separator);
