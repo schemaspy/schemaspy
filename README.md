@@ -128,6 +128,7 @@ For perpetuating SchemaSpy ever since:
 * [Jesper Olsson](https://github.com/jesperolsson-se)
 
 For creating tutorials and guides for the community:
+* :brazil: [Documentando seu banco postgres com schemaspy](https://thiagomont-portifolio.gitlab.io/portifolio/post/0013-documentando-seu-banco-postgres-com-schemaspy/) by Thiago Amaral Monteiro
 * :cn: [SQLite 可视化SQLite数据库Schemaspy](https://geek-docs.com/sqlite/sqlite-questions/370_sqlite_visualize_sqlite_database_schemaspy.html) by Geek Tutorial
 * :czech_republic: [Automatické vytvoření dokumentace k databázi s využitím nástroje SchemaSpy ](https://www.root.cz/clanky/automaticke-vytvoreni-dokumentace-k-databazi-s-vyuzitim-nastroje-schemaspy/) by Pavel Tišnovský
 * :de: [Datenbank-Analyse mit SchemaSpy](https://www.jentsch.io/datenbank-analyse-mit-schemaspy/) by Michael Jentsch
