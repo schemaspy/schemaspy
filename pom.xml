@@ -81,12 +81,12 @@
             <dependency>
                 <groupId>com.vladsch.flexmark</groupId>
                 <artifactId>flexmark</artifactId>
-                <version>0.34.32</version>
+                <version>0.64.6</version>
             </dependency>
             <dependency>
                 <groupId>com.vladsch.flexmark</groupId>
                 <artifactId>flexmark-profile-pegdown</artifactId>
-                <version>0.34.32</version>
+                <version>0.64.6</version>
             </dependency>
             <dependency>
                 <groupId>org.asciidoctor</groupId>

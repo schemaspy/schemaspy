@@ -21,9 +21,9 @@ package org.schemaspy.util.markup;
 
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.profiles.pegdown.Extensions;
-import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter;
-import com.vladsch.flexmark.util.options.DataHolder;
+import com.vladsch.flexmark.profile.pegdown.Extensions;
+import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
+import com.vladsch.flexmark.util.data.DataHolder;
 
 /**
  * Created by rkasa on 2016-04-11.
@@ -33,6 +33,22 @@ import com.vladsch.flexmark.util.options.DataHolder;
  * @author Samuel Dussault
  */
 public class Markdown implements Markup {
+    private static class FlexmarkOptionsHolder {
+        static final DataHolder options = computeOptionsValue();
+
+        private static DataHolder computeOptionsValue() {
+            String dataHolderClassName = System.getProperty("schemaspy.flexmark.options.class");
+            if (null == dataHolderClassName) {
+                return PegdownOptionsAdapter.flexmarkOptions(true,
+                           Extensions.ALL ^ Extensions.HARDWRAPS);
+            }
+            try {
+                return (DataHolder) Class.forName(dataHolderClassName).getDeclaredMethod("getOptions").invoke(null);
+            } catch (ReflectiveOperationException | SecurityException  exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+    }
 
     public static final String LINK_FORMAT = "[%1$s](%2$s)";
     private final Parser parser;
@@ -44,9 +60,7 @@ public class Markdown implements Markup {
     ) {
         this(
             origin,
-            PegdownOptionsAdapter.flexmarkOptions(true,
-                    Extensions.ALL ^ Extensions.HARDWRAPS
-            )
+            FlexmarkOptionsHolder.options
         );
     }
 
