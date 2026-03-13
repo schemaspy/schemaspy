@@ -7,3 +7,5 @@ Databases
 *********
 
 .. include:: mssql.rst.inc
+.. include:: bigquery.rst.inc
+
