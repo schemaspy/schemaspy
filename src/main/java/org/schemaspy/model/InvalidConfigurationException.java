@@ -61,23 +61,6 @@ public class InvalidConfigurationException extends RuntimeException {
         this.paramValue = paramValue;
     }
 
-    /**
-     * When there are no details other than the root cause
-     *
-     * @param cause
-     */
-    public InvalidConfigurationException(Throwable cause) {
-        super(cause);
-        paramName = null;
-        paramValue = null;
-    }
-
-    public InvalidConfigurationException(Throwable cause, String paramName, String paramValue) {
-        super(cause);
-        this.paramName = paramName;
-        this.paramValue = paramValue;
-    }
-
     public String getParamName() {
         return paramName;
     }

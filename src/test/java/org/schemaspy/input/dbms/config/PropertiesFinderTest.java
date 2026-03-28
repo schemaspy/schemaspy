@@ -21,7 +21,7 @@ package org.schemaspy.input.dbms.config;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.schemaspy.input.dbms.exceptions.ResourceNotFoundException;
+import org.schemaspy.util.ResourceNotFoundException;
 
 import java.net.URISyntaxException;
 import java.net.URL;

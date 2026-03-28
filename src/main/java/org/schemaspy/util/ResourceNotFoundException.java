@@ -16,12 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with SchemaSpy. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.schemaspy.output.dot.schemaspy;
+package org.schemaspy.util;
 
 /**
  * @author Nils Petzaell
  */
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {
+        super(message);
     }
 }
