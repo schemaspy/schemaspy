@@ -15,7 +15,7 @@
         <argLine>-Dfile.encoding=UTF-8</argLine>
         <sonar.junit.reportPaths>target/surefire-reports,target/failsafe-reports</sonar.junit.reportPaths>
 
-        <spring-boot.version>3.1.2</spring-boot.version>
+        <spring-boot.version>3.5.16</spring-boot.version>
         <slf4j.version>2.0.17</slf4j.version>
         <testcontainers-java.version>1.19.3</testcontainers-java.version>
 
