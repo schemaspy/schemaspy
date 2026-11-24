@@ -25,6 +25,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterDescription;
 import com.beust.jcommander.ParameterException;
 import org.schemaspy.input.dbms.DatabaseTypes;
+import org.schemaspy.input.dbms.config.PropertiesFinder;
 import org.schemaspy.input.dbms.config.PropertiesResolver;
 import org.schemaspy.input.dbms.config.SimplePropertiesResolver;
 import org.schemaspy.util.DbSpecificConfig;
@@ -168,7 +169,7 @@ public class CommandLineArgumentParser {
         LOGGER.info("Built-in database types and their required connection parameters:");
         TreeMap<String, List<DbSpecificConfig>> builtIns = new TreeMap<>();
         for (String type : new DatabaseTypes().getBuiltInDatabaseTypes()) {
-            Properties props = propertiesResolver.getDbProperties(type);
+            Properties props = propertiesResolver.getDbProperties(PropertiesFinder.DB_TYPES_LOCATION + type);
             String dbms = props.getProperty("dbms");
             builtIns.putIfAbsent(dbms, new ArrayList<>());
             builtIns.get(dbms).add(new DbSpecificConfig(type, props));

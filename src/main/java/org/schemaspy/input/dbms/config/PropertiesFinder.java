@@ -41,7 +41,7 @@ public class PropertiesFinder implements ResourceFinder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final String DB_TYPES_LOCATION = "org/schemaspy/types/";
+    public static final String DB_TYPES_LOCATION = "org/schemaspy/types/";
 
     public URL find(final String dbType) {
         String dbTypeToFind = addExtensionIfMissing(dbType);
